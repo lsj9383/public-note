@@ -1,0 +1,49 @@
+一、面向过程部分和c的差异
+1.添加头文件: #import <Foundataion/Foundation.h>
+2.NS类：是NextSTEP语言原生类，NextSTEP是oc的前身，由于历史原因，oc中的类仍然沿用NS作为类名前缀。
+3.打印:
+	1).方法:NSLog(<NSString Object Pointer>);	NSLog是oc中类似于printf的类，NS类只能打印NSString对象指针的数据。
+	2).<char *> to <NSStriong Object Pointer> : @"<string content>";  @转字符串只能用在后面是""时。 @以为着引号类的字符串视作NSString对象。
+	3).格式化输出:NSLog(<NSString>, <object1>, <object2>, ...);
+		格式化符号和c里面一样，只是多了%@。
+		%@是用于打印oc中对象的，%@会在底层调用该对象的description方法，该方法应该返回一个NSString对象指针。
+4.BOOL:
+	布尔类，oc对其的实现，就是一个类型转换。它本质上是unsigned char数据。
+	YES: 即为1
+	NO : 即为0
+
+二、OOP特性
+1.对象的声明与实现
+
+	@interface CLASS
+	{
+	<field1>
+	<field2>
+	...
+	}
+	- (<ReturnType>) Method : (<Type>)<VarName>
+	...
+	@end
+
+	@
+2.对象的使用
+	1).实例化: [CLASS new];
+	2).方法调用:[CLASS Method];
+	3).传入参数:[CLASS Method:param ...];
+	4).若要使用对象中的变量，需要引出getter和setter的方法，以读取或者写入。
+3.继承
+主要是在类声明的时候使用如下格式
+	@interface CLASS : ParentClass
+	...
+	需要注意的是，oc只能由一个父类。oc程序，若没有需要继承的对象，则需要强制性将其继承于NSObject类，这个类提供了很多基本的能力，类似于java和c#中的object类。
+
+	在对继承类的实例调用一个方法的时候：
+	先看该类是否有该方法，若有该方法，则调用。若不存在该方法，则到父类中取寻找，若所有的祖先都没有该方法，则报错。这样就实现了最简单的多态机制。
+
+override:
+	当欲重写一个父类方法的时候，只在子类中写一个和父类该方法【同名同输入参数类型】的方法即可。这样就不会去父类中寻找该方法了。
+	不会发生名字掩盖，也就是说若子类中的方法，若方法名和父类相同，但是输入参数类型不同，则不会对父类的相应方法override，并且也同样可以正常调用在父类中的该方法。
+	若在该override方法中，想调用父类的方法，只需要用super关键词即可，super代表的是该对象的父类结构。
+	调用方式即[super method];
+
+4.复合
