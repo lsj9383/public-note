@@ -13,7 +13,16 @@
 	1).以/开始，加webappName名称
 	2).以/开始，不加webbappName名称
 	欢迎界面比较特殊，不加/
-	
+
+另：配置文件
+	CATALINA_HOME/conf/server.xml
+	Connector标签中的属性->
+		1).port			端口号
+		2).maxThread	最多支持的线程数, 默认200
+		3).URIEncoding	请求行使用的编码方式
+
+
+
 一、系统架构分类
 C/S : Client / Server
 B/S : Browser / Server. B/S是特殊的C/S，是C被限制为浏览器的C/S。
@@ -201,3 +210,151 @@ GET和POST的区别:
 		POST请求响应后的结果不会被缓存。下次访问，会重新加载。
 		POST常用在向服务器发送，或者修改东西。也因此，最好重新加载。
 		post时，cache-control通常为no-cache或者是max-age=0，其实都是指的不用缓存。
+		
+十二、request以及模板设计方法
+前端发送的请求方式，应该和后台需要的请求方式一致。若前端发送的请求不一致，服务器应该提示错误信息。
+在javaweb后台中，可以通过request变量，获得请求方式，再进行具体的判断。
+获得请求方式:
+	HTTP的请求协议，全部信息被自动封装到javax.servlet.http.HttpServletRequest对象中。
+	HttpServletRequest 是 ServletRequest 的子类。
+	
+	HttpServletRequest request = (HttpServletRequest)req;
+	request.getMethod(); 获得请求方法，是字符串形式的。
+	
+模板方法：
+	由于每个service，都要重新写一次请求方法的判断，非常麻烦，只需要在父类中进行解耦就行了。
+	在父类的service中
+		String method = request.getMethod();
+		if("POST".equals(method)){
+			PostService(request, response);
+		}else if("GET".equals(method)){
+			GetService(request, response);
+		}
+		else{
+			
+		}
+	在子类中重写PostService 和 GetService即可。对于子类没有重写的方法， 在父类中的默认处理是报错。这样子类只需要重写需要的方法即可。
+	
+十三、HttpServletRequest:
+	是一个接口，servlet规范重要接口之一。
+	封装了http请求协议的全部内容：
+		-请求方式
+		-uri
+		-协议版本号
+		-表单提交的数据
+	一次请求，就有一个request对象。因此其生命周期是短暂的。
+	数据的保存方式:
+		Map<String, String[]>, 大多数情况下的Value都只有一个元素。当key重复一样的时候，其实就是将重复的key对应的value保存到String[]中。
+	常用方法：
+		1).获取表单数据
+			String getParameter(String name), 通过key获取value一位数组的首元素
+			Map getParameterMap(),	获取整个Map
+			Enumeration getParameterNames(),	获取Map的所有key
+			String[] getParameterValues(String name),	通过获得value这一数组, 适合取复选框的数据，因为复选框的数据的key全都一样的。
+		2).request短暂保存数据的，可以在跨servlet调用时使用
+			Object getAttribute(String name);
+			void setAttribue(String name);
+			void removeAttribute(String name);
+	
+		
+		3).其他
+			String getContentPath();	获得根路径地址（就是webapp在webapps中的路径）
+			String getRemoteAddr();		获取客户端ip
+			String getMethod();			获取请求方法			
+			String getRequestURI();		uri
+			String getRequestURL();		url
+			String getServletPath();	url-pattern
+			void setCharacterEncoding();
+		
+		4).cookie seesion
+			Cookie[] getCookies();		//cookie内容
+			HttpSession getSession();	//session内容
+	ServletContext和ServletRequest范围：
+		ServletContext 应用范围，可以跨用户传递数据
+		ServletRequest 请求范围，只能在同一个请求中传递数据。
+		
+	跳转：
+		执行完AServlet之后，跳转到BServlet，将一次请求，执行两个servlet。
+		必须使用转发技术。
+		第一步, 获取请求转发器对象：dispatcher = request.getRequestDispatcher("");
+		第二部，调用请求转发器的forward方法: dispatcher.forward(request);
+
+十四、乱码解决
+乱码位置：
+	- 数据保存过程中的乱码
+		最终保存到数据库表中的时候，数据出现乱码
+		导致数据保存过程中的乱码包括以下两个情况：
+			1).在保存之前，数据本身就是乱码。
+			2).保存前，数据不是乱码，但是由于数据库不支持简体中文，保存之后出现乱码。
+	- 数据展示过程中的乱码
+		最终显示到网页数据出现中文乱码。
+		解决:
+			1).设置响应的内容类型，以及对应的字符编码方式：
+				response.setContentType("text/html;charset=UTF-8");
+			2).ide的字符编码方式，和浏览器的解码方式不同，造成显示乱码。
+				可以改ide的编码方式，但是不是很好。
+				可以在<head></head>中使用<meta charset="UTF-8">，用以表示当前网页采用UTF-8。
+				或是使用<meta content="text/html;charset=UTF-8">
+	- 数据传递过程中的乱码
+		数据从浏览器发送给服务器的时候，服务器接收到的是乱码。
+		不管是哪个国家的语言，在浏览器发送给服务器的时候，都会用ISO-8859-1的方式发送，改变吗兼容asiic，因此对英文和数字是不会乱码的。
+		发送给web服务器后，web服务器不知道这些数据是什么类型的文字。所以web服务器接收到的中文数据，将会乱码。
+		浏览器二进制码-->ISO编码---->发送---->服务器接收
+		解决数据传递过程中的乱码：
+			1).万能方式，post和get的乱码，都能解决。
+				先将服务器中接收到的数据，采用ISO-8859-1的方式解码，回归原始状态。
+				在给定一种支持简体中文的编码方式重新编码组装。这时候重新编码的方式，需要和浏览器的编码方式相同。
+				String dname = request.getParameter("dname");
+				byte[] bytes = dname.getBytes("ISO-8859-1");	//回到二进制码
+				String nname = new String(bytes, "UTF-8");		//编码，这里的编码方式，需要和浏览器的编码方式一致。
+			2).支持post请求，因为这种方式只对请求体编码。
+				request.setCharacterEncoding("UTF-8");
+				String dname = request.getParameter("dname");
+
+十五、线程安全问题
+Servlet是单实例多线程环境下运行的。
+线程安全问题：
+	多线程并发。
+	有共享的数据。
+	共享数据有修改操作。
+线程安全不止是在jvm中，也可能在数据库中。例如多个线程共享一张表。
+1.解决数据库线程安全的两种方案：
+	1).在java程序中使用synchronized关键字，线程排队执行，自然不会在数据库中并发
+	2).行级锁
+	3).事务隔离级别，如串行化
+	4).乐观锁
+2.解决servlet中线程安全的问题
+	1).尽量使用局部变量。
+	2).若必须使用使用实例变量，那么刻意考虑将该对象变成多例对象。（一个线程用一个对象）
+	3).若必须使用单例，那就只能用synchronized线程同步机制，线程一旦排队执行，则吞吐量降低，降低用户体验。
+
+十六、转发与重定向
+跳转用两种方式：
+	1).转发	forward
+	2).重定向 
+		重定向，浏览器其实会发送多次请求。
+		当后台执行重定向时，会向浏览器发送新的请求连接，然后浏览器会发送请求到新连接。
+		对于浏览器接收到的第一次回应，是一个重定向回应，状态码是302，即重定向。
+相同点与不同点：
+	相同点：都可以完成资源跳转。
+	不同点：
+		转发是request对象触发的。重定向是response对象触发的。
+		转发是一次请求，浏览器地址不会变化。重定向是多次请求，浏览器地址栏上是会变化的。
+		转发不用加webapp，转发只能在项目内部完成资源调整。重定向的路径需要加webapp根路径，可以完成跨app跳转资源。
+
+跳转的下一个资源可以是什么
+	可以是web服务器中的任何资源。
+	
+什么时候使用转发，什么时候使用重定向(大部分情况使用重定向)
+	- 完成跨app调整，必须使用重定向。
+	- 若在上一个资源中向reqeust范围中存储了数据，希望在下一个资源中从request范围中将数据取出，必须使用转发。
+	- 重定向可以解决浏览器的刷新问题。
+		刷新问题，是由于向某个地址发送数据后，反复刷新页面，会数次发送数据。
+		但若用重定向则不会，因为最终页面并不是表单提交页面。浏览器中间的地址发送过程，不会在地址栏中保存，因此提交请求的地址，根本就不会保存下来。
+重定向原理
+	response.sendRedirect("/jd/login");
+	程序执行到以上代码，将请求路径反馈给浏览器，浏览器自动又向web服务器发送了一次全新的请求:/jd/login
+	浏览器地址栏上最终显示的地址是/jd/login
+	
+十八、cookie
+cookie可以保存以前会话的状态，cookie数据是保存到硬盘上的。（一次会话是指的浏览器打开到关闭的所有操作）
