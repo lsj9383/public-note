@@ -1,0 +1,147 @@
+一、简介与原理
+	vsftpd(Very Secure FTP Daemon)
+	1.功能
+		1).不同等级的用户身份,user, guest, anonymous。
+		2).系统/var/log/可以找到各项登录信息。
+		3).chroot功能，用于许仙志用户的活动范围。
+	2.FTP运转流程与使用的端口
+		FTP采用了双端口，将命令和数据分开。服务器的21端口用于接收指令，20端口用于传输数据。
+		1).主动式联机
+			a).客户端随机选取一个大于1024以上的端口，来与FTP的port21达成联机(三项交握)。
+			b).通知FTP服务器端使用active(主动)且告知连接的端口号。
+			c).FTP服务器主动向客户联机。
+		当牵涉到数据流是，才打开20端口。而21端口是一直打开的。
+		NAT后端的FTP客户端是无法连接到FTP服务器的。因为FTP服务器会要和
+		2).被动式联机
+			a).同主动式
+			b).客户端发送PASV的联机要求，等待服务器回应。（就是给服务器说我想跟你来一手，看你有空没得）
+			c).FTP启动数据端口并通知客户端联机。其中通知了客户短，服务器端将会使用port PASV进行数据传输。
+			d).客户端随机取用大于1024的端口来和服务器端的port PASV进行连接。
+			
+二、FTP服务器
+	vsftpd，针对程序的权限和chroot来设计。
+	1.软件结构
+		1). /etc/vsfptd/vsftpd.conf, 主要的ftp配置文件。
+		2). /etc/pam.d/vsftpd, 使用PAM模块时的相关配置文件，主要用来作为身份认证用，以及一些用户的身份抵挡功能。
+		3). /etc/vsftpd/ftpusers, 指定不能登录FTP的账号。系统账号是默认没有办法使用vsftpd的，因为在这个文件里面默认限制了。
+		4). /etc/vsftpd/user_list, 由vsftpd.conf中的userlist_enable和userlist_deny参数来使能，是vsftpd自定义的抵挡项目，功能和ftpusers功能一样。
+		5). /etc/vsftpd/chroot_list, 由vsftpd.conf中的chroot_list_enable和chroot_list_file, 设定不受chroot影响的用户
+		6). /usr/sbin/vsftpd, vsftpd的开启文件。
+		7). /var/ftp/, 匿名者默认的登入根目录。
+	2.vsftpd.conf设定
+	  2.1 与服务器环境相关
+		1).connect_from_port_20=YES(NO)
+			这个是ftp数据传输所用端口号
+		2).listen_port=21
+			这个是命令通道所用端口。可以更改。
+		3).dirmessage_enable=YES(NO)
+			当用户进入某个目录，会显示该目录需要注意的内容，显示的档案默认是.message.
+		4).message_file=.message
+			当dirmessage_enable=YES时，可用该项来让vsftpd寻找显示讯息的文件。
+		5).listen=YES(NO)
+			若为yes，则是以stand alone(被动式联机)来启动的，默认是no，需要改为yes 
+		6).pasv_enable=YES(NO)
+			被动联机使能，一定要设置为yes 
+		7).use_localtime=YES(NO)
+			是否使用本地之间。
+		8).write_enable=YES(NO)
+			允许用户上传数据时，要开启。
+		9).connect_time=60
+			当主动式联机超时时间设定。单位秒。
+		10).accept_timeout=60
+			当被动式连接时，如果服务器的passive port等待客户端的连接请求时间超过60秒，则强制断线。
+		11).data_connection_timeout=300
+			已经建立了数据连接，但是线路问题，300s内若无法顺利完成数据传送，则连接强制断开。
+		12).idle_session-timeout=300
+			使用者若在300s内没有命令，则强制脱机。
+		13).max_client=0
+			最多有多少client可以连上ftp，限制ftp的用量。
+		14).max_per_ip=0
+			同一个ip同一时间运行多少联机。
+		15).pasv_min_port=0, pasv_max_port=0
+			服务器端被动式连接时，数据传输时服务器端使用的端口号范围，都为零，则随机取用，不限制。
+		16).ftpd_banner=一些文字说明
+			ftp客户端进入到vsftpd时，会在ftp客户端软件上头显示文字说明。这个说明文字比较短。
+		17).banner_file=/path/file
+			以某个纯文本作为客户端登陆服务器时的显示字符串。
+	  2.2 与实体用户较相关的设定值
+		1). guest_enable=YES(NO)
+			若设定为yes，则所有实体账户，都会被假设为guest。
+		2). guest_username=ftp
+			指定访客身份。
+		3). local_enable=YES(NO)
+			为YES时，在/etc/passwd内的账号才能以实体用户的方式登入vsftpd服务器。
+		4). local_max_rate=0
+			实体用户传输速率限制，0为不限制。
+		5). chroot_local_user=YES(NO)
+			YES代表用户默认被chroot, 若是NO，则没有开启chroot。
+		6). chroot_list_enable=YES(NO)
+			是否启用chroot写入列表的功能。
+		7). chroot_list_file=/etc/vsftpd.chroot_list
+		8). userlist_enable=YES(NO)
+			是否借助于vsftpd来地址不受欢迎的账号。
+		9). userlist_deny=YES(NO)
+			等于YES后，则在某档案中的所有账户都无法使用vsftpd。
+		10).userlist_file=/etc/vsftpd/user_list
+			若userlist_deny=YES,则指定文件夹中的账号都无法使用vsftpd。
+	  2.3 匿名者登入的设定值
+		1). anonymous_enable=YES(NO)
+			设定为允许anonymous登入vsftpd主机，预设是YES。后面的设定均是由该设定而生效。
+		2). anon_world_Readable_only=YES(NO)
+			近运行anonymous具有可读档案的权限，预设为yes。
+		3). anon_other_write_enable=YES(NO)
+			是否运行anonymous具有除了写入之外的其他权限。
+		4). anon_mkdir_write_enable=YES(NO)
+		5). deny_email_enable=YES(NO)
+		6). banned_email_file=/etc/vsftpd/banned_emails
+		7). no_anon_password=YES(NO)
+		8). anon_max_rate=0
+			等于0为不限制anonymous的数据传输速度.
+		9). anon_umask=077
+			限制anonymous上传档案的权限，如果是077则anonymous传输过来的档案权限是-rw------
+	  2.4 关系系统安全方面的设定
+		1). ascii_download_enable=YES(NO)
+			若为YES,则client优先以ascii格式下载文件。
+		2). ascii_upload_enable=YES(NO)
+			类似上一个，这里是上传。
+		3). one_process_model=YES(NO)
+			为YES时，表示每个建立的联机都会拥有一支process在负责，会增加vsftpd的效能。一般建议为NO。
+		4). tcp_wrappers=YES(NO)
+		5). xferlog_enable=YES(NO)
+			当设定为yes，使用者上传与下载文件都会被记录起来。
+		6). xferlog_file=/var/log/xferlog
+			登录档的档名。
+		7). xferlog_std_format=YES(NO)
+		8). dual_loogenable=YES, vsftpd_log_file=/var/log/vsftpd.log
+		9). nopriv_user=nobody
+		10). pam_service_name=vsftpd
+			pam模块的名称，就是/etc/pam.d/vsftpd
+	3.vsftpd默认值的情况
+		1).可以使用匿名账号和实体账号登入。(但其实权限比较大的实体账户，都被禁止了，比如root)
+		2).匿名者家在/var/ftp/,无上传权限，且被chroot了。
+		3).实体用户家目录在/etc/passwd, 没有被chroot。
+		4).在/etc/vsftpd/ftpusers内存在的账号无法使用vsftpd。
+		5).主动联机的端口为port20
+	4.总结
+		通常使用ftp，
+		1).要求每个实体用户只能访问自己的家目录， 并要求匿名用户统一访问/
+		   也就是说要使能chroot功能:
+			chroot_local_user=YES
+			chroot_list_enable=YES
+			chroot_list_file=/etc/vsftpd/chroot_list	#在这里面的账户将不受chroot的限制
+		2).对于特殊的不能使用ftp功能的实体用户
+			/etc/vsftpd/ftpusers
+			/etc/vsftpd/user_list
+			只要在上述两个文件中，选择其中一个添加用户，就限制了其ftp访问。
+		3).欢迎界面
+			banner_file=/etc/vsftpd/welcome.txt
+		4).setenforce 0, 关闭SELinux
+		
+	5.客户端常用指令;
+		help 显示所有指令
+		help command 提供需要指令的帮助
+		lcd path, 指定path为工作目录(本机的上传下载均基于该目录)
+		get filename, 下载文件
+		put filename, 上传文件
+		delete filename, 删除文件
+		passive, 启动或关闭passive模式

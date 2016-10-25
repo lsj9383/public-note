@@ -1,0 +1,7 @@
+代理服务器配置
+零、配置文件
+	/etc/suqid/suqid.conf	主要配置文件，所有squid所需要的设定都是防止在这个文档中的
+	/etc/suqid/mine.conf 	设定suqid所支持的internet上面的文件格式。
+	/usr/sbin/squid			提供suqid的主程序
+	/var/spool/suqid		默认的suqid快取防止的目录
+	/usr/lib64/squid/		提供squid额外的控制模块，尤其是影响认证密码方面的程序，都是放在这个目录下的

@@ -1,0 +1,103 @@
+#ifndef MYVIEW_H
+#define MYVIEW_H
+
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsProxyWidget>
+
+#include <QDebug>
+#include <QPushButton>
+#include <QPropertyAnimation>
+#include <QParallelAnimationGroup>
+
+#include "myitem.h"
+#include <math.h>
+
+#define pi 3.141592653
+#define blockN 11
+
+class myView : public QGraphicsView
+{
+    Q_OBJECT
+    /* SLOT */
+private slots:
+
+    void animateFinish(void){
+        qDebug()<<"finished!"<<endl;
+    }
+
+    void showRot(void){
+        for(unsigned i=0; i<blockN; i++){
+            animation[i]->setPropertyName("rotation");
+            animation[i]->setDuration(2000);
+            animation[i]->setStartValue(0);    //从当前位置开始
+            animation[i]->setEndValue(360);    //旋转到360
+        }
+        grp->start();
+    }
+
+    void showSin(void){
+        for(unsigned i=0; i<blockN; i++){
+            animation[i]->setPropertyName("pos");
+            animation[i]->setDuration(2000);
+            animation[i]->setStartValue(item[i]->pos());
+            animation[i]->setEndValue(QPoint(50+200/blockN*i, 150+100*sin(2*pi*i/blockN)));
+        }
+        grp->start();
+    }
+
+    /* construct and destory */
+public:
+    myView(QWidget *parent=0):QGraphicsView(parent),
+        scene(new QGraphicsScene), btnRot(new QPushButton("rot")),btnSin(new QPushButton("sin")),
+        grp(new QParallelAnimationGroup){
+
+        //view初始化设置
+        scene->setSceneRect(0, 0, 400, 350);
+        QGraphicsProxyWidget *graBtnRot = scene->addWidget(btnRot);
+        QGraphicsProxyWidget *graBtnSin = scene->addWidget(btnSin);
+        for(int i=0; i<blockN; i++)
+        {
+            item[i] = new myItem(QColor(qrand()%256, qrand()%256, qrand()%256));
+            scene->addItem(item[i]);
+
+            double theta = 2*pi/blockN*i;
+            item[i]->setPos(150+cos(theta)*100, 150+sin(theta)*100);
+        }
+
+        //item初始化设置
+        graBtnRot->moveBy(300, 150);
+        graBtnSin->moveBy(300, 50);
+  //      btnRot->installEventFilter(this);
+        connect(btnRot, SIGNAL(clicked()), this, SLOT(showRot()));
+        connect(btnSin, SIGNAL(clicked()), this, SLOT(showSin()));
+        //view初始化设置
+        this->setScene(scene);
+        this->setBackgroundBrush(QColor(0, 0, 0, 100));
+
+        //animate初始化设置
+        for(int i=0; i<blockN; i++)
+        {
+            animation[i] = new QPropertyAnimation;
+            animation[i]->setTargetObject(item[i]);
+            grp->addAnimation(animation[i]);
+        }
+        connect(grp, SIGNAL(finished()), this, SLOT(animateFinish()));
+    }
+    /* member fun */
+
+    /* member var */
+private:
+    QGraphicsScene *scene;
+    QPushButton *btnRot, *btnSin;
+    myItem *(item[blockN]);
+    QPropertyAnimation *animation[blockN];
+    QParallelAnimationGroup *grp;
+
+    /* event filter*/
+    bool eventFilter(QObject *obj, QEvent *event){
+       return false;
+    }
+};
+
+#endif // MYVIEW_H

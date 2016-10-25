@@ -1,0 +1,30 @@
+一、基本信息
+	根目录是/var/www/html中
+	apach的配置文件在:/etc/httpd/
+	除了这个还有很多小文件，其实这些都是分布式的配置文件，httpd.conf才是最核心的, httpd.conf会从这些分布式配置文件中读取配置
+	
+二、连接apach
+	开机自动启动:chkconfig httpd on
+	启动apach	:service httpd start
+	重启apach	:service httpd restart
+	检查apach	:netstat -tnpl(检查80端口是否打开，是否有httpd的应用)
+	若需要外部计算机访问，需要禁用防火墙.(Linux下的apach的配置文件默认运行了外部计算机访问)
+	
+三、配置文件
+	
+	虚拟主机:
+	虚拟主机就是将我一个主机中建立多个子级网站。所有的子域名都是指向我个人主机，但是根据子域名的不同，返回不同的站点。
+	而每个站点是完全独立的，就像是独立的主机的一样，这就是虚拟主机。
+	1).虚拟主机要先让域名全部指向1台主机(IP).
+	2).修改/etc/httpd/httpd.conf中的关于虚拟主机的配置(或者是修改/etc/httpd/conf.d/vhost.conf中的配置)
+		NameVirtualHost IP地址:端口号
+		<VirutalHost IP:端口>
+			DocumentRoot 网站index.php所在目录
+			ServerName 域名
+		</VirtualHost>
+		
+		<VirutalHost IP:端口>
+			...
+		</VirtualHost>
+	3)配置完成后，重启apache
+	

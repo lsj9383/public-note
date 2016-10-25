@@ -1,0 +1,10 @@
+ECS_SERVER, IP:115.28.75.203
+			user	:root
+			password:Lsj930426
+		
+VPS		,	IP:209.141.35.237
+			user	:root
+			password:lsj930426
+https://manage.buyvm.net/
+Username: lsj9383@163.com
+Password: 50a48e9b16260eb0

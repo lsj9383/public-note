@@ -1,0 +1,53 @@
+服务器测试系统搭建过程：
+一、LAMP
+	1.关闭SELinux
+		vi /etc/selinux/config
+		#SELINUX=enforcing #注释掉
+		#SELINUXTYPE=targeted #注释掉
+		SELINUX=disabled #增加
+		:wq #保存，关闭
+		shutdown -r now #重启系统
+	2.安装apach
+		yum -y install httpd #根据提示，输入Y安装即可成功安装 
+		service httpd start #启动Apache
+		chkconfig httpd on #设为开机启动
+		/etc/init.d/httpd restart #重启Apache
+	3.安装php
+		yum -y install php
+		下面是php服务器的相关组件
+		yum install php-mysql php-gd libjpeg* php-imap php-ldap php-odbc php-pear php-xml php-xmlrpc php-mbstring php-mcrypt php-bcmath php-mhash libmcrypt
+		service mysqld restart #重启MySql
+		service httpd restart #重启Apche
+	4.安装MySQL
+		yum -y install mysql mysql-server
+		/etc/init.d/mysqld start #启动MySQL
+		chkconfig mysqld on #设为开机启动
+		cp /usr/share/mysql/my-medium.cnf /etc/my.cnf #拷贝配置文件（注意：如果/etc目录下面默认有一个my.cnf，直接覆盖即可）
+二、phpmyadmin
+	将下载好的phpmyadmin.tar.gz解压到/var/www/html中
+	然后将权限升满 chmod -R 777 phpmyadmin.
+	cp config.sample.inc.php config.inc.php(将phpmyadmin中的sample配置文件设为正儿八经的)
+	
+三、gcc/g++编译环境
+	1.将codeblocks软件包和wxGTK软件包搞到。
+	2.安装gcc g++ gtk2
+		yum install gcc
+		yum install gcc-c++
+		yum install gtk2-devel
+	3.安装wxGTK
+		tar -xzvf  wxGTK-2.8.12.tar.gz
+		cd wxGTK-2.8.12
+		./configure --prefix=/usr --enable-xrc --enable-monolithic --enable-unicode
+		make
+		make install
+	4.安装CodeBlocks
+		tar -xzvf codeblocks_13.12-1.tar.gz
+		cd codeblocks_13.12-1
+		export ACLOCAL_FLAGS="-I `wx-config --prefix`/share/aclocal"
+		yum -y install libtool
+		./bootstrap
+		./configure --with-contrib-plugins=all     
+			在这里可能会报错，configure: error: Package requirements (hunspell) were not met:这种错误，
+			需要用命令yum install hunspell-devel，类似的还有gamin和boost，分别运行上面命令如果出现了说缺少再安装
+		make
+		make install
