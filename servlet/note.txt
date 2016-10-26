@@ -1,14 +1,35 @@
 零、路径写法
-1.超链接
-	<a href="/webappName/doSome"></a>
-2.form表单的action
-	<form action="/webappName/doSome"></form>
-3.web.xml的url-pattern
-	<url-pattern>/doSome</url-pattern>
-4.application.getRealPath
-	String realPath = application.getRealPath("/doSome");
-5.Welcome-file-list
-	
+	1.要用项目名
+		1).超链接
+			<a href="/webappName/doSome"></a>
+		2).form表单的action
+			<form action="/webappName/doSome"></form>
+		3).重定向
+			response.sendRedirect("/webappName/doSome");
+		4).cookie设置path
+			cookie.setPath("/webappName/doSome");
+			
+	2.不用项目名
+		1).转发
+			request.getRequestDispatcher("/doSome").forward(request, response);
+		2).web.xml的url-pattern
+			<url-pattern>/doSome</url-pattern>
+		3).application.getRealPath
+			String realPath = application.getRealPath("/doSome");
+		4).Welcome-file-list
+			<welcome-file>xxx.html</welcome-file>
+
+	3.url-pattern
+		1).精确匹配
+			可以多个url-pattern对应同一个servlet
+			<url-pattern>/doSome1</url-pattern>
+			<url-pattern>/doSome2</url-pattern>
+		2).扩展匹配
+			<url-pattern>/doSome/*</url-pattern>
+		3).后缀匹配
+			<url-pattern>*.do</url-pattern>
+		4).全部匹配
+			<url-pattern>/*</url-pattern>
 也就三类:
 	1).以/开始，加webappName名称
 	2).以/开始，不加webbappName名称
@@ -357,4 +378,37 @@ Servlet是单实例多线程环境下运行的。
 	浏览器地址栏上最终显示的地址是/jd/login
 	
 十八、cookie
-cookie可以保存以前会话的状态，cookie数据是保存到硬盘上的。（一次会话是指的浏览器打开到关闭的所有操作）
+由http协议规定的，cookie可以保存会话的状态。（一次会话是指的浏览器打开到关闭的所有操作）
+cookie数据可以保存
+	1).浏览器缓存中，浏览器关闭cookie消失。
+	2).客户端的硬盘中，浏览器关闭cookie还在。
+java中cookie当做类处理，使用new来创建cookie。cookie由两部分组成，key和value
+
+1.servlet发送cookie：
+	1).默认情况下，服务器发送的cookie，浏览器将cookie保存到浏览器缓存中，浏览器一关闭，缓存中的cookie被清除。
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		response.addCookie(cookie);	
+	2).通过设置cookie的有效时常(>0)，以保证cookie保存到硬盘文件中。
+		cookie1.setMaxAge(expire);
+		expire > 0 存储到硬盘上。
+		expire = 0 cookie直接删除。
+		expire < 0 无操作，不存储。
+2.浏览器发送cookie：
+	不同的请求路径，会发送不同的cookie。
+	默认情况下，/prj/test/cookie创建了cookie，以后浏览器向/prj/test/...都会带cookie。
+		/prj/test 		不带cookie
+		/prj/test/ 		要带cookie
+		/prj/test/...	要带cookie
+	可以通过java设置cookie的关联路径。关联后和原默认路径就无任何关系了。
+		cookie1.setPath(request.getContextPath() + "/king");
+
+3.servlet接收cookie
+	Cookie[] cookies = request.getCookies();	若浏览器没有cookie发送，则返回null
+	for(Cookie cookie : cookies){
+		String name = cookie.getName();
+		String value = cookie.getValue();
+	}
+4.浏览器接收cookie可以禁用
+	即 服务器仍然会发送cookie，但是本地不会对cookie作保存。
+
+十九、Session
