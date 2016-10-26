@@ -412,3 +412,35 @@ java中cookie当做类处理，使用new来创建cookie。cookie由两部分组成，key和value
 	即 服务器仍然会发送cookie，但是本地不会对cookie作保存。
 
 十九、Session
+	Session将会话状态保存到服务器端。Session对象是一个会话级别的对象，一次会话对应一个HttpSession。
+	会话 是指 用户打开浏览器 直到关闭，这期间就是会话时间。可以看出，一次会话包括了多次请求。
+	在会话进行过程中，web服务器一直为当前这个用户维护着一个会话对象/HttpSession。
+	在web容器中，web容器维护了大量的HttpSession对象。
+	
+	1.session原理：
+		- 浏览器发送请求
+		- 服务器会创建HttpSession对象，检查浏览器的是否有JESSIONID的cookie对象存在。
+		- 若没有该cookie，产生HttpSession对象，以及一个对应name是JSESSIONID，value是128bit字符串的cookie对象。
+		- 服务器将Cookie的Value和HttpSession对象，绑定到session对象中。
+		- 服务器将cookie完整发送给浏览器客户端。
+		- 浏览器将cookie保存到缓存中，浏览器不关闭，cookie不会消失。
+		- 当浏览器再次发送请求时候，会发送cookie。
+		- 服务器在创建HttpSession对象时，若发现客户端有JESSIONID的cookie对象，则将对应的Value从Session列表中找到相应的session对象。
+	=> 禁用cookie后，服务器拿不到jsessionid，因此禁用cookie，每次都是新的HttpSession对象。
+	
+	浏览器关闭后，服务器不会销毁session对象。而是在session超时的时候销毁。
+	也就是，当很长一段时间（可以配置）没有用户在访问该session对象，次数session对象超时，web服务器自动回收session对象。
+	在web.xml中，可以配置该项目的session的超时时间。
+	<session-config>
+		<session-timeout>分钟</session-timeout> <!-- 默认是30分钟 -->
+	</session-config>
+	
+	2.HttpSession常用方法
+		HttpSession = getSession(boolean create);
+			create == true , 若没有session对象(该对象过期，或是jsessionid不存在)，则新建session对象
+			create == false, 若没有session对象，则返回null
+			默认create=true
+		void setAttribue(String name, Object value);	向会话范围存入时间
+		Object getAttribute(String name);				
+		void remote Attribyte(String name);
+		void invalidate();
