@@ -1,0 +1,71 @@
+一、简介
+	NIS(Network Information Service)网络信息服务，用于某linux系统在有使用者登入时，会去nis服务器找寻找账号和密码来与之对应。
+	NIS服务器所提供数据需要用到传输与读写比较快的数据库文件系统，而不是文本数据。
+	NIS和NFS的远程协议相同，都是基于RPC的。
+	为了避免NIS服务器压力过大，挂掉而造成的无法提供NIS的局面，通常使用master/slave的架构。有几台slave可以取得master的database，并提供nis client查询。
+	运作流程：
+		1).NIS Server(master/slave)的运作流程
+			a).NIS Master先将本身的账号密码相关档案制作成数据库档案。
+			b).NIS Master可以告知NIS Slave来获取数据库。
+			c).NIS Slave可以主动前往master获取数据库。
+			d).若有账号密码异动时，需要重新制作database并重新同步master/slave。
+		2)NIS Client的登入
+			a).NIS Client若有登入需求时，先查询本机的/etc/passwd, /etc/shadow等档案（/etc/passwd是账号对应的uid，/etc/shadow是uid对应的密码）
+			b).在本机找不到相关账号数据，就像NIS网域的主机广播查询。
+			c),每部NIS Server都可以享用，基本上市先响应者优先。
+
+二、NIS Server
+	1.所需软件
+		yp-tools，	提供NIS相关的查询指令功能, CentOS一般自带了
+		ypbind，	提供NIS Client端的设定软件,CentOS一般自带了
+		ypserv，	提供NIS Server端的设定软件,一般没得
+		rpcbind，	rpc所需要的
+	2.相关配置文件
+		1)配置文件
+			/etc/ypserv.conf, 最主要的配置文件，规范nis客户端是否可登入的权限。
+			/etc/hosts, NIS Server/client会用到网络主机名与ip的对应，因此每一步主机名与ip都需要记录。
+			/etc/sysconfig/network, 这个文件指定NIS的网域。
+			/var/yp/Makefile, 将账号数据转换为数据库有关的动作配置文件。
+		2)NIS服务器提供的主要服务
+			/usr/sbin/ypserv, 就是nis服务器的主要提供服务。
+			/usr/sbin/rpc.yppasswdd, 提供额外的NIS Client的用户密码修改服务。有这个服务，NIS客户端可以直接修改NIS服务器伤的密码。使用yppasswd指令。
+		3)账号密码的数据库有关文件
+			/usr/lib64/yp/ypinit, 建立数据库的指令.
+			/usr/bin/passwd,与NIS Client有关，让用户修改服务器上的密码。
+	3.NIS Server的设定与启动
+		1).先设定NIS的域名
+			NIS会分域名来分辨不同的账号密码数据的，因此必须在服务器端与客户端都指定相同的NIS域名.
+			vim /etc/sysconfig/network
+			-->NISDOMIAN=lsj			#设定NIS域名
+			-->YPSERV_ARGS="-p1011"		#NIS每次都启动在固定的端口
+		2).主要配置文件/etc/ypserv.conf
+			dns:no, 因为一般都是局域网内使用，不用dns，有/etc/hosts就够了。
+			files:30, 预设30个数据库被读入内存中，够用了。
+			xfr_check_port:yes, 与master/slave有关。
+			*:*:*none, 对任何主机，任何域名，任何数据库，
+		3).设定主机名与ip相对应
+		4).启动相关服务
+			service ypserv start
+			service yppasswdd start
+			chkconfig ypserv on
+			chkconfig yppasswdd on
+		5).检查
+			rpcinfo -p localhost，可以看到本机的rpc服务
+			若重启rpc，rpc里面是没有空间的
+		6).设定nis账户，并创建数据库
+			添加账户 useradd -u uid 用户名.
+			设定密码 passwd --stdin 用户名.(随后系统会提示输入密码)
+			初始化数据库 /usr/lib64/yp/ypinit -m (32bit的centOS，用../lib/..)
+		
+		因此，简单说来，服务器短的设计就是，根据服务器的passwd和shadow来创建数据库。
+											打开端口1011供nis使用。
+											打开端口1012供yppasswdd使用。
+											nis运行任何主机，任何域名，任何数据库的接入，只通过iptables来限制接入。
+三、NIS Client
+	1.配置
+		通过setup就可以配置。当配置完成，会自动启动ypbind, 和服务器绑在一起。
+	2.测试客户端
+		1).yptest, 会出现多个测试结果。包括NIS域名称，服务器域名，数据库中用户等等。
+		2).ypcat passwd.byname 只显示数据库中的账户对。
+	3.在客户端修改密码
+		yppasswd,	只能修改当登录用户的密码，不能修改别的用户的密码。(除非root)

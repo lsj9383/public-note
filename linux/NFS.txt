@@ -1,0 +1,82 @@
+一、简介
+	NFS(Network File System)网络文件系统.
+	可以透过网络，让不同的机器，不同的操作系统，彼此分享个别的文件。
+	可以讲远程的NFS服务器分享的目录，挂载到本地端的机器中。那个目录就好像自己的磁盘分区一样。
+	客户端的挂载点可以自定义。
+	NFS服务的端口开在2049
+	需要注意的是NFS只适合局域网内使用，在不同的网域中使用，防火墙较麻烦。(简单点，防火墙关掉就是，但是这样真的好么？)
+	1.RPC
+		NFS的端口非常多，每个小端口都用于一些时间传输。但是客户端并不能直接得知这些小端口。
+		这时，就要使用RPC服务(远程过程调用).服务器在启动随机端口时，会向RPC注册。因此RPC知道每个端口对应的NFS功能。
+		RPC使用固定的port 111来监听客户端。
+		因此，在启动nfs前，rpc需要先启动，以响应来自nfs的端口注册。
+		注意，rpc重启后，原本注册的数据会不见，因此rpc重启后，它管理的所有服务都需要重启。(这样才能重新向rpc注册)
+		nfs必须要使rpc，因此nfs是rpc server的一种。
+	2.client和server的简单流流程
+		1).client向server的rpc发出nfs文件存取功能的询问要求
+		2).nfs找到对应的已经注册的nfs端口，返回给客户端
+		3).客户端了解正确的端口后，就和nfs来搞。
+	3.nfs启动的rpc
+		1) rpc.nfsd
+			主要功能是管理客户端是否能够使用服务器挂载信息等，保护登入者id的判断。
+		2) rpc.mountd
+			主要功能就是管理nfs文件系统。客户端顺利通过rpc.nfsd登入服务器后，还会经过文件权限的认证程序。
+			他会读取nfs的配置文件/etc/exports来比对客户端的权限。
+		3) rpc.lockd
+			为了避免多个客户同时写入某个文件而造成的问题。
+		4) rpc.statd
+			用来检查文件的一致性。
+二、NFS server
+	1.软件
+		1) rpcbind
+		2) nfs-utils
+	2.NFS软件结构
+		1) /etc/exports
+			主要配置文件，一般就配置这个就够了。
+		2) /usr/sbin/exportfs
+			nfs文件系统维护指令。
+		3) /var/lib/nfs/*tab
+			分析资源的登录档
+		4) /usr/sbin/showmount
+			客户端的。
+	3. 配置文件/etc/exports
+		[分享目录] [第一步主机ip(权限)] [可用主机名] [可用通配符]
+		权限参数不止1个时，用","来分隔
+		1)配置权限:
+			rw/ro, 可擦写或是制度。
+		2)sync/async
+			sync会让数据同步写入到内存和硬盘中，async会把数据暂时放入内存，而非直接写入硬盘
+		3)no_root_squash/root_squash
+			前者若登录nfs文件系统的账号为root时，则压缩为匿名者。
+			后者则保持root。
+		4)all_squash
+			不论登入nfs的使用者身份为何，都会被压缩为匿名用户。
+		5)anonuid/anonfid
+			设置匿名的uid和gid。
+	4.权限问题
+		通常，	首先，根据exports来初步判断权限。
+				随后，确定使用者nfs server中的身份。主要根据uid来判断。在nfs client中uid是多少，那么在nfs server中uid就是多少。
+					  若nfs server中没有uid对应的用户，则以匿名处理该用户。匿名用户nfsnobody的uid为65534。
+				最后，便可确定权限。
+				成为匿名就两种情况，人为压缩为匿名, client的uid在server中不存在时。
+	5,启动
+		service rpcbind start	开启rpc服务
+		service nfs start		开启nfs服务
+		service nfslock start	开启nfslock服务
+		chkconfig rpcbind on
+		chkconfig nfs on
+		chkconfig nfslock on
+	6.观察
+		showmount -e hostIp 显示某部主机/etc/exports所分享的目录数据
+		exportfs -arv, 可以重新加载exports中的数据，这样就不用重启nfs服务了，也就不用向rpc注册，提高效率。
+		顺带一提，/etc/passwd和/etc/group分别记录了uid和gid
+		
+三、nfs client
+	步骤:
+		1).确认本地启动了rpcbind nfslock服务(nfs服务没必要开)
+		2).扫描nfs服务器分享了哪些目录.(showmount -e hostIp)
+		3)在本地建立预计要挂载的挂载点目录.(mkdir)
+		4)利用mount将远程主机直接挂载到香港目录
+		
+	挂载mount -t nfs ip:path1 path2
+	取消挂载umount path2

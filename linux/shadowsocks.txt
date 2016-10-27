@@ -1,0 +1,19 @@
+shadowsocks服务器
+shadowsocks是一款轻量级socks代理软件
+
+/etc/shadowsocks.json 是ss的配置文件.
+/etc/init.d/shadowsocks restart 重启服务
+						stop	关闭服务
+						start	开启服务
+						
+209.141.35.237
+
+
+https://manage.buyvm.net/
+Username: lsj9383@163.com
+Password: 50a48e9b16260eb0
+
+原理：
+	浏览器上外网，要先发数据给ss客户端，ss客户端再发数据给指定的服务器，服务器将外网的数据沿原路返回给浏览器。
+	ss客户端，客户端在本机(127.0.0.1)，使用了代理端口(默认1080)。浏览器要使用插件(switchyomega)，连接到ss客户端，再开启数据代理服务，将上网请求发送给ss客户端。
+	ss客户端接收到数据后，和服务器指定端口通信。

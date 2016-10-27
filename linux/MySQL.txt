@@ -1,0 +1,31 @@
+零、phpMyAdmin
+	1.要访问phpMyAdmin，必须关闭selinux
+		1).getenforce, 可以查看selinux状态
+		2).setenforce 0, 将selinux临时关闭
+		3).vi /etc/sysconfig/selinux 将李某的SELINUX=disabled将永远关闭
+	2.解压后的文件改个短点的名字，如phpMyAdmin
+	3.并将该文件移动到/var/www/html/下，方便localhost或者外部访问
+
+一、基本情况
+	sql指令后面必须加 ; !!
+	mysql>status;	可以查看mysql版本
+	
+二、MySQL的连接
+	MySQL连接成功后，在MySQL中只有一个用户root，密码为空.
+	1)开启MySql服务	:service mysqld start.
+	2)重启MySql服务	:service mysqld restart.
+	3)登录MySql		:mysql -u 用户名 -p.		(用户名稍后系统会提示输入)
+	4)修改MySql的密码	:mysqladmin -u root password "newpass"
+	5)检查MySql的连接	:netstat -tnpl,	如果3306端口有监听，就说明数据库已经开启.
+	
+三、基本命令
+	显示数据库列表	:show databases;
+	选择数据库		:use 库名;
+	显示所在数据库	:select database();
+	显示库中的数据表:show tables;		(选中数据库后才能显示数据表)
+	建库			:create database 库名;
+	建表			:create table 表名 (字段列表设定...);
+	显示表中字段情况:describe 表名; 或者 show columns from 表名;
+	增加记录		:insert into 表名 (字段) values (对应数据);
+	删除数据		:delete from 表名 where 条件
+	显示表			:select * from 表名;

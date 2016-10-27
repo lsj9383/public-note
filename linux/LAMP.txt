@@ -1,0 +1,14 @@
+Linux+MySQL+PHP
+
+配置文件:
+	1)apache
+		配置文件在:/etc/httpd/
+	2)MySQL
+		2.1、数据库目录　　
+		/var/lib/mysql/ 　　
+		2.2、配置文件　　
+		/usr/share/mysql（mysql.server命令及配置文件）　　
+		2.3、相关命令　　
+		/usr/bin(mysqladmin mysqldump等命令) 　　
+		2.4、启动脚本　　
+		/etc/rc.d/init.d/（启动脚本文件mysql的目录）

@@ -1,0 +1,132 @@
+一、简介
+	防火墙就是透过订定一些有顺序的规则，并管制进入到我们网域内的主机。广义地说，只要能够分析与过滤进程我们管理网域的封包数据，就是防火墙。
+	1.分类
+		1).Netfilter(封包过滤机制)
+			就是分析进入主机的网络封包，主要是分析表头数据，如mac，ip，tcp，udp，icmp等等。
+			由iptables来制订防火墙封包过滤的指令。
+		2).TCP Wrappers(程序管控)
+			分析谁对某程序进行存取，然后透过规则去分析该服务器谁能联机，谁不能联机。也就是说分析服务器程序来管控。只与程序的名称有关。
+	2.限制
+		1).拒绝让Internet的封包进入主机的某些端口。
+		2).拒绝让某些来源的IP封包进入。
+		3).拒绝让带有某些特殊旗帜的封包进入。
+		4).分析硬件地址MAC来决定联机与否。（对付局域网内的坏蛋，因为局域网的ip可以随便换）
+
+二、TCP Wrappers
+	根据客户端想要连接的程序，分析客户端的ip，决定是否需要放行。
+	TCP Wrappers是使用/etc/hosts.allow, /etc/hosts.deny来管理的。
+	并非所有的软件都支持TCP Wrappers.只有 
+	a).有super daemon(xinetd)所管理的服务。
+		配置在/etc/xinetd.d/里面的服务就是xinetd所管理的
+	b).有支援libwrap.so模块的服务。
+	工作方式：
+		1)./etc/hosts.{allow|deny}的设定方式
+			<服务   (亦即程序名称)> : <IP 或领域 或主机名>
+		2).规则
+			a) 先以/etc/hosts.allow为优先对比，该规则符合就予以放行。
+			b) 再以/etc/hosts.deny对比，规则符合就抵挡。
+			c) 若不在这连个档案类，就放行。
+			本质上就是将hosts.deny中的拦住，除了hosts.allow中的。
+三、Netfilter
+	Linux的核心板2.4和2.6，使用iptables来制定防火墙。iptables的更改，立即生效，并不需要重启什么设置。
+	当一个网络封包进入主机前，会经由Netfilter来进行检查，那就是iptables规则。检查通过则接受，否则丢弃。
+	规则是由顺序的，如果符合Rule1, 就进行Action1, 不会理会后面的规则。
+				Rule 1---yes--->Action1
+				  |
+				  |No
+				 \|/
+				Rule 2---yes--->Action2
+				  |
+				  |No
+				 \|/
+				Rule 9---yes--->Action9
+				  |
+				  |No
+				 \|/
+			预设封包动作
+	1.iptables的表格与链
+		至少有3个表格，链就是每个表格中的某种功能。每个链里面可以指定N个规则。
+		1).filter(过滤器):主要跟进入linux本机的封包有关。
+			INPUT:主要与想进入我们Linux本机的封包有关.
+			OUTPUT:主要与我们linux要送出的封包有关。
+			FORWARD：可以传递封包到后端的计算机，与nat table相关性较高。
+		2).nat(地址转换)：主要进行来源于目的ip或port的转换。
+			PEROUTING:在进行路由判断之前所要进行的规则.
+			POSTROUTING:在进行路由判断之后所要进行的规则。
+			OUTPUT:与发出去的封包有关。
+		3).mangle(破坏者)
+	2.规则的观察与清除
+		1).观察
+			a).iptables [-t tables] -L -n
+			若没有指定tables，默认打开filter的规则
+			-L 列出目前的规则
+			-n 不进行ip与hostname反查
+			
+			target:action, 只有accept reject drop三种操作
+			prot:代表封包协议，有tcp udp icmp
+			opt:额外的选项说明
+			source:来源ip
+			destination:目标ip
+			
+			b).iptables-save
+			这个要看的清楚点。
+			-p 封包协议
+			-i 封包所进入的那个网络接口
+			-o 封包所传出的那个网络接口
+			-s 来源IP/网域
+			-d 目标IP网域
+			-j 进行的操作
+		2).清除
+			iptables -F 清除所有制定的规则
+					 -X 杀掉所有使用者自定义的talbes
+					 -Z 将所有的chain的计数与流量统计归零
+			一般在重新定义防火墙前，都要讲所有规则清除。
+	3.定义预设政策
+		预设政策就是IP封包都不满足规则是，以Policy设定为准
+		iptables [-t tables] -P [INPUT OUTUT FORWARD] [ACCEPT DROP]
+		没有指定-t 则默认为filter
+		如 iptables -P INPUT DROP
+	4.封包设定
+		iptables [-AI chain] [-io 网络接口] [-p 协议] [-s 来源IP/网域] [-d 目标IP/网域] -j [ACTION]
+		-A 新增一条规则
+		-I 将新增的规则设为第一条规则
+		-i 封包所进入的网络接口
+		-o 封包所传出的网络接口
+		-p 指定分包的协定 有tcp udp icmp all
+		-s 来源ip/网域
+		-d 目标IP/网域
+		-j 动作
+		在设定是，没有指定的参数，默认代表任意均满足。
+		1).针对接口(信任装置)
+			iptables -A INPUT -i lo -j ACCEPT， 指封包只要来自lo均接受
+		2).针对网域
+			iptables -A INPUT -i eth0 -s 192.168.100.0/24 -j ACCEPT,	来自设备eth0，网域为192.168.100.0/24网域的封包，都接受
+		3).针对ip
+			iptables -A INPUT -i eth0 -s 192.168.100.10 -j ACCEPT,		来自设备eth0，ip网为192.168.100.10的封包，都接受
+		4).针对端口
+			iptables [-AI chain] [-io 网络接口] [-p 协议] [-s 来源][--sport 端口范围] [-d 目标][--dport 端口范围] -j[action]
+			-sport 端口范围，限制来源的端口号码，端口好嘛可以使连续的，如1024:65535
+			-dport 端口范围，限制目标的端口号码
+			注意，要指定tcp udp才能成功哦。
+		5).针对特殊标识
+	5.防火墙设计
+		1).规则归零
+			iptables -F
+			iptables -X
+			iptables -Z
+			(/etc/init.d/iptables stop 也有同样清除规则的效果)
+		2).预定政策
+			iptables -P INPUT ACCEPT
+			iptables -P OUTPUT ACCEPT
+			iptables -P FORWARD ACCEPT
+		3).用户自定义规则
+			iptables -A INPUT -i lo -j ACCEPT
+			iptables -A INPUT -i eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+			iptables -A InPUT -i eth0 -s xxx.xxx.xxx.xxx -j ACCEPT
+		4).保存
+			/etc/init.d/iptables save
+			(若不保存则会丢失)
+		注意，setup设置的开启和关闭防火漆，开启的时候开启的是有软件配置好的，需要进入防火墙软件区设定.
+四、NAT服务器
+	SNAT主要应对内部LAN连接到Internet
+	DNAT主要应对外部Internet访问内部LAN服务器

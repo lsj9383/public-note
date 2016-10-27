@@ -1,0 +1,55 @@
+Linux系统真正认识的可运行程序是二进制位程序
+
+一.运行
+	file 文件路径 可以查看文件的信息, 若是可以运行的文件，会显示executable等信息
+	x写c/c++代码，再经过gcc编译，就可以得到有executable的binary program了。
+	
+二.编译
+	make可以将编译过程简化，make回在当时的目录下搜寻makefile, 而makefile里面则记录了.c/.cpp进行如何编译的详细信息。make会自动判别代码是否经过改编，而自动编译。
+	因为gcc只能一个文件一个文件地编译，每次都这么来就很麻烦，所以要写makefile，指定好编译的文件。
+	若是cpp程序用gcc编译，则要加-lstdc++.如 gcc -o main.out main.c -lstdc++
+三.开始
+	1.单文件程序，无include, 无其他.c
+		1).直接编译gcc xxx.c
+			生成a.out, 执行./a.out 即可执行程序
+	2.多文件程序, 无include
+		1).编译生成目标文件
+			gcc -c xxx1.c xxx2.c,	将xxx1.c和xxx2.c同时生成.o文件
+			-Wall 可以输出编译信息
+		2).编译生成可执行文件
+			gcc -o exeName xxx1.o xxx2.o
+		很明显，之所以要先弄目标文件(.o)是为了方便多个文件进行link
+		也可以直接来一发 gcc -Wall -o exeName xxx1.c xxx2.c
+	3.多文件程序，含include
+		1).自定义头文件
+			在编译的时候，会默认搜寻主程序所在文件夹的路径中的.h文件，再搜寻环境变量中指定的路径的.h文件，若没有则报错。
+			若要在指定的文件中搜索，用-I dir, 就可以搜索指定目录中的.h头文件。
+			如 gcc -o exeName 1.c 2.c -I ./inc/2.h
+		2).静态链接库
+			静态链接库的函数都不是在.c中的，而是在.a文件中。静态链接库的头文件还是xxx.h。
+			静态链接库必须要指定.a文件，使用-lname(name就是.a文件的文件名，可以不写后缀)
+			还必须指定静态链接库的头文件所在 -L dir, dir应是动态链接库所在头文件。
+		3).动态链接库
+			动态链接库的函数在.so文件中。
+四.makefile
+	若工程中有非常多的模块化文件，每次编译都要重新输入庞大的字符串，那么就太枯燥，因此GNU开发了make指令，根据当前文件夹中的makefile进行编译。
+	并且它只会编译改变后的文件，未改变的文件make是不会编译的。
+	1).规则
+		目标: 和目标相关的文件
+			<tab>命令
+		注意，-c生成.o文件时，必须把对应的头文件包含进去.
+	2).使用
+		在bash中输入 make 目标， 就回执行对应目标的相关命令
+	3).例
+		INC = -I ./inc
+		main.out:main.o add.o sub.o
+			gcc -o main.out main.o add.o sub.o $(INC) -lm
+		main.o:main.c ./inc/add.h ./inc/sub
+			gcc -c main.c $(INC)
+		add.o:./src/add.c ./inc/add.h
+			gcc -c add.c $(INC)
+		sub.o:./src/add.c ./inc/sub.h
+			gcc -c sub.c $(INC)
+		clean:
+			rm -rf *.o
+	

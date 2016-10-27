@@ -1,0 +1,63 @@
+一、简介
+	网络参数:IP,netmask,network,broadcast,gateaway, DNS IP
+	通常，配置好这些参数，通过NAT服务起器，内网就可以连接上Internet。
+	当主机数非常多时，配置起来就很麻烦，这时就可以用DHCP服务器，进行网络参数的自动分配。
+	需要注意的是，dhcp协议是基于udp协议上的。
+	1.DHCP协议运作
+		1).客户端，利用广播封包发送搜索DHCP服务器的封包。
+			此封包的IP会是255.255.255.255，一般主机收到时直接丢弃，只有DHCP服务器收到时，才进行后续行为。
+			因此客户端和DHCP服务器应该处于同一个网域内。
+		2).服务器端，提供客户端网络的相关参数以供选择。
+			DHCP服务器在接收到这个要求后，会针对客户端MAC进行设定工作。
+			a).服务器根据该MAC是否有曾经使用过的ip，且该ip无人使用，就提供该ip
+			b).根据配置文件对该MAC提供固定的ip。
+			c).若都不符合，则随机取用没有被使用的ip。
+		3).客户端决定选择dhcp服务器提供的网络参数，并返回服务器信息。
+			若局域网内有多部dhcp服务器，客户端只能接受一组参数，因此客户端选择后应该发送广播包告诉所有dhcp服务器自己选择的参数。没有被接受的dhcp服务器会收回ip。
+		4).dhcp服务器收到客户端的确认后，会回传确认的响应封包。
+			重要的是，会告知客户端该网络参数的生命周期，当生命到期，服务器会收回dhcp。
+		客户端脱机，当关闭网络接口，重新启动，关机，都是脱机，服务器会回收ip。
+		客户端网络参数到期，若客户端没有重新提出dhcp申请，就要收回ip。
+		DHCP 客户端使用  port 68
+		DHCP 服务器端使用port 67
+	2.dhcp分配给客户端的ip
+		1).固定ip
+			根据mac地址，在dhcp服务器端设定该mac地址对应的固定ip
+		2).动态ip
+			dhcp服务器伤的ip都是不固定的。
+		需要注意的是，ip只分public ip和private ip，其他的静态ip，实体ip，虚拟ip，浮动式ip都是根据ip取得方式分类的。
+二、DHCP服务器
+	安装dhcp软件，yum -y install dhcp
+	1.重要文档:
+		1) /etc/dhcp/dhcpd.conf, DHCP服务器的主要配置文件
+		2) /usr/sbin/dhcpd
+		3) /var/lib/dhcp/dhcpd.leases
+	2.dhcp.conf的配置
+		#为注释符号
+		除了")"结尾之外，其他每一行结尾都要用";"。
+		设定语法: <参数代码><设定内容>, 某些是 option <参数代码><设定内容>
+		1).整体设定
+			default-lease-time 时间		:租约默认时间，若使用者没有特别要求，则为此设为默认网络参数生命期，单位是秒。
+			max-lease-time 时间			:租约最大时间，若使用者要求的租约时间超过该时间，则以该时间为设定值。
+			option domain-name "领域名"	:领域名。
+			optiondomain-name-servers IP1, IP2: 这个可以修改DHCP所使用的DNS IP。
+			ddns-update-style 类型		:动态dns，好像有点复杂，可以设置为none。
+			ignore client-updates:好像也有点复杂，也先忽略嘛。
+			option routers 路由器IP		:设定路由器ip
+		2).IP设定
+			subnet NETWORK_IP netmask NETMASK_IP {...}
+			我们要给与network/netmask ip这两个参数。
+			a).动态ip设定
+				range ip1 ip2, 给与一个连续的ip群，用来发放动态ip的设定。
+			b).固定ip设定
+				host 主机名 {...}
+				hardware ethemet 硬件地址，指定mac
+				fixed-address ip地址, 给与一个固定的ip地址
+		3).启动
+			service dhcpd start.
+			注意，在centOS6.5中，需要 vi /etc/rc.d/init.d/dhcpd
+			将user=dhcpd group=dhcpd改为user=root group=root。
+			否则无法启动.
+			netstat -tlunp | grep dhcp, 注意，dhcp是采用的udp.
+三、DHCP客户端
+		
