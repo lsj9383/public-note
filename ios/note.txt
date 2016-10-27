@@ -1,0 +1,113 @@
+应用程序委托
+	每个ios都有一个UIApplication实例，负责应用程序的大循环，用来管理该app。UIApplication中有一个委托成员，这个委托成员用于在适当的时候调用某个方法：
+	这个委托成员实现了UIApplicationDelegate协议：@interface AppDelegate : UIResponder <UIApplicationDelegate>
+	委托的操作包括:
+		-(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions(:NSDictionary)launchOptions{
+			//应用程序启动后调用的代码
+		}
+		
+		-(void) applicationWillResignActive:()application{
+			//应用程序从活动状态切换到非活动状态时，触发这个方法。
+			//也就是说即将切换到后台（还没开始切换）时，会调用这个方法。可以进行暂停游戏等操作
+		}
+		
+		-(void) applicationDidEnterBackground:(UIApplication *)application{
+			//在应用程序进入后台后，调用。可以进行释放资源，保存用户数据等操作。
+		}
+		
+		-(void) applicationWillEnterForeground:(UIApplication *)application{
+			//在应用程序从后台运行状态切换到活动状态的过程中被调用。是还没有切换完成时候调用的。
+		}
+		
+		-(void)applicationDidBecomeActive:(UIApplication *)application{
+			//重新启动应用程序调用。是在切换到前台以后调用的。
+		}
+		
+		-(void) applicationWillTerminate:(UIApplication *)application{
+			//程序即将终止的时候调用
+		}
+
+Horizontal Center in Container 在父视图内居中对其
+
+四、丰富的控件
+
+控件的四种状态：
+	普通：未处于其他状态时，都是普通状态。
+	突出：正在被使用。如手指按在按钮上。
+	禁用：控件关闭。
+	选中：只有一部分控件支持选中状态。只是该控件已经启用或被选中。和突出状态有点类似，但是不直接使用时也可以说选中的。
+
+UIImageView
+	Mode属性
+		-Scale To Fill(自适应缩放)，将图标的内容缩放到与View相匹配
+	Tag属性
+		所有UIView，都有tag，用来进行唯一标识。
+	Interaction
+		用户是否能和当前对象进行交互。对于可以由用户触发的控件，可以选上。
+	Alpha
+		透明度 0.0---1.0
+	Background
+		只有当图形没有填满试图的时候，才会显示背景色。
+	Tint
+		所选试图的高光颜色
+	Drawing
+		-Opaque复选框，选上后ios知道该视图下没有其他对象。
+		-Hidden复选框，隐藏。
+		-clears Graphics Context复选框，选中后，ios在实际绘制对象之前，使用透明的黑色绘制对象覆盖的所有区域。
+		-Clip Subviews复选框，当该试图有自视图时，对子视图的绘制方式。选中，在子视图超出该视图后，不会绘制子视图。不选中，会绘制超出视图范围的子视图。
+		-Autoresize Subviews，告诉ios当前视图大小发生变化时，自动调整子视图大小。
+
+UITextField
+	Text -Plain Text 纯文本
+		 -Attribute Text 属性文本
+	Color 颜色
+	Font 字体和大小
+	Alitgnment 对齐方式
+	Placeholder 占位符，即文本还未输入时，显示在上面的灰色提示内容
+	Background 背景
+	Disabled 选中后，无法编辑文本内容
+	Clear Button 选择何时显示清除按钮。清除按钮可以清除文本框中的内容。
+	Clear when editing begins 每当重新选中文本框，开始编辑前，都会自动清空文本。
+	Adjust to Fit 可以选择显示文本岁文本框尺寸的变化而变化。
+	Capitalization 选words时，将会对单词进行首字母大写。
+	Return Key Return是键盘右下方的键，这里选择Return Key显示什么。
+	Auto-enable Return Key 文本框内容为空时，return键被禁用。知道文本框有内容时才使能。
+	Secure 指定文本框中的内容是否用密码传代替。
+	
+关闭键盘
+	1).当用户按下键盘上的Done时，会触发Did End On Exit事件。该事件会由textField对象接收。
+		-(IBAction)textFieldDoneEditing:(id)sender{
+			[sender resignFirstResponder];		//通知当前的对象注销掉第一响应者
+		}
+		编写完后，需要从storyboard中，将textField和方法进行关联。（因为这个东西才是观察者）
+	2).当用户按下非View处时，会触发视图容器的Touch Down方法。视图容器也是View的，其实没有Touch Down的方法。但是若将视图容器的实现类改成UIControl就行了。
+		然后将视图的Touch Down方法和某个方法关联到一起即可。
+		
+UISlider
+	滑动条
+	可以设置滑动条的最大值与最小值，Value Changed会触发对应事件。
+
+操作表单和警告视图
+	操作表单(action sheet)和警告视图(alert), 它们是一种类的两种表示。
+	它们都是UIAlertController控制器类控制的。
+	1).操作表单
+		a).创建控制器UIAlertController
+			UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"..." message:@"..." preferredStyle:UIAlertControllerStyleActionSheet];
+			这里的preferredStyle属性指定了当前操作是操作表单，还是警告视图。
+			message 是操作表单中显示的信息。
+			alertControllerWithTitle 是操作表单的标题。
+		b).创建动作
+			操作表单中，是个列表项，因此需要一个一个地添加这些项。一个项就是一个按钮，也对应着一个操作。
+			UIAlertrAction *action = [UIAlertAction actionWithTitle:@"///" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action){
+				//action code
+			}];
+			actionWithTitle是操作的名称，其实就是这个按钮的名字。
+			style是这个名字的显示方式
+			handler是代码块，可以是nil，代表不处理
+		c).显示
+			UIPopverPresentationController *ppc = controller.popoverPresentationController; 获得悬浮战士控制器。
+			if(ppc != nil){	//这一段不是必要的，只是将操作表单依附于某个控件上。就算不依附，操作表单也会显示，而且是从底部弹出。
+				ppc.sourceView = sender;
+				ppc.sourceRect = sender.bounds;
+			}
+			[self presentViewController:controller animated:YES completion:nil];
