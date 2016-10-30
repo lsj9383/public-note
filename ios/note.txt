@@ -132,3 +132,40 @@
 					ppc.sourceRect = sender.bounds;
 				}
 				[self presentViewController:controller animated:YES completion:nil];
+				
+四、自动布局与旋转
+
+
+五、多视图应用
+	多视图，通常是指的依附于视图控制器的UIView或其之类。一个视图控制器只有一个视图，这个视图是内容视图，是其他视图的祖先视图，也可以说是容器。
+	需要注意的是，控制器有很多种，视图控制器是其中一种，只有视图控制器才有依附的视图。导航控制器 标签控制器等，都是没有视图的，它们用于调度视图控制器。
+	每个视图控制器控制着一个内容视图，这样的一个组合在storyboard中称为场景。
+	1.根控制器
+		storyboard有着重要的角色，它包含了【所有】的视图和控制器。用户看到的第一个控制器，或者说是初始使用的控制器，就被称为根控制器。
+		在多视图中，通常用导航控制器或是标签控制器作为第一个实例，又是也可以自定义UIViewControl作为根控制器。
+		根控制器的任务是，根据用户的输入，呈现不同的视图控制器。
+		根控制器，更确切的说是视图控制器的容器。根控制器并不负责显示，而是由子视图控制器进行显示。
+		另外，若根控制器是视图控制器， 也可以作同样的功用。
+		
+	2.其他视图控制器
+		可以直接拉出新的视图控制器，并设置该视图控制器关联的类。该类需要是UIViewController的子类。
+		1).视图控制器的初始化
+			初始化是特殊的，不能直接alloc或是new，而是通过：
+			newViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"controller-id"];
+			视图控制器是属于storyboard的，因此可以通过storyboard可以初始化一个给定标识的视图控制器。视图控制器的标识在storyboard中设置。
+			为什么要用标识呢，因为一个场景的视图控制器类型可能是相同的，但是在storyboard中的view布局却不同，为了更具体的对指定场景进行初始化，因此用identifier。
+		2).视图控制器的视图外形设置
+			rootViewController.newViewController.view.frame = rootViewController.view.frame;
+		3).切换
+			if(fromVC != nil){
+				[fromVC willMoveToParentViewController:nil];	//通知视图控制器，即将不作为子视图控制器。（主要是为了通知该视图控制器将parentViewController设为nil）
+				[fromVC.view removeFromSuperview];				//移除视图控制器的视图
+				[fromVC removeFromeParentViewController];		//将视图控制器正式移除
+			}
+			
+			if(toVC != nil){
+				[self addChildViewControoler:toVC] 				//在根控制器中，添加子视图控制器。
+				[self.view insertSubView:toVC.view atIndex:0]	//将指示图控制器的视图添加到根视图控制器中。之所以放在索引为0的位置，是因为根视图控制器可能对视图有修饰的视图，为了保证修饰的视图一直存在（如工具栏等），就确保将新的视图放在索引为0的位置。
+				[toVC didMoveToParentViewController:self]		//通知新的视图控制器，它已经成为了一名子控制器。
+			}
+			

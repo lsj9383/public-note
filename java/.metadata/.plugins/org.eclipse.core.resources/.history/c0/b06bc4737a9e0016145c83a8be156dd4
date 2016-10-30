@@ -1,0 +1,15 @@
+package com.lsj.java;
+
+import java.io.*;
+import java.util.*;
+
+public class Test {
+
+	public static void main(String[] args){
+		//1.创建属性对象
+		Properties p = new Properties();		//和map一样，只不过属性对象只能存储k-v为string的kv对
+												//key若重复，则新的覆盖旧的
+		//2.创建流
+		FileInputStream fis = new FileInputStream("dbinfo");
+	}
+}

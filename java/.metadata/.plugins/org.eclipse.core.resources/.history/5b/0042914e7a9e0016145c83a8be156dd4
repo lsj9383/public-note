@@ -1,0 +1,11 @@
+package com.lsj.java;
+
+import java.util.*;
+
+public class Test {
+
+	public static void main(String[] args){
+		//1.创建属性对象
+		Properties p = new Properties();
+	}
+}

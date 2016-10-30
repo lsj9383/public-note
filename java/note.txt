@@ -1,0 +1,69 @@
+可变长参数:
+	void method(int... a){
+		...
+		//这里a接收到的是个数组
+	}
+	但若有精确匹配的方法，则会调用精确匹配的方法
+	void method(int a){
+		...
+	}
+	method(3);	//会调用定长参数的
+	【可变长参数只能放在参数列表的末尾】
+	
+属性文件:
+	.properties这样的文件可以作为属性配置文件。用.properties作为后缀。（其实随便都行，只是为了区分配置文件的文法类型与其作用，因为还有其他文法的配置文件，比如.xml .json）
+	key和value之间可以使用“空格” "冒号" "等号"。并按在最前面的作为分隔符。
+	读取属性文件的代码：
+		Properties p = new Properties();
+		p.load(new FileInputStream("<properties-file>"));	将文件流中的数据，加载到属性对象中去
+		String value = p.getProperty("<key>");		得到value
+反射:
+	0.关联类
+		java.lang.Class;
+		java.lang.reflect.Constructor;
+		java.lang.reflect.Field;
+		java.lang.reflect.Method;
+		java.lang.reflect.Modifier;
+		后四个由Class所包含。
+		
+		class User{
+			String name;
+			User(){}
+			public void ml(){}
+		}
+		Class代表整个类的结构。
+	
+	1.反射机制的作用:
+		1).反编译: .class->.java
+		2).通过反射机制访问java类的属性、方法、构造器等。
+		
+	2.获取Class的三种方式
+		1).Class c1 = Class.forName("<class-name>");	这个的运行，会将对应的class加载的jvm中，因此会执行static语句块
+		2).java每个类都有个class静态属性
+			Class c2 = <class-name>.class;				这个的执行，是不会执行静态语句块的。
+		3).java语言中任何一个java对象，都有一个getClass方法
+			Class c3 = <obj-name>.getClass();
+		Class对象是单例模式，也就是说这三种方式得到的类对象都是一样的。一个运行时类对象，只有一个。
+	
+	3.通过反射创建对象
+		在获取Class类型的对象后，可以创建Class对应的对象。
+		Object = <Class-object>.newInstance();		//调用无参构造方法，返回一个Object实例
+	
+	4.获取类中的属性、方法、构造器以及其他方法
+		0).其他
+			<Class-Object>.	getName();			//获得类的类全名
+							.getSimpleName();	//获得不包括前缀的类名
+		1).获取属性
+			Field[] fs = c.getFields();				//获取所有的public修饰的属性
+			fs = c.getDeclaredFields();				//获得所有的属性
+			fs[0] = c.getDeclaredField("<field>");	//返回特定的属性
+			
+			fs[0].getName();				//获得属性的名字
+			fs[0].getType();				//获得这个属性的Class对象
+			fs[0].getModifiers();			//获得这个属性的修饰符, .toString()显示修饰符名字
+			fs[0].get(o);					//获得对象o的fs[0]属性的值
+			fs[0].set(o, value);			//设置对象o的fs[0]属性的值
+		2).获取方法
+			省
+		3).获取构造器
+			省
