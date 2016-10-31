@@ -1,0 +1,142 @@
+HIVE
+	使用dobby数据库，会在当前文件夹下建立关于表的元数据库文件。因此dobby不是很方便。所以用公共mysql。
+	配置mysql：
+		1).安装MySql: yum -y install mysql mysql-server
+		2).启动MySql: service mysqld start
+		3).修改MySql: mysqladmin -u root password "<new password>"	初始用户是账号为root密码为空的用户。
+		4).登录MySql: mysql -uroot -p<password> 或 mysql -u root -p(密码稍后提示输入)
+		5).检查MySql: netstat -tnpl
+		
+	配置hive和mysql连接:
+		1).将 目标用户 授权为 超级用户， 可以运行所有操作 包括远程：(这个用户需要是操作hive的用户)
+			->GRANT ALL PRIVILEGES ON *.* TO 'myuser'@'<IP or HOST>' IDENTIFIED BY 'mypassword' WITH GRANT OPTION;
+			->FLUSH   PRIVILEGES; 
+			若希望myuser的方位不受ip限制，则可以设为'%'
+		2).设置配置文件:hive-site.xml:
+			i).javax.jdo.option.ConnectionURL
+				设置hive的连接数据库,通常用jdbc:mysql://host:3306/hive?createDatabaseIfNotExist=true,这是hive连接到数据库host:3306/hive
+			ii).javax.jdo.option.ConnectionDriverName
+				设置hive的数据库驱动，mysql用com.mysql.jdbc.Driver
+			iii).javax.jdo.option.ConnectionUserName
+				设置hive访问mysql的角色的用户名
+			iv).javax.jdo.option.ConnectionPassword
+				设置hive访问mysql的用户密码
+		3).hive是要连接到某个具体的database作为初始化database，这个database就保存了里面所有表的字段、文件映射信息，因此要确保mysql中有指定的hive database。
+	mysql中的hive数据库重要内容：
+		COLUMNS_V2 ： 记录了创建的所有的表的所有字段，每个字段都有个CD_ID表明该字段属于哪个表。
+		TBLS : 记录创建的所有表的相关信息
+		DBS  : 记录hive创建的database在dfs中的路径。 默认database的位置在hdfs://ns1/user/hive/warehouse。
+	
+	Hive 数据的保存：
+		每个database在hdfs都有个文件夹，每个database中的每个表，在对应的database文件夹中都有一个表的文件叫.
+		hdfs://ns1/user/hive/warehouse是默认database的文件夹，所有的其他database也保存在该文件夹下。默认database的表文件夹，也在该文件夹下。
+		表文件夹中，在创立初期，默认为空。若往表中加载数据（文件），表文件下便有该数据文件了。至于加载数据，可以使用load指令，或者直接就往对应的表文件夹中put数据文件。
+		
+	Hive的使用语法(HQL)
+		0).建库
+			CREATE DATABASE database-name;
+			在dfs中创建文件夹，并在mysql中的hive database下作记录。
+			
+		1).建表
+			CREATE <EXTERNAL> TABLE table-name(	field1 field-type1,
+												field2 field-type2,
+												...) <1> <2> <3> <4>;
+			这里<1> : 指定一行为一条记录     --- ROW FORMAT DELIMITED
+				<2> : 指定一行中各个的分隔符 --- FIELDS TERMINATED BY '\t'
+				<3> : 指定文件类型 TEXTFILE 或 SEQUENCEFILE
+				<4> : location '<data file path>'  可以再创建表的时候，将文件数据加载到表中
+				<EXTERNAL> : 声明为外部表，否则为内部表。会将表与hdfs中的数据进行自动关联，而不用将数据移动到指定的文件夹下
+				
+			在hdfs中创建文件夹，并在mysql中的hive database下做记录。
+			
+			用于创建临时表 
+			CREATE TABLE table-name
+			AS
+			SELECT ... 
+			FROM table2
+			SORTED BY ...
+			将table2中选定的字段，创建新表table-name
+			
+		2).删除表
+			drop tables table-name
+			删除内部表，会将数据文件也清除掉。
+			删除外部表，并不会将数据文件清除。
+			
+		3).表中加载数据
+			load data local inpath '<data file path>' (overwrite) into table table-name;		这个是让table将本地的文件数据进行加载，会将该数据文件上传到hdfs的文件夹中。
+			load data inpath '<data file path>' (overwrite) into table table-name;				table将hdfs的数据文件进行加载，会将该文件移动到表的文件下。
+			load data (local) inpath '<data file path>' (overwrite) into table table-name partition(part_flag = '<string>') 将添加进去的数据放在指定的分区(文件夹)下。
+			(local) 指明是本地还是远程数据
+			(overwrite) 指明覆盖表中原数据
+		4).插入数据
+			insert overwrite table table1
+			select * from table2
+			将表2中选择的数据，插入表1中
+			
+		5).分区PARTITION
+			create table tab_part()
+			partitioned by (part_flat string)	指明建表的时候，带分区
+			row format delimited fields terminated by '..'
+			
+			任何东西都可以做分区的标示
+			
+			分区是在导入数据的时候，选择该批数据的分区的。分区表里面有分区文件夹，数据放在分区文件夹下。
+			
+			对于任何统计操作，都可以指定该操作对应的分区。若没有指定分区，则对所有分区进行。
+			如 select count(*) from partitioned-table where partitioned-condition='partitioned-value';
+		6).增加分区
+			alert table table-name add partition (part_flag = '<string>') location '<path>'
+		
+		7).输出到文件
+			insert overwrite (local) directory '' select ..., 可以将select的结果，写到指定的文件中去，该文件可以是本地或者是远程的。
+			
+		8).支持map和array和struct类型的字段
+		9).hive的shell执行
+			hive -S -e 'hql command' > file
+			在执行时，常常需要指定库和表，可以用database.table的方式指定。使用默认database时，可以省略database或者是使用default.table
+			这样就能支持了脚本执行。
+		10).用户自定义函数
+			i).写一个java类，定义上述的函数逻辑，打成jar包，上传到hive的lib中。
+			ii).在hive中添加该jar包 : add jar /home/hadoop/workspace/hiveAreaUdf.jar;   
+			iii).在hive创建 : create temporary function function-name AS '<jar path>'; 是临时函数，因此在重启hive后，会失效。
+			
+	之所以hive和hdfs存在交互，是因为hive中有hdfs的位置的配置。
+
+HBASE
+	是一个分布式的数据库，是弹性的(可扩展)的大数据存储。
+	hbase是数据库，hdfs是文件系统，hive是个生成mapreduce的工具。
+	hbase是基于hdfs实现的。需要随机、实时的读写访问的数据库时，可以使用hbase。
+	hbase不支持关系型查询和处理(非关系型数据库)，只适合简单的处理。它可以支持非常非常大的表，几十亿行 x 几百万列的表。
+	hbase表结构
+		-----------------------------------------------------------------------------
+		|          |              列族1             |              列族2            |
+		-----------------------------------------------------------------------------
+		| row key1 |    key1:value1, key2:value2    |    key3:value3, key4:value4   |
+		-----------------------------------------------------------------------------
+		| row key2 |   key5: [ver-value,veer-value] |
+		-----------------------------------------------------------------------------
+		....
+		建表的时候，不指定字段。只指定若干列族。
+		插入数据，指定行键，列族里面保存具体信息，列族里面是任意多个key-value. 也就是说列族中有任意多个列。
+		更改字段值的时候，并不会覆盖旧的值，不同时候的值，用版本号区分。换句话说，key对应多个value，不同的value间，通过版本号区分(时间戳)
+		要查询某一个具体字段的值，需要制定的坐标：表名---->行健------>列族(ColumnFamily)------>列(Qualifier)------>版本号
+	hbase语法
+		1).help
+			回车若错误，会提示输入的错误，并且该如何输入。
+		2).创建表
+			create '<table-name>', {NAME => '<ColFamily-Name1>', VERSIONS => <version value1>}, {NAME => '<ColFamily-Name2>', VERSIONS => <version value2>} ...	VERSION指定了可以保存几个版本的信息
+			列族之间以逗号隔开。
+		3).表信息
+			list	查看当前有哪些表
+			describe '<table-name>'	查看表结构
+		4).删除表和禁用表
+			disable '<table-name>'	禁用表
+			drop '<table-name>'		删除表，在删除前需要禁用表
+		5).插入数据
+			put '<table-name>' '<row>' '<colFamily>:<col>' '<value>', <ts1> 一次只能put一个value，ts1是时间戳，没带会自动生成
+		6).获得数据
+			get '<table-name>' '<row>' 返回一行所有列
+			get '<table-name>' '<row>' {COLUMN => '<colFamily>:<col>'} 返回指定的行列
+			get '<table-name>' '<row>' {COLUMN => '<colFamily>:<col>', VERSIONS => <version>} 返回指定的行列的数据的指定版本数的值
+			scan '<table-name>' 查找所有行数据
+			

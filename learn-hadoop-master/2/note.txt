@@ -1,0 +1,210 @@
+NameNode，通常一个
+DataNode，很多
+Secondary NameNode
+
+            CLIENT API
+			     |
+				 |
+				 |访问
+				 |
+				\|/
+           hdfs://nn:9000/
+---------------------------------------
+         NN    DN    DN    DN
+---------------------------------------
+
+客户端访问的是namenode的hdfs，nn提供树状文件结构。
+保存文件：
+	客户端找到nn，namenode中查询元数据，nn响应客户端保存允许。若hdfs中已经有了文件，就不能存了（同名）
+	若可以存，则响应客户端哪些dn可以保存，以及如何分块存放。具体分割操作是在客户端完成的。（准确说是客户端的HADOOP API）
+	写副本的方法：
+		1).客户端一个块要写N个拷贝，才算成功。
+		2).客户端一个块只写1个拷贝，就算成功。然后在hdfs内部将其复制N-1个拷贝（即datanode向别的datanode拷贝），这些都是异步的。
+
+NN的元数据管理：
+	一个块占元数据150Byte	
+	Metadata(Name relicas blocks, blocks-hosts) 
+	如 : /test/a/log, 3, {blk_1, blk_2}, {blk_1:[h0,h1,h3], blk_2:[h0,h2,h4]}
+	
+	2.管理形式
+		以日志的形式，记录在一个专门的文件(edits log)里。
+		磁盘中的fsimage是NN内存在磁盘中的完整映射。
+		当edits log满了，就将这些新的元数据写入磁盘文件fsimage（即edits log和fsimage合并）.
+		对于edits log和fsimage合并，会在secondaryNameNode主机上作合并，这样减轻NameNode的工作量。
+	3.保存文件步骤,
+		1).client上传文件时，NN在edits log中记录元数据操作日志。
+		2).client开始上传文件，完成后返回成功信息给NN。
+		3).NN就在内存中加载这次上传操作的新产生的元数据信息。
+	4.合并步骤，
+		1).NN通知SN进行checkpoint（合并）操作
+		2).sn通知NN可以进行合并操作，因此nn不能再更新edits log。
+		3).这时候若nn接收到客户端的新请求，那么NN会在edits.new中写，作为edits log的一个缓冲。
+		4).sn下载fsimage和edits log到本地。
+		5).sn主机上进行合并得到fsimage.chkpoint文件。
+		6).上传fsimage.chkpoint文件到nn主机。
+		7).nn将edits删除，并将edits.new重命名为edits log,fsimage.chkpoint重命名为fsimage
+	5.checkpoint条件
+		1) edits log达到fs.checkpoint.size(默认64M)，chekcpoint一次.
+		2) edits log隔fs.checkpoint.period(默认3600秒)，checkpoint一次.
+		3) 这些参数在hdfs-site.xml，会生效。
+	6.nn职责
+		1) 维护元数据信息。
+		2) 维护hdfs的目录树。
+		3) 响应客户端请求。
+DN:
+	提供真实文件数据的存储服务。
+	文件块(block)，最基本存储单位。其大小dfs.block.size默认128M，在hdfs-site.xml中配置。
+	Replication, 每个块(文件)的副本数。
+
+java hdfs client programe:
+	配置jar包:
+		1.工程属性
+		2.Java Build Path
+		3.Libraries选项卡
+		4.Add Library--->User Library--->next--->User Libraries
+		5.New 创建新的library
+		6.Add External Jars给新的library添加包
+		5.$HADOOP_HOME/share/hadoop/hdfs的核心包以及lib文件夹中的所有包
+		6.$HADOOP_HOME/share/hadoop/common的核心包及lib文件夹中的所有包
+	初始化编程:
+		1.获取系统配置文件: Configuration conf = new Configuration();
+			该函数提取系统的xml中的配置。必须配置fs.defaultFS="hdfs://weekend110:9000/"。
+			否则默认的是本地文件系统，那么new Path();无法获得hdfs的路径，因为不认识该类型路径。
+		2.设置配置文件
+			文件系统设置:conf.set("fs.defaultFS", "hdfs://weekend110:9000");
+			权限设置:..., 配置的是eclipse下的局部环境变量
+			fs = FileSystem.get(new URI("hedfs://weekend110:9000/"), conf, "hadoop");
+		3.初始化文件系统:FileSystem fs = FileSystem.get(conf);
+			根据conf的配置，初始化文件系统，如果配置了hdfs，那么初始化的文件系统为hdfs文件系统。
+	获得hdfs的文件输入输出流:
+		FSDataInputStream in = fs.open(new Path("hdfs://weekend110:9000/...."));
+		FSDataOutputStream in = fs.open(new Path("hdfs://weekend110:9000/...."));
+	
+	hdfs的主要操作函数:
+		IOUtils.copy(input, output);				将输入流的数据全部复制到输出流
+		fs.copyFromLocalFile(Path src,Path dst);	将本地文件拷贝到hdfs。src是本地，dst是远程
+		fs.copyToLocalFile(Path src, Path dst);		将远程文件拷贝到本地。src是远程，dst是本地
+		fs.mkdirs(new Path("/aaa/bbb/ccc"));		创建路径文件夹
+		fs.delete(Path, true);						将指定路径下的文件夹全部删除.
+		fs.rename(old path, new path);				重命名相当于移动.
+		RemoteIterator<LocatedFileStatus> fs.listFile(Path, true);		返回远程文件迭代器,LocatedFileStatus是某个文件的具体属性
+		FileStatus[] listStatus = fs.listStatus(path);	返回远程item的状态, item可以是文件也可以是文件夹
+	注意，在写远程端路径时，由于已经在conf配置了远程端主机root地址，因此其实可以直接以"/"表示远程端根地址。
+RPC：
+	Remote Process Call，远程过程调用，就是两个进程间的调用。
+	hadoop各个节点（主机）间的通信，均采用RPC。
+	本地机远程拿到数据，也是通过rpc和nn以及dn连接。
+	hadoop将远程过程调用抽出来，以免在每个计算机上都额外写相关的调用。
+	这样，直接就在本地计算机得到了远程实例的代理。直接操作代理，代理管理和远程机的通信与过程调用。
+	底层机制：
+		1、本地计算机将要用的类、对应的方法、参数，通过socket传输到远程计算机。
+		2、远程计算机反射出对应的类的实例，调用相应方法。
+		3、将结果通过socket返回给本机计算机。
+	RPC实现机制：
+		1.明确一个真实类的接口，目标机的真实类和本地机的代理类都应该继承该接口。
+		2.编写真实类的接口实现方法。
+		3.目标机和本地机，都有socket程序。
+		4.代理类代理的是client socket, 服务器端有个工具类skt包含了service socket.
+		4.proxy.method(args)，将调用socket通过sendMsg()发送数据给目标机
+		5.目标机的skt的socket接收到数据，将反射出真实类的实际对象，然后传入参数，调用方法，然后返回数据
+		6.proxy的socket接收到数据。
+	RPC实现步骤：
+		1.生成调用端socket程序动态代理对象
+		2.通过proxy调用方法
+		3.调用socket请求方法
+		4.发送调用请求
+		5.服务器端生成动态代理对象
+		6.调用代理对象的具体方法
+		7.获取调用结果
+		8.socket返回调用结果
+		9.proxy返回结果
+	RPC使用：
+		1.RPC代理的使用应该遵循protocol(协议)，协议是指的对类的使用协议，也就是接口。
+		2.由于服务器对于同样的服务，可能有不同的版本，因此协议中应该有versionID，以指定版本号。
+		3.服务器发放类服务:
+			1).制定协议
+			2).制定真实类，描述使用细节
+			3).将builder配置好，其中包括服务的地址(本地ip)，服务所在的端口，服务所用的协议，服务的实际类。
+			4).创建服务,Server ser = builder.build();
+			5).运行服务,ser.start();当前线程阻塞。
+		4.客户端使用代理服务:
+			1).复制服务器协议
+			2).获得代理Interface proxy = (Interface)RPC.getProxy(protocol, versionID, InetSocketAdder, Configuration);
+			3).可直接使用代理了
+hdfs源码要点:
+----------------------------------------------
+|	FileSystem fs = FileSystem.get(conf);    |
+|	DFSInputStream is = fs.open(src);        |
+|	...                                      |
+----------------------------------------------
+	fs得到nn中的信息，是通过RPCProxy，实现的接口是和nn机器上的具体实现类一致。
+	这样通过RPCProxy可以得到nn的信息。例如得到得到块位置。
+	本机拿到块位置后，还会有RPXProxy，代理了和dn机器上的类，以获取这些远程dn主机的数据。
+	1.FileSyste fs = FileSystem.get(conf);
+		->return get(getDefaultUri(conf), conf);		将conf的uri拿到("hdfs://weekend110:9000")
+			->String scheme = uri.getScheme();			拿到文件系统"hdfs"
+			->String authority = uri.getAuthority();	拿到主机名和端口号"weekend110:9000"
+			->if(scheme==null && authority==null)		没有指定，返回本地主机文件系统
+			->return CACHE.get(uri, conf);
+				->Key key = new Key(uri, conf);			用户访问信息,相当于用户连接该远程机的标志。
+				->return getInternal(uri, conf, key)；
+					->FileSystem fs = null;
+					->fs = map.get(key);	根据访问标志，得到一个已经存在或null的fs，对于相同的用户对相同主机的访问，反复多次都反复的是同一的fs.相当于单利模式
+					->if(fs == null) fs = createSystem(uri, conf);
+						->class<?> clazz = getFileSystemClass(uri.getScheme(), conf);	拿到文件系统的类型，可能是dfs，ftp，ntfs，ext3等等等等
+							->clazz = null;
+							->if(clazz==null) return SERVICE_FILE_SYSTEM.get(scheme);	拿到服务器文件系统类型 
+							->return clazz;
+						->FileSystem fs = (FileSystem)ReflectionUtils.newInstance(clazz, conf);	反射出一个未初始化的实例.
+						->fs.initialize(uri, conf);
+							->setConf(conf);		将conf拷贝到fs中
+							->host = uri.getHost();	获得主机名
+							->this.dfs = new DFSClient();	分布式文件系统，里面含有rpc代理对象:ClientProtocol namenode
+								->this(namenodeUri, null, conf, stats);	换了个构造函数
+									->NameNodeProxies.ProxyAndInfo<ClientProtocol> proxyInfo = null;						保存代理对象以及其他信息的
+									->proxyInfo = NameNodeProxies.createProxy(conf, nameNodeUri, ClientProtocol.class);		创建代理对象的
+										->T proxy;
+										->proxy = (T) createNNProxyWithClientProtocol(nnAdr, conf, ugi, withRetries);		进一步创建代理类
+											->proxy = RPC.getProtoProxy(ClientNameNodeProtocolPB.class, version, address, ugi, conf);	终于拿到nn代理了
+											->return proxy;
+									->this.namenode=proxyInfo.getProxy();		拿到代理给namenode
+							->this.uri = getUri...; 			就是远程主机的根目录
+							->this.workingDir = getHomeDirectory();
+						->return fs;
+					->map.put(key, fs);						将该次访问缓存
+					->return fs;							至此，拿到了FileSystem
+		可以看到FileSystem.get(conf)，实际完成了对远程主机的连接，并且指定文件系统。
+		这些信息都在conf中指定。远程连接主要是获得远程主机namenode的实际操作类的远程代理。
+		因此fs.dfs.namenode就是namenode机的代理类。
+	2.fs.open()
+		首先和nn通信，拿到文件的block的信息，如位置连接block的datanode，顺序将blk1 blk2 ...拼接起来.
+		FSDataInputStream is = fs.open(new Path("....."));
+		->return open(f, getConf().getInt("io.file.buffer.size", 4096))；
+			->Path absF = fixRelativePart(f);		将相对路径改成绝对路径（因为有时候简写，这里把文件系统，主机名，端口号都加进去）
+			return new FileSystemLinkResolve<FSDataInputStream>(){
+				public FSDataInputStream doCall(final Path p){	获得流
+					return new HdfsDataInpuStream(dfs.open(getPathName(p)), buffersize, verifyChecksum);	也就是FSDataInputStream里面包装了个dfs流
+				}
+			}.resolve(this, absF);				返回流,实质调用的匿名对象的doCall
+		也就是实质上dfs打开的文件流,这里再看dfs的open(返回DFSInputStream)
+		return dfs.open(src, buffersize, verifyChecksum);
+			->return new DFSInputStream(this, src, buffersize, verifyChecksum);
+				->this.dfsClient = dfsClient;	流持有dfsClient，方便得到nn，和namenode通信
+				->this.src = src;				要打开的文件路径
+				->openInfo();					加载一切需要的信息，例如locatedBlocks(块位置信息), blockReader等
+					->lastBlockBeingWrittenLength=fetchLocatedBlocksAndGetLastBlockLength();	获取块位置并且取最后一块的大小
+						->final locatedBlocks newInfo = dfsClient.getLocatedBlocks(src, 9);		该函数内部通过代理获得块位置信息，这里通过socket和namenode通信，namenode主机执行命令，再通过socket返回执行结果
+						
+						
+		locatedBlocks中的信息由：
+		{
+			fileLength = ...; 文件大小
+			underConstruction=false; 	文件在hdfs是正常状态， 构造完成了的，包括副本等等。
+			blocks=[LocatedBlock{集群标示 : blk1文件名: BlockSize; corrupt; offset; locs=[host1:port1;host2:port2...]},
+					LocatedBlock{集群标示 : blk2文件名: BlockSize; corrupt; offset; locs=...}
+					]		
+		}
+		集群标示用来标示这个文件块所在的集群。集群标示里面有个namenode的ip地址。
+		BlockSize是该块大小，corrupt标志块是否破损，offset是该块在文件中的偏移，locs是该块所坐落的主机。
+		BlockReader是个接口，最后构造的RemoteBlockReader类的实例.
+		RemoteBlockReader有datanode
