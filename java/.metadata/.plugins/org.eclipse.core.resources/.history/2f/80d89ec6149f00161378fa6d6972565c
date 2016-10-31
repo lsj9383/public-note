@@ -1,0 +1,21 @@
+package com.lsj.io;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+public class Test {
+
+	public static void main(String[] args) {
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream("tmp");
+			
+		} catch (FileNotFoundException e) {e.printStackTrace();}finally{
+			
+		}
+		
+		System.out.println("done!");
+
+	}
+
+}

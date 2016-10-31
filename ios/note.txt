@@ -168,4 +168,23 @@
 				[self.view insertSubView:toVC.view atIndex:0]	//将指示图控制器的视图添加到根视图控制器中。之所以放在索引为0的位置，是因为根视图控制器可能对视图有修饰的视图，为了保证修饰的视图一直存在（如工具栏等），就确保将新的视图放在索引为0的位置。
 				[toVC didMoveToParentViewController:self]		//通知新的视图控制器，它已经成为了一名子控制器。
 			}
+七、表视图
+	表视图是MVC中的V部分，从UITableViewDataSource对象中获得行数据，从UITableViewDelegate对象中获得配置数据。
+	1.UITableViewDataSource对象
+		需要实现两个必要的方法：获得行对象，以及行对象的个数.
+		-(NSString) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+			return count;		//获得对应section的row
+		}
+		
+		-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+			//获得指定section和row的行对象，这两个数据包含在indexPath中。行对象是UITableViewCell *
+			//在语句块里面，初始化Cell，获得行对象所需要的数据，并将数据加载到Cell中。
+			//对于行对象，才有了复用机制。也就是说，刚刚滚离屏幕的单元，会用来补充新滚动进屏幕的单元。这样就不用为每一行都创建一个cell，因为这样太耗费内存。
+			UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier]	//从复用队列中提取对象，一般是刚刚滚离屏幕的对象就会在复用队列中。
+			if(cell == nil){	//但是在初始布局的时候，复用队列中没有对象，因此提取出来是nil，就要强制性新创建对象。
+				cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:SimpleTableIdentifier];
+			}
 			
+			return cell;
+		}
+		

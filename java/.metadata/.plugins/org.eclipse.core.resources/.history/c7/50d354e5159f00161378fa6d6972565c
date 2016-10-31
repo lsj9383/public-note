@@ -1,0 +1,54 @@
+package com.lsj.io;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class Test {
+	
+	public static void test1(){
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream("tmp");
+			int i1 = fis.read();
+			int i2 = fis.read();
+			int i3 = fis.read();
+			int i4 = fis.read();
+			int i5 = fis.read();
+			int i6 = fis.read();
+			int i7 = fis.read();
+			
+			System.out.println(i1);
+			System.out.println(i2);
+			System.out.println(i3);
+			System.out.println(i4);
+			System.out.println(i5);
+			System.out.println(i6);
+			System.out.println(i7);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(fis == null){
+				try {
+					fis.close();
+				} catch (IOException e) {e.printStackTrace();}
+			}
+		}
+	}
+	
+	public static void test2(){
+		
+		FileInputStream fis = new FileInputStream("tmp");
+		
+	}
+
+	public static void main(String[] args) {
+		
+		
+		System.out.println("done!");
+
+	}
+
+}

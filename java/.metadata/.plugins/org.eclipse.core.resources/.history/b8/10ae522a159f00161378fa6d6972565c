@@ -1,0 +1,32 @@
+package com.lsj.io;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class Test {
+
+	public static void main(String[] args) {
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream("tmp");
+			int i1 = fis.read();
+			
+			System.out.println(i1);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}finally{
+			if(fis == null){
+				try {
+					fis.close();
+				} catch (IOException e) {e.printStackTrace();}
+			}
+		}
+		
+		System.out.println("done!");
+
+	}
+
+}

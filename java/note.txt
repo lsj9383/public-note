@@ -1,4 +1,220 @@
-可变长参数:
+* IO
+	1.流
+		0).根据流出现的位置，可以分为包装流和节点流。
+		1).根据方向，可以分为【输出流】和【输入流】
+			输入和输出是相对于内存而言的。到内存中就是输入流、从内存出来就是输出流。
+			输入流: InputStream，又叫Read
+			输出流: OutputStream, 又叫Write
+		2).根据读写方式，可以分为【字节流】和【字符流】
+			字节流一次操作一个字节，适合读取视频、声音、图片等多媒体二进制文件。java中以Stream结尾。
+			字符流一次操作一个字符，一个字符等于两个字节。适合读取【纯文本文件】。含有Reader或Writer。
+		3).重要的流
+			FileInputStream
+			FileOutputStream
+			FileReader
+			FileWriter
+			
+			BufferedInputStream
+			BufferedOutputStream
+			BufferedReader
+			BufferedWriter
+			
+			DataInputStream
+			DataOutputStream
+			
+			ObjectInputStream
+			ObjectOutputStream
+			
+			//字节流和字符流的转换
+			InputStreamReader
+			OutputStreamWriter
+			
+			PrintWriter
+			PrintStream
+		4).类结构
+			Object <|-- InputStream <|-- FileInputStream
+				|				 |__<|-- ObjectInputStream
+				|				 |__<|-- FilterInputStream <|-- BufferedInputStream
+				|									    |__<|-- DataInputStream
+				|
+				|__<|-- OutputStream <|-- FileOutputStream
+				|			 	  |__<|-- ObjectOutputStream
+				|				  |__<|-- FilterOutputStream <|-- BufferedOutputStream
+				|									      |__<|-- DataOutputStream
+				|										  |__<|-- PrintStream
+				|
+				|__<|-- Reader <|-- InputStreamReader <|-- FileReader
+				|           |__<|-- BufferedReader
+				|
+				|__<|-- Writer <|-- OutputStreamReader <|-- FileWriter
+				            |__<|-- BufferedWriter
+							|__<|-- PrintWriter
+				   
+				   InputStream实现了Closeable接口
+				   InputStream实现了Closeable接口和Flusable接口, Flusable有flush()方法进行刷新，将缓冲的内容全部写出去。
+				   Reader实现了Closeable接口
+				   Writer实现了Closeable接口和Flusable接口
+		5).FileInputStream
+			将硬盘的文件数据读取到内存中
+			int data = fis.read()			//读取并返回1个字节, 若返回-1，文件读完。该方法频繁访问磁盘会伤害磁盘，并且效率低下。
+			int length = fis.read(byte[] b);//一次读取多个直接字节，将数组填充满，返回实际读取到的字节数。若一个都没读取到，返回-1
+			fis.skip(n);					//跳过的字节数
+			int length = fis.available();	//返回还有多少个直接可以读取。
+		6).FileOutputStream
+			将内存中的数据写到硬盘文件中
+			FileOutputStream fos = new FileOutputStream("<file>", boolean append);	append是指定是否在文件末尾进行。若file不存在，将会创建新文件。
+			fos.write(byte[] bytes); 	将bytes数组中的所有数据写入
+			fos.write(byte[] bytes, start, length);	从start开始写入length个
+		7).FileReader和FileWriter
+			将前面的byte[]换成了char[]，并且FileWriter运行写入字符串:fw.write("xxxx");
+		8).BufferedReader
+			BufferedReader br = new BufferedReader(new FileReader("<file..>"));	//将文件字符输入流，包装成带有缓冲区的输入流	
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("tmp")));		//可以将字节流包装成字符流，再包装成带缓冲区的流。
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));	//将标准输入流InputStream包装成字符流，然后再作缓冲区包装。
+			String res = br.readLine();		//读取文本行, 若读不到，返回null.但是，读的这一行不带换行符的！
+			br.close();						//关闭只需要关闭最外层的包装流。
+		9).BufferedWriter
+			和BufferedReader差不多，只不过是输出的。有个newLine的方法，其实我觉得没啥意思。
+			不过，由于其write是先写入缓冲区，在flush时才写入输出流，因此要在必要的时候【刷新缓冲区】。
+		10).DataOutputStream
+			数据直接输出流
+			将“数据”写入到硬盘文件中，写入的不是字符串，而是二进制数据。
+			DataOutputStream dos = new DataOutputStream(new FileOutputStream("<file>"));
+			dos.writeByte(byte b);
+			dos.writeInt(int i);
+			...
+		11).DataInputStream
+			和DataoutputStream异曲同工。且必须配合使用。
+		12).PrintStream
+			标准输出流。System.out,就是一种，默认打印到控制台。
+			PrintStream out = new PrintStream(OutputStream);
+			System.setOut(OutputStream);可以改变默认的输出流
+			OutputStream可以是new FileOutputStream("<...>");
+	2.序列化
+		将对象保存到硬盘中，就是对象的序列化。从硬盘中恢复到内存里，就是反序列化。
+		1).ObjectOutputStream
+			序列化到硬盘
+			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
+			outputStream 可以是 new FileOutputStream("tmp8");
+			oos.writeObject(object);	//将对象写入输出流
+			
+			【一个对象要序列化，必须实现序列化接口，否则无法支持序列化】
+			class OneClass implements Serializable{
+				...
+			}
+			这个接口是没有方法的，只是一个标志。包括Cloneable接口，也没方法。
+			标识接口的作用：
+				JVM看到对象实现了某个标识接口，会对它特殊待遇。
+		2).ObjectInputStream
+			反序列化到内存
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("tmp8"));
+			Object o = ois.readObject();
+			反序列化在构建对象的时候，会用到对应的.class文件，否则无法重建。
+		3).serialVersionUID
+			JVM会给实现了Serializble的类，在序列化的时候，添加了一个serialVersionUID属性，用于区别不同的类。
+			就算类名完全相同，但是UID不同，也是无法反序列化的。
+			a).序列化版本号是可以手动提供的。
+				直接在类里写：static final long serialVersionUID = xxxxxL;
+			b).可以禁止某个属性序列化
+				transient field;
+				反序列化时，field为null
+	3.File
+		
+* 异常
+	java中采用类去模拟异常。
+	一个异常类，代表一类异常。一个异常对象，是一个具体的异常事件。
+	若出现了异常事件【没有处理】，则后面的代码不会执行，直接退出JVM。
+	1.异常类结构关系：
+		Object <|-- Throwable <|-- Error
+							  <|-- Exception <|-- RuntimeException
+											 <|-- 编译时异常类
+							  
+		1).Throwable
+			可抛出，所以异常都是可抛出的。
+		2).Error 错误
+			是严重的，无法处理，只能直接退出jvm。
+			如StackOverFlowError。
+		3).Exception 异常
+			若程序没有处理异常，程序直接退出jvm。
+		4).RuntimeException
+			运行时异常.如Null异常、除零异常。
+			运行时异常，是不用写异常处理的。当然，若发生了，没处理，会直接退出jvm。
+			现实中，发生的几率低。
+		5).编译时异常类
+			非RuntimeException的异常。如文件不存在异常。
+			要求程序在编写程序阶段，必须对它进行处理，如果不处理，编译无法通过。
+			处理异常有两种方式:
+				a).捕捉  try-catch
+				b).声明抛出 方法声明使用throws关键字。
+			不对编译时异常进行如上处理，根本编译不通过。也就是说，编译时异常是不会造成系统崩溃的，因为怎么说都处理了，除非在main还抛出。。。
+			发生的几率高，一般常见的异常处理都是针对编译时异常的。
+	2.处理异常
+		1).声明抛出 throws
+			方法上声明throws，意味着该方法可能会抛出这个异常。当发生异常时，便会向方法调用者抛出该方法。
+			若方法的函数体内，有可能发生异常，则在发送异常是，将会向上抛出该异常，该方法发送异常的后面的代码将不再执行。
+			若都抛异常抛到了main外面去了，则jvm打印异常信息并且退出执行。
+		2).捕捉 try-catch
+				try{
+					可能出现Exception的代码.
+				}catch(异常类型1 e1){
+				
+				}catch(异常类型2 e2){
+				
+				}
+				...
+			catch中的异常类型，应该覆盖try语句块中代码所有可能出现的异常类型。
+			catch的异常必须从上到下，从小到上捕捉。也就是说，若上面的catch的异常类型，包含了下面的catch的异常类型，那么编译不会通过，因为下面的catch异常不会被执行到。
+			try-catch最多执行1个语句块，因为遇到异常后，后面的代码不会执行，直接跳到catch中。
+			catch执行完后，【会执行到方法结束】。
+	3.异常对象常用方法
+		1).pprintStackTrace();
+			打印异常堆栈信息，一般情况下都会使用该方式去调试程序。
+			如:	java.io.FileNotFoundException: ab.txt (系统找不到指定的文件。)
+					at java.io.FileInputStream.open0(Native Method)
+					at java.io.FileInputStream.open(Unknown Source)
+					at java.io.FileInputStream.<init>(Unknown Source)
+					at java.io.FileInputStream.<init>(Unknown Source)
+					at com.lsj.exception.MyTest.m(MyTest.java:8)
+					at com.lsj.exception.MyTest.main(MyTest.java:13)
+			抛出异常的过程记录在堆栈中。上面是最深的异常抛出位置。
+		2).getMesssage
+			获得异常的解释字符串。
+	4.finally语句块
+		finally语句块中的内容，是一定会执行的。就算在try语句中有return语句，也是会执行完了finally后才return。
+		只有一种情况finally不会执行：在try中用System.exit(0); 退出了jvm。
+		对于
+			try{
+				return object;
+			} finally{
+				操作object...
+			}
+		等价于
+			try{
+				Object  = object;
+				return tmp;
+			} finally{
+				操作object，也就不会影响finally中的返回值。
+			}
+		由于finally一定会执行，所以通常在finally中释放资源。
+		(	final修饰类，类无法继承。修饰变量名，设置为常量
+			finalize是方法名, 垃圾回收器回收前会调用)
+			
+	5.自定义异常与主动抛出异常
+		编译时异常，直接继承Exception。运行时异常，直接继承RuntimeException
+		class MyselfException extends Exception{
+			public IllegaNameException(){}
+			public IllegaNameException(String msg){super(msg);}
+		}
+		
+		method() throws MyselfException{
+			MyselfException e = new MyselfException("发送了异常");
+			throw e;
+		}
+		后面如果继续向上抛，都是对这时候生成的异常继续抛出！！也就是说后面的上抛，并不是产生新异常，而是将一个已经存在的异常继续抛出。
+		子类的方法 无法抛出比 父类中的相同方法 更宽的异常。
+		若父类中的该方法没有抛出异常，重写的方法永远无法抛出异常。因为之类无法抛出比父类更多的异常。
+		若父类抛出Exception，子类可以抛的就多了，在Exception类中的都可以抛出。
+* 可变长参数:
 	void method(int... a){
 		...
 		//这里a接收到的是个数组
@@ -10,14 +226,14 @@
 	method(3);	//会调用定长参数的
 	【可变长参数只能放在参数列表的末尾】
 	
-属性文件:
+* 属性文件:
 	.properties这样的文件可以作为属性配置文件。用.properties作为后缀。（其实随便都行，只是为了区分配置文件的文法类型与其作用，因为还有其他文法的配置文件，比如.xml .json）
 	key和value之间可以使用“空格” "冒号" "等号"。并按在最前面的作为分隔符。
 	读取属性文件的代码：
 		Properties p = new Properties();
 		p.load(new FileInputStream("<properties-file>"));	将文件流中的数据，加载到属性对象中去
 		String value = p.getProperty("<key>");		得到value
-反射:
+* 反射:
 	0.关联类
 		java.lang.Class;
 		java.lang.reflect.Constructor;
@@ -54,16 +270,23 @@
 			<Class-Object>.	getName();			//获得类的类全名
 							.getSimpleName();	//获得不包括前缀的类名
 		1).获取属性
-			Field[] fs = c.getFields();				//获取所有的public修饰的属性
-			fs = c.getDeclaredFields();				//获得所有的属性
-			fs[0] = c.getDeclaredField("<field>");	//返回特定的属性
+			Field[] fs = c.getFields();			//获取所有的public修饰的属性
+			fs = c.getDeclaredFields();			//获得所有的属性
+			f = c.getDeclaredField("<field>");	//返回特定的属性
 			
-			fs[0].getName();				//获得属性的名字
-			fs[0].getType();				//获得这个属性的Class对象
-			fs[0].getModifiers();			//获得这个属性的修饰符, .toString()显示修饰符名字
-			fs[0].get(o);					//获得对象o的fs[0]属性的值
-			fs[0].set(o, value);			//设置对象o的fs[0]属性的值
+			f.getName();						//获得属性的名字
+			f.getType();						//获得这个属性的Class对象
+			f.getModifiers();					//获得这个属性的修饰符, .toString()显示修饰符名字
+			f.get(o);							//获得对象o的fs[0]属性的值
+			f.set(o, value);					//设置对象o的fs[0]属性的值
 		2).获取方法
-			省
+			ms = c.getDeclaredMethods();		//获取所有方法
+			m = c.getDeclaredMethod(<method-name>, <param-list>);	//获得具体的方法,<param-list>是Class类型的变长参数
+			
+			rt = m.getReturnType();				//获取返回值类型
+			methodName = m.getSimpleName();		//获取方法名
+			Class[] ps = m.getParameterTypes();	//获得方法的参数列表类型
+			
+			Object res = m.Invoke(o, <param-set>);			//用参数<param-set>调用o对象的m方法，<param-set>是Object类型的变长参数，返回值Object类型对象
 		3).获取构造器
 			省
