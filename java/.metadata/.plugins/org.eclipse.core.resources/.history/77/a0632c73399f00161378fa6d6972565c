@@ -327,7 +327,7 @@ public class Test {
 //		test17();
 //		test18();
 //		test19();
-		disfiles("D:\\DESIGN\\cpp", 0);
+		disfiles("D:\\DESIGN", 0);
 		System.out.println("\ndone!");
 	}
 

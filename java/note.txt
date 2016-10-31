@@ -119,7 +119,22 @@
 				transient field;
 				反序列化时，field为null
 	3.File
+		File是文件和目录路径名的抽象表示形式。也就是说File代表硬盘上的Directory和file。
+		File f = new File("<path>");
 		
+		f.exists();			返回该文件或目录是否存在
+		f.mkdir();			创建目录
+		f.mkdirs();			创建多重目录（即递归创建）
+		f.createNewFile();	创建文件
+		f.canWrite();
+		f.canRead();
+		f.delete();
+		f.getAbsolutePath();
+		f.parentPath();
+		f.isDirectory();
+		f.length();
+		String[] res = f.list();	找出目录下的所有文件名，这里要求f是个Directory
+		File[] res = f.listFiles();	找出目录下所有的File
 * 异常
 	java中采用类去模拟异常。
 	一个异常类，代表一类异常。一个异常对象，是一个具体的异常事件。

@@ -285,7 +285,7 @@ public class Test {
 		
 	}
 	
-	public static void disfiles(String path, int deep){
+	public static void disfiles(String path){
 		File dir = new File(path);
 		
 		if(!dir.exists()){
@@ -295,12 +295,9 @@ public class Test {
 		File[] files = dir.listFiles();
 		
 		for(File file : files){
-			for(int i=0; i<deep; i++){
-				System.out.print(" ");
-			}
 			System.out.println(file.getAbsolutePath());
 			if(file.isDirectory()){
-				disfiles(file.getAbsolutePath(), deep+1);
+				disfiles(file.getAbsolutePath());
 			}
 		}
 	}
@@ -327,7 +324,7 @@ public class Test {
 //		test17();
 //		test18();
 //		test19();
-		disfiles("D:\\DESIGN\\cpp", 0);
+		disfiles("D:\DESIGN");
 		System.out.println("\ndone!");
 	}
 

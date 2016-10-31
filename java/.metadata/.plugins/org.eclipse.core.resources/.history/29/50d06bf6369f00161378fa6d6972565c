@@ -19,8 +19,6 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Scanner;
 
-import javax.naming.spi.DirectoryManager;
-
 public class Test {
 	
 	public static void test1(){
@@ -280,29 +278,7 @@ public class Test {
 	
 	public static void test19() throws Exception{
 		File f1 = new File("tmp9");
-		
-		System.out.println(f1.exists());
-		
-	}
-	
-	public static void disfiles(String path, int deep){
-		File dir = new File(path);
-		
-		if(!dir.exists()){
-			return;
-		}
-		
-		File[] files = dir.listFiles();
-		
-		for(File file : files){
-			for(int i=0; i<deep; i++){
-				System.out.print(" ");
-			}
-			System.out.println(file.getAbsolutePath());
-			if(file.isDirectory()){
-				disfiles(file.getAbsolutePath(), deep+1);
-			}
-		}
+		f1.close();
 	}
 	
 	public static void main(String[] args) throws Exception {
@@ -325,9 +301,7 @@ public class Test {
 //		test15();
 //		test16();
 //		test17();
-//		test18();
-//		test19();
-		disfiles("D:\\DESIGN\\cpp", 0);
+		test18();
 		System.out.println("\ndone!");
 	}
 
