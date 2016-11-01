@@ -354,16 +354,32 @@
 			get(int index);	//获得指定索引的元素
 		1).ArrayList
 			底层采用数组存储元素，因此适合查询和赋值，但是不适频繁的随机增删元素。
-			默认初始化容量是10，按1.5倍进行扩容。
+			默认初始化容量是10，按1.5倍进行扩容。可以在初始化时指定较大容量，以免频繁扩容。
 		2).LinkedList
 			底层采用双向链表，适合频繁增删元素，但不适合随机查询。
 		3).Vector
 			和ArrayList相同，但是其线程安全。但效率较低，很少使用。
+			默认初始化容量是10，按1.5倍进行扩容。
 	3.Set集合
 		特点:无序，不可重复。(存进去的顺序和取出来的顺序不一样，也就是说顺序被修改了的)
 		对于SortedSet集合，存进去的顺序是排序的。(TreeSet结构本来就是二叉搜索树)
+		1).HashSet
+			HashSet就是一个没有value的HashMap，其底层是Hash结构。
+			add(o); 若o已经存在，那么放弃add，相等判断是通过hashCode和equals进行的。
+					先通过hashCode判断，若hashCode有相同的，再到该数组里，用equals对o进行判断。
+					若hashCode直接就不存在，那么就在数组中添加新的元素。hashCode相同的元素，都在同一数组里。
+			
+			数组初始化容量是16，默认加载因子是0.75。
+			其中的数组元素，占了75%就会开始扩容。
+			
+			存储在HashSet需要重写hashCode方法和equals方法以满足项目的需求。尽量hash均匀分布。
+			对于一个对象，如果没有重写hashCode，那么它返回的都不一样，那么hashSet就退化成一个数组了。
+			如果将hashCode返回相同的值，那么hashSet就退化成一个链表了。
+		2).TreeSet
+			有排序功能。元素也不能重复。
 	4.Map
 		1).HashMap
+			Key是个HashSet
 		2).HashTable
 			线程安全效率低。
 		3).Properties

@@ -68,22 +68,12 @@ public class Main {
 		Employee e4 = new Employee("2001", "SUN");
 		Employee e5 = new Employee("3000", "JIM");
 		Employee e6 = new Employee("3001", "COOK");
-		
-		es.add(e1);
-		es.add(e2);
-		es.add(e3);
-		es.add(e4);
-		es.add(e5);
-		es.add(e6);
-		
-		System.out.println(es.size());
 	}
 	
 	public static void main(String[] args) {
 //		test1();
 //		test2();
 //		test3();
-		test4();
 		System.out.println("Done!");
 	}
 
@@ -113,9 +103,5 @@ class Employee{
 	public Employee(String no, String name){
 		this.no = no;
 		this.name = name;
-	}
-	
-	public int hashCode(){	//以员工编号分组 
-		return no.hashCode();
 	}
 }

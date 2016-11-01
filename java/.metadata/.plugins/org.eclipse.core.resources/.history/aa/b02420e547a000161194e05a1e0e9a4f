@@ -115,7 +115,7 @@ class Employee{
 		this.name = name;
 	}
 	
-	public int hashCode(){	//以员工编号分组 
+	public int hashCode(){	//以员工编号分组
 		return no.hashCode();
 	}
 }

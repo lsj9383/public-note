@@ -59,31 +59,10 @@ public class Main {
 		
 	}
 	
-	public static void test4(){
-		Set es = new HashSet();
-		
-		Employee e1 = new Employee("1000", "JACK");
-		Employee e2 = new Employee("1001", "KING");
-		Employee e3 = new Employee("2000", "SCOTT");
-		Employee e4 = new Employee("2001", "SUN");
-		Employee e5 = new Employee("3000", "JIM");
-		Employee e6 = new Employee("3001", "COOK");
-		
-		es.add(e1);
-		es.add(e2);
-		es.add(e3);
-		es.add(e4);
-		es.add(e5);
-		es.add(e6);
-		
-		System.out.println(es.size());
-	}
-	
 	public static void main(String[] args) {
 //		test1();
 //		test2();
-//		test3();
-		test4();
+		test3();
 		System.out.println("Done!");
 	}
 
@@ -102,20 +81,5 @@ class Customer{
 	@Override
 	public String toString(){
 		return "Customer[name="+name+",age="+age+"]";
-	}
-}
-
-class Employee{
-	
-	String no;
-	String name;
-	
-	public Employee(String no, String name){
-		this.no = no;
-		this.name = name;
-	}
-	
-	public int hashCode(){	//以员工编号分组 
-		return no.hashCode();
 	}
 }
