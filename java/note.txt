@@ -305,3 +305,68 @@
 			Object res = m.Invoke(o, <param-set>);			//用参数<param-set>调用o对象的m方法，<param-set>是Object类型的变长参数，返回值Object类型对象
 		3).获取构造器
 			省
+
+* 集合
+	集合只能保存引用类型。
+	1.结构
+	Iterable <|-- Collection <|-- List <|-- ArrayList
+	                      |         |__<|-- LinkedList
+						  |         |__<|-- Vector
+						  |
+	                      |__<|-- Set <|-- HashSet
+						           |__<|-- SortedSet <|-- TreeSet
+	Map <|-- HashMap
+	 |__<|-- HashTable <|-- Properties
+	 |__<|-- SortedMap <|-- TreeMap
+	 
+		1).迭代器Iterable的子类都是可迭代的。有一个iterator的方法
+			Iterable的子类都是可迭代的。有一个iterator的方法,返回一个Iterator<T>类型的迭代器，用于遍历集合。
+			Iterator<T>有3个方法:
+				a).hasNext()
+				b).next()
+				c).remove()
+			javaSE中的每种集合实现类，都实现了自己的迭代器，并且返回它。
+			初始迭代器是指向第一个元素的，next将指向的元素返回，并移动到下一个元素。
+			remove()方法删掉的是当前所指元素的前一个元素。
+			|_| <- lastRet
+			|_| <- cursor / next(lastRet)
+			|_| <- next(cursor)
+			next()，返回cursor所指对象，并且cursor和lastRet往下移动。
+			remove(), 删除lastRet所指的对象，cursor保持所指的对象（也就是cursor前移一步）
+		2).Collection
+			只能存储引用类型，并且只能单个存储。
+			boolean add(Object o);		想集合中添加元素
+			void clear();				清空
+			boolean isEmpty();			判断是否为空
+			Iterator<E> iterator();		【迭代器】
+			boolean remove(Object o);	删除集合中某个元素
+			int size();					获取集合中元素的个数
+			Object[] toArray();			将集合转换成数组
+			boolean contains(Object o );判断o是否存在
+				a).可以看出， Collection只能存，不能取。只能转换成数组或是迭代器来取数据。
+				b).contains里面使用的是equals方法来进行相等判断。
+				c).remove也是用的equals方法
+		3).Map
+			以kv键值对存储。key是无序不可重复的。
+	2.List集合
+		特点:有序、可重复。（有序指的存进去什么顺序，取出来也就什么顺序，也就是顺序不会更改）
+		0).常用方法
+			get(int index);	//获得指定索引的元素
+		1).ArrayList
+			底层采用数组存储元素，因此适合查询和赋值，但是不适频繁的随机增删元素。
+			默认初始化容量是10，按1.5倍进行扩容。
+		2).LinkedList
+			底层采用双向链表，适合频繁增删元素，但不适合随机查询。
+		3).Vector
+			和ArrayList相同，但是其线程安全。但效率较低，很少使用。
+	3.Set集合
+		特点:无序，不可重复。(存进去的顺序和取出来的顺序不一样，也就是说顺序被修改了的)
+		对于SortedSet集合，存进去的顺序是排序的。(TreeSet结构本来就是二叉搜索树)
+	4.Map
+		1).HashMap
+		2).HashTable
+			线程安全效率低。
+		3).Properties
+			key和value只能是字符串类型。
+		4).TreeMap
+			Key是个TreeSet.

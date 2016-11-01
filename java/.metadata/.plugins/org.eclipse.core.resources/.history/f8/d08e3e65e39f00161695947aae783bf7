@@ -1,0 +1,13 @@
+package com.lsj.collection;
+
+public class Main {
+
+	public static void test1(){
+		
+	}
+	
+	public static void main(String[] args) {
+		System.out.println("Done!");
+	}
+
+}

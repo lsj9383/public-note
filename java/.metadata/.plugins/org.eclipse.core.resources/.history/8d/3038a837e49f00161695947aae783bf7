@@ -1,0 +1,38 @@
+package com.lsj.collection;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
+public class Main {
+
+	public static void test1(){
+		Collection c = new ArrayList<Integer>();
+		c.add(1);				//×Ô¶¯×°Ïä
+		c.add(new Object());
+		c.add(new Customer("JACK", 20));
+		c.clear();
+		System.out.println(c.size());
+	}
+	
+	public static void main(String[] args) {
+		test1();
+		System.out.println("Done!");
+	}
+
+}
+
+
+class Customer{
+	String name;
+	int age;
+	
+	public Customer(String name, int age){
+		this.name = name;
+		this.age = age;
+	}
+	
+	@Override
+	public String toString(){
+		return "Customer[name="+name+",age="+age+"]";
+	}
+}
