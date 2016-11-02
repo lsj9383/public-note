@@ -1,12 +1,19 @@
 package com.lsj.collection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class Main {
 
@@ -79,11 +86,116 @@ public class Main {
 		System.out.println(es.size());
 	}
 	
+	public static void test5(){
+		Set es = new TreeSet();
+		
+		es.add(new User(40));
+		es.add(new User(32));
+		es.add(new User(22));
+		es.add(new User(33));
+		es.add(new User(30));
+		es.add(new User(41));
+		es.add(new User(29));
+		es.add(new User(39));
+		
+		for(Object o : es)
+		{
+			System.out.println(o);
+		}
+	}
+	
+	public static void test6(){
+		Set es = new TreeSet(new Comparator(){
+			@Override
+			public int compare(Object o1, Object o2) {
+				double v1 = ((Product)o1).price;
+				double v2 = ((Product)o2).price;
+				
+				if(v1 == v2){
+					return 0;
+				}else if(v1 > v2){
+					return 1;
+				}else if(v1 < v2){
+					return -1;
+				}
+				return 0;
+			}
+		});
+	
+		
+		es.add(new Product(4.0));
+		es.add(new Product(3.2));
+		es.add(new Product(2.2));
+		es.add(new Product(3.3));
+		es.add(new Product(2.8));
+		
+		for(Object o : es)
+		{
+			System.out.println(o);
+		}
+	}
+	
+	public static void test7(){
+		Map persons = new HashMap();
+		
+		persons.put("1000", "JACK");
+		persons.put("1011", "JACK");
+		persons.put("1002", "SUN");
+		persons.put("1003", "COOK");
+		persons.put("1004", "KING");
+		persons.put("1000", "LUCY"); 
+		
+		System.out.println(persons.size());
+		
+		Iterator it = persons.values().iterator();
+		while(it.hasNext()){
+			System.out.println(it.next());
+		}
+		
+		System.out.println("=================================");
+		
+		Iterator it2 = persons.keySet().iterator();
+		while(it2.hasNext()){
+			System.out.println(it2.next());
+		}
+		
+		Set entrySet = persons.entrySet();
+		Iterator it3 = entrySet.iterator();
+		while(it3.hasNext()){
+			System.out.println(it3.next());
+		}
+	}
+	
+	public static void test8(){
+		List l = new ArrayList();
+		
+		l.add(10);
+		l.add(5);
+		l.add(9);
+		l.add(20);
+		l.add(30);
+		
+		Iterator itr = l.iterator();
+		while(itr.hasNext()){
+			System.out.println(itr.next());
+		}
+		System.out.println("=========================");
+		Collections.sort(l);
+		itr = l.iterator();
+		while(itr.hasNext()){
+			System.out.println(itr.next());
+		}
+	}
+	
 	public static void main(String[] args) {
 //		test1();
 //		test2();
 //		test3();
-		test4();
+//		test4();
+//		test5();
+//		test6();
+//		test7();
+		test8();
 		System.out.println("Done!");
 	}
 
@@ -117,5 +229,38 @@ class Employee{
 	
 	public int hashCode(){	//以员工编号分组 
 		return no.hashCode();
+	}
+}
+
+class User implements Comparable{
+
+	int age;
+	
+	public User(int age){
+		this.age = age;
+	}
+	
+	@Override
+	public String toString(){
+		return "User[age="+age+"]";
+	}
+	
+	@Override
+	public int compareTo(Object o) {
+		return this.age - ((User)o).age;
+	}
+}
+
+class Product{
+	
+	double price;
+	
+	public Product(double price){
+		this.price = price;
+	}
+	
+	@Override
+	public String toString(){
+		return this.price + "";
 	}
 }

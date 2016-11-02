@@ -377,12 +377,57 @@
 			如果将hashCode返回相同的值，那么hashSet就退化成一个链表了。
 		2).TreeSet
 			有排序功能。元素也不能重复。
+			TreeSet添加的对象，需要重写Comparable。比较是否相等，也是通过Comparable的接口方法实现的。
+			也可以单独编写一个比较器, 再创建TreeSet的时候，传递比较器:
+				Set es = new TreeSet(new Comparator(){
+					@Override
+					public int compare(Object o1, Object o2) {
+						
+						return 0;
+					}
+				});
 	4.Map
+		0).常用方法
+			boolean containsKey();
+			boolean containsValue();
+			
+			Object get(Object key);		通过key获取value
+			Object put(key, value);		添加kv对
+			
+			Set KeySet();				获取map中所有的Key
+			Collection<V> values();		获取map中所有的value
+			
+			
+			Set<Map.Entry<K,V>> entrySet();	返回此映射中包含的映射关系的Set视图字符串，相当于返回很多个"key=value"的字串
+			void clear();
+			Object remove(key);			根据key, 删除一个kv
+			boolean isEmpty();
+			int size();					获取map中kv对个数
+			
 		1).HashMap
-			Key是个HashSet
+			Key是个HashSet。
+			初始化容量是16，默认加载是0.75。
+			如果key重复了，则覆盖！
 		2).HashTable
-			线程安全效率低。
+			线程安全, 效率低。
+			默认初始化容量是11， 默认加载因子是0.75。
 		3).Properties
 			key和value只能是字符串类型。
+			关键是可以进行加载，这样的话可以通过该类型对象读取配置文件。
+			getProperty("<key>");
+			setProperty("<key>", "<value>");
+			load(InputStream);		//将输入流的kv对字符串进行结构化
 		4).TreeMap
 			Key是个TreeSet.
+	5.Collections
+		集合工具类。他提供了一些列的算法，包括排序，求最小最大值，线程安全转换。
+		排序的实现，需要对象实现了Comparable接口。
+		sort();
+		synchronizedList(List list);	将list集合转换为线程安全的
+		synchronizedList(Set set);		将set集合转换为线程安全的
+	6.数组和List的相互转化
+		数组到List的转换：List s = Arrays.asList(new String[]{"1", "2", "3"});
+		List到数组的转换: Object[] items = list.toArray();
+	7.泛型
+		如果不使用泛型，集合中的元素类型不统一，需要大量的强转，代码很丑。并且将运行时期的错误，移到了编译时期。
+		
