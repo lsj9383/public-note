@@ -1,0 +1,44 @@
+<html>
+
+	<head>
+		<title>register</title>
+		<meta charset="GBK">
+	</head>
+	
+	<body>
+		<form action="/prj-servlet-12/user/save", method="post">
+			用户名
+				<input type="text" name="username">
+				<br>
+			密码
+				<input type="password" name="userpassword">
+				<br>
+			性别
+				男<input type="radio" name="sex" value="m">
+				女<input type="radio" name="sex" value="f">
+				<br>
+			爱好
+				<input type="checkbox" name="interest" value="sport">运动
+				<input type="checkbox" name="interest" value="music">音乐
+				<input type="checkbox" name="interest" value="dance">跳舞
+				<input type="checkbox" name="interest" value="study">学习
+				<input type="checkbox" name="interest" value="read">阅读
+				<br>
+			学历
+				<select name="grade">
+					<option value="gz">高中</option>
+					<option value="dz">大专</option>
+					<option value="db">打本</option>
+				</select>
+				<br>
+			简历
+				<textarea rows="10" cols="60" name="introduce"></textarea>
+				<br>
+			<input type="submit" value="注册">
+			<input type="rest" value="重置">
+		</form>
+		
+		<a href="/prj-servlet-11/logout">退出</a>
+	</body>
+
+</html>
