@@ -1,0 +1,67 @@
+一、基本套接字
+	1.网络接口相关方法
+		Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();	//获得本机网络接口列表
+		String name = iface.getName();							//获得网络接口的名字
+		Enumeration<InetAddress> = iface.getInetAddress();		//获得网络接口的所有ip地址	
+	2.IP地址相关
+		InetAddress[] address = InetAddress.getAllByName(host);	//获得域名的所有地址
+		InetAddress addr = InetAddress.getByName(host);			//获取域名的一个地址
+		byte[] parts = addr.getAddress();	//获得地址的每个字节
+		String s = addr.getHostName();		//获得地址的主机域名
+		String s = addr.getHostAddress();	//获得地址对应的ip字符串
+		String s = addr.toString();			//是上面两个的结合
+	3.TCP Client
+		1).创建socket实例。
+			Socket创建后，是不可变的。
+			Socket(InetAddress remoteAddr, int remotePort);	//同下
+			Socket(String remoteHost, int remotePort);		//阻塞，直到连接到远程地址和端口号，将其返回给程序。本地的地址和端口是默认选取的。当然也可以指定。
+			Socket();										//创建没有连接的套接字，可以通过connect()方法进行连接。
+		2).通过套接字的IO进行通信，Socket包含了InputStream和OutputStream。
+			void connect(SocketAddress destination);
+			void connect(SocketAddress destination, int timeout);		//可以指定连接的超时时间。
+			
+			InputStream getInputStream();		//需要注意的是，【必须在创建连接后才可以获得输入流】。读出数据，若没有缓冲的数据，则阻塞等待。
+			OutputStream getOutputStream();		//输出流同上。
+			void shutdownInput();				//关闭输入流，放弃没有读取到的所有数据
+			void shutdownOutput();				//关闭输出流，不可以在写数据。但是已经写的数据一般还可以发送过去。
+		3).通过close()方法关闭连接。
+			当一方关闭连接，另一方读完缓冲区的内容后，就再也读不出东西了，直接返回-1。
+		4).Socket相关属性
+			getInetAddress();
+			getPort();
+			getLocalAddress();
+			getLocalPort();
+	4.TCP Server
+		1).创建一个ServerSocket实例，并制定本地端口。
+			ServerSocket servSock = new ServerSocket(port);		一旦创建，就始终在监听。收到客户端的tcp请求，就建立新的socket和客户端对接，并将新的socket保存在队列中。
+		2).accept(); 方法可以获取一个Socket实例，该实例管理和某个客户端的连接。
+			若队列中有socket，取出来用于通信。若队列中没有socket，阻塞直到存在。
+		3).使用该socket实例的InputStream和OutputStream和客户端通信。		
+		4).通信完成，使用close()方法关闭客户端套接字连结。
+	5.输入输出流
+		1.inputstrea
+			1).read时，若没有数据，且远程端的输出流已经关闭，则返回-1。
+			2).read时，若没有数据，且远程端的输出流保存打开，则阻塞。
+			3).read并不一定在整个字节数组填满后才返回，实际上只要有了，立马就返回。
+		2).outputstream的write在缓冲区满的时候，会阻塞。尽量避免这种情况。
+	6.UDP
+		1).DatagramPacket
+			发送和接收的基本单位，里面封装了一个字节数组，相当于将字节数组的内容打包，将字节数组中的内容【发送出去】或【接收到本地】。
+			DatagramPacket(byte[] data, int length);										//将一个字节数组打包为一个packet，主要用于接收，接收的内容在这个直接数组中。
+			DatagramPacket(byte[] data, int length, InetAddress remoteAddr, int port);		//将数组打包，并制定包发送的位置。
+			
+			InetAddress addr = packet.getAddress();	//获得该包的地址(接收包，得到源地址;发送包，得到端地址)
+			int getPort();							//获得该包的端口
+			int getLength();	//数据长度
+			byte[] getData();
+			void setData(byte[] data);
+		2).DatagramSocket
+			DatagramPacket();	//创建udp socket，没有指定端口，那么计算机自动选择绑定端口。
+			
+			connect(remoteAddr, remotePort);	//一旦连接成功，该套接字只能与指定的地址和端口通信。通常可以不建立连接。
+			disconnect();						//清除连接
+			setSoTimeout(int timeoutMillis);	//设置receive()超时时间(ms)
+			int getSoTimeout();					//获得receive()超时时间
+
+			void send(DatagramPacket packet);	//将packet的数据发送出去，packet中已经指定了发送地址了。若connect过，那么就只能向指定的地址和端口发送了。
+			void receive(DatagramPacket packet);//阻塞等待，直到接收到数据报文。接收到的packet填充覆盖旧的packet。
