@@ -27,7 +27,7 @@
 三、struts2开发流程
 	1.<!-- 在web.xml中注册struts2启动项 -->
 	  <filter>
-		<filter-name>Struts2</filter-name>
+		<filter-name>Struts</filter-name>
 		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
 	  </filter>
 	  
@@ -57,4 +57,12 @@
 		将action的uri和其class相互映射。这里的url是host/app/test/login.action
 		并且指定执行完成后，返回的结果字符串将会跳到的页面。
 
-四、struts2工作流程
+四、struts2配置文件
+	1).struts-default.xml
+	2).default.properties
+	3).struts-plugin.xml
+	4).struts.xml(核心配置文件), 可以指定一些常量值。
+	5).struts.properties, 可以指定一些常量值，如扩展名:struts.action.extension=e1,e2
+	6).web.xml，也可以指定一些常量值。
+	这些使能的优先级：web.xml>struts.properties>struts.xml>default.properties
+	不过，web.xml和struts.properties一般不用。直接用struts.xml来设置。

@@ -142,6 +142,7 @@ CLASS_PATH就是import的路径，换句话说，就是程序里面使用的class的路径。
 		f.length();
 		String[] res = f.list();	找出目录下的所有文件名，这里要求f是个Directory
 		File[] res = f.listFiles();	找出目录下所有的File
+		
 * 异常
 	java中采用类去模拟异常。
 	一个异常类，代表一类异常。一个异常对象，是一个具体的异常事件。
