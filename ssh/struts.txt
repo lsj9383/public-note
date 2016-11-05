@@ -1,0 +1,28 @@
+一、struts
+	普通servlet的开发不够灵活。struts就是在servlet基础上进行了封装。
+	不灵活主要体现在：
+		1).对于不同的输入做不同的响应时，需要大量的if-else语句。也无法灵活修改针对新参数而新增条件分支，只能修改代码。
+		2).对于不同的处理结果转到的网页是固定的，无法灵活配置。(若需要修改网页的名字，则必须得改代码)
+		3).类型的转换不够灵活。比如String到int的转换需要程序控制，但其实可以自动完成。
+	解决:
+		使用配置文件，指定操作对应的逻辑类，并且对操作的成功与失败指定转到的网页。
+		中央控制器核心逻辑代码:
+		protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+			String uri = request.getRequestURI();			//获取请求的uri
+			String path = uri.substring(uri.indexOf('/', 1), uri.indexOf('.', 1));	//截取uri的具体请求路径
+			ActionMapping = actionMapping = (ActionMapping)map.get(path);		//获得该请求路径的相信参数，map是配置信息。
+			String type = actionMapping.getType();								//获得完整类路径
+			Action action = (Action)class.forName(type).newInstance();
+			
+			String forward = action.execute(request, response);					//执行对应的action请求。
+			request.getRequestDispatcher(forward).forward(request, response);	//根据action返回值来转到对应的网页。
+		}
+		
+		也就是说，以后只需要写好配置文件就将控制器做好了。也就是将控制器给灵活化了。
+		中央控制器的职责是：
+			1).根据相应的规则截取URL
+			2).根据URL分发到相应的Action
+		action是后期控制器，执行具体的操作逻辑以及确定返回值。
+			
+			

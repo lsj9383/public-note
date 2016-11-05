@@ -1,0 +1,9 @@
+package network;
+
+public class BasicSocket {
+
+	public static void main(String[] args) {
+		
+	}
+
+}

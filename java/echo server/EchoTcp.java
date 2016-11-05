@@ -16,6 +16,7 @@ public class EchoTcp {
 		ServerSocket servSock = new ServerSocket(1020);
 		
 		while(true){
+			/*
 			Socket clntSock  = servSock.accept();
 			
 			SocketAddress clientAddress = clntSock.getRemoteSocketAddress();
@@ -29,6 +30,7 @@ public class EchoTcp {
 			}
 			System.out.println(clientAddress+" close");
 			clntSock.close();
+			*/
 		}
 	}
 	

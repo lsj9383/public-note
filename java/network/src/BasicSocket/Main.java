@@ -57,8 +57,8 @@ public class Main {
 		byte[] rec = new byte[1024];
 		int length = in.read(rec);
 		System.out.println(new String(rec));
-//		socket.close();
-		socket.shutdownOutput();
+		socket.close();
+//		socket.shutdownOutput();
 	}
 	
 	public static void TcpServer() throws Exception{
@@ -108,9 +108,9 @@ public class Main {
 		//Test1();
 		//Test2(new String[]{"localhost", "www.baidu.com"});
 		
-		//TcpClient();
+		TcpClient();
 		//TcpServer();
-		UdpClient();
+		//UdpClient();
 		System.out.println("Main Done");
 	}
 }
