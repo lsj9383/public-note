@@ -1,4 +1,7 @@
 一、struts
+	MVC:
+		1).事件驱动MVC框架，移动端、桌面端常用。
+		2).请求驱动MVC框架，
 	普通servlet的开发不够灵活。struts就是在servlet基础上进行了封装。
 	不灵活主要体现在：
 		1).对于不同的输入做不同的响应时，需要大量的if-else语句。也无法灵活修改针对新参数而新增条件分支，只能修改代码。
@@ -6,7 +9,7 @@
 		3).类型的转换不够灵活。比如String到int的转换需要程序控制，但其实可以自动完成。
 	解决:
 		使用配置文件，指定操作对应的逻辑类，并且对操作的成功与失败指定转到的网页。
-		中央控制器核心逻辑代码:
+		中央控制器(ActionServlet)核心逻辑代码:
 		protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 			String uri = request.getRequestURI();			//获取请求的uri
@@ -23,6 +26,47 @@
 		中央控制器的职责是：
 			1).根据相应的规则截取URL
 			2).根据URL分发到相应的Action
-		action是后期控制器，执行具体的操作逻辑以及确定返回值。
-			
-			
+		action是后期控制器，执行具体的业务逻辑以及确定返回值。
+	struts的实现:
+		web client -request-> ActionServlet <-dispatch-> Action <-wr-> Model
+								    |	|
+									|	|----forward-> jsp/html/...
+									|
+								   \|/
+						   读struts-config.xml
+二、struts开始
+	1.配置struts
+		1).拷贝strtus相关的jar到WEB-INF的lib文件夹下。
+		2).在web.xml中配置ActionServlet
+		3).配置struts-config.xml在WEB-INF文件夹下。
+	2.编写ActionForm类
+		这个是对于post请求才有用的，可以将表单数据进一步封装。
+		表单数据都是字符串，可以通过该类使用更结构化的数据。要求的是该类中的成语变量需要和表单中的name同名。
+	3.编写Action类
+		返回是ActionForward对象。
+		mapping..findForward("<forward-name>");	返回在struts-config.xml中配置的forward信息，由ActionServlet进行转换。
+	4.配置struts-config.xml
+		1).注册struts的ActionForm用于保存保单
+			<form-beans>
+				<form-bean name="<form-name>" type="<类全名>" />
+			</form-beans>
+		2).注册struts的Action
+			<action-mappings>
+				<action path="/login" 							<!-- 指定action的路径，这里的uri应该写/app/login.do -->
+						type="com.lsj.struts.LoginAction"		<!-- Action类全名 -->
+						name="<form-name>"						<!-- 传入尽量的表单类名，该类名是在xml中配置的名字 -->
+						scope="request"							<!-- 表单保存的方式， 有request和session两种，也就是说保存在request中或是session中。因为一般表达都是单词有效，因此常用request。若不配，则默认传到session中 -->
+						>
+					<!-- 配置跳转的目标 -->
+					<forward name="success" path="/login_success.jsp" />
+					<forward name="error" path="/login_success.jsp" />
+				</action>
+			</action-mappings>
+	5.ActionServlet完整逻辑
+		1).processPath.截取URL.
+		2).processPopulate.根据截取的URL获得ActionMapping.
+		3).processActionForm.根据ActionMapping中的name名称查找ActionForm，若配置了ActionForm那么就到request或session中查找。如果在request或session中存在已久创建的ActionForm，那么将返回。如果不存在那么会根据ActionForm的完整路径采用反射进行创建，再将创建好的ActionForm放到request或session中.
+		4).processPopulate.根据ActionForm中的reset方法进行充值，然后得到表单中所有输入域的name名称，再得到对应的值。最后将表单中的kv对保存到一个map中。接下来用第三方组件BeanUtils，将map中的值根据ActionForm中的类型先转换好，再通过ActionForm中的setter配置ActionForm。
+		5).processActionCreate.根据Action的完整类名称到Map中查找，如果存在就返回Action对象，否则根据Action类的完整名称采用反射区创建，再将创建好的Action放到map中.所以struts中的action是单实例的，存在线程安全问题。
+		6).processActionPerform.执行用户自定义的action中的execute方法.
+		7).processForwardConfig.根据返回的ActionForward完成跳转(重定向或转发).
