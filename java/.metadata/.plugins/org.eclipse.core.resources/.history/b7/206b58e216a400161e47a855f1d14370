@@ -1,0 +1,13 @@
+package MultiThread;
+
+public class EchoProtocol implements Runnable {
+
+	private static final int BUFSIZE = 32;
+	
+	
+	@Override
+	public void run() {
+
+	}
+
+}

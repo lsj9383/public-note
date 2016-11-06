@@ -1,0 +1,17 @@
+package MultiThread;
+
+import java.net.Socket;
+import java.util.logging.Logger;
+
+public class EchoProtocol implements Runnable {
+
+	private static final int BUFSIZE = 32;
+	private Socket clntSock;
+	private Logger logger;
+	
+	@Override
+	public void run() {
+
+	}
+
+}

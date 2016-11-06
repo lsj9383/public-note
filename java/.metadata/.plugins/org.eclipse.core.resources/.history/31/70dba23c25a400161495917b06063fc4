@@ -1,0 +1,36 @@
+package MultiThread;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.logging.Logger;
+
+public class Main {
+	
+	public static void TcpServer1() throws Exception{
+		ServerSocket servSock = new ServerSocket(1000);
+		Logger logger = Logger.getLogger("practical");
+		
+		while(true){
+			Socket clntSock = servSock.accept();
+			Thread thread = new Thread(new EchoProtocol(clntSock, logger));
+			thread.start();
+			logger.info("Created and Started Thread " + thread.getName());
+		}
+	}
+	
+	public static void TcpServerPool() throws Exception{
+		final ServerSocket servSock = new ServerSocket(1000);
+		final Logger logger = Logger.getLogger("practical");
+		
+		for(int i=0; i<10; i++){
+			Thread thread = new Thread(){
+				
+			}
+		}
+	}
+	
+	public static void main(String[] args) throws Exception {
+		System.out.println("Main Done!");
+	}
+}

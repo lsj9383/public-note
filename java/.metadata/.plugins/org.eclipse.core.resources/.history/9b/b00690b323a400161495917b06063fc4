@@ -1,0 +1,16 @@
+package MultiThread;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+
+public class Main {
+	
+	public static void TcpServer1() throws Exception{
+		ServerSocket servSock = new ServerSocket(1000);
+		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		System.out.println("Main Done!");
+	}
+}

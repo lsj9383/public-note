@@ -65,3 +65,39 @@
 
 			void send(DatagramPacket packet);	//将packet的数据发送出去，packet中已经指定了发送地址了。若connect过，那么就只能向指定的地址和端口发送了。
 			void receive(DatagramPacket packet);//阻塞等待，直到接收到数据报文。接收到的packet填充覆盖旧的packet。
+二、多线程执行
+	1.日志记录
+		服务器会将用户的活动记录写入日志。java自带了日志类，可以满足一般需求。并且日之泪都是线程安全的。
+		1).创建
+			static Logger getLogger(String name);	//静态方法用于返回指定名字的日志对象。每个名字的日志对象都是单例的。即不存在改名字的对象就创建新的，存在则直接找到并返回。
+		2).记录日志信息
+			每个日志信息都是有等级的，因此记录日志信息的时候是要指定等级的。一共有七个等级。
+			void severe(String msg);			//严峻的
+			void warning(String msg);			//警告的
+			void info(String msg);				//
+			void config(String msg);
+			void fine(String msg);
+			void finer(String msg);
+			void finest(String msg);
+			void log(Level level, String msg);
+		3).设置/获取日志等级
+			日志对象会根据等级去记录日志信息，低于logger当前等级的消息将被抛弃。
+			Level getLevel();
+			void setLevel(Level newLevel);
+			boolean isLoggable(Level level);
+		4).设置/获取日志处理器
+			处理器用于发布一条消息，因此处理器和输出流相连接, 默认情况下又一个ConsoleHandler用来将消息打印到System.err中。
+			需要注意的是，每个handler也有最小日志等级，大于handler的等级才能发布该日志消息。也就是说，发布一条消息由处理器和日志一起限制。
+			Handlers[] getHandlers();			//获得所有处理器
+			void addHandler(Handler handler);	//添加处理器
+	2.多线程方法
+		1).一客户一线程
+			为每个链接都创建一个新的线程来处理。
+		2).线程池
+			预先创建一批线程，然后在线程里面进行accept客户端socket和并处理。
+		3).系统管理调度, Executor接口
+			这个其实是封装好的线程池
+			Executor executor = Executors.newFixedThreadPool(poolSize);		//线程数不变的线程池.
+			Executor executor = Executors.newCachedThreadPool();			//线程数可变的线程池, 线程不够时自动添加，线程空闲过久自动删除.
+			Executor executor = Executor.newSingleThreadExecutor();			//单一线程.
+		

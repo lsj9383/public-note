@@ -1,8 +1,0 @@
-package com.lsj.java;
-
-public class Test {
-
-	public static void main(String[] args){
-		//1.创建属性对象
-	}
-}
