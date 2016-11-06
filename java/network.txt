@@ -100,4 +100,17 @@
 			Executor executor = Executors.newFixedThreadPool(poolSize);		//线程数不变的线程池.
 			Executor executor = Executors.newCachedThreadPool();			//线程数可变的线程池, 线程不够时自动添加，线程空闲过久自动删除.
 			Executor executor = Executor.newSingleThreadExecutor();			//单一线程.
-		
+	3.阻塞与超时
+		1)获取
+			accept()
+			read()
+			receive()
+			以上方法在没有数据可读时会阻塞，可以通过对socket调用setSoTimeout()，设置其阻塞的最长时间。如果在指定的时间阻塞没有返回将会抛出一个InterruptedIOException异常。
+		2).连接与写数据
+			a).若通过构造函数直接将socket与目标连接，那么必须要在连接成功后才会返回。要解决这个问题可以建立无参的Scoket，再通过connect()方法进行连接，该方法可以设置超时时间。
+			   远程端的ServSocket监听到了连接请求，将连接请求的客户端socket获取到并入队意味着连接成功。
+			b).write()方法调用会阻塞等待，知道最后一个字节成功写入到TCP实现的【本地缓存】中。但若是本地缓存满了则会阻塞知道有远程读取数据，才会继续写入。
+			   因此write()方法导致的阻塞取决于写入的数据长度以及连接的另一端。遗憾的是java对write()阻塞【没有提供超时处理】。
+		3).服务器限制每个客户端的时间
+			在服务器端限制与每个客户端连接的时间超时后自动终止。
+			
