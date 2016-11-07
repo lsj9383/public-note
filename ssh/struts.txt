@@ -70,3 +70,27 @@
 		5).processActionCreate.根据Action的完整类名称到Map中查找，如果存在就返回Action对象，否则根据Action类的完整名称采用反射区创建，再将创建好的Action放到map中.所以struts中的action是单实例的，存在线程安全问题。
 		6).processActionPerform.执行用户自定义的action中的execute方法.
 		7).processForwardConfig.根据返回的ActionForward完成跳转(重定向或转发).
+	6.action属性
+		path="<uri>"
+		type="<actioin类全名>"
+		name="<form-name>"				传入的ActionForm对象。
+		scope="request/session"			ActionForm对象保存在request或是session里。默认为session
+		validate="false/true"			验证
+		attribute="<other form-name>"	在session或是request保存的表单的key值，默认为name
+	7.牢记原则。
+		Action的职责是拿到表单数据，并调用Model。业务逻辑应交给专门的Model层去做。
+		对于异常，在Action中抓到Model中的异常，然后进行跳转。
+
+三、标签
+	1.配置
+		1).配置国际化，在struts-config.xml文件中加入如下配置：
+			<message-resources parameter="MessageResources" />
+			加在<struts-config>标签的最下面。
+		2).最好提供国际化资源文件，将该文件放在src下
+		3).在要使用tag的jsp上面，添加<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+	2.Bean Tags
+		<bean:write name="<key>">  将request的<key>对应的value输出.(value的toString()方法)
+		<bean:write name="<key>" filter="true/false">	filter默认为true，为true时将value原封不动输出。若为false会进行html解析。
+		<bean:write name="<key>" format="<format>">	格式化输出
+	3.Logic Tags
+	
