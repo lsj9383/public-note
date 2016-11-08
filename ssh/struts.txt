@@ -87,10 +87,50 @@
 			<message-resources parameter="MessageResources" />
 			加在<struts-config>标签的最下面。
 		2).最好提供国际化资源文件，将该文件放在src下
-		3).在要使用tag的jsp上面，添加<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+		3).在要使用tag的jsp上面，添加
+			<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+			<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
 	2.Bean Tags
+		用于输出的。
 		<bean:write name="<key>">  将request的<key>对应的value输出.(value的toString()方法)
 		<bean:write name="<key>" filter="true/false">	filter默认为true，为true时将value原封不动输出。若为false会进行html解析。
 		<bean:write name="<key>" format="<format>">	格式化输出
+		<bean:write name="<key>" property="<field>"> 这里value是个对象，访问其成员。
 	3.Logic Tags
-	
+		用于逻辑流控制的。
+		<logic:empty name="<key>">
+			<key>为空将会执行这里面		value==null或是""空船
+		</logic:empty>
+		
+		<logic:notEmpty name="<key>">
+			<key>不为空将会执行这里面
+		</logic:empty>
+		
+		<logic:present name="<key>">
+			<key>存在
+		</logic:empty>
+		
+		<logic:notPresent name="<key>">
+			<key>不存在。			value==null也属于不存在
+		</logic:empty>
+		
+		<logic:iterate id="<item>" name="<key>">	<!-- 若value具备迭代能力，则可以用迭代器 -->
+			<item>是当前迭代到的元素
+			<bean:write name="<item>" property="<field>" />
+		</logic:iterate>
+四、ActionForm
+	1.动态ActionForm
+		可以不用定义ActionForm子类，可以减少静态ActionForm的数量，使用动态ActionForm有所有静态ActionForm的功能。
+		其实本质上是将ActionForm的实现，放到了配置文件中指定字段和字段类型。
+		1).配置:
+			<form-beans>
+				<form-bean name="<form-name>" type="org.apache.struts.action.DynaActionForm">
+					<form-property name="username" type="java.lang.String" />
+					...
+				</form-bean>
+			</form-bean>
+		动态ActionForm类里面用一个HashMap来记录变量名和变量类型。
+		2).使用:
+			DynaActionForm daf = (DynaActionForm)form;
+			String username = (String)daf.get("username");
+			在daf中取值的过程，内部是通过hashmap取值来实现的。
