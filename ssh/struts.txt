@@ -130,7 +130,100 @@
 				</form-bean>
 			</form-bean>
 		动态ActionForm类里面用一个HashMap来记录变量名和变量类型。
+		对于其验证通常使用动态验证框架。
 		2).使用:
 			DynaActionForm daf = (DynaActionForm)form;
 			String username = (String)daf.get("username");
 			在daf中取值的过程，内部是通过hashmap取值来实现的。
+	2.上传文件
+		1).对于可以上传文件的表单：
+		<form action="<uri>" enctype="multipart/form-data" method="">
+			file :<input type="file" name="myFile"><br>
+			<input type="submit" value="submit">
+		</form>
+		
+		2).上传的文件在ActionForm中必须用FormFile类型来表示:
+		public class UploadActionForm extends ActionForm {
+			private String title;
+			private FormFile myfile;
+		}
+		
+		3).上传文件大小设置
+			<controller maxFileSize="10M"></controller>
+	3.ActionForm类型转换器
+		采用第三方的beanutils. (utils 工具)
+		转换器中维护了一个map，这个map里面保存了一个key为Class value为对应转换器的结构。
+		自定义转换器:
+			默认的转换器不具备将字符串转换为任意类型的功能。面对这种时候，需要自定义转换器；
+			1).自定义转换器
+				MyConvert implements Converter{
+					@Override
+					public Object convert(class type, Object value){
+						...
+						return ...;
+					}
+				}
+			2).注册转换器
+				写个新的servlet，在新的servlet启动时注册。
+				public void init() throws ServletException{
+					ConvertUtils.register(new MyConvert(), MyType.class);
+				}
+				需要配置servlet在tomcat启动时就进行servlet初始化，这样的话才能让对转换器的配置成功。
+五.ActionForward
+	ActionForward是Action的execute()方法的返回类型。
+	1.重定向与
+		<action ...>
+			<forward name="" paht="<>" redirect="false" />  使用转发。默认redirect为false。
+			<forward name="" paht="<>" redirect="true" />	使用重定向。
+		</action>
+	2.全局和局部forward
+		全局的forward可重用
+		1).局部forawrd
+			<action ...>
+				局部
+			</action>
+		2).全局forward
+			<global-forwards>
+				<forward ...>
+			</global-forwards>
+		3).若全局和局部forward的forward的name重复，则使用局部的。只有局部没有，才找全局的。
+		struts-config.xml文件的行为不能再运行期修改。
+	3.手动转向
+		返回ActionForward为null，就可以自己用response进行跳转。
+	4.动态ActionForward
+		ActionForward af = new ActionForward(String path, boolean redirect);
+		af.setPath("<uri>");		//转发的位置
+		af.setRedirect(boolean);	//设置重定向
+		return af;
+六、ActionMapping
+	保存了配置信息
+	ActionMapping一个实例对应了struts-config.xml中的一个action标签。
+	属性：
+		1).path
+			对应了action中的path
+		2).forward
+			不用建action，向该action的请求是直接跳转。
+			<action ...
+					forward="<uri>"
+			></action>
+			相当于建立个action，该action的execute只有一句跳转的语句。
+		3).type
+			action对应的
+		4).name
+			指定ActionForm的name
+		5).scope
+			默认为session
+		6).validate
+			默认为true，是否调用ActionForm
+		7).input
+			验证出错转到的页面。
+		8).parameter
+		9).unknown
+			输入的.do不存在，转移到指定的页面。
+			<action path="<随便>"
+					forward="<unknown-page>"
+					unknown="true"
+			>
+			</action>
+			当请求的.do不存在的时候，就会到forward对应的页面中去。
+			也就是说，ActionServlet中，取出ActionMapping，由于该action不存在，因此取出的是null。再检查所有的action中是否有unknown为true，有的话就forward到指定的page中。
