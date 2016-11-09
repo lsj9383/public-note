@@ -1,0 +1,11 @@
+package com.lsj.i18n;
+
+import java.util.Locale;
+
+public class I18n {
+	public static void main(String[] args){
+		Locale defaultLocale = Locale.getDefault();
+		
+		System.out.println(defaultLocale.getCountry());
+	} 
+}

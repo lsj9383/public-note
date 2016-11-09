@@ -1,0 +1,22 @@
+package NIO;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+
+public class Main {
+
+	public static void TestClient() throws Exception{
+		
+		SocketChannel clntChan = SocketChannel.open();
+		
+		clntChan.configureBlocking(false);
+		ByteBuffer writeBuf = ByteBuffer.wrap("".getBytes());
+		ByteBuffer readBuf  = ByteBuffer.allocate("".length());
+	}
+	
+	public static void main(String[] args) throws Exception {
+		TestClient();
+	}
+
+}

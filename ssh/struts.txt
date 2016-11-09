@@ -227,3 +227,30 @@
 			</action>
 			当请求的.do不存在的时候，就会到forward对应的页面中去。
 			也就是说，ActionServlet中，取出ActionMapping，由于该action不存在，因此取出的是null。再检查所有的action中是否有unknown为true，有的话就forward到指定的page中。
+七、国际化
+	I18N就是指的国际化。
+	Locale.getDefault();		//获得当前JVM所处环境的语言和国家。(计算机中设置的)
+	Locale.getDefault().getCountry();	//获得当前系统的国家
+	Locale.getDefault().getLanguage();	//获得当前系统的语言
+	
+	1.国际化资源文件
+		配置多个国家多个语言的文件,其实就是一些键值对。
+		baseName.properties			缺省国际化资源文件，以面对无法找到资源文件的情景，会自动使用该资源文件。
+		baseName_zh_CN.properties
+		baseName_en_US.properties
+		...
+	2.使用
+		ResourceBundle rb = ResourceBundle.getBundle("<baseName>", <Locale-Object>);
+		rb.getString("<key>");
+		需要注意，这里Locale对象若不存在，则使用系统默认的。即Locale.getDefault();当然，需要配置了对应的资源文件，否则资源文件无法找到，也会报错。
+	3.动态使用
+		在properties中使用k=<string>{0}<string>{1}		用占位符填充，可以简单的插入数据
+		或者是使用%s %d等等。然后使用Format或者String.format方法
+		
+		1).对于{i}的占位符，使用
+			String str = new MessageFormat(<string>).format(new Object[]{...});
+		2).对于%s的占位符，使用
+			String str = String.format(<string>, new Object[]{...});
+		
+		其实就是使用格式化输出。
+	其实本质上就是对键值对上加了层封装

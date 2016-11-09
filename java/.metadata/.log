@@ -1229,3 +1229,600 @@ This warning can be switched off on the Team > Git > Confirmations and Warnings 
 
 !ENTRY org.eclipse.jface.text 2 0 2016-11-06 22:27:38.133
 !MESSAGE Duplicate template id: 'org.eclipse.wst.xslt.templates.xpath.round'
+!SESSION 2016-11-09 20:27:36.272 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.jface 2 0 2016-11-09 20:28:02.760
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 20:28:02.760
+!MESSAGE A conflict occurred for ALT+SHIFT+D R:
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.debug,Debug on Server,
+		Debug the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@c7d173f,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.debug,Debug RAP Application,
+		Debug RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@12f12744,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 20:28:02.760
+!MESSAGE A conflict occurred for ALT+SHIFT+X R:
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.run,Run on Server,
+		Run the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@1c618295,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.run,Run RAP Application,
+		Run RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@344acc03,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-11-09 20:28:15.909
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\lu'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2016-11-09 20:32:29.061
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 10054 2016-11-09 20:32:29.061
+!MESSAGE Cannot complete the install because of a conflicting dependency.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.061
+!MESSAGE Software being installed: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.061
+!MESSAGE Software currently installed: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.061
+!MESSAGE Only one of the following can be installed at once: 
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.061
+!MESSAGE This version of m2eclipse cannot be installed on top of the already installed m2eclipse. Uninstall the previous version of m2eclipse and try the install again. 1.7.0.20160603-1933 (org.maven.ide.eclipse 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.061
+!MESSAGE Maven Integration for Eclipse 0.12.0.20101115-1102 (org.maven.ide.eclipse 0.12.0.20101115-1102)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.061
+!MESSAGE Maven Integration for Eclipse 0.12.1.20110112-1712 (org.maven.ide.eclipse 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.062
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.062
+!MESSAGE From: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.062
+!MESSAGE To: bundle org.maven.ide.eclipse [1.7.0.20160603-1933]
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.062
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.062
+!MESSAGE From: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.062
+!MESSAGE To: org.maven.ide.eclipse [0.12.1.20110112-1712]
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2016-11-09 20:32:29.109
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 10054 2016-11-09 20:32:29.110
+!MESSAGE Cannot complete the install because of a conflicting dependency.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE Software being installed: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE Software currently installed: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.110
+!MESSAGE Only one of the following can be installed at once: 
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE This version of m2eclipse cannot be installed on top of the already installed m2eclipse. Uninstall the previous version of m2eclipse and try the install again. 1.7.0.20160603-1933 (org.maven.ide.eclipse 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE Maven Integration for Eclipse 0.12.0.20101115-1102 (org.maven.ide.eclipse 0.12.0.20101115-1102)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE Maven Integration for Eclipse 0.12.1.20110112-1712 (org.maven.ide.eclipse 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.110
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE From: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE To: bundle org.maven.ide.eclipse [1.7.0.20160603-1933]
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.110
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE From: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.110
+!MESSAGE To: org.maven.ide.eclipse [0.12.1.20110112-1712]
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2016-11-09 20:32:29.141
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 10054 2016-11-09 20:32:29.141
+!MESSAGE Cannot complete the install because of a conflicting dependency.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE Software being installed: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE Software currently installed: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.141
+!MESSAGE Only one of the following can be installed at once: 
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE This version of m2eclipse cannot be installed on top of the already installed m2eclipse. Uninstall the previous version of m2eclipse and try the install again. 1.7.0.20160603-1933 (org.maven.ide.eclipse 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE Maven Integration for Eclipse 0.12.0.20101115-1102 (org.maven.ide.eclipse 0.12.0.20101115-1102)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE Maven Integration for Eclipse 0.12.1.20110112-1712 (org.maven.ide.eclipse 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.141
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE From: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE To: bundle org.maven.ide.eclipse [1.7.0.20160603-1933]
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.141
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE From: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.141
+!MESSAGE To: org.maven.ide.eclipse [0.12.1.20110112-1712]
+
+!ENTRY org.eclipse.equinox.p2.operations 4 0 2016-11-09 20:32:29.142
+!MESSAGE Operation details
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 10054 2016-11-09 20:32:29.142
+!MESSAGE Cannot complete the install because of a conflicting dependency.
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.142
+!MESSAGE Software being installed: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.142
+!MESSAGE Software currently installed: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.142
+!MESSAGE Only one of the following can be installed at once: 
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.142
+!MESSAGE This version of m2eclipse cannot be installed on top of the already installed m2eclipse. Uninstall the previous version of m2eclipse and try the install again. 1.7.0.20160603-1933 (org.maven.ide.eclipse 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.142
+!MESSAGE Maven Integration for Eclipse 0.12.0.20101115-1102 (org.maven.ide.eclipse 0.12.0.20101115-1102)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.142
+!MESSAGE Maven Integration for Eclipse 0.12.1.20110112-1712 (org.maven.ide.eclipse 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.142
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.142
+!MESSAGE From: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.143
+!MESSAGE To: bundle org.maven.ide.eclipse [1.7.0.20160603-1933]
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:32:29.143
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.143
+!MESSAGE From: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 3 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:32:29.143
+!MESSAGE To: org.maven.ide.eclipse [0.12.1.20110112-1712]
+!SESSION 2016-11-09 20:39:41.201 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product -data file:/D:/DESIGN/other/public-note/java/ -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.emf.ecore 2 0 2016-11-09 20:39:59.993
+!MESSAGE Both 'org.eclipse.m2e.model.edit' and 'org.maven.ide.eclipse.maven_model_edit' register a package for 'http://maven.apache.org/POM/4.0.0'
+
+!ENTRY org.eclipse.emf.ecore 2 0 2016-11-09 20:40:00.036
+!MESSAGE Both 'org.eclipse.m2e.model.edit' and 'org.maven.ide.eclipse.maven_model_edit' register an extension parser for 'pom'
+
+!ENTRY org.eclipse.jface 2 0 2016-11-09 20:40:08.008
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 20:40:08.008
+!MESSAGE A conflict occurred for ALT+SHIFT+X R:
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.run,Run on Server,
+		Run the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@34c050a1,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.run,Run RAP Application,
+		Run RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@7ecf4608,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 20:40:08.008
+!MESSAGE A conflict occurred for ALT+SHIFT+D R:
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.debug,Debug on Server,
+		Debug the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@32c114d9,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.debug,Debug RAP Application,
+		Debug RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@73f6ffb1,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-11-09 20:40:25.071
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\lu'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.core.jobs 4 2 2016-11-09 20:40:29.840
+!MESSAGE An internal error occurred during: "Updating indexes".
+!STACK 0
+java.lang.NoClassDefFoundError: org/eclipse/core/runtime/internal/adaptor/BasicLocation
+	at org.maven.ide.eclipse.internal.index.EquinoxLocker.lock(EquinoxLocker.java:26)
+	at org.maven.ide.eclipse.internal.index.NexusIndexManager.updateRemoteIndex(NexusIndexManager.java:1067)
+	at org.maven.ide.eclipse.internal.index.NexusIndexManager.updateIndex(NexusIndexManager.java:1025)
+	at org.maven.ide.eclipse.internal.index.NexusIndexManager$1.run(NexusIndexManager.java:632)
+	at org.maven.ide.eclipse.internal.index.IndexUpdaterJob.run(IndexUpdaterJob.java:71)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+Caused by: java.lang.ClassNotFoundException: org.eclipse.core.runtime.internal.adaptor.BasicLocation cannot be found by org.maven.ide.eclipse_0.12.1.20110112-1712
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:448)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:361)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:353)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	... 6 more
+
+!ENTRY org.eclipse.equinox.p2.director 2 10054 2016-11-09 20:41:50.556
+!MESSAGE Cannot complete the install because of a conflicting dependency.
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.556
+!MESSAGE Software being installed: artificial_root 1.0.0.v1478695306052
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:41:50.556
+!MESSAGE Only one of the following can be installed at once: 
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.557
+!MESSAGE This version of m2eclipse cannot be installed on top of the already installed m2eclipse. Uninstall the previous version of m2eclipse and try the install again. 1.7.0.20160603-1933 (org.maven.ide.eclipse 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.557
+!MESSAGE Maven Integration for Eclipse 0.12.1.20110112-1712 (org.maven.ide.eclipse 0.12.1.20110112-1712)
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:41:50.557
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.557
+!MESSAGE From: artificial_root 1.0.0.v1478695306052
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.557
+!MESSAGE To: org.eclipse.m2e.feature.feature.group 0.0.0
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:41:50.558
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.558
+!MESSAGE From: artificial_root 1.0.0.v1478695306052
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.558
+!MESSAGE To: org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:41:50.558
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.558
+!MESSAGE From: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.558
+!MESSAGE To: bundle org.maven.ide.eclipse [1.7.0.20160603-1933]
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 20:41:50.558
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.558
+!MESSAGE From: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 20:41:50.559
+!MESSAGE To: org.maven.ide.eclipse [0.12.1.20110112-1712]
+!SESSION 2016-11-09 22:40:47.040 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.emf.ecore 2 0 2016-11-09 22:40:51.002
+!MESSAGE Both 'org.eclipse.m2e.model.edit' and 'org.maven.ide.eclipse.maven_model_edit' register a package for 'http://maven.apache.org/POM/4.0.0'
+
+!ENTRY org.eclipse.emf.ecore 2 0 2016-11-09 22:40:51.002
+!MESSAGE Both 'org.eclipse.m2e.model.edit' and 'org.maven.ide.eclipse.maven_model_edit' register an extension parser for 'pom'
+
+!ENTRY org.eclipse.jface 2 0 2016-11-09 22:40:56.073
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 22:40:56.073
+!MESSAGE A conflict occurred for ALT+SHIFT+X R:
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.run,Run on Server,
+		Run the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@6a4238ff,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.run,Run RAP Application,
+		Run RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@2b98c310,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 22:40:56.073
+!MESSAGE A conflict occurred for ALT+SHIFT+D R:
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.debug,Debug on Server,
+		Debug the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@19834eb7,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.debug,Debug RAP Application,
+		Debug RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@26361572,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-11-09 22:41:03.374
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\lu'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.core.jobs 4 2 2016-11-09 22:41:07.258
+!MESSAGE An internal error occurred during: "Updating indexes".
+!STACK 0
+java.lang.NoClassDefFoundError: org/eclipse/core/runtime/internal/adaptor/BasicLocation
+	at org.maven.ide.eclipse.internal.index.EquinoxLocker.lock(EquinoxLocker.java:26)
+	at org.maven.ide.eclipse.internal.index.NexusIndexManager.updateRemoteIndex(NexusIndexManager.java:1067)
+	at org.maven.ide.eclipse.internal.index.NexusIndexManager.updateIndex(NexusIndexManager.java:1025)
+	at org.maven.ide.eclipse.internal.index.NexusIndexManager$1.run(NexusIndexManager.java:632)
+	at org.maven.ide.eclipse.internal.index.IndexUpdaterJob.run(IndexUpdaterJob.java:71)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+Caused by: java.lang.ClassNotFoundException: org.eclipse.core.runtime.internal.adaptor.BasicLocation cannot be found by org.maven.ide.eclipse_0.12.1.20110112-1712
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClassInternal(BundleLoader.java:448)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:361)
+	at org.eclipse.osgi.internal.loader.BundleLoader.findClass(BundleLoader.java:353)
+	at org.eclipse.osgi.internal.loader.ModuleClassLoader.loadClass(ModuleClassLoader.java:161)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	... 6 more
+
+!ENTRY org.eclipse.equinox.p2.director 2 10054 2016-11-09 22:41:25.214
+!MESSAGE Cannot complete the install because of a conflicting dependency.
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE Software being installed: artificial_root 1.0.0.v1478702482390
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 22:41:25.214
+!MESSAGE Only one of the following can be installed at once: 
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE This version of m2eclipse cannot be installed on top of the already installed m2eclipse. Uninstall the previous version of m2eclipse and try the install again. 1.7.0.20160603-1933 (org.maven.ide.eclipse 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE Maven Integration for Eclipse 0.12.1.20110112-1712 (org.maven.ide.eclipse 0.12.1.20110112-1712)
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 22:41:25.214
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE From: artificial_root 1.0.0.v1478702482390
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE To: org.eclipse.m2e.feature.feature.group 0.0.0
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 22:41:25.214
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE From: artificial_root 1.0.0.v1478702482390
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE To: org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 22:41:25.214
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE From: m2e - Maven Integration for Eclipse (includes Incubating components) 1.7.0.20160603-1933 (org.eclipse.m2e.feature.feature.group 1.7.0.20160603-1933)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE To: bundle org.maven.ide.eclipse [1.7.0.20160603-1933]
+!SUBENTRY 1 org.eclipse.equinox.p2.director 4 1 2016-11-09 22:41:25.214
+!MESSAGE Cannot satisfy dependency:
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE From: Maven Integration for Eclipse (Required) 0.12.1.20110112-1712 (org.maven.ide.eclipse.feature.feature.group 0.12.1.20110112-1712)
+!SUBENTRY 2 org.eclipse.equinox.p2.director 4 0 2016-11-09 22:41:25.214
+!MESSAGE To: org.maven.ide.eclipse [0.12.1.20110112-1712]
+!SESSION 2016-11-09 22:43:49.263 -----------------------------------------------
+eclipse.buildId=4.6.0.I20160606-1100
+java.version=1.8.0_91
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -product org.eclipse.epp.package.java.product -product org.eclipse.epp.package.java.product
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -product org.eclipse.epp.package.java.product -data file:/D:/DESIGN/other/public-note/java/ -product org.eclipse.epp.package.java.product
+
+!ENTRY org.eclipse.jface 2 0 2016-11-09 22:44:03.772
+!MESSAGE Keybinding conflicts occurred.  They may interfere with normal accelerator operation.
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 22:44:03.772
+!MESSAGE A conflict occurred for ALT+SHIFT+D R:
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.debug,Debug on Server,
+		Debug the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@1ecbb787,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+D R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.debug,Debug RAP Application,
+		Debug RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@6441cff1,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+!SUBENTRY 1 org.eclipse.jface 2 0 2016-11-09 22:44:03.772
+!MESSAGE A conflict occurred for ALT+SHIFT+X R:
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.wst.server.launchShortcut.run,Run on Server,
+		Run the current selection on a server,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@1dc987b,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+Binding(ALT+SHIFT+X R,
+	ParameterizedCommand(Command(org.eclipse.rap.tools.launch.RAPLaunchShortcut.run,Run RAP Application,
+		Run RAP Application,
+		Category(org.eclipse.debug.ui.category.run,Run/Debug,Run/Debug command category,true),
+		org.eclipse.ui.internal.WorkbenchHandlerServiceHandler@4f09d998,
+		,,true),null),
+	org.eclipse.ui.defaultAcceleratorConfiguration,
+	org.eclipse.ui.contexts.window,,,system)
+
+!ENTRY org.eclipse.egit.ui 2 0 2016-11-09 22:44:10.964
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\lu'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.e4.ui.workbench 2 0 2016-11-09 22:44:11.728
+!MESSAGE Removing part descriptor with the 'org.maven.ide.eclipse.views.MavenRepositoryView' id and the 'Maven Repositories' description. Points to the invalid 'bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView' class.
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2016-11-09 22:46:34.956
+!MESSAGE Connection to http://eclipse.mirror.rafal.ca/releases/neon/201610111000/plugins/org.eclipse.recommenders.constructors_2.4.3.v20160913-0645.jar.pack.gz failed on Connection timed out: connect. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at org.eclipse.ecf.internal.provider.filetransfer.httpclient4.ECFHttpClientProtocolSocketFactory.connectSocket(ECFHttpClientProtocolSocketFactory.java:86)
+	at org.apache.http.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:177)
+	at org.apache.http.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:144)
+	at org.apache.http.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:131)
+	at org.apache.http.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:611)
+	at org.apache.http.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:446)
+	at org.apache.http.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:863)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer.performConnect(HttpClientRetrieveFileTransfer.java:1084)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer.access$0(HttpClientRetrieveFileTransfer.java:1075)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer$1.performFileTransfer(HttpClientRetrieveFileTransfer.java:1071)
+	at org.eclipse.ecf.filetransfer.FileTransferJob.run(FileTransferJob.java:74)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2016-11-09 22:46:34.964
+!MESSAGE Connection to http://eclipse.mirror.rafal.ca/releases/neon/201610111000/plugins/org.eclipse.recommenders.net_2.4.3.v20160913-0645.jar.pack.gz failed on Connection timed out: connect. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at org.eclipse.ecf.internal.provider.filetransfer.httpclient4.ECFHttpClientProtocolSocketFactory.connectSocket(ECFHttpClientProtocolSocketFactory.java:86)
+	at org.apache.http.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:177)
+	at org.apache.http.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:144)
+	at org.apache.http.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:131)
+	at org.apache.http.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:611)
+	at org.apache.http.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:446)
+	at org.apache.http.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:863)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer.performConnect(HttpClientRetrieveFileTransfer.java:1084)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer.access$0(HttpClientRetrieveFileTransfer.java:1075)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer$1.performFileTransfer(HttpClientRetrieveFileTransfer.java:1071)
+	at org.eclipse.ecf.filetransfer.FileTransferJob.run(FileTransferJob.java:74)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.equinox.p2.transport.ecf 2 0 2016-11-09 22:46:34.974
+!MESSAGE Connection to http://eclipse.mirror.rafal.ca/releases/neon/201610111000/plugins/org.eclipse.buildship.stsmigration_1.0.18.v20160817-1550.jar.pack.gz failed on Connection timed out: connect. Retry attempt 0 started
+!STACK 0
+java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at org.eclipse.ecf.internal.provider.filetransfer.httpclient4.ECFHttpClientProtocolSocketFactory.connectSocket(ECFHttpClientProtocolSocketFactory.java:86)
+	at org.apache.http.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:177)
+	at org.apache.http.impl.conn.AbstractPoolEntry.open(AbstractPoolEntry.java:144)
+	at org.apache.http.impl.conn.AbstractPooledConnAdapter.open(AbstractPooledConnAdapter.java:131)
+	at org.apache.http.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:611)
+	at org.apache.http.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:446)
+	at org.apache.http.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:863)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer.performConnect(HttpClientRetrieveFileTransfer.java:1084)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer.access$0(HttpClientRetrieveFileTransfer.java:1075)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientRetrieveFileTransfer$1.performFileTransfer(HttpClientRetrieveFileTransfer.java:1071)
+	at org.eclipse.ecf.filetransfer.FileTransferJob.run(FileTransferJob.java:74)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.equinox.p2.artifact.repository 2 0 2016-11-09 22:46:38.348
+!MESSAGE Failure reporting download statistics to URL: http://download.eclipse.org/stats/releases/neon/org.eclipse.epp.logging.aeri.feature-2.0.3-SNAPSHOT
+!STACK 1
+org.eclipse.core.runtime.CoreException: Unable to connect to repository http://download.eclipse.org/stats/releases/neon/org.eclipse.epp.logging.aeri.feature-2.0.3-SNAPSHOT
+	at org.eclipse.equinox.internal.p2.transport.ecf.RepositoryTransport.getLastModified(RepositoryTransport.java:236)
+	at org.eclipse.oomph.p2.internal.core.CachingTransport.delegateGetLastModified(CachingTransport.java:368)
+	at org.eclipse.oomph.p2.internal.core.CachingTransport.getLastModified(CachingTransport.java:323)
+	at org.eclipse.equinox.internal.p2.artifact.repository.MirrorRequest.collectStats(MirrorRequest.java:268)
+	at org.eclipse.equinox.internal.p2.artifact.repository.MirrorRequest.transfer(MirrorRequest.java:235)
+	at org.eclipse.equinox.internal.p2.artifact.repository.MirrorRequest.perform(MirrorRequest.java:153)
+	at org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository.getArtifact(SimpleArtifactRepository.java:707)
+	at org.eclipse.equinox.internal.p2.artifact.repository.simple.DownloadJob.run(DownloadJob.java:63)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+Caused by: java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at org.apache.http.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:117)
+	at org.apache.http.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:177)
+	at org.apache.http.impl.conn.ManagedClientConnectionImpl.open(ManagedClientConnectionImpl.java:304)
+	at org.apache.http.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:611)
+	at org.apache.http.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:446)
+	at org.apache.http.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:863)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientFileSystemBrowser.runRequest(HttpClientFileSystemBrowser.java:263)
+	at org.eclipse.ecf.provider.filetransfer.browse.AbstractFileSystemBrowser$DirectoryJob.run(AbstractFileSystemBrowser.java:69)
+	... 1 more
+!SUBENTRY 1 org.eclipse.equinox.p2.transport.ecf 4 1002 2016-11-09 22:46:38.349
+!MESSAGE Unable to connect to repository http://download.eclipse.org/stats/releases/neon/org.eclipse.epp.logging.aeri.feature-2.0.3-SNAPSHOT
+!STACK 0
+java.net.ConnectException: Connection timed out: connect
+	at java.net.DualStackPlainSocketImpl.waitForConnect(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.doConnect(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connectToAddress(Unknown Source)
+	at java.net.AbstractPlainSocketImpl.connect(Unknown Source)
+	at java.net.PlainSocketImpl.connect(Unknown Source)
+	at java.net.SocksSocketImpl.connect(Unknown Source)
+	at java.net.Socket.connect(Unknown Source)
+	at org.apache.http.conn.scheme.PlainSocketFactory.connectSocket(PlainSocketFactory.java:117)
+	at org.apache.http.impl.conn.DefaultClientConnectionOperator.openConnection(DefaultClientConnectionOperator.java:177)
+	at org.apache.http.impl.conn.ManagedClientConnectionImpl.open(ManagedClientConnectionImpl.java:304)
+	at org.apache.http.impl.client.DefaultRequestDirector.tryConnect(DefaultRequestDirector.java:611)
+	at org.apache.http.impl.client.DefaultRequestDirector.execute(DefaultRequestDirector.java:446)
+	at org.apache.http.impl.client.AbstractHttpClient.doExecute(AbstractHttpClient.java:863)
+	at org.apache.http.impl.client.CloseableHttpClient.execute(CloseableHttpClient.java:82)
+	at org.eclipse.ecf.provider.filetransfer.httpclient4.HttpClientFileSystemBrowser.runRequest(HttpClientFileSystemBrowser.java:263)
+	at org.eclipse.ecf.provider.filetransfer.browse.AbstractFileSystemBrowser$DirectoryJob.run(AbstractFileSystemBrowser.java:69)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:55)
+
+!ENTRY org.eclipse.jface.text 2 0 2016-11-09 22:46:51.474
+!MESSAGE Duplicate template id: 'org.eclipse.wst.xslt.templates.xpath.number'
+
+!ENTRY org.eclipse.jface.text 2 0 2016-11-09 22:46:51.475
+!MESSAGE Duplicate template id: 'org.eclipse.wst.xslt.templates.xpath.round'
+
+!ENTRY org.eclipse.jface.text 2 0 2016-11-09 22:49:11.005
+!MESSAGE Duplicate template id: 'org.eclipse.wst.xslt.templates.xpath.number'
+
+!ENTRY org.eclipse.jface.text 2 0 2016-11-09 22:49:11.007
+!MESSAGE Duplicate template id: 'org.eclipse.wst.xslt.templates.xpath.round'
+
+!ENTRY org.eclipse.equinox.p2.touchpoint.natives 2 0 2016-11-09 22:51:16.365
+!MESSAGE Could not remove temporary backup directory (it is safe to manually delete it and its contents): D:\DesignTool\eclipse\eclipse\backup\D__DesignTool_eclipse_eclipse_2b093249aae0_de1229132e86
