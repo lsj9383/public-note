@@ -254,3 +254,18 @@
 		
 		其实就是使用格式化输出。
 	其实本质上就是对键值对上加了层封装
+	4.struts的国际化 
+		1).配置
+			在struts-config.xml中配置国际化.
+				<message-resources parameter="<packageName>.<baseName>" />
+			提供具体的国际化资源文件放在能找到的路径下即可.
+				<baseName>.properties
+				<baseName>_zh_CN.properties
+				<baseName>_en_CN.properties
+			在是用的jsp中配置
+			<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+		2).使用
+			jsp管理视图，因此常在jsp中读出资源文件的数据。并且有专门的标签负责读该类资源文件。
+			<bean:message key="<key in message-resources>">
+			不同的web语言首选项，会发送不同的Locale到server，以读不同的资源文件。
+			web发送accept-language的
