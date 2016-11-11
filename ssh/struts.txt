@@ -261,11 +261,61 @@
 			提供具体的国际化资源文件放在能找到的路径下即可.
 				<baseName>.properties
 				<baseName>_zh_CN.properties
-				<baseName>_en_CN.properties
+				<baseName>_en_US.properties
 			在是用的jsp中配置
 			<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
 		2).使用
 			jsp管理视图，因此常在jsp中读出资源文件的数据。并且有专门的标签负责读该类资源文件。
 			<bean:message key="<key in message-resources>">
 			不同的web语言首选项，会发送不同的Locale到server，以读不同的资源文件。
-			web发送accept-language的
+			web发送accept-language的消息报头给server以指定显示的。若服务器不存在accept-language指定的资源文件，则使用服务器系统的language对应的资源文件，若服务器系统language的资源文件也不存在，那么就使用<baseName>.properties中的配置。
+		当然struts的国际化资源文件，也是在servlet初始化时就加载内存里了，若修改了国际化资源文件，就需要重新启动tomcat。(因为一般都配置servlet在tomcat开启时全部加载)
+		3).手动切换语言设置
+			该用户的语言环境是配置在该用户的session中的。用户第一次登陆，就已经将语言环境配置到session中了，以后该用户的连接就直接用session中的语言设置。
+			因此，在Action中进行session配置locale即可:
+				Locale locale = new Locale("zh", "CN");
+				request.getSession().setAttribute(Globals.LOCALE_KEY locale);
+		4).ActionMessage
+			一个ActionMessage对应了一个国际化资源文件中的一条kv中的value
+			ActionMessage message = new ActionMessage("<key>", Object[]);	从当前对应的locale中的key中读取。后面是添加占位符。
+八、动态异常处理
+	1.配置
+		<action ...>
+			<exception key="<国际资源文件中的key>" type="<Exception Class>" path="<forward-path>"/>	出现了指定的异常类后，在<forward-path>中，打印国际化消息。
+		</action>
+		捕捉的是由action.execute();抛出的异常
+		也可以将异常处理配置为全局的。
+		<global-exceptions>
+			<exception ....>
+		</global-exceptions>
+
+九、DispatchAction
+	这是Action子类，可以将多个Action的逻辑集合到DispatchAction类里的不同方法中去。
+	而不同方法的调用，通过uri中的command参数进行制定。
+	即....dispatch.do?command=<method>
+	1.配置
+		<action ... parameter="command">
+			<forward ... >
+			<forward ... >
+			<forward ... >
+			...
+		</action>
+	2.代码
+		public class Manager extends DispatchAction{
+			method1(){
+			}
+			
+			method2(){
+			}
+			
+			...
+		}
+	3.访问
+		http://.../dispatch.do?commad=method1
+		这里的command跟的参数必须和方法名完全一致。
+	DispatchAction的execute方法有具体的调用逻辑，因此不能覆盖。
+	DispatchAction有一个unspecified的方法，这个方法可以覆盖。用于若没有指定parameter时，就调用该方法。
+	parameter参数值不能是execute和perform方法。
+	
+十、其他
+	BeanUtils.copyProperties(target, origin); 将源对象中的所有getter的属性，赋值到targget的getter属性中去，要求这些属性同名。
