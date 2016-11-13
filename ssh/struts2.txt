@@ -1,68 +1,58 @@
-一、struts框架
-	框架是整个或部分系统的可重用设计，表现为一组抽象构件以及构件实例交互的方法。
-	struts2以webWork的设计思想为核心, 提供了一个整洁的MVC设计模式的实现web应用程序框架。
-	优点
-		1).非侵入式设计，struts的action类为POJO类，不依赖于servletAPI和strutsAPI。(POJO类，就是java原生类)
-		2).提供了拦截器，拦截器可以进行AOP编程。(AOP编程：面向切面编程)
-		3).提供了类型转换器，可以将特殊的请求参数转换成需要的类型。
-		4).输入验证可以指定方法进行验证。
-		5).提供了全局范围、包范围和Action范围的国际化资源文件管理实现。
-		
-二、核心jar包
-	13个
-	asm
-	asm-commons
-	asm-tree
-	javassist			生成字节码代理的
-	commons-fileupload	文件上传
-	commons-io			文件上传依赖的jar包
-	commons-lang		基本类型
-	freemarker			ui模板
-	log4j-api
-	log4j-core			这两个是管理日志的
-	ognl				对象图导航语言
-	struts2				struts2核心jar包
-	xwork-core			webwork的核心(struts2是webwork基础上建立的)
-	
-三、struts2开发流程
-	1.<!-- 在web.xml中注册struts2启动项 -->
-	  <filter>
-		<filter-name>Struts</filter-name>
-		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
-	  </filter>
-	  
-	  <filter-mapping>
-		<filter-name>Struts</filter-name>
-		<url-pattern>/*</url-pattern>
-	  </filter-mapping>
-	
-	2.添加类路径的xml
-		在src文件夹中添加【struts.xml】，名字一定要对。可以在其中添加struts约束。		
-		<?xml version="1.0" encoding="UTF-8"?>
-			<!DOCTYPE struts PUBLIC
-				"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
-				"http://struts.apache.org/dtds/struts-2.3.dtd">
-		<struts>
-			....
-		</struts>
-		
-	3.编写action
-		
-	4.注册action
-		<package name="demo" namespace="/test" extends="struts-default">
-			<action name="login" class="com.lsj.actions.LoginAction">
-				<result name="success">/welcome.jsp</result>
-			</action>
-		</package>
-		将action的uri和其class相互映射。这里的url是host/app/test/login.action
-		并且指定执行完成后，返回的结果字符串将会跳到的页面。
+一、struts
+	struts2需要运行在jre1.5及以上版本
+	1.与struts的比较
+		1).Actioin类
+			struts1的Action必须继承
+			struts2的Action不必继承
+		2).线程安全
+			struts1是单例的
+			struts2是多例的
+		3).Servlet API依赖
+			struts1的Action需要依赖Servlet API(HttpRequest, HttpResponse)
+			struts2的Action不依赖Servlet API
+		4).可测试性
+			struts1的action 需要容器支持，所以不容易测试。
+			struts2的actioin不依赖于容器，所以易于测试。
+		5).ActionForm
+			struts2没有ActionForm，直接用action来收集数据。也因此struts2必须是多例的。
+		6).类型转换器
+			struts1对ActionForm类型转换使用beanUtils
+			struts2使用OGNL
+		7).Action执行控制
+			struts1固定不变
+			struts2通过拦截器，可以改变执行流程
+	2.配置
+		1).web.xml
+			配置核心的控制器，用于请求的转发，就和struts1中的servlet一样。struts2是用filter作为控制器的。
+			在web.xml中配置
+			<filter>
+				<filter-name>struts2</filter-name>
+				<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+			</filter>
 
-四、struts2配置文件
-	1).struts-default.xml
-	2).default.properties
-	3).struts-plugin.xml
-	4).struts.xml(核心配置文件), 可以指定一些常量值。
-	5).struts.properties, 可以指定一些常量值，如扩展名:struts.action.extension=e1,e2
-	6).web.xml，也可以指定一些常量值。
-	这些使能的优先级：web.xml>struts.properties>struts.xml>default.properties
-	不过，web.xml和struts.properties一般不用。直接用struts.xml来设置。
+			<filter-mapping>
+				<filter-name>struts2</filter-name>
+				<url-pattern>/*</url-pattern>  
+			</filter-mapping>
+
+			
+		2).创建Action
+			struts2可以直接创建一个普通类，不继承和实现任何类和接口。因此struts2是个pojo类。
+			action的缺省方法名称：public String execute() throws Exception
+			action中提供getter和setter方法，方便收集表单数据。其实就是将struts1中的ActionForm的功能将Action结合到了一起。
+
+		3).struts.xml
+			在src中配置struts.xml
+			<?xml version="1.0" encoding="UTF-8"?>
+			<!DOCTYPE struts PUBLIC
+			"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+			"http://struts.apache.org/dtds/struts-2.3.dtd">
+			<struts>
+				<!-- 必须要继承这个包，这个包提供基本的struts2的包的能力 -->
+				<package name="struts2" extends="struts2-default">
+					<action name="login" class="LoginAction">
+						<result name="<ret-value1>"><uri></result>
+						<result name="<ret-value2>"><uri></result>
+					</action>
+				</package>
+			</struts>
