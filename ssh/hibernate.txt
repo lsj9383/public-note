@@ -1,0 +1,105 @@
+一、介绍
+	Hibernate是持久层，用于数据持久化。其实就是对jdbc做了一层封装。
+	使用Hibernate可以使我们采用对象化的操作关系型数据库。
+	1.优点
+		1).使开发更加对象化。
+		2).易移植
+		3).没有侵入性，支持透明持久化。
+	2.缺点
+		1).使用数据库特性的语句。
+		2).对大批量数据更新存在问题。
+		3).系统中存在大量的统计查询功能不太适合。
+	3.目录结构
+		- doc		一些api参考文档
+		- eg		一些demo
+		- etc		一些配置文件的例子模板
+		- lib		第三方依赖包
+		- src		源代码
+		- test		测试程序
+
+二、开始
+	Hibernate可以用在任何java项目，因为它本来就只是用于sql的。
+	1.创建User Library. 加入依赖包
+		* HIBERNATe_HOME/lib/*.jar
+		* HIBERNATe_HOME/hibernate3.jar
+		* 加入数据库驱动(mysql的jdbc驱动)
+	2.添加配置文件
+		hibernate.cfg.xml放到classpath可以搜索的路径下，一般放到src路径下。
+		<!DOCTYPE hibernate-configuration PUBLIC
+			"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+			"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+		<hibernate-configuration>
+			<session-factory>
+				<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+				<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate_first</property>
+				<property name="hibernate.connection.username">root</property>
+				<property name="hibernate.connection.password">root</property>
+				<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+				<property name="hibernate.show_sql">true</property>		<!-- 方便观察生成的文件 -->
+				<property name="hibernate.format_sql">true</property>
+			</session-factory>
+			
+			<!-- 指出映射文件 -->
+			<mapping resource="com/lsj/hibernate/User.hbm.xml"/>
+		</hibernate-configuration>
+	3.建立实体类
+		该类对象是需要持久化的，也就是该类将会保存到数据库中，类中的每个属性就是一个字段。
+		也就是说，一个表其实就是一个对象集合。
+	4.建立映射
+		<class-name>.xml，该配置文件一般和实体类放在同一个包下。
+		<?xml version="1.0"?>
+		<!DOCTYPE hibernate-mapping PUBLIC 
+			"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+			"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+		<hibernate-mapping>
+			<class name="com.lsj.hibernate.User">	<!-- 建立类和表的映射 -->
+				<id name="<class-property>">		<!-- 建立主键对应 -->
+					<generator class="uuid" />		<!-- 主键生成策略，必须提供 -->
+				</id>
+				
+				<!-- 对象的属性和表中的字段建立映射-->
+				<property name="<class-property>" />
+				<property name="<class-property>" />
+				...
+				<property name="<class-property>" />
+			</class>
+		</hibernate-mapping>
+		
+		这样子对对象的操作，将会对应到对数据库表的操作。
+	5.添加建表类，以创建表：
+		这是手动法，也可以采用别的机制。
+		Configuration cfg = new Configuration().configure();	//读取hibernate.cfg.xml配置文件
+		SchemaExport export = new SchemaExport(cfg);			//
+		export.create(true, true);		//创建表,配置文件中有类到表的映射，因此先将表创建出来。
+	6.建立客户端类，添加数据：
+		Configuration cfg = new Configuration().configure();
+		SessionFactory factory = cfg.buildSessionFactory();		//建立session-factory, 这是数据库的镜像。
+		Session session = null;			//用于进行事务
+		try{
+			session = factory.openSession();	//得到session
+			session.beginTransaction();			//开启事务
+			....
+			session.save(object);				//保存一个对象到表中
+			session.getTransaction().commit();	//提交事务
+		}catch(Exception e){
+			e.printStackTrace();
+			session.getTransaction().rollback();
+		}finally{
+			if(session != null){
+				if(session.isOpen()){
+					session.close();
+				}
+			}
+		}
+	三、持久化对象的状态
+		1.瞬时对象Transient Objects
+			不在数据库中的对象，例如刚刚new的对象。不再应用这些对象时，他们的状态将会丢失，进而被垃圾回收。
+		2.持久化对象
+			具有数据库标识，并且由持久化管理器session统一管理的。session可以通过提交事务，进行和数据库的同步。
+		3.理想对象
+			session关闭后，持久化对象就变为了离线对象，表示该对象不再与数据库同步。也就是说对象的状态改变时，不会同步到数据库中。
+	
+	四、Junit测试
+		创建测试类，测试类继承于TestCase
+		这样该类中的所有方法都会顺序自动执行一遍。
