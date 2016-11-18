@@ -159,3 +159,27 @@
 		2.分页
 			query.setFirstResult(int);	//查找的起始位置
 			quer.setMaxResult(int);		//查找的最大结果集
+
+八、基本映射
+	映射在<hibernate-mapping>标签中配置
+	1.常用映射
+		表-----------实体类 采用<class>标签
+		表字段 ------实体类中的普通属性(不包括集合、自定义类和数组) 采用<property>标签
+
+		注：1.如果实体类的属性名和sql中的关键词重了，将会出现错误。这种情况可以采用table属性和column属性对其在在数据库中的字段名重命名。
+			2.类不能用final，因为代理是继承与类的。
+			3.类最好提供标识符，例如id。
+			4.setter是可以省略的，但是需要改配置。
+			
+	2.实体类设计原则:
+		1).实现无参的默认构造函数。
+		2).提供一个标识。
+		3).建议不要使用final修饰实体类。
+		4).建议为实体类生产getter和setter方法。
+	
+	3.配置文件
+		<hibernate-mapping package="<package-name>">
+			<class name="<class-name>" table="<table-name>">	<!-- 若没有table属性，则默认table名为class名 -->
+				<property name="" column="<column-name>">		<!-- 若梅有指定column，则默认字段名用类的属性名 -->
+			</class>
+		</hibernate-mapping>
