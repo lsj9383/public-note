@@ -268,7 +268,7 @@ GET和POST的区别:
 		Map<String, String[]>, 大多数情况下的Value都只有一个元素。当key重复一样的时候，其实就是将重复的key对应的value保存到String[]中。
 	常用方法：
 		1).获取表单数据
-			String getParameter(String name), 通过key获取value一位数组的首元素
+			String getParameter(String name), 通过key获取value一位数组的首元素, POST或者GET中的数据
 			Map getParameterMap(),	获取整个Map
 			Enumeration getParameterNames(),	获取Map的所有key
 			String[] getParameterValues(String name),	通过获得value这一数组, 适合取复选框的数据，因为复选框的数据的key全都一样的。

@@ -80,7 +80,7 @@
 			session = factory.openSession();	//得到session
 			session.beginTransaction();			//开启事务
 			....
-			session.save(object);				//保存一个对象到表中
+			session.save(object);				//将对象纳入session管理，在这里会在数据库中生成于之对应的主键
 			session.getTransaction().commit();	//提交事务
 		}catch(Exception e){
 			e.printStackTrace();
@@ -92,14 +92,70 @@
 				}
 			}
 		}
-	三、持久化对象的状态
-		1.瞬时对象Transient Objects
-			不在数据库中的对象，例如刚刚new的对象。不再应用这些对象时，他们的状态将会丢失，进而被垃圾回收。
-		2.持久化对象
-			具有数据库标识，并且由持久化管理器session统一管理的。session可以通过提交事务，进行和数据库的同步。
-		3.理想对象
-			session关闭后，持久化对象就变为了离线对象，表示该对象不再与数据库同步。也就是说对象的状态改变时，不会同步到数据库中。
+三、持久化对象的状态
+	1.瞬时对象Transient Objects
+		不在数据库中的对象，例如刚刚new的对象。不再应用这些对象时，他们的状态将会丢失，进而被垃圾回收。
+		通过session.save(object)，可以将瞬时对象纳入session管理。
+		* 没有被session管理
+		* 在数据库中没有与之匹配的记录
+		
+	2.持久化对象
+		具有数据库标识，并且由持久化管理器session统一管理的。session可以通过提交事务，进行和数据库的同步。
+		在提交前，若对该类对象做了任何修改，都会在sql语句中体现出来。
+		持久化对象，调不调用session.update没有意义。
+		* 纳入session管理
+		* 数据库中有与之匹配的记录（一旦save，就会在数据库中生成主键，创建于之对应的记录）
+		* 当属性发送改变，在清理缓存会自动和数据同步。
+		
+	3.离线对象(detached)
+		session关闭后，持久化对象就变为了离线对象，表示该对象不再与数据库同步。也就是说对象的状态改变时，不会同步到数据库中。
+		通过session.update(object)，可以将离线对象重新纳入session管理。
+		一个对象是否映射到了数据库中，主要是通过主键来判断的。对象的主键值存在于数据库中，那么该对象将映射与数据库中对应的对象。
+		换句话说，可以手动创建离散对象，也就是将其主键值设置为在数据库中已经存在的主键值。
+		* 没有被session管理
+		* 在数据库中存在与之匹配的记录
+		
+四、Junit测试
+	* 创建测试类，测试类继承于TestCase。
+	* 编写单元测试方法，方法名称必须为test开头，方法没有参数，没有返回值。
+	* 最好采用单的目录存放测试程序
 	
-	四、Junit测试
-		创建测试类，测试类继承于TestCase
-		这样该类中的所有方法都会顺序自动执行一遍。
+五、关系型对象转实际对象(查询)
+	只能通过主键来拿取。并且拿取下的是持久化对象。
+	1.get
+		执行get会马上执行一条sql查询语句。立刻返回实际对象。
+		Serializable session.get(<Class>, "<primary-key-value>");	//返回的是持久化对象，也就是说它受session管理。
+		若指定的数据不存在，会返回null。
+	2.load
+		执行load不会执行sql查询语句。返回的是代理模式，直到在使用该对象的实际数据时才执行sql查询语句，将其加载进来。
+		这其实是延迟加载，只有在真正使用对象时，再加载。这样做可以提高性能。
+		这里的代理采用CGLIB库生成的，而非jdk的动态代理。jdk动态代理要求类实现了接口，CGLIB代理不需要这样的约束。
+		Serializable session.load(<Class>, "<primary-key-value>");
+		若指定的数据不存在，还是会得到代理的，在使用代理时，会抛出ObjectNotFoundException异常。
+		
+六、删除与更新
+	1.删除
+		先获得持久化对象，再删除。
+		session.delete(object);		将指定的对象从数据库中删除。
+		object需要先从数据库中加载。
+	2.更新
+		更新是针对detached对象(离线对象)的.
+		1).一般是将对象加载进来，对象进入了持久化状态，这时候根本不需要update就可以更新。
+		2).若对象没有被加载进来，但是通过某种方式这个对象存在了，就需要通过update来进行加载。session.update(<detached-object>);
+		
+七、Query接口
+	提供更丰富的查询功能。
+	1.使用
+		session.beginTransaction();
+		Query query = session.createQuery(queryString);
+		List userList = quer.list();
+		...
+		
+	2.queryString
+		可以是HQL/SQL
+		HQL是Hibernate QL，因为不同的sql有不同的sql语句，而Hibernate把不同的sql封装了，用hql来提供服务。
+		1.queryString=="from <class-name>"
+			这样得到是对应class的所有对象，其实就是把对应表里的数据全部都拿出来了。
+		2.分页
+			query.setFirstResult(int);	//查找的起始位置
+			quer.setMaxResult(int);		//查找的最大结果集
