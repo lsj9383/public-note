@@ -183,3 +183,79 @@
 				<property name="" column="<column-name>">		<!-- 若梅有指定column，则默认字段名用类的属性名 -->
 			</class>
 		</hibernate-mapping>
+	4.主键标签
+		1).常用属性
+		<id
+			name=""
+			type=""		<!-- 字段在表中保存的类型 -->
+			column=""
+			access="field|property|ClassName"	<!-- 若设置为field，则类可以省略setter方法 -->
+			
+			<generator class="" />
+		/>
+
+		2).生成器策略:
+			identity	自增。mysql支持，orcale不支持
+			sequence	也是自增的，和上者的数据库类型不一样。orcale支持，mysql不支持。
+			uuid		用一个128bit的uuid算法生成字符串类型标识符，这在一个网络中是唯一的（使用了ip地址）。
+			native		根据底层数据库支持的来生成，自动使用。
+			assigned	主键手动分配，即在session.save之前程序员为主键分配数值。
+			foreign		使用另外一个相关联的对象的标识符。
+	5.属性标签
+		<property
+			name=""				<!-- 属性的名字 -->
+			column=""			<!-- 属性在表中的字段名 -->
+			type=""				<!-- 属性在表中的字段类型 -->
+			unique="true|false"	<!-- 字段值不可重复-->
+			not-null="true|false"
+			access="field|property|ClassName"	<!-- 若设置为field，则类可以省略setter方法 -->
+		/>
+九、多对一关联映射
+	关联映射，就是将对象模型的关联关系映射到数据库中。
+	所谓的关联关系，在对象模型中就是一个或多个引用。
+	1.多对一关联映射原理
+		在多的一端加入一个外键，指向一的一端。
+		<many-to-one name="group" column="groupid" />	<!-- 该标签添加到多的一方 -->
+			
+	2.两个表的配置
+		1).Group table
+			<class name="com.lsj.hibernate.Group", table="t_group">
+				<id name="id">
+					<generator class="native">
+				</id>
+				<property name="name" />
+			</class>
+		2).User table
+			<class name="com.lsj.hibernate.User"  table="t_user">
+				<id name="id">
+					<generator class="native">
+				</id>
+				<property name="name" />
+				<many-to-one name="group" column="groupid" />	<!-- 在多的一段加个外键 -->
+			</class>
+	3.类配置
+		class Group{
+			String id;
+			String name;
+		}
+		
+		class User{
+			String id;
+			String name;
+			Group group;
+		}
+	4.使用
+		Persistent对象不能引用Transient对象。否则在commit时，发现Persistent中引用了Transient对象，是会报错的。这里的引用这的是对象所映射的表存在引用关系。
+		因为引用的对象，也会在数据库中更新表，而Transient对象无法被session管理。
+	5.级联(cascade)
+		<many-to-one name="group" column="groupid" cascade=""/>
+		hibernate会首先保存表的关联对象,这样就让关联的对象强制成为了Persistent对象。
+		级联是对象之间的连锁操作，只影响添加，删除和修改。自动对关联的对象进行操作。
+		all  任何行为都进行级联操作。
+		none 不进行级联操作，默认
+		save-update	在保存和更新时，进行级联操作。
+		delete 在删除时执行级联操作。
+	6.查询
+		load(Class, id);可以拿到对象，若要使用引用的对象时，才会去取该引用对象的数据。这是因为load采用延迟加载策略。
+
+十、一对一关联映射
