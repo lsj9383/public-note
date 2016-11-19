@@ -218,14 +218,14 @@
 		<many-to-one name="group" column="groupid" />	<!-- 该标签添加到多的一方 -->
 			
 	2.两个表的配置
-		1).Group table
+		1).Group
 			<class name="com.lsj.hibernate.Group", table="t_group">
 				<id name="id">
 					<generator class="native">
 				</id>
 				<property name="name" />
 			</class>
-		2).User table
+		2).User
 			<class name="com.lsj.hibernate.User"  table="t_user">
 				<id name="id">
 					<generator class="native">
@@ -259,3 +259,63 @@
 		load(Class, id);可以拿到对象，若要使用引用的对象时，才会去取该引用对象的数据。这是因为load采用延迟加载策略。
 
 十、一对一关联映射
+	主键关联	：两个对象具有相同的主键。比如身份证对象和人类对象，这两类对象是一一对应的。
+	唯一外键关联：外键的值增加了唯一约束。其实一对一就是多对一的特殊情况。
+	这类的数据用两个表，并不是为了减少冗余，而是增加对象型。
+	1.表和类的配置
+		1).表1
+			class t1{
+				private int id;
+				private String other-property;
+				setter and getter...
+			}
+			<class name="<class-name>" table="<table-name-1>">
+				<id name="native" />
+				<property name="<property-in-class>" />
+				...
+				<one-to-one name="">
+			</class>
+		2).依赖表1主键的表2
+			class t2{
+				private int id;
+				private String name;
+				private t1 reference;		//引用的对象。当前对象与引用对象是一一对一的。
+				setter and getter...
+			}
+			<class name="<class-name>" table="<table-name-2>">
+				<id name="id">
+					<!-- foreign会取得关联对象的标识 -->
+					<generator class="foreign">
+						<param name="property"></param>	<!-- 具体取哪个property的标识 -->
+					</generator>
+				</id>
+				<property name="<property-in-class>" />
+				...
+				<!--
+					one-to-one标签，指示hibernate如何加载对象的关联(引用)对象，也就是拿到关系字段值，
+					也就是拿到关系字段值，根据对端的主键加载关联对象。
+					Constrained="true"表示当前主键，还是一个外键 
+				-->
+				<one-to-one name="<reference-object>" constrained="true">
+			</class>
+	2.编程
+		1).保存
+			session.beginTransaction();
+			t1 idcard = new t1();
+			t1.setProperty
+			
+			t2 person = new t2();
+			t2.setReference(idcard);
+			session.save(t2);			//建立两个对象(表)之间的一一对应关联。
+			
+			//一对一关联映射，默认会先保存关联对象。
+			session.getTransaction().commit();
+		2).读取
+			session.beginTransaction();
+			t2 person = (t2)load(t2.class, id);		//指定对象和关联对象都会读取出来
+			session.getTransaction().commit();
+	3.双向关联
+		需要在两端都加上<one-to-one>标签，指示hibernate将关联对象根据主键加载上来。
+		两端的类中也需要进行相互对象的引用。
+		<one-to-one>不影响存储(save保存数据)，只影响加载(load读取数据)。
+		也就是说，保存还是单向的，加载是双向的（加载任何一个类对象，都可以加载出关联对象）
