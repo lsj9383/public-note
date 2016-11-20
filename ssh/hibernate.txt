@@ -319,3 +319,178 @@
 		两端的类中也需要进行相互对象的引用。
 		<one-to-one>不影响存储(save保存数据)，只影响加载(load读取数据)。
 		也就是说，保存还是单向的，加载是双向的（加载任何一个类对象，都可以加载出关联对象）
+十一、session flush
+	1.session flush方法主要做两件事：
+		清理缓存
+		执行sql(执行sql后，数据库就已经缓存了对应的数据，但是其他事务是否能够读取当前事务更新的数据，要根据隔离级别来说。mysql默认是当前事务提交后，才会允许其他事务读取)
+	2.session flush的执行时间
+		默认在事务提交时
+		显示调用flush
+		在执行查询前
+	3.隔离级别
+		隔离级别	是否存在脏读	是否存在不可重复读		是否存在幻读
+		------------------------------------------------------------------
+		未提交读	T				T						T
+		提交读		N				T						T
+		可重复读	N				N						T
+		序列化读	N				N						N
+	4.不同主键生成策略的影响
+		1.uuid
+			执行save后不会执行sql语句，仅仅本地生成主键值并将对象放入session缓存，也会记录insert操作。
+		2.native
+			执行save后会执行sql语句，因为主键值的改变是基于表中主键数据的。当然也会放到session缓存中。
+			这个的save执行后，相当于就flush了。
+		3.assigned
+
+十二、一对多关联映射
+	比如班级和学生以一对多关系。（班级->学生是一对多, 学生->班级是多对一）
+	需要注意的是，虽然关系采用一对多，但是外键还是加在多的一端来建立关系。
+	一对多和多对一的映射原理是一样的，区别在于维护的关系不同（本质上是加载方向不同）
+		多对一维护的关系是，多指向一。加载多的时候，就可以加载出一。
+		一对多维护的关系是，一指向多。加载一的时候，就可以加载出多。
+	1.类与表
+		1).班级
+			class Classes{
+				private int id;
+				private String name;
+				private Set students;
+			}
+			
+			<class name="<classes-class-name>" table="t_classes">
+				<id name="id"><generator class="native" /></id>
+				<property name="name">
+				<!-- 一对多的集合维护 -->
+				<set name="students">
+					<!-- 在多的一端(student的表)添加一个字段，该字段指明了关系 -->
+					<key column="classid">
+						<one-to-many class="<student-class-name>" />	<!-- 指明了集合中是什么数据 -->
+					</key>
+				</set>
+			</class>
+		2).学生
+			class Student{
+				private int id;
+				private String name;
+			}
+			<class name="<student-class-name>" table="t_student">
+				<id name="id"><generator class="native" /></id>
+				<property name="">
+			</class>
+	2.使用
+		1).保存
+			session.beginTransaction();
+			Student student1 = new Student();
+			Student student2 = new Student();
+			Classes classes = new Classes();
+			classes.setStudents(new HashSet{student1, student2});
+			session.save(student1);		//多的classid字段并没有在student中，在表里classid将为null。也因此classid不能为null。
+			session.save(student2);
+			session.save(clases);		
+			session.getTransaction().commit();	//要保证student对象是persistent对象。该语句会更新student中的classid。
+		2).加载
+			session.beginTransaction();
+			Classes classes = (Classes)session.load(Classes.class, id);
+			Set students = classes.getStudent;
+			for(Iterator stu = students.iterator(); iter.hasNext(); ){	//这个集合里面的学生，也是延迟加载的。
+				..
+			}
+			session.getTransaction().commit();
+	3.双向
+		1).多对一存在一些缺陷，主要是:
+			* save(student)时，classid会存在null字段
+			* save(classes)时，会发送多余的update语句去更新student的classid
+			因此，采用双向不是需求驱动，而是为了克服缺陷。
+		
+		2).映射方式:
+			* 在一的一端，采用<key>标签，这样在多的一端会加入一个外键。
+			* 在多的一端，采用<many-to-one>标签。
+			以上两个标签加入的字段保持一致，否则会产生数据混乱。
+			
+		3).inverse属性：
+			* 默认为false。表示在本端可以维护关系。如果inverse为true，本端不能维护关系，交给另一端维护，并且本端失效。
+			* 可以用在一对多和多对多双向关联。
+			* 一对多关联映射，我们通常在多的一段维护关系，让一的一端失效，因此会设置inverse为true。（也就是说不让一来保存，让多的一端来保存）
+			
+		4).在多的一端
+			class Student{
+				private int id;
+				private String name;
+				private Classes classes;
+			}
+			<class name="<student-class-name>" table="t_student">
+				<id name="id"><generator class="native" /></id>
+				<property name="">
+				<many-to-one column="classid">
+			</class>
+
+十三、多对多映射
+	比如用户与角色，一个用户有多个角色，一个角色也可以有多个用户。
+	1.表与类
+		1).Role
+			class Role{
+				private int id;
+				private String name;
+			}
+			
+			<class name="<role-class-name>" table="t_role">
+				<id name="id">
+					<generator class="native" />
+				</id>
+				<property name="name" />
+			</class>
+		2).User
+			class User{
+				private int id;
+				private String name;
+				private Set roles;
+			}
+			
+			<class name="<role-class-name>" table="t_role">
+				<id name="id">
+					<generator class="native" />
+				</id>
+				<property name="name" />
+				<!-- 这样会添加一个表 -->
+				<set name="roles" table="t_user_role">
+					<key column="user_id" />
+					<many-to-many class="<role-class-name>" column="role_id"></many-to-many>
+				</set>
+			</class>
+
+十四、继承映射
+	1.一颗继承树一张表 的 类和表设计
+		比较简单，但是会造成大量的冗余。
+		1).Animal
+			class Animal{
+				private int id;
+				private String name;
+				private boolean sex;
+			}
+		2).Pig
+			class pig extends Animal{
+				private int weight;
+			}
+		3).Bird
+			class Bird extends Animal{
+				private int height;
+			}
+		4).表设计
+		<class name="<class-name>" table="t_animal">
+			<id name="id">
+				<generator class="">
+			</id>
+			<property name="name">
+			<property name="sex">
+			
+			<!-- 添加鉴别字段, 不同的类以不同的值来区分，这些值都属于鉴别字段 -->
+			<discriminator column="type" type="sring">
+			</discriminator>				
+			
+			<!-- 以下是指明当前类(表)的子类，以及需要扩展的属性 -->
+			<subclass name="<sub-class-name>" discriminator-value="P">
+				<property name="weight" />
+			</subclass>
+			<subclass name="<sub-class-name>" discriminator-value="B">
+				<property name="height" />
+			</subclass>
+		</class>
