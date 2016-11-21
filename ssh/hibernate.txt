@@ -458,8 +458,7 @@
 			</class>
 
 十四、继承映射
-	1.一颗继承树一张表 的 类和表设计
-		比较简单，但是会造成大量的冗余。
+	0.类模式
 		1).Animal
 			class Animal{
 				private int id;
@@ -474,7 +473,15 @@
 			class Bird extends Animal{
 				private int height;
 			}
-		4).表设计
+	1.一颗继承树一张表 的 类和表设计
+		比较简单，但是会造成大量的冗余。
+		-----------------------------------
+		id	name  sex  weight  height  type
+		------------------------------------
+		1    sp    M     100    NULL    P
+		2    sb    W     NULL   200     B
+		..
+		-------------------------------------
 		<class name="<class-name>" table="t_animal">
 			<id name="id">
 				<generator class="">
@@ -494,3 +501,184 @@
 				<property name="height" />
 			</subclass>
 		</class>
+	2.每个类一张表
+		存储冗余小，但是执行效率低，因为插入一个数据，要操作多个表（当前类和所有的父类）
+		-------------
+		id	name  sex
+		-------------
+		1    sp    M 
+		2    sb    W 
+		..
+		-------------
+		-----------
+		pid  weight
+		-----------
+		1    100
+		..
+		-----------
+		-----------
+		bid  height
+		-----------
+		2    200
+		..
+		-----------
+		<class name="<class-name>" table="t_animal">
+			<id name="id">
+				<generator class="">
+			</id>
+			<property name="name">
+			<property name="sex">	
+			
+			<!-- 以下是指明当前类(表)的子类，以及需要扩展的属性，这会生成新的表 -->
+			<joined-subclass name="<sub-class-name>" table="t_pig">
+				<key column="pid" />			<!-- pid和父类的id对应 -->
+				<property name="weight" />
+			</joined-subclass>
+			<joined-subclass name="<sub-class-name>" table="t_bird">
+				<key column="bid">				<!-- bid和父类的id对应 -->
+				<property name="height" />
+			</joined-subclass>
+		</class>
+	3.每个具体类一张表
+		---------------------
+		id	name  sex  weight
+		---------------------
+		1    sp    M     100 
+		..
+		---------------------
+		---------------------
+		id	name  sex  weight
+		---------------------
+		2    sb    W     200 
+		..
+		---------------------
+		<class name="<class-name>" table="t_animal" abstract="true">
+			<id name="id">
+				<generator class="">
+			</id>
+			<property name="name">
+			<property name="sex">	
+			
+			<!-- 以下是指明当前类(表)的子类，以及需要扩展的属性，这会生成新的表 -->
+			<union-subclass name="<sub-class-name>" table="t_pig">
+				<property name="weight" />
+			</union-subclass>
+			<union-subclass name="<sub-class-name>" table="t_bird">
+				<property name="height" />
+			</union-subclass>
+		</class>
+
+十五、复合主键映射
+	要将表中的复合主键抽取出来，单独生成类。
+		* 这个类应该实现序列化接口。
+		* 这个类也应该覆盖hashCode，因为可能会有HashMap的结构进行数据存储。
+	public PK{
+		private Object o1;
+		private Object o2;
+	}
+	<class name="<class-name>">
+		<composite-id name="<PK-class-name>">
+			<key-property name="<PK-property>">
+			...
+		</composite-id>
+		<property name="" />
+		...
+	</class>
+	
+十六、Component映射
+	把类中的引用的对象的属性摊开来保存到表里。
+	class User{
+		private int id;
+		private String name;
+		private Component component;
+	}
+	
+	class Component{
+		private Object Component-Property1;
+		private Object Component-Property2;
+		private Object Component-Property3;
+	}
+	<class name="">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property name="<this-class-property>">
+		<component name="<this-class-property>">
+			<property name="<component-property>" />
+			<property name="<component-property>" />
+			<property name="<component-property>" />
+		</component>
+	</class>
+
+十七、集合映射
+	public class CollectionMapping{
+		private int id;
+		private String name;
+		private Set setValues;
+		private List listValues;
+		private String[] arrayValues;
+		private Map mapValues;
+	}
+	每个集合都会额外保存为一张表。
+	---------------------
+	set_id      set_value
+	----------------------
+	   1           a
+	   1           b
+	-----------------------
+	
+	--------------------------------------
+	list_id      list_value    list_index
+	--------------------------------------
+	   1           c               0
+	   1           d               1
+	--------------------------------------
+	
+	------------------------------------------
+	array_id      array_value    array_index
+	------------------------------------------
+	   1              e              0
+	   1              f              1
+	------------------------------------------
+	
+	--------------------------------------
+	map_id      map_key     map_value
+	--------------------------------------
+	   1           K1          V1
+	   1           K2          V2
+	--------------------------------------
+	
+	<class name="" table="">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property name="name" />
+		<set name="setValues" table="t_set_values">
+			<key column="set_id" />
+			<element type="string" column="set_value" />
+		</set>
+		<list name="listValues" table="t_list_values">
+			<key column="list_id" />
+			<list-index column="list_index" />
+			<element type="string" column="list_value" />
+		</list>
+		<array name="arrayValues" table="t_array_values">
+			<key column="list_id" />
+			<array-index column="array_index" />
+			<element type="string" column="array_value" />
+		</array>
+		<map name="mapValues" table="t_map_values">
+			<key column="map_id" />
+			<map-key type="string" column="map_key" />
+			<element type="string" column="map_value" />
+		</map>
+	</class>
+
+十八、lazy策略
+	hibernate的lazy策略，必须在session打开状态下有效。
+	* <class>标签上，可以取值true/false
+		只影响普通属性
+	* <property>标签上，可以取值trre/false
+	* <set><list>标签上，可以取值true/false/extra
+	* <many-to-one><one-to-one>标签上，可以取值false/proxy
+		这些标签不会受到class的lazy策略影响，他们可以定义自己的lazy策略、
