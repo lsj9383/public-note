@@ -681,4 +681,47 @@
 	* <property>标签上，可以取值trre/false
 	* <set><list>标签上，可以取值true/false/extra
 	* <many-to-one><one-to-one>标签上，可以取值false/proxy
-		这些标签不会受到class的lazy策略影响，他们可以定义自己的lazy策略、
+		这些标签不会受到class的lazy策略影响，他们可以定义自己的lazy策略
+		
+十九、HQL(Hibernate Query Language)
+	HQL用面向对象的方式生成SQL，使用HQL是方便跨SQL平台。
+		* 以类和属性来代替表和数据字段
+		* 支持多态
+		* 支持各种关联
+		* 减少了SQL冗余
+	HQL关键字不区分大小写，通常小写。
+	1.简单属性查询
+		List items = session.createQuery("<hql>");
+		1).查询单个属性
+			hql == select <property-name> from <class-name>		//查询出指定类的所有对象中的指定属性名。
+		2).查询多个属性
+			a).默认方式
+				返回对象数组集合即List<Object[]>, Object[]的长度和查询的属性个数一直。
+				hql == select <property-name>,<>,<>,.. from <class-name>		//查询出指定类的所有对象中的指定属性名。
+			b).自定义方式
+				hql == select new <property-save-calss-name>(<property-name>,<>,<>),.. from <class-name>		//查询出指定类的所有对象中的指定属性名。
+				这样可以自定义一个新的类，用于保存这些查询出来的属性名。
+				返回的是List< <property-save-calss-name> >;
+		3).使用别名
+				hql == select <property-name>.alias from <class-name>"
+	2.实体对象查询
+		1).list
+			执行一条list就会发送一条sql语句去查询所有数据，将结果保存到session缓存里。
+			需要注意，list是【强制】每次都发送sql语句，并不检查缓存。
+			session.createQuery("from <class-name>").list();			//可以忽略select关键字，返回<class-name>的所有对象实体
+			session.createQuery("select <alias> from <class-name> as <alias>").list();			//若使用select关键字，必须加别名，这样才可以返回所有对象实体。
+			不支持select * 的写法
+		2).iterate
+			会发送一条查询id列表的sql语句，再根据id到去session缓存里找对应数据。若没有，就会发送一条sql语句去查询，查询只查一条。
+			Iterator iter = session.createQuery("from <class-name>").iterate;;
+			会有N+1问题:
+				1:发出一条查询id列表的语句
+				N:根据id发出n条sql语句，加载相关对象。
+	3.条件查询
+		1).拼串
+			session.createQuery("from <class-name> where ....").list();
+		2).占位符
+			Query query = session.createQuery("from <class-name> where <property> like ? ").;
+			query.setParameter(0, "...");		//在这里设置占位符句内容，索引从0开始.(jdbc从1开始)
+			List items = query.list();
+			也可采用':参数名'作为占位符
