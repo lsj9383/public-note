@@ -725,3 +725,18 @@
 			query.setParameter(0, "...");		//在这里设置占位符句内容，索引从0开始.(jdbc从1开始)
 			List items = query.list();
 			也可采用':参数名'作为占位符
+	4.分页查询
+		session.createQuery("from <class-name>")
+				.setFirstResult(base)	//从第base条开始
+				.setMaxResults(max)		//最多显示max个
+				.list();
+	5.统计查询
+		Long count = (Long) session.createQuery("select count(*) from <class-name>")
+									.list()
+									.get(0);
+		Long count = (Long) session.createQuery("select count(*) from <class-name>")
+								.setMaxResult()			//以免有多个结果，无法调用uniqueResult.
+								.uniqueResult();
+	6.hql的dml语句
+		session.createQuery("update <class-name> <alias> set <class-property>=.. where <class-property>...");
+		少用这个语句，因为这个语句不会更新session的缓存。会导致数据库和session缓存中的数据不一致。
