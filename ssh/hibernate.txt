@@ -1,5 +1,6 @@
 一、介绍
-	Hibernate是持久层，用于数据持久化。其实就是对jdbc做了一层封装。
+	Hibernate是ORM即对象关系映射，使用对象操作来操作关系型数据库。
+	Hibernate是持久层，用于数据持久化(即保存对象)。其实就是对jdbc做了一层封装。
 	使用Hibernate可以使我们采用对象化的操作关系型数据库。
 	1.优点
 		1).使开发更加对象化。
@@ -740,3 +741,99 @@
 	6.hql的dml语句
 		session.createQuery("update <class-name> <alias> set <class-property>=.. where <class-property>...");
 		少用这个语句，因为这个语句不会更新session的缓存。会导致数据库和session缓存中的数据不一致。
+
+十九、悲观锁和乐观锁
+	1.悲观锁
+		通常由数据库机制实现的，在整个查询过程中把数据锁住，只要查询的事务不释放（提交或回滚）任何用户都不能查看和修改。
+		obj = session.load(<class-type>, id, LockMode.UPGRADE);		//使用悲观锁模式进行查询，查询出来后，其他事务不可对查出来的数据作任何操作，直到当前事务提交。
+	2.乐观锁
+		并非由数据库机制提供。大多数的使用是采用数据库版本的方式实现，一般在数据库中加入一个version字段。
+		在读取数据时将version读取出来，在保存数据时判断version的值是否小于数据库中的version值，如果小于则不予更新，否则给与更新。
+		1).表和类的配置：
+			class 
+			<class name="" table="" optimistic-lock="version">
+				<id>
+					<generator class="<gen-type>" />
+				</id>
+				<version name="version" />				<!-- 乐观锁版本所使用的字段 -->
+				<property name="<property-name>" />
+			</class>
+		2).使用
+			会自动使用乐观锁, 即:
+			在更新数据时，会检测version以及自动修改version。
+	悲观锁影响并发，一般使用乐观锁。
+
+二十、缓存机制
+	1.一级缓存
+		一级缓存声明周期很短 和 session的声明周期一致，一级缓存也叫session级缓存 或 事务级缓存。
+		* load、get、iter查询对象是支持缓存的，会把查询的结果放到session里面，再次查询也是利用的session里的缓存。
+		* iter查询属性，是不会缓存的。
+		也就是说，一级缓存只会缓存实体对象，不会缓存属性。
+		一级缓存会因为session的消亡而消亡。
+		* save支持缓存
+		* 对于大批量的数据
+			for(int i=0; i<Length; i++){
+				Student student = new Student();
+				string.setName("lsj"+i);
+				session.save(student);
+				if(i%20 == 0){
+					session.flush();		//将缓存里的数据更新到数据库中，并且会清理部分缓存
+					session.clear();		//强制性清理session中的所有缓存
+				}
+			}
+			这样做以免Length过长而导致内存溢出。
+	2.二级缓存
+		由sessionFactory管理。也称为进程级缓存或sessionFactory级的缓存，二级缓存可以被所有session共享。
+		二级缓存的生命周期和SessionFactory的生命周期一致。
+		二级缓存的配置和使用：
+			1).ehcache.xml
+				a).默认缓存机制
+					<defaultCache
+						maxElementsInMemory="10000"		缓存的对象个数
+						eternal="false/true"			对象是否过期，true为永远不过期，false为会过期。若为false，下面两个参数才起作用。
+						timeToIdleSeconds="120"			间隔多长时间没被访问就被清理。
+						timeToLiveSeconds="120"			对象存活的时间，秒
+						overflowtToDisk="true"			溢出了会保存到磁盘上。
+						/>
+				b).单独配置
+					<cache name="<class-absoluate-name>"		指定对象采用下面的缓存机制
+						maxElementsInMemory="10000"		缓存的对象个数
+						eternal="false/true"			对象是否过期，true为永远不过期，false为会过期。若为false，下面两个参数才起作用。
+						timeToIdleSeconds="120"			间隔多长时间没被访问就被清理。
+						timeToLiveSeconds="120"			对象存活的时间，秒
+						overflowtToDisk="true"			溢出了会保存到磁盘上。
+						/>
+			2).在hibernate.cfg.xml文件中配置
+				a).缓存产品提供商
+					<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+				b).启用二级缓存(默认就是启用的)
+					<property name="hibernate.cache.use_second_level_cache">true</property>
+			3).指定使用缓存的类
+				a).在该类的映射中使用
+					<class name="" table="">
+						<cache usage="read-only"/>		<!-- 这里配置的是只读，即缓存中的数据不可修改，还可以采用read-write -->
+						...
+					</class>
+			4).原则
+				通常将读远远大于写的数据进行缓存。
+			5).使用
+				* 清理二级缓存: SessionFactory.evict(<class>);	将所有的<class>对象从缓存中清除。
+				* 禁止将一级缓存的数据，放到二级缓存汇总：session.setCacheMode(CacheMode.IGNORE);
+				* 大批量数据就禁止一级缓存与二级缓存的交互，否则大批量数据就算从一级缓存清理了，但也会放到二级缓存中。
+		先在一级缓存里找，若没有就到二级缓存里找，若还是没有,就发语句到sql去查询。
+		二级缓存和一级缓存都是缓存的实体对象，不会缓存属性。
+	3.查询缓存
+		查询缓存是缓存普通属性结果集的。对实体对象的结果集会缓存id。
+		查询缓存的生命周期：
+			* 和session生命周期无关。
+			* 当关联的表发生修改，查询缓存声明周期结束。
+		1).配置
+			a).hibernate.cfg.xml
+				开启查询缓存 : <property name="hibernate.cache.user_query_cache">true</property>	<!-- 默认是关闭的 -->
+			b).必须在程序里启用
+				query.setCacheable(true);
+		2).使用
+			session.createQuery("<hql>").setCacheable(true).list();	//启用查询缓存
+			查询缓存只对query.list()起作用，对itera不支持。
+	
+		
