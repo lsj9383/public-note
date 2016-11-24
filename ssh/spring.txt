@@ -1,1 +1,40 @@
-Sprint
+一、Spring
+	spring可以将依赖关系放到配置文件里，而非用代码。
+	0.IoC(控制反转)
+		本来由应用程序管理的对象之间的依赖关系，现在交给了容器管理，这就叫控制反转，即交给了IoC容器。
+		Spring的IoC容器主要使用DI(注入)方式实现的， 对象的查找、定位和创建。
+		注入，即只需类提供构造器，spring将创建好依赖的对象通过构造器将依赖对象传到当前对象中
+		优势:
+			* 大量减少了Factory(工厂)和Singleto(单例)的数量，使代码层次更加清晰。
+			* IoC容器是轻量级容器，没有侵入性，不需要依赖容器API和特殊接口，定义的类均是POJO类。
+	1.spring的依赖包配置
+		* SPRING_HOME/dist/spring.jar
+		* SPRING_HOME/lib/lo4j/log4j-1.2.14.jar
+		* SPRING_HOME/lib/jakarta-commons/commons-logging.jar
+	2.提供配置文件
+		将一下配置文件放到classpath可以找到的地方, 由于src文件夹就是classpath中配置的当前目录，因此放在src下即可。
+		* log4j.properties
+		* applicationContext.xml
+			在其中描述依赖关系，让spring负责依赖对象的注入。
+			要让spring管理我们对象的创建和依赖，必须将依赖关系配置到spring的该文件中。
+			<?xml version="1.0" encoding="UTF-8"?>
+
+			<beans xmlns="http://www.springframework.org/schema/beans"
+					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xmlns:aop="http://www.springframework.org/schema/aop"
+					 xmlns:tx="http://www.springframework.org/schema/tx"
+					 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+					   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+					   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+					   
+				<!-- 对产品类的信息 以及产品之间的相互依赖进行描述 -->
+				<bean id="<product-name1>" class="<class-name1>"/>
+				<bean id="<product-name2>" class="<class-name2>"/>
+				<bean id="<product-name3>" class="<class-name3>">
+					<constructor-arg ref="<product-name1>"/> 	<!-- 通过DI来获取依赖对象 -->
+					<property name="<product-name-in-class>" ref="<product-name>" />   <!-- 通过getter setter获得，此时不可有构造函数 -->
+				</bean>
+			</beans>
+	3.编程使用
+		BeanFactory factory = new ClassPathXmlApplicationContext("applicationContext.xml");
+		Interface userManager = (Interface)factory.getBean("<product-name>");

@@ -444,3 +444,53 @@ java中cookie当做类处理，使用new来创建cookie。cookie由两部分组成，key和value
 		Object getAttribute(String name);				
 		void remote Attribyte(String name);
 		void invalidate();
+二十、Filter
+	Filter不用于处理客户端请求，而是在请求达到servlet进行正式的业务处理前进行一些操作，且Filter是链式的:
+	 ________      _________      _________      _________
+    |        | -> |         | -> |         | -> |         |
+	| client |    | Filter1 |    | Filter2 |    | Servlet |
+	|________| <- |_________| <- |_________| <- |_________|
+	
+	1.Filter接口
+		public interface Filter{
+			public void init(FilterConfig config) throws ServletException;	//web程序启动是调用此方法，用于初始化Filter
+			public void destroy();											//web程序关闭时调用此方法，用于销毁一些资源
+			public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException;
+		}
+	2.使用Filter
+		public class MyFilter implements Filter {
+			@Override
+			public void init(FilterConfig arg0) throws ServletException {}
+			@Override
+			public void destroy() {}
+			@Override
+			public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
+					throws IOException, ServletException {
+				System.out.println("befor request have processed");
+				filterChain.doFilter(request, response);				//执行链条的下一个节点
+				System.out.println("after request have processed");
+			}
+		}
+	3.配置Filter
+		<filter>
+			<filter-name>MyFilter</filter-name>
+			<filter-class>com.lsj.filter.MyFilter</filter-class>
+		</filter>
+
+		<filter-mapping>
+			<filter-name>MyFilter</filter-name>
+			<url-pattern>*.do</url-pattern>
+			<dispatcher>REQUEST</dispatcher>
+			<dispatcher>FORWARD</dispatcher>
+		</filter-mapping>
+		
+		<url-pattern>标签所包含的servlet，都会经过该过滤器。
+		<dispatcher>标签表示了filter生效的方式：
+			REQUEST : 默认就有的，仅当直接请求servlet时才生效。
+			FORWARD : 另一个servlet通过FORWARD到该servlet时才生效。
+			INCLUDE : jsp中通过<jsp:include />请求某servlet时才生效。
+			ERROR : jsp中通过<%@ page errorPage="error.jsp" %>指定错误处理页面，仅在这种情况下才有效。
+		=> <url-pattern>和<dispatcher>是【且】的关系，也就是说两者都满足，该filter才会生效被调用。
+	4.Filter顺序
+		对一个请求经过filter的顺序是：
+			通过配置文件，可以获悉符合该请求的filter配置。
