@@ -38,3 +38,73 @@
 	3.编程使用
 		BeanFactory factory = new ClassPathXmlApplicationContext("applicationContext.xml");
 		Interface userManager = (Interface)factory.getBean("<product-name>");
+		
+二、常用属性注入
+	1.属性初始化
+		<bean id="bean1" class="com.lsj.spring.Bean1">
+			<property name="strValue" value="Hello_Spring" />	<!-- 对于java自带的值类型，用value作为初始值 -->
+		</bean>
+		只有数值、字符串、List、Set、Map可以自动赋值。对于更多一部分的类是无法通过value设初始值的，此时需要通过转换器。转换器可以放在另外的配置文件中，以使配置文件模块坏。
+	2.转换器配置
+		1).转换器代码
+			public class UnitilDatePropertyEditor extends PropertyEditorSupport {
+				@Override
+				public void setAsText(String text) throws IllegalArgumentException {
+					this.setValue(new <class-name>(text));	//将字符串转换到指定的对象
+				}
+			}
+
+		2).转换器配置文件
+			<?xml version="1.0" encoding="UTF-8"?>
+			<beans xmlns="http://www.springframework.org/schema/beans"
+					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xmlns:aop="http://www.springframework.org/schema/aop"
+					 xmlns:tx="http://www.springframework.org/schema/tx"
+					 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+					   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+					   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+					  
+				<bean id="<self-dfine-editors>" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+					<property name="cuustomEditors">	<!-- 这个那么是定了的，它是上述类中的属性，也就是说该属性是管理自定义转换器的 -->
+						<map>
+							<!-- 意思是转换到<class-name>需要用<editor-class-name>, spring自动会调用 -->
+							<!-- 这个本质上其实就是个map属性，key值为要转换的对象，value为转换到该对象使用的转换器-->
+							<entry key="<class-name>">
+								<bean class="<editor-class-name>" />	<!-- value其实就是一个转换器对象，该转换器的还可以继续增加配置参数的，因为bean对象可以配置初始属性即在下面加<property>属性标签 -->
+							</entry>
+						</map>
+					</property>
+				</bean>
+			</beans>
+	3.多配置文件的读取
+		BeanFactory factory = new ClassPathXmlApplicationContext(new String[]{"applicationContext.xml", ..});
+		BeanFactory factory = new ClassPathXmlApplicationContext("applicationContext-*.xml");	将classpath中可以匹配名字的配置文件都读入   
+	4.公共配置的抽象
+		通过<bean>标签，将公共的配置提取出来，放在单独的<bean>标签中，且该<bean>中的abstract属性为true
+		在其他的<bean>标签中指定其parent即可。
+		配置:
+			<bean id="AbstractBean" abstract="true">
+				<property name="<product-name>" value="<init-value>"/>
+			</bean>
+			<bean id="<child-id>" class="<class-name>" parent="AbstractBean">
+				<property name="<product-name>" value="<init-value>"/>
+			</bean>
+	5.value和ref的关系与区别
+		* ref属性中，应该指定依赖的bean组件。spring会在当前对象初始化时，会自动将依赖的bean组件的类初始化并注入到当前对象中。
+		* value属性中，应该指定具体的某个字符串。spring会在当前对象初始化时，传入该字符串作为该属性的初始值，对于常用的属性会将字符串自动转换为对应的类型，其他情况则需要自定义转换器。
+		* ref和value都是用来对属性初始化赋值的。ref是赋予的bean组件对象，value是字符串。
+		
+三、spring的作用域
+	scope取值:
+		* singleton : 默认值，每次调用getBean()向IoC容器取得对象是相同的，即相当于是该类为单例模式。
+		* prototype : 每次调用getBean()向IoC容器中取得对象是不相同的。
+		
+四、spring自动装配
+	1.根据名字匹配
+		在<beans>标签中使用属性: default-autowire="byName"
+		这样子对象中的应用会自动到spring的bean中进行匹配，而不用写明在配置文件中。
+		匹配的方式是依赖对象的setter getter方法和依赖的bean组件的name或者id属性同名。
+		如 public void setBean3(Bean3 bean3){...} 这样可以自动将id或name为bean3的组件进行注入。
+	2.根据类型匹配
+		在<beans>标签中使用属性: default-autowire="byType"
+		bean组件的名字无所谓，而是通过依赖对象的类型到spring容器中寻找相同类型的组件。
