@@ -108,3 +108,147 @@
 	2.根据类型匹配
 		在<beans>标签中使用属性: default-autowire="byType"
 		bean组件的名字无所谓，而是通过依赖对象的类型到spring容器中寻找相同类型的组件。
+
+五、AOP
+	1.术语
+		* Cross Cuttin Concern(横切性关注点的实现)
+			是一种服务，遍布在系统的处理流程之中。
+		* Aspect
+			对横切性关注点的模块化。
+		* Advice
+			对横切性关注点的具体实现。
+		* Pointcut
+			定义Advice应用到哪些JoinPoint上，对spring来说是方法调用。
+		* JoinPoint
+			Advice在应用程序上执行的点或时机，Spring只支持JoinPoint。
+		* Weave
+			将Advice应用到TargetObject的过程，叫织入。spring支持动态织入。
+		* Target Object
+			是Advice被应用的对象。
+		* Proxy
+			Spring AOP默认使用JDK的动态代理，这个代理在运行时创建。也可以使用cglib代理。
+		* Introduction
+			可以动态的为类添加方法。
+	2.使用步骤(注解方式)
+		1).spring的依赖包配置
+			* SPRING_HOME/dist/spring.jar
+			* SPRING_HOME/lib/lo4j/log4j-1.2.14.jar
+			* SPRING_HOME/lib/jakarta-commons/commons-logging.jar
+			* SPRING_HOME/lib/aspectj/*.jar
+		2).将横切型关注点模块化
+			该模块就是一个类，而且是个POJO类
+			@Aspect				//告诉spring，这是个aspect
+			public class Aspect-Name{
+				/**
+				 *	定义Pointcut，其名称为Method，该方法就是一个标识，不进行调用
+				 */
+				@Pointcut("execution(* add*(..))")
+				private void Method(){}
+				
+				/**
+				 *	定义Advice，表示我们的Advice应用到哪些Pointcut订阅的Joinpoint上。
+				 */
+				@Before("Method()")		//告诉spring，这是个before-advice
+				private void advice-method(){
+					....
+				}
+			}
+		3).配置spring
+			<?xml version="1.0" encoding="UTF-8"?>
+
+			<beans xmlns="http://www.springframework.org/schema/beans"
+					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xmlns:aop="http://www.springframework.org/schema/aop"
+					 xmlns:tx="http://www.springframework.org/schema/tx"
+					 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+					   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+					   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+				<!-- 启用AspectJ对Annotation的支持 -->
+				<aop:aspectj-autoproxy />
+				
+				<!-- 将目标类和Aspect类配置到IoC容器中 -->
+				<bean id="<target-name-in-spring>" class="<class-name>" />
+				<bean id="<aspect-name-in-spring>" class="<aspect-class-name>" />
+			</beans>
+		4).客户端使用
+			BeanFactory factory = new ClassPathXmlApplicationContext("applicationContext.xml");
+			<class-name> object = (<class-name>)factory.getBean("<target-name-in-spring>");
+			object.addUser(...);
+			
+			需要注意的是getBean会创建对象，若对象中有joinpoint的方法，那么创建的对象将会是代理。
+	2.使用步骤(配置文件)
+		1).spring的依赖包配置
+		2).将横切型关注点模块化
+			该模块就是一个类，而且是个POJO类
+			public class Aspect-Name{
+				private void Method(){};
+				private void advice-method(){
+					....
+				}
+			}
+		3).spring配置文件
+			<?xml version="1.0" encoding="UTF-8"?>
+
+			<beans xmlns="http://www.springframework.org/schema/beans"
+					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xmlns:aop="http://www.springframework.org/schema/aop"
+					 xmlns:tx="http://www.springframework.org/schema/tx"
+					 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+					   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+					   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+				<!-- 启用AspectJ对Annotation的支持 -->
+				<aop:aspectj-autoproxy />
+				
+				<!-- 将目标类和Aspect类配置到IoC容器中 -->
+				<bean id="<target-name-in-spring>" class="<class-name>" />
+				<bean id="<aspect-class-name-in-spring>" class="<aspect-class-name>" />
+				
+				<aop:config>
+					<aop:aspect id="<aop-name>" ref="<aspect-class-name-in-spring>">
+						<aop:pointcut id="<pointcut-name-in-spring>" expression="execution(* add*(..))" />
+						<aop:before method="advice-method" pointcut-ref="<pointcut-name-in-spring>"/>
+					</aop:aspect>
+				</aop:config>
+			</beans>
+	3.表达式
+		execution(* <package-name>.*.*(..))	该包下所有的类所有的方法
+		execution(* add*(..))	所有的add开头的方法
+		execution(* <package-name>.*.add*(..))	该包下所有的类所有的add开头的方法
+	4.参数传入
+		public class Aspect-Name{
+			private void advice-method(JointPoint jointPoint){
+				//jointPoint中有方法调用的相关信息，例如传入的参数。
+				Object[] args = joinPoint.getArgs();
+			}
+		}
+	5.spring对aop的支持
+		1).三种情况
+			* 如果目标类实现了接口，在默认情况下回采用jdk代理，也可以强制使用cglib代理。
+			* 如果目标类有实现接口，则必须引入cglib代理。
+		2).强制使用CGLIB代码
+			* 引入cglib的jar包: SPRING_HOME/cglib/*.jar
+			* 在配置文件起始位置使用: <aop:aspect-autoproxy proxy-target-class="true">
+		3).jdk动态代理和cglib代理的区别
+			* jdk动态代理只能对实现了接口的类进行代理
+			* cglib对任何非final的类都可以进行代理，采用的方式是生成子类(final类不可继承，也就无法代理)。
+			
+六、编程式事务
+	1.OpenSession和getCurrentSession的区别
+		* openSession必须关闭，currentSession在事务结束后自动关闭
+		* openSession没有和当前线程绑定，currentSession和当前线程绑定（和ThreadLocal相关）。
+	2.要使用getCurrentSession获得session，必须的在hibernate.cfg.xml中配置<property name="hibernate.current_session_context_class">thread</property>予以支持。
+	
+七、声明式事务
+	1.传播特性的属性
+		1).PROPAGATION_REQUIRED
+			如果存在一个事务，则支持当前事务。如果没有事务则开启。最常用。
+		2).PROPAGATION_SUPPORTS
+			如果存在一个事务，则支持当前事务。如果没有事务则非事务执行。
+		3).PROPAGATION_MANDATORY
+			如果存在一个事务，则支持当前事务。如果没有事务则抛出异常。
+		4).PROPAGATION_REQUIRES_NEW
+			总是开启一个新的事务。如果一个事务已经存在，则将该事务挂起。
+		5).PROPAGATION_NOT_SUPPORTED
+			总是非事务地执行，并挂起任何事务。
+		6).PROPAGATION_NEVER
+			总是非事务地执行，如果存在一个活动事务，则抛出异常。
