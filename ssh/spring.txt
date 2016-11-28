@@ -239,7 +239,7 @@
 	2.要使用getCurrentSession获得session，必须的在hibernate.cfg.xml中配置<property name="hibernate.current_session_context_class">thread</property>予以支持。
 	
 七、声明式事务
-	1.传播特性的属性
+	1.事务传播特性的属性
 		1).PROPAGATION_REQUIRED
 			如果存在一个事务，则支持当前事务。如果没有事务则开启。最常用。
 		2).PROPAGATION_SUPPORTS
@@ -252,3 +252,64 @@
 			总是非事务地执行，并挂起任何事务。
 		6).PROPAGATION_NEVER
 			总是非事务地执行，如果存在一个活动事务，则抛出异常。
+	2.配置applicationContext-commons.xml
+		<?xml version="1.0" encoding="UTF-8"?>
+
+		<beans xmlns="http://www.springframework.org/schema/beans"
+				 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				 xmlns:aop="http://www.springframework.org/schema/aop"
+				 xmlns:tx="http://www.springframework.org/schema/tx"
+				 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+				   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+				   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+			<!--
+				 配置SessionFactory.
+				这个类就是sesssionFactory，将其交给spring管理。
+			 -->
+			<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+				<property name="configLocation">
+					<value>classpath:hibernate.cfg.xml</value>		<!-- 读取该配置文件，进行sessionFactory初始化 -->
+				</property>
+			</bean>
+			
+			<!-- 配置事务管理器
+				用来管理sessionFactory的
+			 -->
+			<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+				<property name="sessionFactory" ref="sessionFactory"/>
+			</bean>
+			
+			<!-- 哪些类哪些方法使用事务 -->
+			<aop:config>
+				<aop:pointcut id="allManagerMethod" expression="execution(* com.lsj.usermgr.manager.*.*(..))"/>
+				<aop:advisor advice-ref="txAdvice"  pointcut-ref="allManagerMethod" />
+			</aop:config>
+			
+			<!-- 配置advice和其事务传播特性 -->
+			<tx:advice id="txAdvice" transaction-manager="transactionManager">
+				<tx:attributes>
+					<tx:method name="add*" propagation="REQUIRED" />
+					<tx:method name="del*" propagation="REQUIRED" />
+					<tx:method name="modify*" propagation="REQUIRED" />
+					<tx:method name="*" propagation="REQUIRED" read-only="true"/>
+				</tx:attributes>
+			</tx:advice>
+		</beans>
+	3.编写dao
+		public class DaoImpl extends HibernateDaoSupport implements UserManager {
+			@Override
+			public void addUser(User user) {
+				//this.getSession().save(user);
+				this.getHibernateTemplate().save(user);
+				..其他业务..
+			}
+		}
+		为dao做配置
+		<!-- 获取该dao组件时，会根据是否有joinpoint而返回实体类或是代理 -->
+		<bean id="daoImpl" class="<class-name>">
+			<property name="sessionFactory" ref="sessionFactory" />	<!-- 将sessionFactory交给该组件 -->
+		</bean>
+	4.抛出异常情况。
+		客户端实际使用的dao类的代理，若在dao类的方法中跑出了异常，将有spring接收。
+		* 若抛出运行时异常，spring将会回滚。
+		* 若抛出编译时异常，spring不会回滚，只会继续上抛。
