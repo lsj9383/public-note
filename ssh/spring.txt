@@ -313,3 +313,49 @@
 		客户端实际使用的dao类的代理，若在dao类的方法中跑出了异常，将有spring接收。
 		* 若抛出运行时异常，spring将会回滚。
 		* 若抛出编译时异常，spring不会回滚，只会继续上抛。
+		
+八、spring+struts 1
+	1.集成原理
+		在Action中取得BeanFactory，通过BeanFactory取得业务逻辑对象
+	2.配置与使用
+		1).依赖包
+			* struts相关依赖包
+				-- struts和jstl的jar包
+				-- 在web.xml文件中配置ActionServlet
+				-- 提供struts-config.xml文件
+				-- 提供国际化支持
+			* spring相关依赖包
+		2).取得spring的BeanFactory
+			Action中要使用spring，必然要取得beanFactory，不应该在Action中由Action取得beanFactory，这是因为beanFactory的对象获取是相当耗时的，因此需要提前将该factory做初始化并缓存起来。
+			让web server在启动的时候将BeanFactory放到ServletContext中，spring可以通过servlet机制或listener机制实现。以后要获得beanFactory只需要从ServletContext中拿取即可。
+				a).配置listener
+					<context-param>
+						<param-name>contextConfigLocation</param-name>
+						<param-value>classpath:applicationContext.xml</param-value>
+					</context-param>
+					<listener>
+						<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+					</listener>
+					监听器类总会从contextConfigLocation中读取拿到spring的配置文件，然后创建出BeanFactory并保存到ServletContext中。
+					需要注意的是listener是2.3版本中加入的规范。
+				b).取得beanFactory
+					BeanFactory factory = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getServletContext());
+				c).通过beanFactory去的业务逻辑对象
+	3.缺点
+		Action中依赖了spring中的类，比如依赖了BeanFactory。
+
+九、spring+struts 2
+	该继承方案是利用spring提供的Action类来进行的，该Action其代理作用：取得BeanFactory，然后到IoC容器中将本次请求对应的Action取出。关键是取出的依赖对象会被注入。(因为是用factory创建对象时，会注入依赖的对象)
+	1.集成原理
+		将struts的Action交给spring创建，这样业务逻辑对象将会被注入。这样就不会在struts的Action中依赖spring的beanFactory，减少侵入性。
+	2.配置
+		1).spring的action配置
+			spring的action将会去取得BeanFactory对象，并将创建Action对象，在创建Action对象时会将该对象依赖的数据都注入进去。
+		2).配置struts的action为一个bean
+			将action配置到spring中去，这样spring才方便创建他
+			<bean name="<path-in-struts>" class="<action-class>">
+				<property name="..." ref=".." />		<!-- 需要注入的对象 -->
+			</bean>
+			需要注意的是 bean的name应该和struts-config.xml对应的Action的path相同，这样spring的action才能取得对应的Action。这是根据spring中action实现所约定的。
+		3).可以改进为多例
+			建议将scope设置为prototype，这样struts的Action将是线程安全的。因为此时Action将会是多例的，而非单例的。
