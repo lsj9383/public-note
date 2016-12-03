@@ -39,7 +39,7 @@
 		不用自己写代理类，直接生成和接口对应的代理对象。因此动态代理在运行的时候生成。
 		Proxy.newProxyInstance(
 			target.getClass().getClassLoader(),	//目标类的类加载器
-			target.getClass().getInterface(),	//目标类实现的接口
+			target.getClass().getInterfaces(),	//目标类实现的接口
 			new InvocationHandler(){			//代理类实现的东西
 				@Override
 				public Object invoke(Object proxy, Method method,

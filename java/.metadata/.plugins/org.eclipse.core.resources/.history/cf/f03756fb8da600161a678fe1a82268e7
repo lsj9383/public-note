@@ -1,7 +1,0 @@
-package com.lsj.i18n;
-
-public class I18n {
-	public static void main(){
-		
-	} 
-}
