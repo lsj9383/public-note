@@ -1,0 +1,185 @@
+一、开始
+	jquery是一个常用的javascript框架。
+	使用jquery有两种方式:
+		1.在jquery官网(http://jquery.com/)下载最新版本的jquery到本地。
+		2.利用一些公司提供的cdn服务（内容分发网络），jquery放在了强劲、低延时的服务器上，这些服务器遍布全球，保证用户可以以最快的速度下载到jquery文件。
+			如 google: https://developers.google.com/speed/libraries/devguide
+			   microsoft: http://www.asp.net/ajaxlibrary/cdn.ashx
+	jquery下载后是一个js文件，通常将其重命名为自己习惯使用的，这里就以jquery.js来代表该文件。引用jquery时，应该把该js文件放在其他所有js文件之前。
+	chrome开发工具的基本能力:
+		1.在Elements标签页中, 显示当前页面的网页结构 以及 css信息。
+		2.在Sources标签页中，显示页面加载的所有脚本，并且可以设置断点。
+		3.在Console标签页中，可以输入并执行javascript语句，console.log(..); 可以用来在控制台上进行打印。
+		
+二、选择元素 
+	1.$()函数
+		$()可以创建jquery对象，该函数充当一个工厂，返回jquery对象。
+		$(<选择符>)，返回包含页面中对应元素的jquery对象。
+		$(<dom对象>)，若传入dom对象，会返回该dom对象的jquery对象。
+		1）.css选择符:
+			a).标签名	$('p'), 返回所有p标签的对象。
+			b).ID		$('#id')，返回所有id为此的对象，由于id唯一，因此实际上返回只有唯一一个元素。
+			c).类		$('.clss'), 取得文档中所有类为此的对象。
+		2).属性选择符:
+			通过html的属性选择元素。可以选择所有元素中属性为此的对象。
+			$('img[alt]'), 选择所有带alt属性的图像元素。
+			$('<label>[<property>]')
+		3).自定义选择符:
+			自定义选择符可以在已经找出的元素中再进行选元素。通常跟在一个css选择符后面，基于已经选择的元素集的位置来查找元素。
+			并且，自定义选择符的语法是以:开头。
+			$('div.horizontal : eq(1)') 取得集合中的第二个元素。
+			常用选择符:
+				a) :eq(index), 选择集合中的index个元素
+				b) :nth-child(index), 选择集合中所有元素的index子元素
+				c) :odd, 选择集合中的奇数index为元素
+				d) :even，选择集合中的偶数index为元素
+				e) :contain(value)，选择集合中内容为value的元素
+				f) 给予表单的选择符
+					i)  :input
+					ii) :button
+					iii):enabled
+					iv) :disabled
+					v)  :checked
+					vi) :selected
+	2.jquery对象常用方法
+		0).length
+			得到集合中元素的个数。
+		1).filter(..)
+			可以传入函数或是自定义选择符，从而在集合中筛选出需要的元素。
+			$('a').filter(function(){
+				....
+			});
+		2).next()
+			获得当前jquery对象下一个最接近的同辈元素。
+			nextAll()，可以获得后面的所有同辈元素。
+			当然也有prev方法。
+		3).parent()
+			集合中所有元素的父级元素。若某些元素的父级元素相同，则只有一个父级元素
+		4).children()
+			集合中所有元素的字元素
+		5).get(index)
+			获得集合中的某个位置的元素。若index不在可用范围内，返回undefine。
+		6).addClass('<class-name>')
+			为集合中的所有元素添加一个类。通过这个方法可以赋予元素额外的能力。
+		7).removeClass('<class-name>')
+			将集合中所有元素的指定类删除。若没有带'<class-name>'参数，那么将会移除所有的类。
+		8).toggleClass('<class-name>')
+			没有就添加类， 有就移除类。
+		9).on('<event-name>', function(){})
+			添加事件处理
+			若使用<event-name>.<namespace-name>可以为事件处理添加命名空间，以免重复。
+			若使用on('<event-name>', '<choice-expression>', <function>)意味着要在event.target和选择符表达式匹配的时候，才会执行事件处理程序。
+		10).off('<event-name>')
+			移除事件处理
+			若事件处理带有命名空间，需要使用<event-name>.<namespace-name>
+		11).is('<choice-expression>')
+			判断jquery对象是否满足符号选择表达式。
+		12).css(...);
+			.css('<property-name>'); 获得jquery对象中所有对应css属性值
+			.css('[<property-name1>, <property-name1>, ...]'); 可以获得多个css属性值
+			.css('<property-name>', '<value>'); 设置单个css属性值
+			.css({	'<property-name1>': '<value1>',
+					'<property-name2>': '<value2>',
+					'<property-name3>': '<value3>'});	设置多个css属性值
+			需要注意，若jquery对象是个集合并获取属性值时，返回的属性值是首元素的。
+			设置属性时是集合中所有元素都会设置。
+		13).hide();
+			隐藏元素, 与.css('display', 'none')类似。
+		14).show();
+			显示元素，恢复前一次的display状态。（需要注意的是，display不同的元素是不同的，而且类型也是繁复的）。
+		15).attr(..);
+			设置或获取html属性。
+		16).prop(..);
+			设置或获取dom属性。
+		17).val();
+			针对表单控件的，用于设置他们的数据。这是由于表单控件的html属性和dom属性差距太大，不易编写通用代码。
+三、事件
+	1.在页面加载后执行任务
+		$(document).ready(function(){
+			...
+		});
+		执行了该js代码后，就会在页面加载完成后执行传入的函数。
+		1).执行时机
+			html下载完成，并解析为dom树后立即运行。也就是说并不要求所有资源下载完毕，例如图片。
+			传统的window.onload，是在资源都下载完毕后才可操作。
+			另一方面，为了保证js代码执行以前样式已经生效，最好把head中的css标签放在js标签前面。
+		2).多任务执行
+			$(document).ready(function(){});每次执行该函数，都会往内部队列中添加一个会执行的函数。事件触发时，所有添加的函数都会依次触发。触发顺序是注册顺序。
+		3).简写
+			$(document).ready(function(){}); 等价于
+			$(function(){});
+	2.处理简单的事件
+		有很多事件，例如鼠标单击(onclick)、表单被修改(onchange)、窗口大小变化(onresize)。
+		如果直接定义在onload中，那么这些繁复的事件处理会被分散在html中，非常难以管理。
+		<jquery-object>.on('<event-name>', function(){});	可以通过这样的方式为jquery对象绑定事件处理函数。
+		并且需要注意的是，
+			a).这些事件处理的注册，好像都基本在$(document).ready(function(){});中进行
+			b).在jquery对象的事件处理中，可以通过$(this)获得当前这个jquery对象。
+		1).click事件
+			$('#switcher-large').on('click', function(){
+				;
+			});//按钮单击时调用
+			并且等价于 其简写形式
+			$('#switcher-large').click(function(){
+				...
+			});
+		2).hover事件
+			$('#switcher-large').hover(function(){}, function(){});
+			在鼠标进入对象 或 离开对象时，将会触发对应的事件。并且需要明确的是，可以避免事件传播。关于事件传播可看下节。
+	3.事件传播
+		对于一个多层嵌套的dom，存在两种事件传播模型:
+		1).事件捕获
+			当某个对象的发生某个事件时，事件会从该对象最外层往内部传播，可以在任何一层进行事件的捕获。
+		2).事件冒泡
+			当事件发生时，会首先发送给具体元素，而后事件回向上冒泡到更一般的元素。
+		不同的浏览器最初采用的传播模型不同，最终出台的dom标准规定同时使用这两个策略：首先，事件要从一般元素到具体元素逐层捕获，然后事件通过冒泡返回dom树的顶层。
+		对于jquery的事件注册而言，都是在冒泡阶段进行注册并执行处理程序的。因此使用jquery注册事件处理时，总可以假定最具体的元素会首先获得事件的机会。
+	4.改变事件传播
+		在一些情况下，目标元素和父元素对于相同的事件有各自的处理，目标元素处理后不希望父元素继续处理！这类情况下需要停止事件传播。
+		1).事件对象
+			事件对象是个dom结构，它会在事件发生时传递给被调用的处理程序。
+			.on('<event-name>', function(event){
+				event.target
+			});
+			event.target是事件处理的目标对象，可以通过event.target == this来判定当前事件处理程序的元素是否和目标对象相同。
+		2).停止事件传播
+			event.stopPropagation();
+		3).阻止默认操作
+			有些元素具备默认操作，例如<a>和表单的点击，这些都会触发默认操作。需要注意的是，默认操作不在正常的事件传播流之中。对于默认操作，需要用.preventDefault()在触发默认操作之前终止事件。
+			事件传播和默认操作是相互独立的两套机制，在二者任何一方发生时，都可以终止另一方。如果想同时停止事件传播和默认操作，需要在事件处理程序中返回false。
+			意思就是说，若当前元素有默认操作，并且默认操作的动作还有个事件处理函数，那么事件处理函数会先调用，并且若返回false，默认操作和事件传播都会停止。
+	5.模仿用户操作
+		$().trigger('<event-name>');	指定的元素上发生指定的事件。
+		例如$('#switcher').trigger('click')  在id=switcher的元素上将会触发click事件。
+四、样式与动画
+	1.获取和设置css
+		参考jquery对象常用方法的css方法。
+	2.隐藏和显示元素
+		参考jquery对象常用方法的hide和show方法。
+		
+五、操作dom
+	1.操作属性
+		每个dom都有自己的className属性，通过.addClass等函数可以非常简单的为dom元素实现添加类和删除类。
+		1).非className属性
+			对于非类属性，要通过.attr()和.revoveAttr()方法。
+			.attr({	<property-name> : '<value>',
+					<property-name> : '<value>'}), 可以传染一个kv对象来设置属性。
+		2).值回调
+			可以给属性一个函数值，而非一个具体的值。若传入的是函数中，jquery将会自动对集合中所有的元素迭代调用该函数，函数的返回值将会是对应元素的值。
+			<property-name> : function(index, oldValue){
+				...
+			}
+			第一个参数index，是迭代次数。
+			这个函数中还有一个叫作this的dom对象，可以用$(this)封装为jquery对象，这个this就是每次调用回调时正在操作的那个dom元素。
+		3).表单控件的值
+			在涉及到设置或获取表单控件值的时候，不建议使用.attr或.prop，这是由于html属性和dom属性区别造成的。
+			html属性，指的是html标记放在引号中的数据。
+			dom属性，指的是将html解析后，可以由js读取的数据。
+			大部分情况下，html属性和dom属性的关键值是相同、数据类型也是相同的。但是也有特殊情况。
+			例如<p class="id-class">demo</p>，这里的html属性是class属性，而dom属性为className。在chrome的elements标签页下的properties中，显示的都是dom属性。
+			某些dom属性，html中没有对应的属性，就无法用attr来操作他们。因此要用prop方法。总结来说
+				a).attr，是用来设置html属性的。(className是dom属性，因此无法通过attr获得className的值，只能通过class)
+				b).prop，是用来设置dom属性的。
+				以上两者的用法 完全相同。
+			html属性和dom属性差别最大的地方就是表单控件的值了。例如文本输入框的html属性value，在dom属性中叫作defaultValue。为了统一表单控件的代码，通过val来控制。
+			.val()可以设置和返回表单控件的值。

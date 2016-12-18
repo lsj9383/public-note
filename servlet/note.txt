@@ -279,7 +279,7 @@ GET和POST的区别:
 	
 		
 		3).其他
-			String getContentPath();	获得根路径地址（就是webapp在webapps中的路径）
+			String getContextPath();	获得根路径地址（就是webapp在webapps中的路径）
 			String getRemoteAddr();		获取客户端ip
 			String getMethod();			获取请求方法			
 			String getRequestURI();		uri
@@ -494,3 +494,23 @@ java中cookie当做类处理，使用new来创建cookie。cookie由两部分组成，key和value
 	4.Filter顺序
 		对一个请求经过filter的顺序是：
 			通过配置文件，可以获悉符合该请求的filter配置。
+			
+二十一、上传文件
+	客户端:
+	<form action="/mdblog/upload" method="post" enctype="multipart/form-data">
+		<input type="text" name="postname"><br>
+		<input type="file" name="file"><br>
+		<input type="submit" name="submit" value="submit">
+	</form>
+	
+	服务器端:
+	需要使用appach common提供的库:commons-fileupload.jar.
+	DiskFileUpload diskFileUpload = new DiskFileUpload();
+	try {
+		List<FileItem> fileList = diskFileUpload.parseRequest(request);
+		for(FileItem fileItem : fileList){	//遍历所有上传来的文件
+			if(!fileItem.isFormField()){	//是文件
+				out.println(fileItem.getName());
+			}
+		}
+	} catch (FileUploadException e) {e.printStackTrace();}

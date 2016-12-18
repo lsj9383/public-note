@@ -16,3 +16,12 @@
 			* 重构 目的在于使软件更容易被理解和修改。
 			* 性能优化 在不改变组件的行为条件下，提高执行速度。往往会使的代码较难理解。
 		虽然重构可能让软件更慢，但它使软件的性能优化更容易。因为重构会使得程序结构高内聚，低耦合。这样针对效率低效的模块进行优化即可。
+
+二、坏味道
+	1.重复代码(Duplicated Code)
+	2.过长函数(Long Method)
+	3.过大的类(Large Class)
+	4.过长参数列(Long Parameter List)
+	5.发散式变化(Divergent Change)
+	6.霰弹式修改(Shotgun Surgery)
+	7.依恋情结(Feature Envy)
