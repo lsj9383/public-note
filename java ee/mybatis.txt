@@ -107,3 +107,15 @@
 			int id = 1;
 			String sql = "select * from t_user where id = ?";
 			pstat.setInt(1, id);
+			减少编译次数提高效率，且防sql注入。
+	2.Mybatis
+		1).占位符
+			由于框架将sql语句和程序代码分离开，所以无法直接确认参数的含义。
+			所以框架用特殊的符号来代替?
+			a).配置
+				<select id="selectUser" resultType="com.lsj.User">
+					select * from t_user where usercode = #{usercode}
+				</select>
+			b).使用
+			User user = session.selectOne("selectUser", <parameter>);
+		2).拼串
