@@ -1,0 +1,7 @@
+一、开始
+	配置
+二、handlerMapping
+	处理映射器
+	将请求路径和控制器进行关联映射，当用户发送相应的请求，会找到对应的控制器。
+	使用BeanNameUrlHandlerMapping
+	

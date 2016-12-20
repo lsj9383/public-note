@@ -1,0 +1,839 @@
+一、介绍
+	Hibernate是ORM即对象关系映射，使用对象操作来操作关系型数据库。
+	Hibernate是持久层，用于数据持久化(即保存对象)。其实就是对jdbc做了一层封装。
+	使用Hibernate可以使我们采用对象化的操作关系型数据库。
+	1.优点
+		1).使开发更加对象化。
+		2).易移植
+		3).没有侵入性，支持透明持久化。
+	2.缺点
+		1).使用数据库特性的语句。
+		2).对大批量数据更新存在问题。
+		3).系统中存在大量的统计查询功能不太适合。
+	3.目录结构
+		- doc		一些api参考文档
+		- eg		一些demo
+		- etc		一些配置文件的例子模板
+		- lib		第三方依赖包
+		- src		源代码
+		- test		测试程序
+
+二、开始
+	Hibernate可以用在任何java项目，因为它本来就只是用于sql的。
+	1.创建User Library. 加入依赖包
+		* HIBERNATe_HOME/lib/*.jar
+		* HIBERNATe_HOME/hibernate3.jar
+		* 加入数据库驱动(mysql的jdbc驱动)
+	2.添加配置文件
+		hibernate.cfg.xml放到classpath可以搜索的路径下，一般放到src路径下。
+		<!DOCTYPE hibernate-configuration PUBLIC
+			"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+			"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+		<hibernate-configuration>
+			<session-factory>
+				<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+				<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/hibernate_first</property>
+				<property name="hibernate.connection.username">root</property>
+				<property name="hibernate.connection.password">root</property>
+				<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+				<property name="hibernate.show_sql">true</property>		<!-- 方便观察生成的文件 -->
+				<property name="hibernate.format_sql">true</property>
+			</session-factory>
+			
+			<!-- 指出映射文件 -->
+			<mapping resource="com/lsj/hibernate/User.hbm.xml"/>
+		</hibernate-configuration>
+	3.建立实体类
+		该类对象是需要持久化的，也就是该类将会保存到数据库中，类中的每个属性就是一个字段。
+		也就是说，一个表其实就是一个对象集合。
+	4.建立映射
+		<class-name>.xml，该配置文件一般和实体类放在同一个包下。
+		<?xml version="1.0"?>
+		<!DOCTYPE hibernate-mapping PUBLIC 
+			"-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+			"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+		<hibernate-mapping>
+			<class name="com.lsj.hibernate.User">	<!-- 建立类和表的映射 -->
+				<id name="<class-property>">		<!-- 建立主键对应 -->
+					<generator class="uuid" />		<!-- 主键生成策略，必须提供 -->
+				</id>
+				
+				<!-- 对象的属性和表中的字段建立映射-->
+				<property name="<class-property>" />
+				<property name="<class-property>" />
+				...
+				<property name="<class-property>" />
+			</class>
+		</hibernate-mapping>
+		
+		这样子对对象的操作，将会对应到对数据库表的操作。
+	5.添加建表类，以创建表：
+		这是手动法，也可以采用别的机制。
+		Configuration cfg = new Configuration().configure();	//读取hibernate.cfg.xml配置文件
+		SchemaExport export = new SchemaExport(cfg);			//
+		export.create(true, true);		//创建表,配置文件中有类到表的映射，因此先将表创建出来。
+	6.建立客户端类，添加数据：
+		Configuration cfg = new Configuration().configure();
+		SessionFactory factory = cfg.buildSessionFactory();		//建立session-factory, 这是数据库的镜像。
+		Session session = null;			//用于进行事务
+		try{
+			session = factory.openSession();	//得到session
+			session.beginTransaction();			//开启事务
+			....
+			session.save(object);				//将对象纳入session管理，在这里会在数据库中生成于之对应的主键
+			session.getTransaction().commit();	//提交事务
+		}catch(Exception e){
+			e.printStackTrace();
+			session.getTransaction().rollback();
+		}finally{
+			if(session != null){
+				if(session.isOpen()){
+					session.close();
+				}
+			}
+		}
+三、持久化对象的状态
+	1.瞬时对象Transient Objects
+		不在数据库中的对象，例如刚刚new的对象。不再应用这些对象时，他们的状态将会丢失，进而被垃圾回收。
+		通过session.save(object)，可以将瞬时对象纳入session管理。
+		* 没有被session管理
+		* 在数据库中没有与之匹配的记录
+		
+	2.持久化对象
+		具有数据库标识，并且由持久化管理器session统一管理的。session可以通过提交事务，进行和数据库的同步。
+		在提交前，若对该类对象做了任何修改，都会在sql语句中体现出来。
+		持久化对象，调不调用session.update没有意义。
+		* 纳入session管理
+		* 数据库中有与之匹配的记录（一旦save，就会在数据库中生成主键，创建于之对应的记录）
+		* 当属性发送改变，在清理缓存会自动和数据同步。
+		
+	3.离线对象(detached)
+		session关闭后，持久化对象就变为了离线对象，表示该对象不再与数据库同步。也就是说对象的状态改变时，不会同步到数据库中。
+		通过session.update(object)，可以将离线对象重新纳入session管理。
+		一个对象是否映射到了数据库中，主要是通过主键来判断的。对象的主键值存在于数据库中，那么该对象将映射与数据库中对应的对象。
+		换句话说，可以手动创建离散对象，也就是将其主键值设置为在数据库中已经存在的主键值。
+		* 没有被session管理
+		* 在数据库中存在与之匹配的记录
+		
+四、Junit测试
+	* 创建测试类，测试类继承于TestCase。
+	* 编写单元测试方法，方法名称必须为test开头，方法没有参数，没有返回值。
+	* 最好采用单的目录存放测试程序
+	
+五、关系型对象转实际对象(查询)
+	只能通过主键来拿取。并且拿取下的是持久化对象。
+	1.get
+		执行get会马上执行一条sql查询语句。立刻返回实际对象。
+		Serializable session.get(<Class>, "<primary-key-value>");	//返回的是持久化对象，也就是说它受session管理。
+		若指定的数据不存在，会返回null。
+	2.load
+		执行load不会执行sql查询语句。返回的是代理模式，直到在使用该对象的实际数据时才执行sql查询语句，将其加载进来。
+		这其实是延迟加载，只有在真正使用对象时，再加载。这样做可以提高性能。
+		这里的代理采用CGLIB库生成的，而非jdk的动态代理。jdk动态代理要求类实现了接口，CGLIB代理不需要这样的约束。
+		Serializable session.load(<Class>, "<primary-key-value>");
+		若指定的数据不存在，还是会得到代理的，在使用代理时，会抛出ObjectNotFoundException异常。
+		
+六、删除与更新
+	1.删除
+		先获得持久化对象，再删除。
+		session.delete(object);		将指定的对象从数据库中删除。
+		object需要先从数据库中加载。
+	2.更新
+		更新是针对detached对象(离线对象)的.
+		1).一般是将对象加载进来，对象进入了持久化状态，这时候根本不需要update就可以更新。
+		2).若对象没有被加载进来，但是通过某种方式这个对象存在了，就需要通过update来进行加载。session.update(<detached-object>);
+		
+七、Query接口
+	提供更丰富的查询功能。
+	1.使用
+		session.beginTransaction();
+		Query query = session.createQuery(queryString);
+		List userList = quer.list();
+		...
+		
+	2.queryString
+		可以是HQL/SQL
+		HQL是Hibernate QL，因为不同的sql有不同的sql语句，而Hibernate把不同的sql封装了，用hql来提供服务。
+		1.queryString=="from <class-name>"
+			这样得到是对应class的所有对象，其实就是把对应表里的数据全部都拿出来了。
+		2.分页
+			query.setFirstResult(int);	//查找的起始位置
+			quer.setMaxResult(int);		//查找的最大结果集
+
+八、基本映射
+	映射在<hibernate-mapping>标签中配置
+	1.常用映射
+		表-----------实体类 采用<class>标签
+		表字段 ------实体类中的普通属性(不包括集合、自定义类和数组) 采用<property>标签
+
+		注：1.如果实体类的属性名和sql中的关键词重了，将会出现错误。这种情况可以采用table属性和column属性对其在在数据库中的字段名重命名。
+			2.类不能用final，因为代理是继承与类的。
+			3.类最好提供标识符，例如id。
+			4.setter是可以省略的，但是需要改配置。
+			
+	2.实体类设计原则:
+		1).实现无参的默认构造函数。
+		2).提供一个标识。
+		3).建议不要使用final修饰实体类。
+		4).建议为实体类生产getter和setter方法。
+	
+	3.配置文件
+		<hibernate-mapping package="<package-name>">
+			<class name="<class-name>" table="<table-name>">	<!-- 若没有table属性，则默认table名为class名 -->
+				<property name="" column="<column-name>">		<!-- 若梅有指定column，则默认字段名用类的属性名 -->
+			</class>
+		</hibernate-mapping>
+	4.主键标签
+		1).常用属性
+		<id
+			name=""
+			type=""		<!-- 字段在表中保存的类型 -->
+			column=""
+			access="field|property|ClassName"	<!-- 若设置为field，则类可以省略setter方法 -->
+			
+			<generator class="" />
+		/>
+
+		2).生成器策略:
+			identity	自增。mysql支持，orcale不支持
+			sequence	也是自增的，和上者的数据库类型不一样。orcale支持，mysql不支持。
+			uuid		用一个128bit的uuid算法生成字符串类型标识符，这在一个网络中是唯一的（使用了ip地址）。
+			native		根据底层数据库支持的来生成，自动使用。
+			assigned	主键手动分配，即在session.save之前程序员为主键分配数值。
+			foreign		使用另外一个相关联的对象的标识符。
+	5.属性标签
+		<property
+			name=""				<!-- 属性的名字 -->
+			column=""			<!-- 属性在表中的字段名 -->
+			type=""				<!-- 属性在表中的字段类型 -->
+			unique="true|false"	<!-- 字段值不可重复-->
+			not-null="true|false"
+			access="field|property|ClassName"	<!-- 若设置为field，则类可以省略setter方法 -->
+		/>
+九、多对一关联映射
+	关联映射，就是将对象模型的关联关系映射到数据库中。
+	所谓的关联关系，在对象模型中就是一个或多个引用。
+	1.多对一关联映射原理
+		在多的一端加入一个外键，指向一的一端。
+		<many-to-one name="group" column="groupid" />	<!-- 该标签添加到多的一方 -->
+			
+	2.两个表的配置
+		1).Group
+			<class name="com.lsj.hibernate.Group", table="t_group">
+				<id name="id">
+					<generator class="native">
+				</id>
+				<property name="name" />
+			</class>
+		2).User
+			<class name="com.lsj.hibernate.User"  table="t_user">
+				<id name="id">
+					<generator class="native">
+				</id>
+				<property name="name" />
+				<many-to-one name="group" column="groupid" />	<!-- 在多的一段加个外键 -->
+			</class>
+	3.类配置
+		class Group{
+			String id;
+			String name;
+		}
+		
+		class User{
+			String id;
+			String name;
+			Group group;
+		}
+	4.使用
+		Persistent对象不能引用Transient对象。否则在commit时，发现Persistent中引用了Transient对象，是会报错的。这里的引用这的是对象所映射的表存在引用关系。
+		因为引用的对象，也会在数据库中更新表，而Transient对象无法被session管理。
+	5.级联(cascade)
+		<many-to-one name="group" column="groupid" cascade=""/>
+		hibernate会首先保存表的关联对象,这样就让关联的对象强制成为了Persistent对象。
+		级联是对象之间的连锁操作，只影响添加，删除和修改。自动对关联的对象进行操作。
+		all  任何行为都进行级联操作。
+		none 不进行级联操作，默认
+		save-update	在保存和更新时，进行级联操作。
+		delete 在删除时执行级联操作。
+	6.查询
+		load(Class, id);可以拿到对象，若要使用引用的对象时，才会去取该引用对象的数据。这是因为load采用延迟加载策略。
+
+十、一对一关联映射
+	主键关联	：两个对象具有相同的主键。比如身份证对象和人类对象，这两类对象是一一对应的。
+	唯一外键关联：外键的值增加了唯一约束。其实一对一就是多对一的特殊情况。
+	这类的数据用两个表，并不是为了减少冗余，而是增加对象型。
+	1.表和类的配置
+		1).表1
+			class t1{
+				private int id;
+				private String other-property;
+				setter and getter...
+			}
+			<class name="<class-name>" table="<table-name-1>">
+				<id name="native" />
+				<property name="<property-in-class>" />
+				...
+				<one-to-one name="">
+			</class>
+		2).依赖表1主键的表2
+			class t2{
+				private int id;
+				private String name;
+				private t1 reference;		//引用的对象。当前对象与引用对象是一一对一的。
+				setter and getter...
+			}
+			<class name="<class-name>" table="<table-name-2>">
+				<id name="id">
+					<!-- foreign会取得关联对象的标识 -->
+					<generator class="foreign">
+						<param name="property"></param>	<!-- 具体取哪个property的标识 -->
+					</generator>
+				</id>
+				<property name="<property-in-class>" />
+				...
+				<!--
+					one-to-one标签，指示hibernate如何加载对象的关联(引用)对象，也就是拿到关系字段值，
+					也就是拿到关系字段值，根据对端的主键加载关联对象。
+					Constrained="true"表示当前主键，还是一个外键 
+				-->
+				<one-to-one name="<reference-object>" constrained="true">
+			</class>
+	2.编程
+		1).保存
+			session.beginTransaction();
+			t1 idcard = new t1();
+			t1.setProperty
+			
+			t2 person = new t2();
+			t2.setReference(idcard);
+			session.save(t2);			//建立两个对象(表)之间的一一对应关联。
+			
+			//一对一关联映射，默认会先保存关联对象。
+			session.getTransaction().commit();
+		2).读取
+			session.beginTransaction();
+			t2 person = (t2)load(t2.class, id);		//指定对象和关联对象都会读取出来
+			session.getTransaction().commit();
+	3.双向关联
+		需要在两端都加上<one-to-one>标签，指示hibernate将关联对象根据主键加载上来。
+		两端的类中也需要进行相互对象的引用。
+		<one-to-one>不影响存储(save保存数据)，只影响加载(load读取数据)。
+		也就是说，保存还是单向的，加载是双向的（加载任何一个类对象，都可以加载出关联对象）
+十一、session flush
+	1.session flush方法主要做两件事：
+		清理缓存
+		执行sql(执行sql后，数据库就已经缓存了对应的数据，但是其他事务是否能够读取当前事务更新的数据，要根据隔离级别来说。mysql默认是当前事务提交后，才会允许其他事务读取)
+	2.session flush的执行时间
+		默认在事务提交时
+		显示调用flush
+		在执行查询前
+	3.隔离级别
+		隔离级别	是否存在脏读	是否存在不可重复读		是否存在幻读
+		------------------------------------------------------------------
+		未提交读	T				T						T
+		提交读		N				T						T
+		可重复读	N				N						T
+		序列化读	N				N						N
+	4.不同主键生成策略的影响
+		1.uuid
+			执行save后不会执行sql语句，仅仅本地生成主键值并将对象放入session缓存，也会记录insert操作。
+		2.native
+			执行save后会执行sql语句，因为主键值的改变是基于表中主键数据的。当然也会放到session缓存中。
+			这个的save执行后，相当于就flush了。
+		3.assigned
+
+十二、一对多关联映射
+	比如班级和学生以一对多关系。（班级->学生是一对多, 学生->班级是多对一）
+	需要注意的是，虽然关系采用一对多，但是外键还是加在多的一端来建立关系。
+	一对多和多对一的映射原理是一样的，区别在于维护的关系不同（本质上是加载方向不同）
+		多对一维护的关系是，多指向一。加载多的时候，就可以加载出一。
+		一对多维护的关系是，一指向多。加载一的时候，就可以加载出多。
+	1.类与表
+		1).班级
+			class Classes{
+				private int id;
+				private String name;
+				private Set students;
+			}
+			
+			<class name="<classes-class-name>" table="t_classes">
+				<id name="id"><generator class="native" /></id>
+				<property name="name">
+				<!-- 一对多的集合维护 -->
+				<set name="students">
+					<!-- 在多的一端(student的表)添加一个字段，该字段指明了关系 -->
+					<key column="classid">
+						<one-to-many class="<student-class-name>" />	<!-- 指明了集合中是什么数据 -->
+					</key>
+				</set>
+			</class>
+		2).学生
+			class Student{
+				private int id;
+				private String name;
+			}
+			<class name="<student-class-name>" table="t_student">
+				<id name="id"><generator class="native" /></id>
+				<property name="">
+			</class>
+	2.使用
+		1).保存
+			session.beginTransaction();
+			Student student1 = new Student();
+			Student student2 = new Student();
+			Classes classes = new Classes();
+			classes.setStudents(new HashSet{student1, student2});
+			session.save(student1);		//多的classid字段并没有在student中，在表里classid将为null。也因此classid不能为null。
+			session.save(student2);
+			session.save(clases);		
+			session.getTransaction().commit();	//要保证student对象是persistent对象。该语句会更新student中的classid。
+		2).加载
+			session.beginTransaction();
+			Classes classes = (Classes)session.load(Classes.class, id);
+			Set students = classes.getStudent;
+			for(Iterator stu = students.iterator(); iter.hasNext(); ){	//这个集合里面的学生，也是延迟加载的。
+				..
+			}
+			session.getTransaction().commit();
+	3.双向
+		1).多对一存在一些缺陷，主要是:
+			* save(student)时，classid会存在null字段
+			* save(classes)时，会发送多余的update语句去更新student的classid
+			因此，采用双向不是需求驱动，而是为了克服缺陷。
+		
+		2).映射方式:
+			* 在一的一端，采用<key>标签，这样在多的一端会加入一个外键。
+			* 在多的一端，采用<many-to-one>标签。
+			以上两个标签加入的字段保持一致，否则会产生数据混乱。
+			
+		3).inverse属性：
+			* 默认为false。表示在本端可以维护关系。如果inverse为true，本端不能维护关系，交给另一端维护，并且本端失效。
+			* 可以用在一对多和多对多双向关联。
+			* 一对多关联映射，我们通常在多的一段维护关系，让一的一端失效，因此会设置inverse为true。（也就是说不让一来保存，让多的一端来保存）
+			
+		4).在多的一端
+			class Student{
+				private int id;
+				private String name;
+				private Classes classes;
+			}
+			<class name="<student-class-name>" table="t_student">
+				<id name="id"><generator class="native" /></id>
+				<property name="">
+				<many-to-one column="classid">
+			</class>
+
+十三、多对多映射
+	比如用户与角色，一个用户有多个角色，一个角色也可以有多个用户。
+	1.表与类
+		1).Role
+			class Role{
+				private int id;
+				private String name;
+			}
+			
+			<class name="<role-class-name>" table="t_role">
+				<id name="id">
+					<generator class="native" />
+				</id>
+				<property name="name" />
+			</class>
+		2).User
+			class User{
+				private int id;
+				private String name;
+				private Set roles;
+			}
+			
+			<class name="<role-class-name>" table="t_role">
+				<id name="id">
+					<generator class="native" />
+				</id>
+				<property name="name" />
+				<!-- 这样会添加一个表 -->
+				<set name="roles" table="t_user_role">
+					<key column="user_id" />
+					<many-to-many class="<role-class-name>" column="role_id"></many-to-many>
+				</set>
+			</class>
+
+十四、继承映射
+	0.类模式
+		1).Animal
+			class Animal{
+				private int id;
+				private String name;
+				private boolean sex;
+			}
+		2).Pig
+			class pig extends Animal{
+				private int weight;
+			}
+		3).Bird
+			class Bird extends Animal{
+				private int height;
+			}
+	1.一颗继承树一张表 的 类和表设计
+		比较简单，但是会造成大量的冗余。
+		-----------------------------------
+		id	name  sex  weight  height  type
+		------------------------------------
+		1    sp    M     100    NULL    P
+		2    sb    W     NULL   200     B
+		..
+		-------------------------------------
+		<class name="<class-name>" table="t_animal">
+			<id name="id">
+				<generator class="">
+			</id>
+			<property name="name">
+			<property name="sex">
+			
+			<!-- 添加鉴别字段, 不同的类以不同的值来区分，这些值都属于鉴别字段 -->
+			<discriminator column="type" type="sring">
+			</discriminator>				
+			
+			<!-- 以下是指明当前类(表)的子类，以及需要扩展的属性 -->
+			<subclass name="<sub-class-name>" discriminator-value="P">
+				<property name="weight" />
+			</subclass>
+			<subclass name="<sub-class-name>" discriminator-value="B">
+				<property name="height" />
+			</subclass>
+		</class>
+	2.每个类一张表
+		存储冗余小，但是执行效率低，因为插入一个数据，要操作多个表（当前类和所有的父类）
+		-------------
+		id	name  sex
+		-------------
+		1    sp    M 
+		2    sb    W 
+		..
+		-------------
+		-----------
+		pid  weight
+		-----------
+		1    100
+		..
+		-----------
+		-----------
+		bid  height
+		-----------
+		2    200
+		..
+		-----------
+		<class name="<class-name>" table="t_animal">
+			<id name="id">
+				<generator class="">
+			</id>
+			<property name="name">
+			<property name="sex">	
+			
+			<!-- 以下是指明当前类(表)的子类，以及需要扩展的属性，这会生成新的表 -->
+			<joined-subclass name="<sub-class-name>" table="t_pig">
+				<key column="pid" />			<!-- pid和父类的id对应 -->
+				<property name="weight" />
+			</joined-subclass>
+			<joined-subclass name="<sub-class-name>" table="t_bird">
+				<key column="bid">				<!-- bid和父类的id对应 -->
+				<property name="height" />
+			</joined-subclass>
+		</class>
+	3.每个具体类一张表
+		---------------------
+		id	name  sex  weight
+		---------------------
+		1    sp    M     100 
+		..
+		---------------------
+		---------------------
+		id	name  sex  weight
+		---------------------
+		2    sb    W     200 
+		..
+		---------------------
+		<class name="<class-name>" table="t_animal" abstract="true">
+			<id name="id">
+				<generator class="">
+			</id>
+			<property name="name">
+			<property name="sex">	
+			
+			<!-- 以下是指明当前类(表)的子类，以及需要扩展的属性，这会生成新的表 -->
+			<union-subclass name="<sub-class-name>" table="t_pig">
+				<property name="weight" />
+			</union-subclass>
+			<union-subclass name="<sub-class-name>" table="t_bird">
+				<property name="height" />
+			</union-subclass>
+		</class>
+
+十五、复合主键映射
+	要将表中的复合主键抽取出来，单独生成类。
+		* 这个类应该实现序列化接口。
+		* 这个类也应该覆盖hashCode，因为可能会有HashMap的结构进行数据存储。
+	public PK{
+		private Object o1;
+		private Object o2;
+	}
+	<class name="<class-name>">
+		<composite-id name="<PK-class-name>">
+			<key-property name="<PK-property>">
+			...
+		</composite-id>
+		<property name="" />
+		...
+	</class>
+	
+十六、Component映射
+	把类中的引用的对象的属性摊开来保存到表里。
+	class User{
+		private int id;
+		private String name;
+		private Component component;
+	}
+	
+	class Component{
+		private Object Component-Property1;
+		private Object Component-Property2;
+		private Object Component-Property3;
+	}
+	<class name="">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property name="<this-class-property>">
+		<component name="<this-class-property>">
+			<property name="<component-property>" />
+			<property name="<component-property>" />
+			<property name="<component-property>" />
+		</component>
+	</class>
+
+十七、集合映射
+	public class CollectionMapping{
+		private int id;
+		private String name;
+		private Set setValues;
+		private List listValues;
+		private String[] arrayValues;
+		private Map mapValues;
+	}
+	每个集合都会额外保存为一张表。
+	---------------------
+	set_id      set_value
+	----------------------
+	   1           a
+	   1           b
+	-----------------------
+	
+	--------------------------------------
+	list_id      list_value    list_index
+	--------------------------------------
+	   1           c               0
+	   1           d               1
+	--------------------------------------
+	
+	------------------------------------------
+	array_id      array_value    array_index
+	------------------------------------------
+	   1              e              0
+	   1              f              1
+	------------------------------------------
+	
+	--------------------------------------
+	map_id      map_key     map_value
+	--------------------------------------
+	   1           K1          V1
+	   1           K2          V2
+	--------------------------------------
+	
+	<class name="" table="">
+		<id name="id">
+			<generator class="native" />
+		</id>
+		<property name="name" />
+		<set name="setValues" table="t_set_values">
+			<key column="set_id" />
+			<element type="string" column="set_value" />
+		</set>
+		<list name="listValues" table="t_list_values">
+			<key column="list_id" />
+			<list-index column="list_index" />
+			<element type="string" column="list_value" />
+		</list>
+		<array name="arrayValues" table="t_array_values">
+			<key column="list_id" />
+			<array-index column="array_index" />
+			<element type="string" column="array_value" />
+		</array>
+		<map name="mapValues" table="t_map_values">
+			<key column="map_id" />
+			<map-key type="string" column="map_key" />
+			<element type="string" column="map_value" />
+		</map>
+	</class>
+
+十八、lazy策略
+	hibernate的lazy策略，必须在session打开状态下有效。
+	* <class>标签上，可以取值true/false
+		只影响普通属性
+	* <property>标签上，可以取值trre/false
+	* <set><list>标签上，可以取值true/false/extra
+	* <many-to-one><one-to-one>标签上，可以取值false/proxy
+		这些标签不会受到class的lazy策略影响，他们可以定义自己的lazy策略
+		
+十九、HQL(Hibernate Query Language)
+	HQL用面向对象的方式生成SQL，使用HQL是方便跨SQL平台。
+		* 以类和属性来代替表和数据字段
+		* 支持多态
+		* 支持各种关联
+		* 减少了SQL冗余
+	HQL关键字不区分大小写，通常小写。
+	1.简单属性查询
+		List items = session.createQuery("<hql>");
+		1).查询单个属性
+			hql == select <property-name> from <class-name>		//查询出指定类的所有对象中的指定属性名。
+		2).查询多个属性
+			a).默认方式
+				返回对象数组集合即List<Object[]>, Object[]的长度和查询的属性个数一直。
+				hql == select <property-name>,<>,<>,.. from <class-name>		//查询出指定类的所有对象中的指定属性名。
+			b).自定义方式
+				hql == select new <property-save-calss-name>(<property-name>,<>,<>),.. from <class-name>		//查询出指定类的所有对象中的指定属性名。
+				这样可以自定义一个新的类，用于保存这些查询出来的属性名。
+				返回的是List< <property-save-calss-name> >;
+		3).使用别名
+				hql == select <property-name>.alias from <class-name>"
+	2.实体对象查询
+		1).list
+			执行一条list就会发送一条sql语句去查询所有数据，将结果保存到session缓存里。
+			需要注意，list是【强制】每次都发送sql语句，并不检查缓存。
+			session.createQuery("from <class-name>").list();			//可以忽略select关键字，返回<class-name>的所有对象实体
+			session.createQuery("select <alias> from <class-name> as <alias>").list();			//若使用select关键字，必须加别名，这样才可以返回所有对象实体。
+			不支持select * 的写法
+		2).iterate
+			会发送一条查询id列表的sql语句，再根据id到去session缓存里找对应数据。若没有，就会发送一条sql语句去查询，查询只查一条。
+			Iterator iter = session.createQuery("from <class-name>").iterate;;
+			会有N+1问题:
+				1:发出一条查询id列表的语句
+				N:根据id发出n条sql语句，加载相关对象。
+	3.条件查询
+		1).拼串
+			session.createQuery("from <class-name> where ....").list();
+		2).占位符
+			Query query = session.createQuery("from <class-name> where <property> like ? ").;
+			query.setParameter(0, "...");		//在这里设置占位符句内容，索引从0开始.(jdbc从1开始)
+			List items = query.list();
+			也可采用':参数名'作为占位符
+	4.分页查询
+		session.createQuery("from <class-name>")
+				.setFirstResult(base)	//从第base条开始
+				.setMaxResults(max)		//最多显示max个
+				.list();
+	5.统计查询
+		Long count = (Long) session.createQuery("select count(*) from <class-name>")
+									.list()
+									.get(0);
+		Long count = (Long) session.createQuery("select count(*) from <class-name>")
+								.setMaxResult()			//以免有多个结果，无法调用uniqueResult.
+								.uniqueResult();
+	6.hql的dml语句
+		session.createQuery("update <class-name> <alias> set <class-property>=.. where <class-property>...");
+		少用这个语句，因为这个语句不会更新session的缓存。会导致数据库和session缓存中的数据不一致。
+
+十九、悲观锁和乐观锁
+	1.悲观锁
+		通常由数据库机制实现的，在整个查询过程中把数据锁住，只要查询的事务不释放（提交或回滚）任何用户都不能查看和修改。
+		obj = session.load(<class-type>, id, LockMode.UPGRADE);		//使用悲观锁模式进行查询，查询出来后，其他事务不可对查出来的数据作任何操作，直到当前事务提交。
+	2.乐观锁
+		并非由数据库机制提供。大多数的使用是采用数据库版本的方式实现，一般在数据库中加入一个version字段。
+		在读取数据时将version读取出来，在保存数据时判断version的值是否小于数据库中的version值，如果小于则不予更新，否则给与更新。
+		1).表和类的配置：
+			class 
+			<class name="" table="" optimistic-lock="version">
+				<id>
+					<generator class="<gen-type>" />
+				</id>
+				<version name="version" />				<!-- 乐观锁版本所使用的字段 -->
+				<property name="<property-name>" />
+			</class>
+		2).使用
+			会自动使用乐观锁, 即:
+			在更新数据时，会检测version以及自动修改version。
+	悲观锁影响并发，一般使用乐观锁。
+
+二十、缓存机制
+	1.一级缓存
+		一级缓存声明周期很短 和 session的声明周期一致，一级缓存也叫session级缓存 或 事务级缓存。
+		* load、get、iter查询对象是支持缓存的，会把查询的结果放到session里面，再次查询也是利用的session里的缓存。
+		* iter查询属性，是不会缓存的。
+		也就是说，一级缓存只会缓存实体对象，不会缓存属性。
+		一级缓存会因为session的消亡而消亡。
+		* save支持缓存
+		* 对于大批量的数据
+			for(int i=0; i<Length; i++){
+				Student student = new Student();
+				string.setName("lsj"+i);
+				session.save(student);
+				if(i%20 == 0){
+					session.flush();		//将缓存里的数据更新到数据库中，并且会清理部分缓存
+					session.clear();		//强制性清理session中的所有缓存
+				}
+			}
+			这样做以免Length过长而导致内存溢出。
+	2.二级缓存
+		由sessionFactory管理。也称为进程级缓存或sessionFactory级的缓存，二级缓存可以被所有session共享。
+		二级缓存的生命周期和SessionFactory的生命周期一致。
+		二级缓存的配置和使用：
+			1).ehcache.xml
+				a).默认缓存机制
+					<defaultCache
+						maxElementsInMemory="10000"		缓存的对象个数
+						eternal="false/true"			对象是否过期，true为永远不过期，false为会过期。若为false，下面两个参数才起作用。
+						timeToIdleSeconds="120"			间隔多长时间没被访问就被清理。
+						timeToLiveSeconds="120"			对象存活的时间，秒
+						overflowtToDisk="true"			溢出了会保存到磁盘上。
+						/>
+				b).单独配置
+					<cache name="<class-absoluate-name>"		指定对象采用下面的缓存机制
+						maxElementsInMemory="10000"		缓存的对象个数
+						eternal="false/true"			对象是否过期，true为永远不过期，false为会过期。若为false，下面两个参数才起作用。
+						timeToIdleSeconds="120"			间隔多长时间没被访问就被清理。
+						timeToLiveSeconds="120"			对象存活的时间，秒
+						overflowtToDisk="true"			溢出了会保存到磁盘上。
+						/>
+			2).在hibernate.cfg.xml文件中配置
+				a).缓存产品提供商
+					<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+				b).启用二级缓存(默认就是启用的)
+					<property name="hibernate.cache.use_second_level_cache">true</property>
+			3).指定使用缓存的类
+				a).在该类的映射中使用
+					<class name="" table="">
+						<cache usage="read-only"/>		<!-- 这里配置的是只读，即缓存中的数据不可修改，还可以采用read-write -->
+						...
+					</class>
+			4).原则
+				通常将读远远大于写的数据进行缓存。
+			5).使用
+				* 清理二级缓存: SessionFactory.evict(<class>);	将所有的<class>对象从缓存中清除。
+				* 禁止将一级缓存的数据，放到二级缓存汇总：session.setCacheMode(CacheMode.IGNORE);
+				* 大批量数据就禁止一级缓存与二级缓存的交互，否则大批量数据就算从一级缓存清理了，但也会放到二级缓存中。
+		先在一级缓存里找，若没有就到二级缓存里找，若还是没有,就发语句到sql去查询。
+		二级缓存和一级缓存都是缓存的实体对象，不会缓存属性。
+	3.查询缓存
+		查询缓存是缓存普通属性结果集的。对实体对象的结果集会缓存id。
+		查询缓存的生命周期：
+			* 和session生命周期无关。
+			* 当关联的表发生修改，查询缓存声明周期结束。
+		1).配置
+			a).hibernate.cfg.xml
+				开启查询缓存 : <property name="hibernate.cache.user_query_cache">true</property>	<!-- 默认是关闭的 -->
+			b).必须在程序里启用
+				query.setCacheable(true);
+		2).使用
+			session.createQuery("<hql>").setCacheable(true).list();	//启用查询缓存
+			查询缓存只对query.list()起作用，对itera不支持。
+	
+		

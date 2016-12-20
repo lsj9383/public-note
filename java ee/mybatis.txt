@@ -1,0 +1,109 @@
+一、框架
+	原来叫ibatis，后来改名叫做mybatis，是一个基于java的持久层框架，和hibernate类似。
+	Hibernate面向对象的orm框架，即对象关系映射框架，将面向对象的java语言和关系型数据库做映射，操作对象就等同于操作与数据库记录，但hibernate的效率非常低 而且 占用内存。
+	MyBits面向SQL的框架，也称为sql映射器。
+	配置:
+		1).引入框架jar包
+			MYBATIS/mybatis-x.y.z.jar
+			MYBATIS/lib/*.jar
+			数据库驱动jar
+		2).增加配置文件，放置在src的文件夹中
+			Hibernate的配置文件
+				a).主配置文件
+					数据库的连接信息(账号密码、数据库位置之类的)
+					方言（不同的数据库来生成不同的sql）
+					映射文件路径(就是实体类映射文件)
+				b).实体类映射文件
+					对象和数据库的映射
+			MyBatis
+				a).主配置文件
+					数据库连接信息
+					映射文件路径
+					<?xml version="1.0" encoding="UTF-8" ?>
+					<!DOCTYPE configuration
+					PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+					"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+					<configuration>
+						<properties resource="db-config.properties"></properties>
+						
+						<!-- 所有的环境匹配, 环境可以不止一个,default是默认使用的环境的标识 -->
+						<environments default="development">
+							<!-- 配置单个环境,标识为developement -->
+							<environment id="development">
+								<!-- 事务处理管理器，采用jdbc -->
+								<transactionManager type="JDBC"/>
+								<!-- 数据源, 
+									POOLED表示使用连接池, 不使用资源后并不会释放，而是等待重复利用
+									UNPOOLED表示不使用连接池，每次都创建新的，不重复利用 -->
+								<dataSource type="POOLED">
+									<!-- 下面的数据可以直接写， 也可以从properties中获取 -->
+									<property name="driver" value="${jdbc.driverClass}"/>
+									<property name="url" value="${jdbc.url}"/>
+									<property name="username" value="${jdbc.username}"/>
+									<property name="password" value="${jdbc.password}"/>
+								</dataSource>
+							</environment>
+						</environments>
+						
+						<mappers>
+							<!-- 在src下找 -->
+							<mapper resource="mybatis-user-mapping.xml"/>
+						</mappers>
+					</configuration>
+				b).SQL映射文件
+					将执行的sql进行关联映射
+					主要是将sql语句 与 保存查询结果的类 和 sql语句标识进行关联。在编程的时候，只需要提供sql语句标识与需要的参数，就能将结果保存到一个自定义的类中。如
+					<mapper namespace="test">
+						<!-- 将id和sql语句绑定在一起，访问id时，等同于访问sql -->
+						<!-- resultType表示查询结果所转换的类型 -->
+						<select id="selectUsers" resultType="com.lsj.mybatis.bean.User">
+							select * from t_user
+						</select>
+					</mapper>
+				c).编程使用
+				InputStream is = Resources.getResourceAsStream(resource);
+				SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);	//sql工厂，用于生产session的。
+				SqlSession session = sqlSessionFactory.openSession();	//生产一个session
+				
+				List<User> list = session.selectList("selectUsers");				//一个session可以执行sql映射文件中的映射语句, 以此获得查询结果。查询结果都是放在list中的。
+				User user = session.selectOne("selectOne");							//返回单一结果，若执行后返回多个结果会运行时报错。
+				Map<String, Object> session.selectMap("selectUser", "usercode");	//将指定的字段作为key，将查询结果作为value，形成kv对，放在map里。
+				session.close();
+				
+二、mybatis的命名空间
+	1.目的
+		主要用于避免sql映射id重名的情况。
+		同一个映射文件中，无法使用命名空间区分相同名称的映射id。换句话说一个映射文件就只有一个映射空间。
+	2.使用方式: 
+		命名空间.sql映射id
+		若不同的命名空间中有重名id时，在使用id的时候，需要使用全名。
+		映射id不冲突时，是可以不用加命名空间的。
+	3.接口绑定
+		将命名空间和接口进行绑定，然后将接口中的方法和映射id进行绑定。
+		当调用接口中的方法时，等同于调用命名空间中的sql映射id。
+		<mapper namespace="com.lsj.UserDao">
+			<!-- id应该和接口中的方法同名 -->
+			<select id="selectUsers" resultType="com.lsj.mybatis.bean.User">
+				select * from t_user
+			</select>
+		</mapper>
+		
+		编程使用
+		UserDao dao = session.getMapper(UserDao.class);	//获得接口的实例
+		dao.selectUsers();	//dao其实是jdk动态代理的对象
+	4.打印log信息
+		可以显示框架具体执行了什么sql语句。甚至sql执行的详细log。
+		配置
+			log4j.logger.命名空间名称=TRACE
+			放在log4j.properties文件的最后。这样命名空间里的sql都会有详细的log。
+
+三、mybatis输入参数
+	1.jdbc的传参
+		1).拼串
+			String id = "1";
+			String sql = "select * from t_user where id " + id;
+		2).占位符
+			int id = 1;
+			String sql = "select * from t_user where id = ?";
+			pstat.setInt(1, id);
