@@ -213,8 +213,14 @@
 			$(源).append('目标');	将目标添加到源的末尾。
 			也就是说$('<p>hello</p>').appendTo('#container');  与  $('#container').appendTo('<p>hello</p>');等价
 	3.复制元素
-
-	4.锚(mao)
+		.clone()		便可复制元素，但是仅仅是复制出来，还未插入到html中。
+		.clone(true)	连同事件处理也一同复制
+	4.内容的获得与设置(getter setter)
+		.html();	这是获取jquery对象中的标签内容，即获取<label>context</label>中的context。若jquery对象是个集合，那么获取的将会是集合中收个jquery对象的。
+		.html(<new-html>);	将context换位<new-html>并重新渲染出来。若jquery对象是集合，那么设置将会设置所有jquery对象中的context内容。
+		.text(<new-text>);	将html中的数据转换为<new-text>，注意，将会全部作为字符串显示出来，就算有标签也不会渲染出来。
+		.text();	获取context，不过若jquery对象是集合，将会把所有的内容都获取出来并且拼接成一个字符串返回。需要注意的是，会忽略掉标签元素返回。如<label> <a>click</a> </label> $('label').text()只会返回click 而不会返回<a>click</a>
+	5.锚(mao)
 		<a>可以使用锚以在当前页面中进行定位。
 		若使用<a href="#<id>">click</a>，
 		则会在点击click后浏览器自动定位到指定id的元素。

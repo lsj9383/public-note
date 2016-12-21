@@ -1,15 +1,12 @@
-body.large .chapter {
- font-size: 1.5em;
-} 
-
-body.narrow .chapter {
- width: 250px;
+.pulled {
+	position: absolute;
+	width: 120px;
+	top: -20px;
+	right: -180px;
+	padding: 20px;
+	font: italic 1.2em "Times New Roman", Times, serif;
+	background: #e5e5e5;
+	border: 1px solid #999;
+	border-radius: 8px;
+	box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.6);
 }
-
-.selected {
- font-weight: bold;
-} 
-
-.hidden {
- display: none;
-} 
