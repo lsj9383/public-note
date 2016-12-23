@@ -279,3 +279,76 @@
 				
 				});	
 				可以直接获取对应的文本数据字串。参数data就是这个文本数据字符串。
+	2.浏览器发送数据并获得回应
+		1).get请求
+			$.get(
+				'<url>',
+				<requestData>,
+				function(data){
+					....
+				}
+			);
+			<requestData>，这是一个键值对对象，这样发送的请求将会是将键值对对象拼接成串放置于url后面作为get请求的参数。
+		2).post请求
+			$.post(
+				'<url>',
+				<requestData>,
+				function(data){
+					...
+				}
+			);
+			<requestData>，这和get一样，也是个键值对对象。但是发送的是post请求。
+			.load方法可以简化该操作.
+			$('...').load('<url>', <requestData>);该方法若接收了两个参数，则会自动发送post请求，并将返回的数据覆盖对应jquery对象的html内容。
+		3).序列化表单
+			在表单提交前，若希望执行一些操作，在操作执行完成后需要一个一个添加表单数据，这样做难免有些繁琐。
+			我们可以将表单数据直接序列化，以此来提交数据:
+			$('form').submit(function(event){
+				event.preventDefault();		//阻止表单自己的提交操作。
+				$.post(
+					'<url>',
+					$(this).serialize,
+					function(data){
+						...
+					}
+				);	//人为发送post数据
+			});
+	3.全局事件
+		每个document都有多个全局ajax相关的事件：
+		$(document).ajaxStart(function(){
+			...		//ajax开始时(即将发送请求，还未发送请求)会调用
+		});
+		
+		$(document).ajaxStop(function(){
+			...		//ajax结束(最后一个相关操作结束)会调用
+		});
+		$(document).ajaxError(function(XMLHttpRequest){
+			...		//ajax操作发生错误会调用
+		});
+	4.错误处理
+		除了全局的错误处理(.ajaxError)还提供了高层次的错误处理方法。
+		$.get/post(
+			'url',...
+		).fail(function(jqXHR){
+			//错误处理
+			jqXHR.status;	//错误的状态码，http协议指定
+		});
+	5.安全限制
+		XMLHttpRequest(jquery的ajax的底层浏览器技术)会受到严格的限制，这是为了防止各种跨站点脚本攻击。因此，一般情况下从提供原始页面的服务器之外的站点请求文档是不可能的。
+		只要将网页与请求的数据文件限制在同一个服务器上，就能实现ajax取得数据。
+	6.低级ajax
+		$.ajax方法，是一个较为底层的ajax方法,所有的高层方法都会转换为该方法。
+		$.ajax(<setting>);
+		setting是一个键值对对象，并且可以接受的有30于项。
+		例如:
+		<setting> = {
+			url : '<url>';
+			type : '<method:GET/POST>';
+			success : function(data){
+				...
+			}
+		}
+		使用低级ajax可以避免浏览器缓存来自服务器的响应，因此非常适合服务器动态生成数据。
+		会阻止正常情况下ajax交互会触发的全局时间，例如$(document).ajaxStart注册的事件。
+		由于$.ajax可以接受30于项，而经常不会提供那么多的，没有提供的项，都存在默认值。而通过$.ajaxSetup(<setting>)可以修改默认值。
+		
