@@ -252,9 +252,173 @@
 		框架采用特殊的标签进行参数条件判断
 			1) <if>: 判断参数条件是否成立，如果成立，将标签体中的sql和外部的sql拼接在一起。
 			2) <where>: 根据条件自动判断是否添加where关键词。如果第一个条件成立时，以and开头，那么会省略掉这个and。
-			3) 
+			3) if-else
 				<choose>
 					<when test=""></when>
 					<otherwise></otherwise>
 				</choose>
 				等同于if-else
+			4).foreach
+				<foreach collection="items" item="item" separator=",">
+					#{item}
+				</foreach>
+				"items"是map中的key的名称，其value应该是个集合。item是集合中遍历得到的值，以","进行分隔。
+七、CUD（增删改）
+	框架提供了增加，修改，删除的接口，开发人员调用就可以了。
+	框架默认的dml使用事务，	因此操作完成后应该提交事务。
+	1.insert
+		1).配置
+			<insert id="insertUser">
+				insert into t_user(
+					usercode,username,userpswd
+				) values (
+					#{usercode}, #{username}, #{userpswd}
+				)
+			</insert>
+		2.)使用
+			session.insert("insertUSer", <parameter>);
+			session.commit();
+			<parameter>和之前查询的使用方式完全相同。
+	2.update
+		1).配置
+			<update id="updateUser">
+				update tbl_user 
+				set
+					usercode = #{usercode},
+					username = #{username},
+					userpswd = #{userpswd}
+			</update>
+		2.)使用
+			session.update("updateUser", <parameter>);
+			session.commit();
+			<parameter>和之前查询的使用方式完全相同。
+	3.delete
+		1).配置
+			<delete id="deleteUser">
+				delete from tbl_user where id = #{id}
+			</delete>
+		2.)使用
+			session.delete("delteUser", <parameter>);
+			session.commit();
+			<parameter>和之前查询的使用方式完全相同。
+	4.获取自增长主键
+		为了方便对插入的数据作进一步的操作，需要获得其自增长的主键。
+		<insert id="insertUser">
+			<insert sql语句>
+			<selectKey KeyProperties="<保存主键的key或者是属性>" resultType="java.lang.Integer">
+				select @@identity as id	<!-- mysql中这么写 -->
+			</selectKy>
+		</insert>
+八、事务处理
+	1.基本概念
+		0).事务的边界
+			事务的开始与结束，一般由service层管理。
+		1).传播行为
+			多个数据库操作在嵌套使用时引用事务的方式。
+		2).隔离级别
+			多个事务操作数据库时的交互级别。
+	2.框架的事务处理
+		try{
+			...
+			session.commit();
+		}catch(){
+			session.rollback();
+		}finally{
+			session.close();	==>>close会根据当前的提交情况来判断是否回滚。老实说，只要没有提交，不管有没有发生异常，close都会自动进行回滚。
+		}
+		====》因此简化为
+		try{
+			...
+			session.commit();
+		}finally{
+			session.close();
+		}
+		另外:
+			1.finally和return
+				函数中的所有return都共享同一个临时变量，return实质上是返回的一个临时变量_retValue.
+				int i = 10;
+				try{
+					return i;
+				}finally{
+					i += 1;
+				}
+				这里返回的是10 而非11.执行return i时，会_retValue = i;然后判断是否存在finally语句，若存在finally则执行finally中的代码。执行完以后再执行return _retValue;而非return i;
+			2).protected
+				满足同类或同包或之类，才可以访问的方法。
+				
+九、缓存
+	1.一级缓存
+		sqlSession，默认使用。
+		框架处理缓存是依赖于sql映射id，只要id不同，就算sql语句一样，也要从数据库中读取数据。若id相同，会先尝试从内存中读取。
+		一级缓存无法跨越session，一旦session发生变化，一级缓存失效。
+	2.二级缓存
+		sqlSessionFactory，默认不使用。
+		配置
+			1).在映射文件中添加标签:
+			<mapper namespace="">
+				<select id=...></select>
+				<cache evction="" flushInterval="" readOnly=""></cache>
+				<!--
+					evction : 移除策略。主要是防止缓存满了。
+						LRU - 最近最少使用的对象会被移除。
+						FIFO - 先放进去的先移除
+					flushInterval : 缓存刷新时间，单位ms。多长时间将缓存清空。
+					readOnly : 是否只读。默认只读。
+					size : 缓存容量。默认1024(个)
+				-->
+			</mapper>
+			只要使用配置了二级缓存的mapper标签中的sql，都会使用二级缓存。
+			2).序列化
+				将缓存结果的类实现序列化接口。
+十、多表关联
+	1.多对一
+		1).设计
+			表设计：在多的一方增加一的一方的外键。
+			类设计：在多的一方增加一的一方的引用。
+		2).使用
+			mybatis本身并非orm(对象关系映射)，对象的管理并不会有框架完成，需要由用户编程或者配置，因此多表查询时，不会自动将关联的表添加到对象的应用中去，需要人为配置。
+			可以写两个sql，先将多的一方查出来全部，再对应的少的一方查出来，将结果保存到多的一方对象引用中。
+			也可以结合两者
+			<resultMap id="map" type="<保存结果的类，其实就是多的一方的那个类>">
+				<id column="sid" property="sid" />
+				<result column="sname" property="sname" />
+				<association property="<多的一方引用的对象>" javaType="<多的一方引用的类>">
+					<id column="cid" property="cid" />
+					<result column="cname" property="cname" />
+				</association>
+			</resultMap>
+			
+			<select id="selectStudent" resultMap="map">
+				select
+					s.*,
+					c.cname
+				from p_student s
+				join p_classes c on c.cid = s.cid	<!-- 班级id相同的 -->
+				where sid = #{sid}	<!-- 查对应的学生 -->
+			</select>
+	2.一对多
+		1).表设计
+			多的一方增加一的一方的外键。
+			在一的一方增加多的一方的数据集合。
+		2).使用
+			<select id="selectStudentByClasses" resultType="">
+				select * from p_student where cid=#{cid}
+			</select>
+			
+			<resultMap id="" type="">
+				<id column="cid" property="cid" />
+				<result column="cname" property="cname" />
+				<collection property="<集合应用对象的属性>" 
+							ofType="<集合中的对象类型	>" 
+							column="<查询结合中对象所用到的参数>"
+							select="selectStudentByClasses">
+				</collection>
+			</resultMap>
+			
+			<select id="" resultMap="">
+				select *
+				from p_clsses
+				where cid = #{cid}
+			</select>
+	3.一对一
+	4.多对多
