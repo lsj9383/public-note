@@ -1,7 +1,141 @@
 一、开始
-	配置
-二、handlerMapping
-	处理映射器
-	将请求路径和控制器进行关联映射，当用户发送相应的请求，会找到对应的控制器。
-	使用BeanNameUrlHandlerMapping
-	
+	Spring Web MVC是一种基于java的，实现了Web MVC设计模式的，请求驱动类型的，轻量级web框架。是Spring框架的重要组成部分。
+	基于请求驱动指导指的就是使用请求-响应模型。
+	MVC架构模式中要求一定存在前端控制器，而且一定要是servlet实现。
+	springMVC的优势:
+		1).与spring框架天然集成.
+		2).简单的web层测试单元
+		3).支持灵活的url到页面控制器的映射
+			servlet规范对路径匹配规则是有要求的
+				a).如果一个路径是斜杠开头，以斜杠星结尾，称为路径的前缀匹配，如 /servlet/*
+				b).如果一个路径以星点开头，那么这个路径称为扩展匹配，如:*.do
+				c).其他所有路径都是精确匹配。
+		4).非常容易与其他视图技术集成
+	springmvc配置
+		1).引入jar包
+			SPRING-HOME/lib/*.jar
+			commons-logging.jar
+			jstl.jar
+			standard.jsr
+		2).配置servlet前端控制器
+			<servlet>
+				<servlet-name>springmvc</servlet-name>
+				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+				<load-on-startup>1</load-on-startup>	<!-- 启动时加载 -->
+			</servlet>
+			
+			<servlet-mapping>
+				<servlet-name>springmvc</servlet-name>
+				<url-pattern>/</url-pattern>
+			</servlet-mapping>
+		3).springmvc-servlet.xml配置
+			前端控制器，会加载WEB-INFO下的 <前端控制器的servlet名字>-servlet.xml配置文件. 这里就是springmvc-servlet.xml
+			<?xml version="1.0" encoding="UTF-8"?>  
+			<!-- Bean头部 -->  
+			<beans xmlns="http://www.springframework.org/schema/beans"  
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+				xmlns:p="http://www.springframework.org/schema/p"  
+				xmlns:mvc="http://www.springframework.org/schema/mvc"  
+				xmlns:context="http://www.springframework.org/schema/context"  
+				xmlns:util="http://www.springframework.org/schema/util"  
+				xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+						http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd  
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+						
+				<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />	<!-- 配置springmvc的映射类的具体类，在前端控制器会使用的 -->
+				<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />	<!-- 配置springmvc的控制适配器的具体类，在前端控制器会使用的 -->
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >	<!-- 配置springmvc的视图解析器 里面暗示了视图的来源-->
+					<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+					<!-- view的前缀和后缀 -->
+					<property name="prefix" value="/WEB-INF/jsp/" />
+					<property name="suffix" value=".jsp" />
+				</bean>
+						
+				<!-- 配置处理的控制器 -->
+				<bean name="<url expect root : /hello>" class="<controller-class-name>"></bean>
+						
+			</beans>
+			
+二、HandlerMapping 映射控制器
+	将请求路径和控制器进行关联映射，当用户发出相应的请求，会找到对应的控制器。
+	1.BeanNameUrlHandlerMappping
+		将<bean>标签的name属性作为映射url进行关联。
+		<bean name="/hello" class="<controller-class-name>" />	这样的缺点是bean-name和url强相关不够独立。
+	2.SimpleUrlHandler
+		<bean id="helloWorldController" class="<controller-class-name" />
+		
+		url和bean进行关联:
+		<bean class="org.springframework.web.servlet.handler.SimpleUrlHandler">
+			<property name="urlMap">
+				<map>
+					<entry key="/hello" value="<controller-id such as : helloWorldController>"></entry>
+				</map>
+			</property>
+		</bean>
+		
+		url可以使用的通配符:
+			*, 任意可能的字串，包括空字串。
+			?, 1个任意字符，必须有1个。
+		
+	3.路径
+		1).绝对路径	固定不变的，无法改变的路径
+			本地路径：增加盘符的路径(D:/test/abc)
+			网络路径：增加协议和服务器及端口号的路径(http://www.baidu.com:80/test/abc)
+			http://www.baidu.com:80总是固定关联到主机的一个绝对本地路径。因此网络路径也是绝对路径。
+		2).相对路径，存在一个基准路径，从基准路径查找资源
+			a).需要注意的是 基准路径 是当前只有的【访问路径】。
+				所在路径：文件实际存在的路径
+				访问路径：通过某个路径来访问该文件，最后一个斜杠前面的路径。
+			b).如果一个相对路径斜杠开头，那么是特殊的相对路径，改变了默认的基准路径的位置
+				i).前台路径
+					由浏览器解析执行的代码，称为前台代码，代码中的路径，就称为前台路径。
+					以斜杠开头时，web服务器的根路径为基准路径。
+					url = http://localhost:8080/mvc/test/testServlet
+					基准路径 = http://localhost:8080/
+				ii).后台路径
+					由服务器解析执行的代码，称为后台代码，代码中的路径，就称为后台路径。
+					以斜杠开头时，web服务器的应用根路径为基准路径。
+					url = http://localhost:8080/mvc/test/testServlet
+					基准路径 = http://localhost:8080/mvc
+					
+三、拦截器
+	作用就是对业务功能的补充，队请求和响应进行拦截，拦截后进行业务操作。拦截器就是仿照过滤器来设计的。拦截器就是一种aop的体现。
+	1.拦截器和过滤器的区别
+		过滤器是加在servlet上的，拦截器是加在controller上的。
+	2.自定义拦截器
+		1).创建类，继承org.springframework.web.servlet.handler.HandlerInterceptorAdapter
+		2).重写方法
+			class LogInterceptor{
+				//拦截器执行完毕后执行的
+				@Override
+				public void afterCompletion(HttpRequest request, HttpResponse response){
+				
+				}
+				
+				//在执行控制器之后，对响应的验证，比如字符串编码等等
+				@Override
+				public void postHandler(HttpRequest request, HttpResponse response){
+				
+				}
+				
+				//在执行控制器之前进行验证
+				@Override
+				public boolean preHandler(HttpRequest request, HttpResponse response){
+					return true;	//验证成功往下走，否则直接返回。
+				}
+			}
+		3).配置拦截器
+			<!-- 将拦截器交给spring管理 -->
+			<bean id="log" class="<interceptor-class-name>"></bean>
+			
+			<!-- 给控制器增加拦截器 -->
+			<bean ... >
+				...<!-- url映射 -->
+				<!-- 配置拦截器 -->
+				<property>
+					<list>
+						<ref bean="<interceptor-id such as : log>" />
+					</list>
+				</property>
+			</bean>
