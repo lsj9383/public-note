@@ -134,8 +134,76 @@
 				...<!-- url映射 -->
 				<!-- 配置拦截器 -->
 				<property>
+					<!-- list中的顺序，就是拦截器的排列顺序 -->
 					<list>
 						<ref bean="<interceptor-id such as : log>" />
 					</list>
 				</property>
 			</bean>
+四、springmvc控制器
+	由适配器调用，控制器可以实现的:
+	1).Controller (interface)，适配器中只能调用实现了Controller接口的对象。
+	2).AbstractController (class) 这个类实现了Controller接口了的。
+		这个类可以设置被支持请求方法:
+			<bean id="<controller-id>" class="<controller-class-name>">
+				<!-- 设置控制器可以接受的请求方法 -->
+				<property name="supportedMethods">
+					<set>
+						<value>POST</value>
+					</set>
+				</property>
+			</bean>
+	3).MultiactActionController (class) 继承了AbstractController
+		这个类里面，不同的请求走不同的方法。
+		<bean id="<controller-id>" class="<controller-class-name>">
+			<property name="methodNameResolver">
+				<bean class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodName">
+					<property name="mappings">
+						<props>
+							<prop key="<url>"> <method-name> </prop>
+							<prop key="<url>"> <method-name> </prop>
+						</props>
+					</property>
+				</bean>
+			</property>
+		</bean>
+		
+		这个东西的原理是所有的相关url请求都会跳转到这个控制器类中，再分发到不同的方法。
+		因此还需要配置这个控制器的url，将其使用通配符以满足props中的url都可以进入该控制器。
+		下面是另一种url解析方法，比上面的更方便。
+		<bean id="<controller-id>" class="<controller-class-name>">
+			<property name="methodNameResolver">
+				<bean class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodName"> 
+					<!-- 方法参数, 默认为action -->
+					<property name="paramName" value="m"></property>
+				</bean>
+			</property>
+		</bean>
+		这个是靠get传入的参数来选择方法的.默认为action参数。
+		url = http://localhost/mvc/test?action=insert
+		这就会调用里面的insert方法。
+		
+五、ModelAndView
+	1.模型
+		主要指的数据数据模型
+			ModelAndView mv = new ModelAndView();
+			mv.addObject(String key, Object value); 就是在设置模型的数据，以方便在View中获取。往map中放重复key的数据时，会替换掉旧的value
+	2.视图
+		View，仅仅用于声明展示数据的相关配置，用于关联具体的视图。
+		mv.setViewName("<view-name>");
+
+六、viewresolver
+	视图解析。在控制器返回后，仅仅是视图对象，并没有指向任何页面，所以需要解析。
+	1.InternalResourceViewResolver: 内部资源解析器。
+		用于在当前web应用的内部查找只有
+		查找资源遵循查找规则：
+		视图的前缀　+ 视图的名称 + 视图的后缀
+		跳转的方式是转发（内部调整，url不变）
+	2.BeanNameViewResolver: 对象名称解析器
+		将视图名称作为spring bean对象的名称进行解析。
+		<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"></bean>
+		
+		<!-- view和bean的id相对应，会找到这里面的视图文件 -->
+		<bean id="<view-id>" class="org.springframework.web.servlet.view.JstlView">
+			<property name="url" value="/WEB-INF/jsp/test.jsp"></property>
+		</bean>

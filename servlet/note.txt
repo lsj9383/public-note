@@ -1,3 +1,30 @@
+servlet或者jsp获取数据
+数据来源主要有3个方面:
+1.get/post
+	String value = request.getParameter("<key>");
+2.cookie
+	1).响应cookie
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		response.addCookie(cookie);	
+	2).读取cookie数据
+		Cookie[] cookies = request.getCookies();	若浏览器没有cookie发送，则返回null
+		for(Cookie cookie : cookies){
+			String name = cookie.getName();
+			String value = cookie.getValue();
+		}
+3.session
+	1).创建session
+		HttpSession session = request.getSession(true/false);	//true，原本有session就使用，没有就创建。false，原本有session就使用，没有就返回null
+		session.setAttribue("<key>", Object o);
+	2).获取session数据
+		Object o = session.getAttribute("<key>")
+		
+4.其他servlet的转发
+	内部跳转而进行数据传递时使用
+	request.setAttribue("<key>", Object item);		在请求中暂存数据，只在一次请求中有用。常用于内部转发时的数据发送。
+	Object obj = request.getAttribute("<key>");		读取请求中暂存的数据。
+
+
 零、路径写法
 	0.相对路径问题
 		浏览器向一个url发送请求获取网页信息，这个网页中还会有很多依赖的资源，比如css，js，img等等。浏览器会在网页中找到这些资源的请求路径，然后再去发送请求以请求这些资源。
@@ -449,7 +476,7 @@ java中cookie当做类处理，使用new来创建cookie。cookie由两部分组成，key和value
 			默认create=true
 		void setAttribue(String name, Object value);	向会话范围存入时间
 		Object getAttribute(String name);				
-		void remote Attribyte(String name);
+		void remoteAttribyte(String name);
 		void invalidate();
 二十、Filter
 	Filter不用于处理客户端请求，而是在请求达到servlet进行正式的业务处理前进行一些操作，且Filter是链式的:
