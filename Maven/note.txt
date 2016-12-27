@@ -1,2 +1,82 @@
-下载Maven:
-http://maven.apache.org/download.html
+一、maven基本配置
+	1.下载
+		从http://maven.apache.org/download.cgi下载maven
+	2.配置环境变量
+		为了方便使用maven提供的mvn指令，配置maven中的bin目录到path路径下。
+		先将M2_HOME配置为maven的目录，然后再将%M2_HOME%\bin配置到path下面。
+	3.检测环境
+		基本应该没问题了，通过mvn -v可以检查maven的版本信息，以此来检查配置问题。
+	4.本地路径配置
+		默认情况下，maven的本地仓库路径是在c盘的用户目录下的.m2/文件夹。
+		如，用户名为lu，其maven的本地仓库路径为 -> C:\Users\lu\.m2\repository
+		本地仓库是本地计算机编程引用jar包的来源，maven并不会给每个项目都复制jar包，而是直接引用这里面的jar包。
+		本地仓库的jar包可以通过本地项目生成再按照获得，或是在远程仓库中下载。
+		c盘是系统盘，不建议放太多与系统无关的文件。因此需要配置别的路径为本地仓库。
+		可以在.m2文件夹下 创建settings.xml，在里面写入：
+		<?xml version="1.0" encoding="UTF-8"?>
+		<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+				  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+		  <localRepository>D:\DESIGN\lib\maven_repository</localRepository>
+		  <pluginGroups></pluginGroups>
+		  <proxies></proxies>
+		  <servers></servers>
+		  <mirrors></mirrors>
+		  <profiles></profiles>
+		</settings>
+		以此配置新的本地仓库的路径。
+
+二、maven非ide项目
+	1.编写pom.xml
+		pom.xml里面简述了项目的信息 使用的maven插件 以及依赖的jar包
+		<?xml version="1.0" encoding="UTF-8"?>
+		<project	xmlns="http://maven.apache.org/POM/4.0.0"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+					http://maven.apache.org/xsd/maven-4.0.0.xsd">
+				
+			<!-- 项目模块信息 -->
+			<modelVersion>4.0.0</modelVersion>
+			<groupId>com.lsj.mvnbook</groupId>
+			<artifactId>hello-world</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<name>Maven Hello World Project</name>
+			
+			<dependencies>
+				<dependency>
+					<groupId>junit</groupId>
+					<artifactId>junit</artifactId>
+					<version>4.7</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			
+			<build>
+				<plugins>
+					<!-- Maven核心插件 compiler默认只支持编译java1.3，而单元测试等功能都需要至少1.5，这里配置compiler插件的编译版本为1.5 -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<source>1.5</source>
+							<target>1.5</target>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+			
+		 </project>
+	2.编写项目代码
+		项目代码编写在./src/main/java/路径下
+	3.编写测试代码
+		测试代码编写在./src/test/java路径下
+	4.编译 测试 打包 安装
+		编译: mvn clean compile
+			编译源代码，生成.class。
+		测试: mvn clean test
+			编译测试代码，生成.class，并执行查看结果。
+		打包: mvn clean package
+			会生成jar包，在生成以前会先做测试。
+		安装: mvn clean install
+			会将生成的jar包 输出到maven本地仓库中。

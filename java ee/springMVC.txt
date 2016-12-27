@@ -207,3 +207,101 @@
 		<bean id="<view-id>" class="org.springframework.web.servlet.view.JstlView">
 			<property name="url" value="/WEB-INF/jsp/test.jsp"></property>
 		</bean>
+		
+七、注解
+	所谓的注解，就是加标记。框架的配置文件的内容太多，比较复杂，不利于维护和管理。
+	使用注解可以简化配置文件，提高开发效率。
+	使用注解进行简化，只保留视图解析器。
+	1.配置
+		<!-- 启用注解功能 -->
+		<context:annotation-config />
+		
+		<!-- 扫描注解类, 查询这个包下的所有注解类 -->
+		<context:component-scan base-package="com.lsj.springmvc.*" />
+		
+		<!-- 视图解析器 -->
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+			<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+			<property name="prefix" value="/WEB-INF/jsp/" />
+			<property name="suffix" value=".jsp" />
+		</bean>
+	2.使用
+		创建注解类，用于扫描，加载到spring中。类不需要实现任何接口，继承任何的类。
+		@Controller
+		public class UserController{
+			@RequestMapping("/user/insert")
+			public String insert(){
+				return "success";
+			}
+		}
+		方法的返回值表示视图的名称。
+	3.注解
+		1).@Controller，类前声明，声明该类为控制器类。
+		2).@RequestMapping(...)，方法前声明，配置控制器对请求的执行逻辑。
+			@RequestMapping(value = "<url>", 				//请求与方法进行映射,url支持通配符。
+							method={RequestMethod.POST/GET}	//GET和POST方法的限定。
+							params={"<param-name>"}			//请求对象中必须包含指定的参数，这个参数可以是get也可以是post。若是【!<param-name>】指若存在这个参数，不允许访问。【<param-name>=<must-valu>】参数必须为这个值才能访问。
+							)
+		3).@RequestMapping("<namespace>")，类前声明，以为这命名空间。相当于给下面方法的url增加了前缀，而且这个前缀必须使用！
+	4.函数的参数
+		1).普通类型
+			函数的参数名和请求中的参数同名，就可以取出参数。这个支持多个参数。
+			若函数参数名和请求中的参数不同命，需要增加注解进行映射。
+			@RequestMapping("/user/insert")
+			public String insert(String <param-name>){
+				return "success";
+			}
+			这个方法对于参数特别多时，不适用。
+		2).将表单数据封装到数据模型
+			@RequestMapping("/user/insert")
+			public String insert(<class-object>){
+				return "success";
+			}
+			这个方式，参数将会赋给对象中属性名和参数名相同的那些属性。
+		3).获取request
+			需要什么就给方法声明
+			@RequestMapping("/user/insert")
+			public String insert(HttpServletRequest request, HttpServletResponse response){
+				...
+			}
+			
+			public String insert(HttpSession session){
+				...
+			}
+	5.函数的返回值
+		1).String
+			public String insert(HttpServletRequest request, HttpServletResponse response){
+				return "";
+			}
+		2).void
+			方法可以没有返回值，因此方法可以是void，这是因为可以自己利用response进行
+			public void insert(HttpServletRequest request, HttpServletResponse response){
+				
+			}
+		3).View
+			public View insert(HttpServletRequest request, HttpServletResponse response){
+				RedirectView view = new RedirectView();		//重定向的view
+				view.setUrl("<url>");
+				return view;
+			}
+		4).Json
+			a).必须添加特殊的注解
+				@ResponseBody
+				public Object fun(){
+					return item;
+				}
+			b).引入jackson的jar包
+			c).修改配置文件，让响应体的内容变为json字符串
+				<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+					<property name="messageConverters">
+						<list>
+							<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+								<property name="supportedMediaTypes">
+									<list>
+										<value>application/json;charset=UTF-8</value>
+									</list>
+								</property>
+							</bean>
+						</list>
+					</property>
+				</bean>
