@@ -268,6 +268,12 @@
 			public String insert(HttpSession session){
 				...
 			}
+		4).路径传参
+			@RequestMapping("<url>/{<param-name1>}/{<param-name2>}/...")
+			public String insert(@PathVariable("<param-name1>")String <param1>, @PathVariable("<param-name2>")String <param2>, ...){
+				...
+			}
+			@PathVariable("<param-name-in-path>") String <param> 将path中的参数和函数参数绑定
 	5.函数的返回值
 		1).String
 			public String insert(HttpServletRequest request, HttpServletResponse response){
