@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <display-name></display-name>	
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+  
+  <servlet>
+  	<servlet-name>CookieServlet</servlet-name>
+  	<servlet-class>com.lsj.servlet.CookieServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>CookieServlet</servlet-name>
+  	<url-pattern>/test/cookie</url-pattern>
+  	<url-pattern>/a</url-pattern>
+  </servlet-mapping>
+  
+    <servlet>
+  	<servlet-name>SendCookieServlet</servlet-name>
+  	<servlet-class>com.lsj.servlet.SendCookieServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>SendCookieServlet</servlet-name>
+  	<url-pattern>/test/send</url-pattern>
+  </servlet-mapping>
+</web-app>

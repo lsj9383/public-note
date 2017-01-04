@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+  <display-name></display-name>	
+  
+  <servlet>
+  	<servlet-name>AServlet</servlet-name>
+  	<servlet-class>com.lsj.servlet.AServlet</servlet-class>
+  	
+  	<!-- 初始化参数 -->
+  	<init-param>
+  		<param-name>driver</param-name>
+  		<param-value>com.mysql.jdbc.Driver</param-value>
+  	</init-param>
+  	
+  	<init-param>
+  		<param-name>url</param-name>
+  		<param-value>jdbc:mysql://localhost:3366/bjpowernode</param-value>
+  	</init-param>
+  	
+  	<init-param>
+  		<param-name>user</param-name>
+  		<param-value>root</param-value>
+  	</init-param>
+  	
+  	<init-param>
+  		<param-name>password</param-name>
+  		<param-value>root</param-value>
+  	</init-param>
+  	
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>AServlet</servlet-name>
+  	<url-pattern>/a</url-pattern>
+  </servlet-mapping>
+  
+   <servlet>
+  	<servlet-name>BServlet</servlet-name>
+  	<servlet-class>com.lsj.servlet.BServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+  	<servlet-name>BServlet</servlet-name>
+  	<url-pattern>/b</url-pattern>
+  </servlet-mapping>
+  
+  
+</web-app>
