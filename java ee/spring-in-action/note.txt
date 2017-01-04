@@ -1,0 +1,48 @@
+一、概述
+	1.简化java开发
+		1).POJO
+			spring使用组件是非侵入性的，不用继承任何类。
+		2).依赖注入
+			为了降低组件和组件之间的依赖，避免一个组件中指定一个具体的实现类（因为若指定了具体实现类，那么依赖性很强）采用依赖注入。
+			依赖注入可以通过组件的构造函数和setter-getter方法实现。
+		3).应用切面
+			AOP，面向切面编程。系统有许多不同组件构成，组件只需要关注自己需要关心的就好，不应该承担其他任务。
+			与组件核心功能无关的职责，主要是日志、事务管理、安全检查等等，这些系统服务通常称为横切关注点。若没有aop编程：
+				a).实现系统关注点功能的代码将会重复出现在多个组件中。
+				b).组件会因为那些与自身核心业务无关的关注点代码而混乱。
+		4).消除样板代码
+			例如jdbc中和核心业务相关的异常处理、打开数据库连接等等。这些在spring都采用模板编程来消除了。
+	2.bean与容器
+		在Spring应用中，组件对象必须由Spring容器它才具备多种功能，例如di和aop。
+		默认情况下，在xml配置文件中一个<bean />就是一个对象。
+		1).spring容器
+			spring容器有多种，但可以归为两种：
+				i).bean工厂
+					由org.springframework.beans.factory.beanFactory接口定义，是最简单的容器。提供基本的DI支持。
+				ii).上下文
+					由org.springframework.context.ApplicationContext接口定义，并且是基于BeanFactory构建的。提供了框架级别的服务。
+					bean工厂太过底层，因此大多数情况都是使用的上下文容器。以下几种上下文是最常用的。
+					a).AnnotationConfigApplicationContext
+						从一个或多个基于Java的配置类中加载spring应用上下文。
+					b).AnnotationConfigWebApplicationContext
+						从一个或多个基于java的配置类中加载spring web应用上下文。
+					c).ClassPathXmlApplicationContext
+						从【类路径】下的一个或多个xml配置文件中加载上下文定义
+					d).XmlWebApplicationContext
+						从Web应用下的一个或多个xml配置文件中加载上下文定义。
+					e).FileSystemXmlApplicationContext
+						从【文件系统】下的一个或多个xml配置文件中加载上下文定义。
+					使用ApplicationContext context = new ClassPathXmlApplicationContext("xxx.xml");就可以将该xml中的上下文加载到spring中。
+		2).bean的声明周期
+			加载xml文件，便开始构建bean对象:
+			a).spring对bean进行实例化。
+			b).spring将值和bean的引用注入到bean对应的属性中。
+			c).若bean实现了BeanNameAware接口，spring将bean的id传递给setBeanName()方法。
+			d).若bean实现了BeanFactoryAware接口，spring将bean的BeanFactory实例传递给setBeanFactory()方法。
+			e).若bean实现了ApplicationContextAware接口，spring将bean的上下文引用传递给setApplicationContext()方法。
+			f).若bean实现了BeanPostProcessor接口，spring将调用postProcessBeforeInitialization()方法。
+			g).若bean实现了InitializingBean接口，spring它的afterPropertiesSet()方法。当然，若使用init-method声明了初始化方法，声明的该方法也会被调用。
+			h).若bean实现了BeanPostProcessor接口，spring将调用postProcessAfterInitialization()方法。
+			i).此时bean已经就绪，可以被引用程序使用了，并且一直驻留在应用上下文中。
+			j).上下文被销毁。
+			k).若bean实现了DisposableBean接口，spring将调用destory()接口方法。若使用destroy-method声明了销毁方法，该方法也会被调用。
