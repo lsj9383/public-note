@@ -52,13 +52,14 @@
 		1).配置规范
 			<?xml version="1.0" encoding="UTF-8"?>
 			<beans xmlns="http://www.springframework.org/schema/beans"
-					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					 xmlns:aop="http://www.springframework.org/schema/aop"
-					 xmlns:tx="http://www.springframework.org/schema/tx"
-					 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-					   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-					   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
-					   default-autowire="byName">
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xmlns:context="http://www.springframework.org/schema/context"
+				xmlns:mvc="http://www.springframework.org/schema/mvc"
+				xsi:schemaLocation="
+				http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+				http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+			
 			</beans>
 			在<beans>中可以配置多个<bean>
 		2).bean配置
@@ -129,3 +130,38 @@
 				加载java配置文件时，会扫描每个@Bean，并且每个@Bean方法都会返回一个新对象，这个对象会缓存在spring中，并且这个对象就是spring管理的bean。
 				其注入方式就和普通的java代码几乎一模一样。只有一点不同，直接使用@Bean的方法来获得对象时，获得是单例模式的对象。
 	3.隐式的bean发现机制和自动装配
+		自动化装配依赖于两个技术:组件扫描和自动装配。
+		1.组件扫描
+			1).创建可被扫描的bean
+				带有@Component注解的实现类，都是可以被扫描的。被扫描的意思是会创建一个该类的对象并由spring管理。
+				并且需要了解的是，若没有显示指定@Component的id，那么id就是首写字母小写的类名。
+				可以通过@Component("<id>");来指定该component的id。
+			2).启用扫描
+				为了启用扫描，还是得需要一个启动扫描的配置文件，xml和javaconfig都可以实现。
+				a).xml
+					<context:component-scan base-package="<package-name>" />
+					将扫描指定包中的所有类，被@Component的类将被添加到spring中。
+				b).javaconfig
+					@Configuration
+					@ComponentScan
+					public class <config-class-name>{}
+					这里的配置类可以为空，因为是扫描的方式来添加的bean。这个扫描的位置默认是当前这个配置类所在的包中。
+					可以通过@ComponentScan(basePackages="<package-name>");来指定搜索的包
+					@ComponentScan(basePackages={"<package-name>","<package-name>"});可以指定多个包。
+			3).自动装配(注入)
+				对于value的属性，可以通过设置类初值的方式注入。而对于引用类型的属性，则需要使用自动装配注解来注入。
+				a).构造函数注入
+					在构造器的位置添加@Autowired注解
+					@Autowired
+					public ctor(<class-name> object){
+						this.object = object;
+					}
+					这样扫描到当前bean时，发现构造器需要自动装配，那么就在spring容器中寻找到一个与<class-name>相同的bean来注入。
+				b).setter方法注入
+					@Autowired
+					public setter(<class-name> object){
+						this.object = object;
+					}
+					这样扫描到当前bean且在bean实例化后，就在spring容器中寻找到一个与<class-name>相同的bean来注入。
+				需要注意的是，@Autowired是利用<class-name>来选择bean的，若有两个不同的bean但具有相同的类，或者是相同的父类，那么这时是会发生冲突异常的，因为spring不知道选择哪个注入。
+				若没有在spring容器中找到对应<class-name>的bean，也会抛出异常。使用@Autowired(required=false)，当没找到对应的bean时不会抛出异常，而是注入null。
