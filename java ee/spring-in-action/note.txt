@@ -46,3 +46,86 @@
 			i).此时bean已经就绪，可以被引用程序使用了，并且一直驻留在应用上下文中。
 			j).上下文被销毁。
 			k).若bean实现了DisposableBean接口，spring将调用destory()接口方法。若使用destroy-method声明了销毁方法，该方法也会被调用。
+
+二、装配bean
+	1.在xml中进行显示的配置
+		1).配置规范
+			<?xml version="1.0" encoding="UTF-8"?>
+			<beans xmlns="http://www.springframework.org/schema/beans"
+					 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					 xmlns:aop="http://www.springframework.org/schema/aop"
+					 xmlns:tx="http://www.springframework.org/schema/tx"
+					 xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+					   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+					   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+					   default-autowire="byName">
+			</beans>
+			在<beans>中可以配置多个<bean>
+		2).bean配置
+			<bean class="<class-name>" />
+			在没有给出id的时候，会根据全限定类名来进行生成id = <class-name>#0, 最后1个数字是索引，标记这是第几个该类的对象。
+			为了方便引用该bean，通常会给bean一个id:<bean id="<id>" class="class-name" />
+			a).构造器注入
+				通过构造器注入，是spring实例化该bean时，将需要注入的引用和值通过构造器注入到bean中。
+				i).<constructor-arg>
+					<bean>
+						<constructor-arg ref="<>" />
+						<constructor-arg value="<>" />
+					</bean>
+					可以配置多个<constructor-arg />这个标签是有顺序的，顺序应该和构造器参数顺序一致。个别情况spring可以判断顺序，但是尽量就和构造器参数顺序一致。
+				ii).c-命名空间
+					这个方式需要修改xml头部，这里暂不叙述。
+			b).属性注入
+				可以通过setter方法进行注入(只有setter即可)
+				i).<property>
+					<bean>
+						<property name="<property-name-in-class>" ref="<id-in-spring>" />
+						<property name="<property-name-in-class>" value="<new-value>" />
+					</bean>
+				ii).p-命名空间
+			c).可以注入的标签和属性（这里称为注入标签）
+				i).ref/<ref>
+					这个是设置当前bean某个属性引用，这个引用的对象应该也是有spring管理的一个bean。需要指明引用对象的id。可用标签，也可以用标签上的属性。
+				ii).value/<value>
+					这个是设置当前bean某个属性的值，支持String int boolean，可以自动将String转换为对应属性的值。可用标签，也可以用标签上的属性。
+				iii).<bean>
+					这个可以直接定义一个对象。
+				iv).<list>
+					List对象可以使用的标签，这个标签里面可以签其他注入标签。
+				v).<set>
+					Set对象可以使用的标签。
+				vi).<map>
+					Map对象可以使用的标签。
+	2.在java中进行显示的配置
+		和xml配置相同，需要添加一个配置文件，在配置文件中添加bean。但不同于xml语法，这里使用java语法来进行配置。
+		1).添加配置文件
+			配置文件是一个类.类名什么的随意。
+			import org.springframework.context.annotation.Configuration;
+
+			@Configuration
+			public class CDPlayerConfig {
+
+			}
+			@Configuration这个注解说明这是个spring配置类。
+		2).声明bean
+			bean是配置在配置类中的
+			@Bean
+			public <class-name> <method-name/id>(){
+				return new <class-name>(...);
+			}
+			@Bean注解就是声明这是配置类。并且这个bean的id就是这个方法名。
+			也可以通过@Bean(name="<id>")来设置一个id。这些个方法里面都可以添加逻辑代码。
+		3).注入
+			a).构造函数注入
+				@Bean
+				public <class-name> <method-name/id>(){
+					return new <class-name>(<method-name-in-javaconfig>());
+				}
+				虽然可以看到每个<method-name-in-javaconfig>()方法中都是返回一个new的对象，因此会认为这里注入的引用会是新对象。其实不是的。
+				对于有@Bean注解的方法，spring会拦截对它的调用，并直接返回该方法之前创建过的对象。因为这是个单例模式的。
+			b).setter注入
+				其实也和构造函数注入差不多。只是在该方法中获得这个对象，然后用对象的setter方法来设置。
+			c).本质
+				加载java配置文件时，会扫描每个@Bean，并且每个@Bean方法都会返回一个新对象，这个对象会缓存在spring中，并且这个对象就是spring管理的bean。
+				其注入方式就和普通的java代码几乎一模一样。只有一点不同，直接使用@Bean的方法来获得对象时，获得是单例模式的对象。
+	3.隐式的bean发现机制和自动装配
