@@ -220,3 +220,50 @@
 			引入允许想类中添加新的方法或属性。
 		6).织入(Weaving)
 			把切面应用到目标对象并创建新的代理对象的过程。
+	2.spring的aop支持
+		spring支持4种aop形式
+		1).基于代理的经典SpringAOP
+			过于笨重，现在很少使用了。
+		2).纯POJO切面
+			和xml配合使用
+		3).@AspectJ注解驱动的切面
+		4).注入式AspectJ切面
+		spring的通知都是通过java代码编写的，定义通知的切点可以使用注解或xml。
+		spring支持方法级别的连接点。
+	3.选择连接点
+		在Spring AOP，要使用AspectJ的切点表达式语言来定义切点。
+		主要使用exection()来匹配连接点的执行方法，其他的一些语法是进行限制。
+		exection(* <class-name>.<method-name>(..));
+		        /|\                          /|\
+				 |---指的返回任意类型         |---任意参数
+	4.使用注解创建切面
+		1).使用AspectJ注解定义切面:
+		@Aspect
+		public class <aspect-class-name>{
+			@<advice-time>("execution(<expression>)")
+			public void <advice-method-name>(){
+				...
+			}
+		}
+		这里一个方法就会配置好通知和切点。(通知就是方法里面的工作逻辑和<advice-time>, 切点就是execution匹配的连接点)
+		这里的@<advice-time>可以的取值是:
+		@After
+		@AfterReturning
+		@AfterThrowing
+		@Around
+		@Before
+		对于不同方法，相同的切点以及advice-time时，会按照method的编写顺序来执行。
+		对于不同的切面，完全相同的advice-time和切点，执行顺序会按照他们在bean在配置文件中的顺序。
+		2).设置配置文件
+			a).xml
+				<aop:aspectj-autoproxy /> 切面代理启动，这个必须要有哦。
+				<bean class="<aspect-class-name>" />切面bean是需要纳入spring管理的。
+			b).javaconfig
+				@Configuration
+				@EnableAspectJAutoProxy
+				public class Config{
+					@Bean
+					public <aspect-class-name> <aspect-name>(){
+						return ...
+					}
+				}
