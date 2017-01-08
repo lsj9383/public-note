@@ -267,3 +267,137 @@
 						return ...
 					}
 				}
+	5.使用xml声明切面
+		1).顶层aop标签
+			<aop:config>
+				....
+			</aop:config>
+			所有的aop的声明都在这个标签里面.其中可以声明多个aop切面、通知器或切点。
+		2).aop切面
+			<aop:aspect ref="<aspec-bean-id>">
+				...
+			</aop:aspect>
+			在aop切面中可以声明多个aop【通知器和切点】。
+		3).通知器和切点
+			<aop:<advice-time>	pointcut="exection(...)"
+								method="<bean-method-name>" />
+			指定了切面的哪个方法，在哪个时候，在哪个切点调用。
+		4).切点定义
+			<aop:pointcut id="<pointcut-id>" expression="exection(...)">
+			有些时候很多切点的execution是相同的，为了增加可读性可以将这些抽出来，赋予一个id，这样在指定aop切点的时候可以直接使用该id:
+			<aop:<advice-time>	pointcut-ref="<pointcut-id>"
+								method="<bean-method-name>" />
+								
+四、springmvc
+	1.搭建springMVC
+		在传统的servlet工程中，需要使用web.xml来搭建工程，新的servlet支持使用java类来配置。
+		1.AbstractAnnotationConfigDispatcherServletInitializer
+			这个是spring框架中的一个类，配置这个类就是配置DispatcherServlet的映射和spring应用上下文。
+			在servlet3.0中，会查找实现了ServletContainerInitializer接口的类，如果发现了，就采用该类来配置servlet。spring有个类实现了该接口:SpringServletContainerInitializer，这个类会查找实现了WebApplicationInitializer接口的类，并将配置认为交给该类完成。
+			AbstractAnnotationConfigDispatcherServletInitializer就是这个类的基础实现，因此会用该类的实现类来配置servlet。该类需要重写3个方法。
+			1).getServletMappings()
+				这个会将一个或多个路径映射到DispatcherSer。
+				@Override
+				protected String[] getServletMappings() {		//将DispatcherServlet映射到"/"
+					return new String[]{"/"};
+				}
+			2).getServletConfigClasses()
+				返回带有@Configuration注解的类，将会用来配置DispatcherServlet创建的应用上下文中的bean。
+				@Override
+				protected Class<?>[] getServletConfigClasses() {
+					return null;
+				}
+			3).getRootConfigClasses()
+				返回带有@Configuration注解的类，将会用来配置ContextLoaderListener创建的应用上下文中的bean。
+				@Override
+				protected Class<?>[] getRootConfigClasses() {
+					return null;
+				}
+			需要注意，这里会涉及到返回两个上下文配置类。
+			当DispatcherServlet启动的时候，会创建spring应用上下文，并加载配置文件或配置类中的bean。该配置类由getServletConfigClasses指定，这个通常包含web组件的bean。
+			当DispatcherServlet启动的时候，还会启动ContextLoaderListener，也会创建上下文，加载配置文件或配置类中的bean。该配置类由getRootConfigClasses指定，这个通常包含驱动应用后端的中间层和数据层的bean。
+			后面还会介绍使用纯web.xml如何加载。
+		2.配置SpringMVC的组件
+			由getServletConfigClasses()这个方法指定。
+			主要是配置:
+				1).视图解析器。
+				2).启用组件扫描，这样才方便使用注解来配置控制器。
+				3).静态资源, 静态资源也会走DispatcherServlet，这样是无法访问静态资源的。
+			@Configuration
+			@EnableWebMvc
+			@ComponentScan("<package-name>")
+			public class WebConfig {
+				@Bean
+				public ViewResolver viewResolver(){		//配置视图解析器
+					InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+					resolver.setPrefix("/WEB-INF/views/");
+					resolver.setSuffix(".jsp");
+					return resolver;
+				}
+				@Override
+				public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer){	//配置静态资源
+					configurer.enable();
+				}
+			}
+		3.配置RootConfig的组件
+			这个是由ContextLoaderListener来加载的。
+		4.配置控制器
+			1).Controller注解
+				@Controller
+				public class <controller-name>{
+					...
+				}
+				这个@Controller是用来声明控制器的，但实际上这个本质上就是Bean注解，只是更能表征它的作用而已。
+			2).RequestMapping注解
+				@RequestMapping(...)
+				public String <method-name>( ... ){
+					return ...;
+				}
+				这个注解的方法返回的是视图的逻辑名称。@RequestMapping有两个常用的参数:value="<url>", method=<GET/POST>，用来将url映射到该方法上，并且需要满足get或post请求类型。
+		5.请求处理
+			1).@RequestMapping("<url>")
+				等价于@RequestMapping(value="<url>").
+			2).返回值
+				用于寻找视图。
+			3).传递模型到视图
+				@RequestMapping(...)
+				public String <method-name>( Model model ){
+					model.addAttribute(Object);
+					model.addAttribute("<key>", Object);
+					return ...;
+				}
+				这里model添加对象的时候，没有带"<key>"，会根据对象类型来指定key(类首写小写作为key)。
+				数据其实是添加到request中的，可以通过el表达式取出。${"<key>"}
+			4).输入参数
+				a).查询/表单参数
+					i).传统
+						查询参数是指的GET请求后面跟的参数,表单参数就是post请求后面跟的参数。
+						public String spittles(	@RequestParam("<var-name-in-query>") <class> <new-var-name>,
+												...
+												Model model )
+							return ...;
+						}
+						<var-name-in-query>是变量在url中的变量名。
+						这个要求url中包含所有的参数，如果有参数不存在则会报错。
+					ii).传统默认值
+						如果要使用默认参数用:@RequestParam(value="<var-name-in-query>" defaultValue=<初始值>) <class> <new-var-name>,
+					iii).传统简写
+						如果<var-name-in-query>和<new-var-name>相同，那么可以省掉@RequestMapping。在这种情况下若查询不包含该参数的，会传以null。
+					iv).对象
+						public String spittles(	<new-class> new-object )
+							会自动根据传入的参数填充new-object中的属性
+							return ...;
+						}
+					v).request response的获取
+						@RequestMapping("...")
+						public String insert(HttpServletRequest request, HttpServletResponse response){
+							...
+						}
+					vi).传文件
+						
+				b).路径参数
+					@RequestMapping("<pre-uri>/{param1}/{param2}/...")
+					public String showSpittle(@PathVariable("param1") Long param1){
+						return "spittle";
+					}
+					路径中必须包含次参数，否则服务器抛出异常。
