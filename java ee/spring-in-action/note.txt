@@ -401,3 +401,135 @@
 						return "spittle";
 					}
 					路径中必须包含次参数，否则服务器抛出异常。
+五、springmvc高级技术
+	1.JavaConfig springmvc 进一步配置
+		AbstractAnnotationConfigDispatcherServletInitializer实现类之前重载了3个方法，分布指定了DispatcherServlet以及两个spring上下文加载的类，除此之外还有一别的方法可以重载。
+		1).customizeRegistration
+			在DispatcherServlet注册到servlet容器中之后，就会调用该方法。并且该方法还有个Dynamic的参数传进来，可以用于进一步配置
+			@Override
+			protected void customizeRegistration(Dynamic registration){
+				...
+			}
+			可以设置load-on-startup优先级、通过setInitParameter初始化参数、通过setMultipartConfig配置Servlet3.0对multipart的支持。
+		2).getServletFilters
+			若只想DispatcherServlet添加filter，可以重载该方法。
+			@Override
+			protected Filter[] getServletFilters() {
+				return new Filter[]{new Filter(), new ..};
+			}
+			filter顺序和该数组中的顺序一致。
+		3).添加其他的Servlet和Filter
+			采用Java的初始化器，可以定义任意数量的初始化器，如果想往Web容器中注册组件，只需要创建一个新的初始化器就可以了。
+			初始化器和AbstractAnnotationConfigDispatcherServletInitializer实现类相同会自动调用的里面的方法。
+			public class <servlet-initializer-class-name> implements WebApplicationInitializer {
+				@Override
+				public void onStartup(ServletContext servletContext) throws ServletException {
+						Dynamic myServlet = servletContext.addServlet("<servlet-name>", <servlet-class-name>.class);		//注册servlet
+						myServlet.addMapping("<uri>");		//添加uri映射
+				}
+			}
+			filter和listener都可以通过类似的方式来加载。主要是调用servletContext.add<filter/listener/servlet>来指定。
+	2.xml springmvc 配置
+		当有web.xml配置文件的时候，还是会使用java初始化器。这种情况可能存在两个DispatcherServlet。
+		1).配置web.xml
+			<context-param>
+				<param-name>contextConfigLocation</param-name>
+				<param-value>【xml路径】/【java类】</param-value>	<!-- 指定ContextLoader会加载的配置文件，可以是xml也可以是java类 -->
+			</context-param>
+			
+			<!-- 指定由springmvc提供的一个ContextLoader监听器，该监听器将会加载contextConfigLocation指定路径下的配置文件 -->
+			<listener>
+				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+			</listener>
+			
+			<!-- DispatcherServlet的配置 -->
+			<servlet>
+				<servlet-name>appServlet</servlet-name>
+				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+			</servlet>
+			
+			<servlet-mapping>
+				<servlet-name>appServlet</servlet-name>
+				<url-pattern>/</url-pattern>
+			</servlet-mapping>
+		2).配置spring mvc
+			springmvc的xml配置文件，默认是<servlet-name>-servlet.xml，如果该文件另有路径或者要采用java类，可以通过以下方式来选择
+			<servlet>
+				<servlet-name>appServlet</servlet-name>
+				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+				<init-param>
+					<param-name>contextConfigLocation</param-name>
+					<param-value>【xml路径】/【java类】</param-value>
+				</init-param>
+			</servlet>
+		3).使用java类来作为上下文配置
+			在<param-value>中需要指明java类，除此之外还需要通知ContextLoader监听器以及DispatcherServlet采用java类来加载：
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+	3.处理multipart形式数据
+		post请求可以上传multipart数据，比如图片，硬盘等文件。multipart格式的数据会将一个表单拆分为多个部分(part，因此叫multi-part 多部分)，每个部分对应一个输入域。上传的文件的输入域将会是二进制数据。
+		1).配置multipart解析器
+			DispatcherServlet没有实现任何解析multipart请求数据的功能。它将该任务委托给了MultipartResolver接口来实现，通过这个来解析multipart请求中的内容。
+			Spring内置了两个MultipartResolver的实现:
+			a).standardServletMultipartResolver
+				依赖于servlet3.0对multipart请求的支持。常用该方式，因为它是servlet3.0支持的，不需要依赖于其他的。
+				在spring应用上下文中配置bean
+				public class RootConfig {
+					@Bean
+					public MultipartResolver multipartResolver(){
+						return new StandardServletMultipartResolver();
+					}
+				}
+				上面只是multipart的解析器，但是对multipart参数的配置需要在AbstractAnnotationConfigDispatcherServletInitializer的配置中或web.xml的配置中来实现。
+				需要注意的是standardServletMultipartResolver必须要临时文件存放路径的配置，否则接收到的文件是null对象。
+				i).AbstractAnnotationConfigDispatcherServletInitializer
+					@Override
+					protected void customizeRegistration(Dynamic registration){
+						registration.setMultipartConfig(new MultipartConfigElement("<临时文件的存放路径>", 		//必须有
+																					<上传文件的最大容量, 字节为单位, 默认是没有限制>,
+																					<整个multipart请求的最大容量，字节为单位，默认是没有限制>,
+																					<上传过程中，如果文件大小达到了指定的最大容量，将会写入到临时文件路径中，默认值为0，即会写入到临时文件>));
+					}
+				ii).xml配置
+					省
+			b).CommonsMultipartResolver
+				使用Jakarta Commons FileUpload解析multipart请求。这个需要commons-fileupload的jar包支持
+				i).javaConfig配置
+					@Bean
+					public MultipartResolver multipartResolver(){
+						return new CommonsMultipartResolver();
+					}
+					这个的默认临时文件存放路径是自己就存在的，不用额外设定。要让这个工作起来不用作任何其余的设定。
+					若要进行配置:
+					public MultipartResolver multipartResolver(){
+						CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+						resolver.setUploadTempDir(new FileSystemResource("..."));
+						resolver.setMaxUploadSize(....);
+						return resolver;
+					}
+				也可以在springmvc的xml文件中配置:
+					<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+						<property name="defaultEncoding" value="utf-8"></property>   
+						<property name="maxUploadSize" value="10485760000"></property>
+				   </bean>
+				
+		2).处理multipart请求
+			前端的form: <form method="" enctype="multipart/form-data"></form>
+			服务器通常使用MultipartFile接口来接收对象，该接口提供了多种方法。其中包括可以直接将接收到的文件进行保存的方法。
+			public String register(MultipartFile uploadFile) throws IllegalStateException, IOException{
+				uploadFile.transferTo(new File("..."));	//保存
+				return ...;
+			}
+	4.跨重定向请求传递数据
+		1).重定向
+			在方法中处理完后通过 return "redirect:<uri>";来进行重定向。等价于response.sendRedirect("/<app>/<uri>");
+		2).flash
+			重定向传递参数可以通过拼接uri，在后面使用?a=1&b=2的方式，但是这样的方式只能传递简单的字符串，不便于传递对象。
+			spring提供了flashAttribute来进行重定向请求传递数据，这样的方式类似于将数据存放在session中。spring通过RedirectAttributes类型的对象来实现flash属性，这个是Model的一个子接口，也提供Model的功能。
+			@RequestMapping("<url>")
+			public String <method-name>(RedirectAttributes model) throws IllegalStateException, IOException{
+				model.addFlashAttribute("<key>", <value-object>);
+				return "redirect:...";
+			}
+			在重定向之前，所有的flash属性都会复制到session中，而在重定向完成后session会取出其中的flash属性，并且清除掉session中的这些数据。
+			这样重定向之后，数据就在Model中了，在jsp中就和使用其他的model数据相同。
