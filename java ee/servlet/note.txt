@@ -1,5 +1,5 @@
 servlet或者jsp获取数据
-数据来源主要有3个方面:
+数据来源主要有6个方面:
 1.get/post
 	String value = request.getParameter("<key>");
 2.cookie
@@ -23,7 +23,33 @@ servlet或者jsp获取数据
 	内部跳转而进行数据传递时使用
 	request.setAttribue("<key>", Object item);		在请求中暂存数据，只在一次请求中有用。常用于内部转发时的数据发送。
 	Object obj = request.getAttribute("<key>");		读取请求中暂存的数据。
-
+5.servlet的初始化数据
+	在servlet中可以通过getInitParameter(String para-name)来获取初始参数的值, 不同的servlet之间这些值是没有关联的。这些初始值配置在servlet中。
+	<servlet>
+		<servlet-name>...</servlet-name>
+		<servlet-class>...</servlet-class>
+		<init-param>
+			<param-name>key</para-name>
+			<param-name>value</para-name>
+		</init-param>
+		...
+	</servlet>
+	
+6.servlet上下文数据
+	在servlet中可以通过getServletContext()获得servlet上下文，servlet上下文可以在在当前webapp的所有servlet之间共享数据。
+	1).从上下文读取数据
+		ServletContext servletContext = this.getServletContext();
+		Object o = servletContext.getAttribute()<key>;
+	2).设置上下文数据
+		a).代码方式
+			ServletContext servletContext = this.getServletContext();
+			servletContext.setAttribute(<key>, Object o); 用于在上下文中设置数据
+		b).配置方式
+			这样可以用于配置初始的上下文数据
+			<context-param>
+				<param-name>key</para-name>
+				<param-name>value</para-name>
+			</context-param>
 
 零、路径写法
 	0.相对路径问题
