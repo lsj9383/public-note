@@ -8,5 +8,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.lsj.jvm.memory.HeapOOM"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="jvm"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms20m -Xmx20m -XX:+HeapDumpOnOutOfMemoryError"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-verbose:gc -Xms20M -Xmx20M -Xmn10M -XX:SurvivorRatio=8"/>
 </launchConfiguration>

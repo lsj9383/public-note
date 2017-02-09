@@ -1,0 +1,9 @@
+package com.lsj.jvm.gc;
+
+public class testAllocation {
+	
+	public static void main(String[] args) {
+		
+	}
+
+}
