@@ -150,3 +150,124 @@
 		-verbose:gc 开启GC日志，输出于控制台。每当发生gc事件时便会打印。
 		-XX:+PrintGCDetails 打印更完善的GC日志，也是在GC事件时打印，并在当前进程退出的时候输出当前的内存各区域分配情况。打开这个的时候，可以不用-verbose:gc。
 		-XX:MaxTenuringThreshold=xx 设置对象在年龄为多少的时候会进入老年代。
+(三)、类文件结构
+	Class文件是一组以字节为基础单位的二进制流，中间没有添加任何分隔符。Class文件本质上就是一张表:
+      类型     |          名称         |           数量           |    描述
+---------------|-----------------------|--------------------------|-------------
+       u4      |          magic        |  1                       |     魔数
+       u2      |     minor_version     |  1                       |   次版本号
+       u2      |     major_version     |  1                       |   主版本号
+       u2      |   constant_pool_count |  1                       |  常量池大小
+    cp_info    |     constant_pool     |  constant_pool_count-1   |    常量池
+       u2      |      access_flags     |  1                       | 类的访问权限标志
+       u2      |       this_class      |  1                       |     类索引
+       u2      |       super_class     |  1                       |    父类索引
+       u2      |    interfaces_count   |  1                       |    接口个数
+       u2      |       interfaces      |  interfaces_count        |   接口集合索引
+	   u2      |      fields_count     |  1                       |     字段个数
+   field_info  |         fields        |  fields_count            |    字段的信息
+       u2      |      methods_count    |  1
+ method_info   |         methods       |  methods_count
+       u2      |     attributes_count  |  1
+attribute_info |       attributes      |  attributes_count
+	一、魔数于class文件版本
+		每个class文件的头4个直接称为魔数，用于确定这个文件是否为一个能被虚拟机接收的Class文件。魔数是magic : 0xCAFEBABE，咖啡宝贝。
+		接着魔术的4个字节直接是class文件的版本号，由次版本号(minor_version)和主版本号(major_version)确定。
+	二、常量池
+		常量池相当于class的资源仓库。常量池的常量数是不固定的，由constant_pool_count指定。
+		常量池主要存放了两大类常量:
+			* 字面量
+				如 文本字符串，final常量
+			* 符号引用
+				- 类和接口的全限定名
+				- 字段的名称和描述符
+				- 方法的名称和描述符
+		常量池的数据类型:
+			CONSTANT_Utf8_info UTF-8编码的字符串
+			CONSTANT_Integer_info 整型字面量
+			CONSTANT_Float_info 浮点型字面量
+			CONSTANT_Long_info 长整型字面量
+			CONSTANT_Double_info 双精度浮点型字面量
+			CONSTANT_Class_info 类或接口的符号引用
+			CONSTANT_String_info 字符串类型字面量
+			CONSTANT_Fieldref_info 字符串类型字面量
+			CONSTANT_Methodref_info 类中方法的符号引用
+			CONSTANT_InterfaceMethodref_info 接口方法的符号引用
+			CONSTANT_NameAndType_info 接口中方法的符号引用
+			CONSTANT_MethodHandle_info 表示方法句柄
+			CONSTANT_InvokeDynamic_info 表示一个动态方法调用点
+			不同的数据类型，在常量池中的数据结构又是不同的，这里不展开了。但是所有的常量数据都有个tag标志，用于标识当前这个常量项的类型。
+			很多常量类型，最后指向的都是字符串常量。
+	三、访问标志
+		用于识别类或接口层次的访问信息，包括该class是类还是接口，是否为public，是否为abstract。
+	四、类索引、父类索引和接口索引
+		类索引 和 父类索引 都是一个u2类型的数据，接口索引 是一个u2类型的数据集合。因为一个类的父类唯一，接口可以有多个。
+		索引其实就是索引到常量池中的一个符号。
+		类索引用于确定这个类的全限定名。
+		父类索引用于确定福利的全限定名。
+	五、字段表集合
+		用于描述接口或类中声明的变量。字段表结构为:
+		-------------|--------------------|--------------
+		      u2     |    accessflags     | 1    访问标志(public/protected/private final static等等)
+		      u2     |     name_index     | 1    字段名的索引(常量池中)
+		      u2     |  descriptor_index  | 1    描述符的索引(常量池中)
+		      u2     |  attributes_count  | 1
+	  attribute_info |     attributes     | attributes_count
+	  字段表集合不会列出从超类或父接口中继承而来的字段。
+	六、方法表集合
+		方法表集合和字段表集合的结构，完全相同。方法中的代码字节码是放在方法表的attributes中的Code属性中的。
+	七、属性表集合
+		Class文件、字段表、方法表都能携带自己的属性表集合。
+		对于每个属性，它的名称需要从常量池中引用一个CONSTANT_Utf8_info类型的常量。
+		属性表抽象结构:
+		|--------------------------------|
+		|	u2  attribute_name_index 1   |
+		|	u4  attribute_length     1   |
+		|	      info                   |
+		|--------------------------------|
+(四)、虚拟机类加载机制
+	虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型。
+	一、类加载的时机
+	              ------------连接------------
+				  |                          |
+		加载 ---> | 验证 ---> 准备 ---> 解析 | ---> 初始化 ---> 使用 ---> 卸载
+		          |                          |
+				  ----------------------------
+		jvm严格规定只有5种情况必须立即对【类】进行初始化:
+			1.遇到new getstatic putstatic invokestatic这4条字节码指令时，如果类没有进行过初始化，则需要先触发初始化。
+			2.使用reflect包的方法对类进行反射调用的时候，如果类没有进行过初始化，则需要先触发其初始化。
+			3.当初始化一个类的时候，如果发现父类还没有进行过初始化，则需要先触发父类的初始化。
+			4.当虚拟机启动时，用户需要制定一个执行的主类，jvm会对这个类先初始化。
+			5.如果1个java.lang.invoke.MethodHandle实例最后的解析结果REF_getStatic、REF_putStatic、REF_invokeStatic的方法句柄，并且这个句柄所对应的类没有进行过初始化，则需要先初始化。
+	二、类加载的过程
+		1.加载
+			这是【加载】是【类加载】的第一个过程，要完成3件事:
+				1).通过一个类的全限定名来获取定义此类的二进制字节流。(可以使用自定义类加载器来获取二进制字节留)
+				2).将这个字节流所代表的静态存储结果转化为方法区的运行时数据结构。
+				3).在内存中生成一个代表这个类的java.lang.Class对象，作为方法区这个类的各种数据的访问入口。
+		2.验证
+			是连接阶段的第一步，这一阶段的目的是为了确保Class文件的字节流中包含的信息符合当前虚拟机的要求，并不危害jvm只是你的安全。
+		3.准备
+			准备阶段是正式为类变量分配内存并设置【类变量】初始值的阶段。这里的初始值指的是数据类型的零值。
+		4.解析
+			解析阶段是虚拟机将常量池内的符号替换为直接引用的过程。需要注意的是，有些符号是没办法在类加载阶段就解析完毕的。类加载的时候就解析好的引用，通常是private static方法 实例变量等。
+			符号引用:符号可以是任何形式的字面量，只要使用时能无歧义地定位到目标即可。
+			直接引用:直接引用可以说知己指向目标的指针、相对偏移量或是一个能间接定位到目标的句柄。
+			解析动作主要针对类或接口、字段、类方法、接口方法、方法类型、方法句柄和调用点限定符。
+		5.初始化
+			在初始化这里，会执行类中定义的java代码。这个初始化并非对象实例化的初始化，而是类的初始化，执行static代码块。static代码块的符号是<clinit>
+			需要注意的是，虚拟机会保证一个<clinit>()方法在多线程环境中被正确的加锁、同步。如果多个线程同时去初始化一个类，那么只会有一个线程去执行这个类的<clinit>()方法。
+	三、类加载器
+		类加载器的作用是 通过一个类的全限定名来获取此类的二进制字节流。
+		类在java中通过全限定名来唯一标识，但是在jvm得奖角度，类是通过类加载器和全限定名来唯一识别。因此不同的类加载器加载的同名类，用equals来判断是会返回false的。
+		1.双亲委派模型
+			1.启动类加载器
+				由c++实现，负责将放在<JAVA_HOME>/lib目录中的的类库加载到虚拟机内存中。
+			2.扩展类加载器
+				ClassLoader的子类，用于将<JAVA_HOME>/lib/ext目录中的类库加载到jvm中。
+			3.应用程序类加载器
+				用于将classpath中的jar加载到jvm中。
+			双亲委派模型的工作过程是，如果一个类加载器收到类加载的请求，它首先不会自己去尝试加载这个类，而是委派给父类加载器去完成，每一个层次的类加载器都是如此。所有的加载请求都会在顶层的启动类加载器中完成。
+		2.双亲委派模型的破坏
+			用户自定义的类加载器，应该覆盖findClass()方法，而不能覆盖loadClass()方法，否则会破坏双亲委派模型。
+			loadClass()的逻辑是调用父类加载器，无法成功加载再调用当前类的findClass()方法，因此若重写loadClass很有可能破坏掉双亲委派模型，因此应该覆盖findClass()方法。
