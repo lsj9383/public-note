@@ -1,5 +1,0 @@
-package com.lsj.utils;
-
-public interface LIterable {
-
-}

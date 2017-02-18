@@ -43,6 +43,7 @@
 2017-02-24 16:30:48,724 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
 2017-02-25 21:18:28,298 [Worker-3] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
 2017-02-26 16:42:31,758 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+<<<<<<< HEAD
 2017-02-19 16:25:52,687 [Worker-7] INFO  c.g.e.m.h.c.ui.Html5AppCoreUIPlugin - Pluging started
 2017-02-19 16:25:58,969 [Worker-12] INFO  o.e.m.c.i.i.nexus.NexusIndexManager - Updating index for repository: central|http://repo.maven.apache.org/maven2
 2017-02-19 16:25:59,688 [Worker-1] INFO  o.e.m.c.i.embedder.EclipseLogger - 
@@ -389,3 +390,10 @@
 2017-02-19 16:26:55,846 [Worker-1] INFO  o.e.m.c.i.embedder.EclipseLogger - Using the builder org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder with a thread count of 1
 2017-02-19 16:26:55,846 [Worker-1] INFO  o.e.m.c.i.embedder.EclipseLogger - Installing D:\Program Files (x86)\Myeclipse\plugins\com.genuitec.eclipse.ws_13.0.0.me201501141551\lib\jersey\1.0\jersey-multipart-1.0.3.1.jar to D:\.m2\repository\com\sun\jersey\jersey-multipart\1.0.3.1\jersey-multipart-1.0.3.1.jar
 2017-02-19 16:26:56,252 [Worker-1] INFO  o.e.m.c.i.embedder.EclipseLogger - Installing C:\Users\think\AppData\Local\Temp\mvninstall8837814112724414066.pom to D:\.m2\repository\com\sun\jersey\jersey-multipart\1.0.3.1\jersey-multipart-1.0.3.1.pom
+=======
+2017-02-28 00:21:31,375 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2017-02-28 12:38:33,485 [Worker-2] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2017-02-28 16:45:53,148 [Worker-0] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2017-03-01 21:27:58,881 [Worker-3] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2017-03-03 15:11:16,104 [Worker-1] INFO  c.g.t.t.d.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+>>>>>>> c5814556d73613b1ad5356ef7b551f4ceb97f62c

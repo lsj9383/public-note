@@ -1,0 +1,19 @@
+package demo;
+
+import com.lsj.util.LArrayList;
+
+public class Main {
+
+	public static void main(String[] args) {
+		
+		LArrayList<Integer> list = new LArrayList<>();
+		for(int i=0; i<50; i++){
+			list.add(i);
+		}
+		
+		list.remove(20);
+		list.remove(new Integer(30));
+		
+		System.out.println(list);
+	}
+}
