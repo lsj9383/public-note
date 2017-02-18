@@ -6,7 +6,8 @@
             service层的服务从设计上尽量是原子的，也就是说service的开始和结束代表着一个事务的开始和结束。在service中将会涉及到数据库的多个操作，用以完成需要的服务。
         3).dao层
             dao层的服务应该是数据库中最基本，最底层的服务，比如crud。service将会使用多个dao方法来完成服务。
-    2.
+    2.sql助手
+        在web开发时，可以为了方便写sql语句，可以写个sql助手，利用数据库系统表来生成各表的crud语句。
 二 安全与用户体验
     1.防止xss攻击
         需要添加给所有的url添加要给过滤器，该过滤器中将request封装在HttpServletRequestWrapper类中，

@@ -52,9 +52,45 @@
                 父类中的onRefresh方法，会到当前类中，实际调用的是initStrategies来进行更进一步的初始化，这里面对多个mvc部件初始化。
                 protected void initStrategies(ApplicationContext context) {
                     ...
-                    initHandlerMappings(context);               //为http请求找到想要的controller，在其中将会获取所有的mappings
-                    initHandlerAdapters(context);               //不同的adapter的调用以及输入输出封装不同，比如类型检查，json转换
+                    initHandlerMappings(context);
+                    initHandlerAdapters(context);
                     ....
                     initViewResolvers(context);
                     ...
                 }
+        2).http分发
+            a).HandlerExecutionChain
+                这个类里面持有两个重要的对象handler(Object) 和 interceptors(HandlerInterceptor[])，这里handler就是控制器，interceptors是拦截器链。
+            b).HandlerMapping
+                一个springmvc会持有一个handlerMappings对象，这里面包含了多个handlerMapping，而handlerMapping用于处理请求到控制器的映射。
+                在DispatcherServlet的getHandler方法中，将会遍历这些handlerMapping，只要一旦发现映射，就把这个映射结果返回回去。映射结果是HandlerExecutionChain。
+                HandlerMapping有一个公共方法，getHandler(request)用于得到一个HandlerExecutionChain，这包括了请求会经过的拦截器和控制器。
+                i).SimpleUrlHandlerMapping
+                    通过registerHandlers(urlMap)来进行初始化，但是在这个方法中，只是将url和handler提取出来，做一点预处理，更多的工作在父类AbstractUrlHandlerMapping的registerHandler(url, handler)中完成。
+                ii).AbstractHandlerMapping
+                    在该类的registerHandler中，使用bean的名称作为映射，这里通过url或者handlerName来获得handler，然后将url和handler作为key值来保存。保存到了一个LinkedHashMap中。cc
+                    getHandler方法可以通过request请求将对应handler取出来，并加上相应的拦截器。而取出handler是通过AbstractUrlHandler的getHandlerInternal方法来获取的。
+            c).doDispatch方法
+                DispatcherServlet的核心处理方法，由该servlet的doService调用，其主要流程是:
+                i).mappedHandler = getHandler(processedRequest);
+                    这个将遍历handlerMappings，并将其中的HandlerExecutionChan取出。
+                ii).HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
+                    这个将对handler进行一层封装，比如检验handler的合法性等等。
+                iii).mappedHandler.applyPreHandle(processedRequest, response)
+                    执行拦截器链。
+                iv).mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
+                    执行控制器，并得到返回的modelandview。
+                v).applyPostHandle
+                    执行拦截器链。
+                vi).processDispatchResult
+                    对结果的modelAndView进行处理。这里面会调用render(mv, request, response)来渲染出页面。
+                    更进一步，在render中，又会通过view = resolveViewName(mv.getViewName(), mv.getModelInternal(), locale, request);来获得具体的视图对象，
+                    并最后通过view.render(mv.getModelInternal(), request, response);将页面渲染出来。
+    3.视图解析
+        在doDispatch中，会进行processDispatchResult，在这个方法里面会通过view.render来渲染页面。
+        1).view.render(model, request, response)
+            在这个方法中，将会进展示视图前的预处理，例如合并所有的model。
+            然后调用renderMergedOutputModel(model, request, response)来进行下一步操作
+        2).renderMergedOutputModel(model, request, response)
+            在这个方法中将会调用exposeModelAsRequestAttributes(model, request)将model的kv对放到request的attribute中，以便在jsp中提取。
+            最后通过rd.forward(request, response)跳转到页面，这个rd=request.getRequestDispatcher(path)。
