@@ -19,4 +19,23 @@
 <entry path="D:\DesignTool\Java\jdk1.8.0_91\jre\lib\endorsed"/>
 </endorsedDirs>
 </libraryInfo>
+<libraryInfo home="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45" version="1.7.0_45">
+<bootpath>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\resources.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\rt.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\sunrsasign.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\jsse.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\jce.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\charsets.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\jfr.jar"/>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\classes"/>
+</bootpath>
+<extensionDirs>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\ext"/>
+<entry path="C:\WINDOWS\Sun\Java\lib\ext"/>
+</extensionDirs>
+<endorsedDirs>
+<entry path="D:\Program Files (x86)\Myeclipse\binary\com.sun.java.jdk7.win32.x86_64_1.7.0.u45\jre\lib\endorsed"/>
+</endorsedDirs>
+</libraryInfo>
 </libraryInfos>

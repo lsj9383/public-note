@@ -1,0 +1,25 @@
+一 Spring IOC
+    1. tiny spring架构
+        1).ApplicationContext
+            ApplcationContext中有一个BeanFactory
+            加载loadBeanDefinitions时，会构造一个Reader实例，通过调用Reader的loadBeanDefinitions来读取Xml文件中的bean配置到BeanDefinition中，这些BeanDefinition保存在Reader中。
+            取出Reader中的BeanDefinition，中BeanFactory中注册。
+        2).Reader
+            Reader类中有一个ResourceLoader和一个Map，Loader用来将指定路径的Resource得到，Map用来缓存加载的BeanDefinition
+        3).ResourceLoader
+            ResourceLoader用于获得路径处的Resource。
+        4).Resource
+            有多种Resource，有的基于Classpath，有的基于FileSystem，通过Resource类，将不同资源获取inputstream的接口统一。
+    2.spring架构
+        1.ApplicationContext
+            ApplicationContext中有一个BeanFactory，且是ResouceLoader的一个子类
+            在refresh时，都会把之前用的BeanFactory销毁掉，创建一个新BeanFactory。还是会创建一个XmlBeanDefinitionReader，用来读取Xml文件的BeanDefinition并缓存起来。
+            ApplicationContext的loadBeanDefinition方法，实际上就是创建Reader，然后拿到自己实现的Resource，再将Resource和beanFactory交给Reader进行loadBeanDefinition。
+        2.Reader
+            Reader，这里面有ResourceLoader，BeanFactory等对象，Reader执行loadBeanDefinitions后，将会把指定location中的bean生成BeanDefinition并交给beanFactory。
+            需要强调的是，ResourceLoader就是ApplicationContext实例本身，因为这个实例是ResourceLoader的子类，并且实现了自己需要的Resource获取。
+        3.Resource
+        4.DefaultListableBeanFactory
+            这个类中有个HashMap保存了所有的BeanDefinition，Reader读取解析出BeanDefinition后，应该就交给它了。更正确的说，在Reader得到一个BeanDefinition后，将会使用beanFactory的registerBeanDefinition(beanName, beanDefinition)来注册beanDefinition。这样Reader解析完所有的BeanDefinition，并向beanFactory中注册beanDefinition，就完成了IoC容器的初始化过程，是后面依赖注入的基础。
+    3.IoC依赖注入
+        发生依赖注入的过程，是用户第一次向IoC容器所要Bean时触发，即用到哪个对象再实例化哪个对象，当然它所依赖的对象也会实例化。也可以用lazy-init属性来让容器完成Bean的预实例化，即在容器初始化完成时就进行实例化。

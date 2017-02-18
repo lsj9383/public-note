@@ -1,0 +1,49 @@
+一 数据库
+    1.dao三层模型
+        1).controller层
+            controller层获取由客户端传递上来的数据，并进行一些简单的操作，将预期的具体数据库操作交给service的方法，以实现客户端需要的服务。
+        2).service层
+            service层的服务从设计上尽量是原子的，也就是说service的开始和结束代表着一个事务的开始和结束。在service中将会涉及到数据库的多个操作，用以完成需要的服务。
+        3).dao层
+            dao层的服务应该是数据库中最基本，最底层的服务，比如crud。service将会使用多个dao方法来完成服务。
+    2.
+二 安全与用户体验
+    1.防止xss攻击
+        需要添加给所有的url添加要给过滤器，该过滤器中将request封装在HttpServletRequestWrapper类中，
+        该类可以将request的getParameter进行正则校验，防止xss攻击。
+    2.主键加密
+        主要包括主键在类的参数传递时，不应该是明文的，因为这将会把主键暴露出来，黑客或者爬虫可以利用主键从服务器简单的获取数据。(因为很多操作，比如delete都是传的主键)
+        在服务器从数据库中加载出数据时，会将加载出来的数据中的主键进行加密后再发送给浏览器。浏览器的js的操作都是基于加密主键的，当需要发送主键到服务器来以进行某些操作时，浏览器将会把接收到的主键进行解密，然后再操作。
+    3.类型检查
+        浏览器传上来的表单等文件，需要将数据加载到数据库中，因此在进行实际加载到数据库中以前，需要对表单中的数据进行校验，若发现类型有问题，需要将错误记录下来，传递到浏览器以进行显示。
+三 权限认证
+四 spring
+    1.javabean和数据库之间的交互
+        1).从数据库中取出的数据自动转换为javabean
+            使用【JdbcTemplate】
+            private RowMapper<JavaBean> javaBeanMapper = new BeanPropertyRowMapper<JavaBean>(JavaBean.class);   //rowMapper，用于将数据库字段转换为其中的属性
+            JavaBean javaBean = jdbcTemplate.queryForObject("select ...",  JavaBeanMapper);         //查出单个JavaBean数据
+            List<JavaBean> javaBeanList = jdbcTemplate.query("select ...", JavaBeanMapper);         //查出一组JavaBean数据
+        2).将JavaBean的数据插入数据库
+            使用【NamedParameterJdbcTemplate】
+            SqlParameterSource params = new BeanPropertySqlParameterSource(JavaBean);		//这类似于一个HashMap, JavaBean中的属性和数据形成jv对
+            String  sql = "insert into <table> where sid=:sid, ...";                        //:property，这个需要人为将数据库中的字段和javabean中的属性名对应起来。
+            njt.update(sql, params);        //这样就将sql中需要的参数传递过去了
+        3).配置
+    2.json返回
+        浏览器经常会使用js获取服务器的json，为了方便这样的操作，服务器应该将对象方便的转换为json。
+        1).配置文件
+            <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+                <property name="messageConverters">
+                    <list>
+                        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />        //使用jackson来进行转换
+                    </list>
+                </property>
+            </bean>
+        2).controller层
+            @ResponseBody
+            @RequestMapping("...")
+            public Objct controller(){
+                return new Object();            //返回任意对象，都会转换为json
+            }
+    3.数据库连接池druid的配置

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>Genuitec</title>
+	<atom:link href="https://www.genuitec.com/feed/" rel="self" type="application/rss+xml" />
+	<link>https://www.genuitec.com</link>
+	<description>The Cloud Control Company</description>
+	<lastBuildDate>Sun, 26 Feb 2017 04:14:30 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>hourly</sy:updatePeriod>
+	<sy:updateFrequency>1</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=4.6.1</generator>
+	<item>
+		<title>Connecting your Angular 2 App to your Java EE Backend</title>
+		<link>https://www.genuitec.com/connecting-angular-2-app-java-ee-backend/</link>
+		<pubDate>Mon, 13 Feb 2017 20:32:20 +0000</pubDate>
+		<dc:creator><![CDATA[Brian Fernandes]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[Planet Eclipse]]></category>
+		<category><![CDATA[Programming Tips]]></category>
+		<category><![CDATA[Angular]]></category>
+		<category><![CDATA[Eclipse]]></category>
+		<category><![CDATA[Java]]></category>
+		<category><![CDATA[Web Development]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=509516</guid>
+		<description><![CDATA[<p>Connecting your Angular 2 App to your Java EE BackendYou’ve been developing in Java EE all this time, but you’re tired of using JSF, or perhaps even Struts, and want to move to something more modern for your front end? Angular 2 is a perfect fit, and with the recent release of Angular 2 GA, [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/connecting-angular-2-app-java-ee-backend/">Connecting your Angular 2 App to your Java EE Backend</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Angular Who?</title>
+		<link>https://www.genuitec.com/angular-who/</link>
+		<pubDate>Mon, 13 Feb 2017 15:31:14 +0000</pubDate>
+		<dc:creator><![CDATA[Wanda Muriy]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[Planet Eclipse]]></category>
+		<category><![CDATA[Webclipse]]></category>
+		<category><![CDATA[angular 2]]></category>
+		<category><![CDATA[Angular 4]]></category>
+		<category><![CDATA[AngularJS]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=511196</guid>
+		<description><![CDATA[<p>Staying true to the Angular dynasty.When you are in a serious relationship, you want your partner to have it all… So when someone more attractive comes along, it’s hard to resist the temptation, isn’t it? That’s true for those who started their love story with Angular (or should we say “AngularJS” or “Angular 1”?), have [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/angular-who/">Angular Who?</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>And now&#8230; Darkest Dark Theme for Eclipse</title>
+		<link>https://www.genuitec.com/now-eclipse-darkest-dark-theme/</link>
+		<pubDate>Fri, 03 Feb 2017 14:00:59 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[Eclipse]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[Webclipse]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=509976</guid>
+		<description><![CDATA[<p>Introducing the Darkest Dark Theme for Eclipse.Finally the wait for a dark theme without limitations, without blurry icons and incredibly easy to set up is over. Most importantly, it’s completely free. Why is it important for you to download it? Well, first of all—free. And aside from making your coding environment cooler in a Matrix kinda [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/now-eclipse-darkest-dark-theme/">And now&#8230; Darkest Dark Theme for Eclipse</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>MyEclipse 2017 &#8211; Welcome to the Next Generation Technology</title>
+		<link>https://www.genuitec.com/myeclipse-2017-welcome-next-generation-technology/</link>
+		<pubDate>Wed, 04 Jan 2017 15:18:33 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[MyEclipse Top News]]></category>
+		<category><![CDATA[2017]]></category>
+		<category><![CDATA[Angular]]></category>
+		<category><![CDATA[angular 2]]></category>
+		<category><![CDATA[debugging]]></category>
+		<category><![CDATA[deployment]]></category>
+		<category><![CDATA[neon]]></category>
+		<category><![CDATA[typescript]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=506630</guid>
+		<description><![CDATA[<p>Today is a very exciting day at Genuitec! As we speak, we are just unveiling MyEclipse 2017! This is the first release of what’s going to be an amazing year of new functionality for the MyEclipse (and Webclipse) customer base. This release represents our best way to start off the year right. Yes, we are [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/myeclipse-2017-welcome-next-generation-technology/">MyEclipse 2017 &#8211; Welcome to the Next Generation Technology</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>SDC 2017 &#8211; Looks, Security &#038; Neon.</title>
+		<link>https://www.genuitec.com/sdc-2017-looks-security-neon/</link>
+		<pubDate>Tue, 03 Jan 2017 15:22:46 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[2017]]></category>
+		<category><![CDATA[neon]]></category>
+		<category><![CDATA[portal]]></category>
+		<category><![CDATA[SDC]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=507532</guid>
+		<description><![CDATA[<p>Get your installers ready (Java 1.8), because Neon is here! Our first release of the year is based on Eclipse Neon and with it, many other exciting updates.Totally new portal, we are updating the look and feel of the SDC portal, giving extra functionality that allows you to perform basic editing of packages without the [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/sdc-2017-looks-security-neon/">SDC 2017 &#8211; Looks, Security &amp; Neon.</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Webclipse CI 9 is out, and with it TSLint!</title>
+		<link>https://www.genuitec.com/webclipse-ci-9-tslint/</link>
+		<pubDate>Thu, 01 Dec 2016 16:25:58 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[Webclipse]]></category>
+		<category><![CDATA[angular 2]]></category>
+		<category><![CDATA[ts lint]]></category>
+		<category><![CDATA[typescript]]></category>
+		<category><![CDATA[typescript 2.0]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=504637</guid>
+		<description><![CDATA[<p>While our previous release included TypeScript, which provides you with incredible validation of syntax errors in your code, this release took code checking to a whole other level by adding TSLint. TSLint is an extensible linter for TypeScript and complements TypeScript by checking your code’s readability, maintainability, and functionality errors.TSLint can catch a number of [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/webclipse-ci-9-tslint/">Webclipse CI 9 is out, and with it TSLint!</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Java 8 Features Supported by Spring 4</title>
+		<link>https://www.genuitec.com/java-8-and-spring-4/</link>
+		<pubDate>Tue, 15 Nov 2016 19:17:20 +0000</pubDate>
+		<dc:creator><![CDATA[support-swapna]]></dc:creator>
+				<category><![CDATA[Eclipse]]></category>
+		<category><![CDATA[Java]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[Planet Eclipse]]></category>
+		<category><![CDATA[Programming Tips]]></category>
+		<category><![CDATA[Java EE]]></category>
+		<category><![CDATA[Spring]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=501467</guid>
+		<description><![CDATA[<p>Spring Framework 4 supports Java 8 language and API features. In this article, we will focus on the new Java 8 features which are supported in Spring 4. The most important ones are lambda expressions, method references, JSR-310 Date and Time, and Repeatable annotations.Lambda ExpressionsSpring code base uses a lot of functional interfaces and with [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/java-8-and-spring-4/">Java 8 Features Supported by Spring 4</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Rock Your Front-End Development With Angular IDE by Webclipse</title>
+		<link>https://www.genuitec.com/rock-front-end-development-angular-ide-webclipse/</link>
+		<pubDate>Wed, 09 Nov 2016 09:00:47 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[Webclipse]]></category>
+		<category><![CDATA[Angular]]></category>
+		<category><![CDATA[IDE]]></category>
+		<category><![CDATA[typescript]]></category>
+		<category><![CDATA[webclipse]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=500689</guid>
+		<description><![CDATA[<p>Early this year we announced our mission to help developers go from Java developers to awesome full stack developers. We started with many tools that were crucial for that goal (e.g,. JSjet, TypeScript, DevSearch, and others) and now we are incredibly pleased to announce Angular IDE by Webclipse will be part of Webclipse as well. [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/rock-front-end-development-angular-ide-webclipse/">Rock Your Front-End Development With Angular IDE by Webclipse</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Webclipse Twitter Chat &#8211; Recap October 24th</title>
+		<link>https://www.genuitec.com/webclipse-twitter-chat-recap-october-24th/</link>
+		<pubDate>Mon, 24 Oct 2016 16:57:54 +0000</pubDate>
+		<dc:creator><![CDATA[Rocio Trujillo]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[Webclipse]]></category>
+		<category><![CDATA[angular2]]></category>
+		<category><![CDATA[terminal]]></category>
+		<category><![CDATA[twitter]]></category>
+		<category><![CDATA[twitterchat]]></category>
+		<category><![CDATA[typescript]]></category>
+		<category><![CDATA[wbclipse]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=500950</guid>
+		<description><![CDATA[<p>Hello! here is the Genuitec Twitter chat recap! in case you missed it ?Great! Its been a while since we last chatted about @Webclipse. Why don&#8217;t we start off with some catching up! #genuitecchatQ1 What’s new in @Webclipse and @MyEclipseIDE land?A1 The highlight of recent releases has been #TypeScript support for #Eclipse, as promised in [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/webclipse-twitter-chat-recap-october-24th/">Webclipse Twitter Chat &#8211; Recap October 24th</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Eclipse Neon goes SR1 -Secure Delivery Center does too!</title>
+		<link>https://www.genuitec.com/eclipse-neon-goes-sr1-secure-delivery-center/</link>
+		<pubDate>Fri, 30 Sep 2016 17:14:43 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[Secure Delivery Center]]></category>
+		<category><![CDATA[Eclipse]]></category>
+		<category><![CDATA[neon]]></category>
+		<category><![CDATA[SDC]]></category>
+		<category><![CDATA[sr1]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=498319</guid>
+		<description><![CDATA[<p>Holy cow! Is this release full of improvements or what? Yes, indeed it is. For sure this will give us material to be entertained with for days exploring each of them. One thing that caught my attention is that many of these improvements are focused on how to keep us inside the IDE and make [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/eclipse-neon-goes-sr1-secure-delivery-center/">Eclipse Neon goes SR1 -Secure Delivery Center does too!</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Creating My First Web App with Angular 2 in Eclipse</title>
+		<link>https://www.genuitec.com/first-angular-2-app/</link>
+		<pubDate>Tue, 20 Sep 2016 14:00:01 +0000</pubDate>
+		<dc:creator><![CDATA[dimitry]]></dc:creator>
+				<category><![CDATA[Eclipse]]></category>
+		<category><![CDATA[Java]]></category>
+		<category><![CDATA[Planet Eclipse]]></category>
+		<category><![CDATA[Programming Tips]]></category>
+		<category><![CDATA[angular 2]]></category>
+		<category><![CDATA[Web Development]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=496768</guid>
+		<description><![CDATA[<p>Angular 2 is a framework for building desktop and mobile web applications. After hearing rave reviews about Angular 2, I decided to check it out and take my first steps into modern web development. In this article, I&#8217;ll show you how to create a simple master-details application using Angular 2, TypeScript, Angular CLI and Eclipse [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/first-angular-2-app/">Creating My First Web App with Angular 2 in Eclipse</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>Genuitec to Discontinue Development of GapDebug</title>
+		<link>https://www.genuitec.com/discontinue-development-of-gapdebug/</link>
+		<pubDate>Tue, 13 Sep 2016 14:00:58 +0000</pubDate>
+		<dc:creator><![CDATA[wayne]]></dc:creator>
+				<category><![CDATA[General]]></category>
+		<category><![CDATA[Genuitec]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=496654</guid>
+		<description><![CDATA[<p>As GapDebug Product Manager, I want to share some information about the future of GapDebug. For almost 3 years we have developed and maintained GapDebug (@GapDebug) as a free debugging and app management platform for hybrid-mobile developers. It has been a fun learning experience with many cool challenges and rewards. After much consideration we have [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/discontinue-development-of-gapdebug/">Genuitec to Discontinue Development of GapDebug</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>From Java Developer to Rockstar Full Stack Developer &#8211; Part 1</title>
+		<link>https://www.genuitec.com/from-java-developer-to-rockstar-full-stack-developer-part-1/</link>
+		<pubDate>Fri, 09 Sep 2016 14:58:48 +0000</pubDate>
+		<dc:creator><![CDATA[Anabella]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[dev search]]></category>
+		<category><![CDATA[developer]]></category>
+		<category><![CDATA[full-stack]]></category>
+		<category><![CDATA[Java]]></category>
+		<category><![CDATA[jsjet]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[typescript]]></category>
+		<category><![CDATA[webclipse]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=495275</guid>
+		<description><![CDATA[<p>Genuitec is working hard on making it easier for you, Java developer, to become an awesome full stack developer. Now that I hopefully got your attention, let me tell you more about our plans on how we are going to achieve this goal.We had a vision. A vision to make it easier for Java developers [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/from-java-developer-to-rockstar-full-stack-developer-part-1/">From Java Developer to Rockstar Full Stack Developer &#8211; Part 1</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>MyEclipse Twitter Chat &#8211; Recap August 30th</title>
+		<link>https://www.genuitec.com/myeclipse-twitter-chat-recap-august-30th/</link>
+		<pubDate>Tue, 30 Aug 2016 16:22:37 +0000</pubDate>
+		<dc:creator><![CDATA[Rocio Trujillo]]></dc:creator>
+				<category><![CDATA[Genuitec]]></category>
+		<category><![CDATA[Webclipse]]></category>
+		<category><![CDATA[angular 2]]></category>
+		<category><![CDATA[JSHint]]></category>
+		<category><![CDATA[MyEclipse]]></category>
+		<category><![CDATA[Twitter Chat]]></category>
+		<category><![CDATA[webclipse]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=495293</guid>
+		<description><![CDATA[<p>Hello! here is the Genuitec Twitter chat recap! in case you missed it ?Q1 What’s new with the latest 2016 CI 5 releases of @Webclipse and @MyEclipseIDE? A1 Our first addition to the #CodeLive dashboard, is a new Magic Wand analysis and navigation tool. The Wand shows you where each section of the file is coming [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/myeclipse-twitter-chat-recap-august-30th/">MyEclipse Twitter Chat &#8211; Recap August 30th</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+		<item>
+		<title>How Developers Can Get in on the Pokémon Go Craze</title>
+		<link>https://www.genuitec.com/how-developers-can-get-in-on-the-pokemon-go-craze/</link>
+		<pubDate>Tue, 16 Aug 2016 15:38:49 +0000</pubDate>
+		<dc:creator><![CDATA[aaronlonin]]></dc:creator>
+				<category><![CDATA[General]]></category>
+		<category><![CDATA[Programming Tips]]></category>
+		<category><![CDATA[Webclipse]]></category>
+		<category><![CDATA[Gaming]]></category>
+		<category><![CDATA[programming]]></category>
+		<category><![CDATA[webclipse]]></category>
+
+		<guid isPermaLink="false">https://www.genuitec.com/?p=493994</guid>
+		<description><![CDATA[<p>Unless you’ve been living under a rock, you’ve heard of Pokémon Go. This mobile app uses GPS to combine the virtual world and the real world. Back in the day, I logged many hours playing Pokémon on an old Nintendo Game Boy. Now, Pokémon Go has gotten me outside hunting for Pokémon because I want [&#8230;]</p>
+<p>The post <a rel="nofollow" href="https://www.genuitec.com/how-developers-can-get-in-on-the-pokemon-go-craze/">How Developers Can Get in on the Pokémon Go Craze</a> appeared first on <a rel="nofollow" href="https://www.genuitec.com">Genuitec</a>.</p>
+]]></description>
+		</item>
+	</channel>
+</rss>
+
+<!-- Performance optimized by W3 Total Cache. Learn more: https://www.w3-edge.com/products/
+
+Object Caching 9262/9384 objects using disk
+Page Caching using disk: enhanced (Requested URI is rejected)
+Content Delivery Network via resources.cloud.genuitec.com
+Database Caching using disk
+
+ Served from: www.genuitec.com @ 2017-02-26 10:13:51 by W3 Total Cache -->
