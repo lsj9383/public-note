@@ -1,0 +1,134 @@
+Zookeeper
+	hadoop的生态体系就是动物园，每个产品都是用动物来象征的。
+	Zookeeper所属google的Chubby一个开源的实现。是Hadoop的分布式协调服务。
+	zookeeper也是个集群，提供少量数据的存储和管理，并可以为数据配置监听器(主机节点)。它可以将各个节点间的数据进行同步，保证一致性。
+		分布式应用中，多个节点会有共享的文件比如配置信息，这些数据放在一个服务器中，会不安全，如当机就不能允许，因此用集群来保存这些数据。
+		zookeeper就是一个对这样的情况而开发的，也就是对这些共享数据进行管理，包括同步、读写等。
+	Zookeeper中的主机角色
+		Leader:所有数据的写操作，由Leader实现。是为了保证数据一致性。当集群里超过一半的节点更新成功，就认为更新成功。
+		Follower：集群中除了Leader以外的其他Server。用于保存数据的。
+		Leader和Follower不由配置文件决定，而是由zookeeper内部投票机制，决定who is leader。
+	使用原因：
+		大部分分布式应用需要一个主控、协调器或控制器来管理物理分布的子进程。
+		大部分应用需要开发私有的协调程序，缺乏一个通用的机制。
+		协调程序的反复编写浪费，且难以形成通用、伸缩性好的协调器。
+		Zookeeper 提供分布式锁服务，用以协调分布式应用。
+	安装和配置：
+		在conf目录下创建一个配置文件zoo.cfg
+			tickTime=2000					默认配置，单位ms
+			dataDir=/home/hadoop/app/zookeeper-3.4.5/data	zookeeper在本地的一个工作目录
+			dataLogDir=...
+			clientPort=2181					客户端连接到zookeeper的端口
+			initLimit=5						初始化时，两个节点启动可以容忍的时间差，单位tickTime
+			syncLimit=2						请求和响应间，可以容忍的时间差。
+			server.1=server1:2888:3888		配置集群中机器的列表
+			server.2=server2:2888:3888
+			server.3=server3:2888:3888
+			
+		每台机器都要保证dataDir存在
+		在每台机器的dataDir中配置myid。在配置文件会表示为server.myID。
+		在每台机器中通过./bin里的./bin/zkServer.sh start启动。
+		./zkServer.sh status可以观察zookeeper的工作状态：
+			Mode : standalone - 单点模式
+			Mode : Leader - 分布式的leader节点工作模式
+			Mode : Follower - 分布式的Follower节点工作模式
+	
+	zookeeper管理客户所存放的数据采用类似于文件树的结构
+	每一个节点叫做一个node,每个节点可以有数据以及子节点。每个节点的数据最好<1M。注意，保存的数据，而不是文件。
+	这其实有点像xml或者json。
+	
+	create node-path data, 用data数据初始化一个节点.
+	数据更新是同步的。对一个计算机节点更新数据，所有计算机同步。
+	zookeeper要正常工作，正在工作的主机需要是欲配置的节点数量的一半以上。
+	
+	Znode有两种类型：
+		短暂的：客户端往zookeeper写的数据，客户端一旦和集群断开连接，集群会删除这个数据。
+		持久的：客户度往zookeeper写的数据会始终存在。
+	zookeeper角色：
+		leader	:
+		learner	:
+		follower:
+		ovserver:
+	应用场景：
+		1.统一命名服务。
+		2.配置管理。
+		3.共享锁。
+		
+HA(高可用机制)
+	HDFS的高可用机制:
+		hdfs的namenode当机了，整个集群将停止服务。因此传统方式的服务可用性不高，只能保证可靠性(SecondaryNamenode中有)。
+		HA可以提高服务的可用性。
+		两个NN的运行问题：
+			1.能否两个NN都正常响应客户端请求？
+				应该让两个NN在某个时间，只能有一个节点正常响应客户端节点。
+				有两个状态ACTIVE和STANDBY。
+				响应请求的必须为ACTIVE状态的那一台。
+			2.standby状态的节点，必须快速无缝地切换为active状态。
+				意味着两个namenode必须时刻保持元数据的一致。
+				传统namenode中管理了两块数据，edits和fsimage。现在可以将edits脱离出namenode内部。fsimage不用作同步，只要edits中的数据相同即可。fsimage只是由edits合并进去的而已。
+				将edits放在外部，就要保证外部的可靠性和可用性。这样就要对edits进行分布式管理。
+				对edits进行分布式管理的hadoop应用就是qjournal，qjournal依赖zookeeper实现。
+			3.如何避免状态切换时发生brain split现象
+				brain split的意思是ACTIVE假死，造成了STANDBY转换为ACTIVE，此时有两个ACTIVE，将会产生冲突。
+				每个nn都有一个zkfc进程，zkfc进程进行状态监测，并将工作状态传递给qjournal。
+				standby的zkfc从qjournal发现active的namenode状态异常，那就会启动状态切换。
+				但active的namenode可能是假死，那么就会发生brain split。
+				因此为了保证active的namenode死掉，standby的nn会发送杀死active的消息(ssh nn1 kill -9 namenode)，等待杀死成功，再启动状态切换。
+				若发送的的kill指令超时，会执行自定义shell脚本。
+		一对如此同步的namenode称为一个Federation。
+		以前访问hdfs，只需要访问一台nn，现在又多台nn，多台nn之间有个名称。
+		因此现在访问hdfs，是访问的Federation的名称:hdfs://federation-name/....
+		集群可以有多对namenode，也就是多对Federation。
+		
+		最好将datanode和nodemanager是同一台计算机。
+		HA配置需要配置的文件：
+			1.ssh配置
+				这是为了方便进行远程机器启动的。
+				ssh-keygen -t rsa.		生成密钥对
+				ssh-copy-id host_name.	发送公钥，发送成功后，就可以无密登录了。
+			2.文件配置
+				1).hadoo-env.sh
+				2).core-site.xml
+				3).hdfs-site.xml
+				4).mapred-site.xml
+				5).yarn-site.xml
+				6).slave
+			3.分发
+				以上文件在一台计算机上配置好即可，再将配置文件分发给各主机。
+				对于dfs和yarn，需要在slave中配置各自的小弟。
+		启动:
+			1).首先启动zookeeper，必须在所有启动前启动。
+			2).在各个节点上启动journalnode，提供元数据edits文件的管理。第一次手动启动hadoop-daemon.sh start journalnode，后面可以不用手动启动了。
+			3).格式化HDFS，在一台nn节点上执行即可。hdfs namenode -format。将格式化生成的数据文件夹，分发到其他nn。这个很重要，若出现了什么问题，一定要将所有dfs节点的数据文件夹删除，重新格式化。
+			4).格式化ZKFC，在一台nn节点上执行即可。zkfc是作两个nn失败切换管理的。格式化是为了在zookeeper建立数据结构，因为zkfc就是去zookeeper上取数据的。
+			5).启动HDFS。
+			6).启动YARN，要在所有的resourcemanager都进行启动，因为启动一个rm不会自动启动其他rm，只会启动nm。yarn-daemon.sh start resourcemanager
+		检查日志文件，就在hadoop主目录的logs文件夹中的.log文件。删除日志文件没关系，有新的日志但没日志文件会自动创建。
+		测试：	1).active的nn的进程被kill掉的时候，
+				2).active断电的话，standby会发送active予以kill掉进程，并等待响应，会一直等到超时，standby才会启动为active。
+				3).手动可以切换为standby和active ：hdfs haadmin -transitionToStandby namenode-id --forceManual
+				5).resourcemanager也可以高可用，但是在一个任务运行的时候，若rm被kill掉，该任务会失败。
+		动态增加datanode：
+			kill掉datanode，会在超时后，nn才会意识到datanode死掉了。会在其网页中有显示。在hdfs-site.xml中可以设置超时参数。
+			冗余数据块的自动删除，datanode一段时间后，会向namenode汇报数据块信息，nn会得知冗余数据块的情况。汇报的时间默认较长，在hdfs-site.xml文件中有该参数。
+		cluster ID: namenode id和datanode id匹配，datanode才属于集群。对于新加入进的datanode，要配置clusterID。
+					新加入的dn，删除tmp即可，它启动的时候，会根据配置文件自动去获取namenode的clusterID，并配置tmp。
+					在集群初始化的时候，datanode就是这么配置clusterID的。
+		注意在编程的时候，要与hdfs通信，应该使用namesever的名字。为了使用该名字，就要使用配置文件。直接用core-site.xml与hdfs-site.xml文件即可。
+		
+HIVE
+	基于分布式存储实现的海量数据的查询和管理的工具。是一种统计数据的好工具。操作非常类似于数据库。
+		首先建立个表：create table tab_order(....) path ... 建的表的信息（比如字段、路径）放在元数据库中。
+		然后，可以写查询语句了，并执行。
+		接着，将进行编译，生成出一个jar包，是一个可以正式运行的程序。（这是一个mapreduce程序）
+		最后，将jar包交给执行器runner，runner会提交给hadoop，然后得到结果。
+	也就是说，只需要写好sql语句即可，不用写mapreduce写统计程序。
+	hive是个数据库，里面有多个表，使用的时候，就是直接引用表，以及里面的字段。hive面对一个表的符号，要去另外的数据库去解析。因此还需要外部数据库。不过也可以用自带的dobby数据库。
+	这些信息数据就是hive的元数据。
+	hive的conf可以直接默认，不配置。
+	由于hdfs不支持修改数据，所以hive是不能insert的。所以很明显，hive只支持查询功能。hive只适合数据本来就在那里，并用于查询。
+	因此hive的表需要获得数据：
+		1.将文件导入到已存在的hive表。
+		2.建表的时候，就已经指定了文件数据。
+		
+	另外，centos的共享文件夹在/mnt/hgfs/share文件夹中

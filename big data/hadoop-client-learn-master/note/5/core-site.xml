@@ -1,0 +1,19 @@
+<configuration>
+<!-- 指定hdfs的nameservice为ns1 -->
+<property>
+	<name>fs.defaultFS</name>
+	<value>hdfs://ns1/</value>
+</property>
+
+<!-- 指定hadoop临时目录 -->
+<property>
+	<name>hadoop.tmp.dir</name>
+	<value>/home/hadoop/app/hadoop-2.4.1/tmp</value>
+</property>
+
+<!-- 指定zookeeper地址 -->
+<property>
+	<name>ha.zookeeper.quorum</name>
+	<value>zk1:2181,zk2:2181,zk3:2181</value>
+</property>
+</configuration>
