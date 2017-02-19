@@ -1,0 +1,32 @@
+package demo;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
+public class Main {
+
+	public static void main(String[] args) {
+		List<Integer> list = new ArrayList<>();
+		list.add(1);
+		list.add(2);
+		list.add(3);
+		list.add(4);
+		list.add(5);
+	
+		Integer[] ar = new Integer[100];
+		ar[99] = 9;
+		list.toArray(ar);
+		for(Integer number : ar){
+			System.out.println(number);
+		}
+		
+		ListIterator<Integer> it = list.listIterator();
+		it.add(new Integer(0));
+		for(Integer num : it){
+			System.out.println(num);
+		}
+	}
+
+}

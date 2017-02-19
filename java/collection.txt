@@ -1,0 +1,251 @@
+集合详解：
+一、继承关系：
+	Iterable <|-- Collection <|-- List <|-- ArrayList
+							  |         |__<|-- LinkedList
+							  |         |__<|-- Vector
+							  |
+							  |__<|-- Set <|-- HashSet
+									   |__<|-- SortedSet <|-- TreeSet
+	Map <|-- HashMap
+	 |__<|-- HashTable <|-- Properties
+	 |__<|-- SortedMap <|-- TreeMap
+ 
+二、集合接口
+	记录这些接口所拥有的方法 及其作用。
+	1.Iterable接口
+		public interface Iterable<T>{
+			Iterator<T> iterator();		//返回迭代器
+			
+			default void forEach(Consumer<? super T> action) {		//foreach方法，传入每个元素的操作方法, default方法可以让接口进行一些默认方法的实现，有点反传统。
+				Objects.requireNonNull(action);
+				for (T t : this) {
+					action.accept(t);
+				}
+			}
+			
+			default Spliterator<T> spliterator() {		//还不清楚
+				return Spliterators.spliteratorUnknownSize(iterator(), 0);
+			}
+		}
+		
+	2.Iterator接口
+		看样子提供了向后移动和删除的接口。
+		public interface Iterator<E>{
+			boolean hasNext();				//如果迭代器还有更多的元素，则返回true。
+			E next();						//返回迭代器的【下一个】元素。换句话说，迭代器"指针"在最开始的时候是在首个元素之前的。
+			default void remove() {			//默认不支持删除操作
+				throw new UnsupportedOperationException("remove");
+			}
+			default void forEachRemaining(Consumer<? super E> action) {		//将迭代器中剩余的元素进行foreach迭代。
+				Objects.requireNonNull(action);
+				while (hasNext())
+					action.accept(next());
+			}
+		}
+	3.ListIterator接口
+		比Iterator具有更强的能力，可以向前移动，可以添加和设置元素，还可以获得当前的索引。
+		public interface ListIterator<E> extends Iterator<E> {
+			/* 重述接口 */
+			boolean hasNext();
+			E next();
+			void remove();
+			
+			/* 特有接口 */
+			boolean hasPrevious();
+			E previous();
+			int nextIndex();
+			int previousIndex();
+			void set(E e);
+			void add(E e);
+		}
+	
+	4.Collection接口
+		看样子，集合只能添加和删除，不能直接获取和设置。
+		public interface Collection<E> extends Iterable<E> {		//接口继承Iterable，泛型和父接口是相同的。
+			int size();						//集合中元素的个数
+			boolean isEmpty();				//集合是否为空
+			boolean contains(Object o);		//判断集合是否包含对象o
+			Iterator<E> iterator();			//返回一个迭代器
+			Object[] toArray();				//将集合转换为一个数组
+			<T> T[] toArray(T[] a);
+			boolean add(E e);				//添加一个元素
+			boolean remove(Object o);		//？？？
+			boolean containsAll(Collection<?> c);
+			boolean addAll(Collection<? extends E> c);
+			boolean removeAll(Collection<?> c);	
+			default boolean removeIf(Predicate<? super E> filter) {		//移除符合条件的元素，若有移除的动作，则返回true，没有任何移除则返回false
+				Objects.requireNonNull(filter);
+				boolean removed = false;
+				final Iterator<E> each = iterator();
+				while (each.hasNext()) {
+					if (filter.test(each.next())) {
+						each.remove();
+						removed = true;
+					}
+				}
+				return removed;
+			}
+			boolean retainAll(Collection<?> c);	//???
+			void clear();						//清空该集合中的所有元素
+			boolean equals(Object o);
+			int hashCode();
+			@Override
+			default Spliterator<E> spliterator() {		//???
+				return Spliterators.spliterator(this, 0);
+			}
+			
+			default Stream<E> stream() {				//???
+				return StreamSupport.stream(spliterator(), false);
+			}
+			
+			default Stream<E> parallelStream() {		//???
+				return StreamSupport.stream(spliterator(), true);
+			}
+		}
+		
+	5.List接口
+		public interface List<E> extends Collection<E> {	//list的泛型和父类的collection的泛型相同
+			int size();
+			boolean isEmpty();
+			Iterator<E> iterator();
+			Object[] toArray();
+			<T> T[] toArray(T[] a);
+			boolean add(E e);
+			boolean remove(Object o);
+			boolean containsAll(Collection<?> c);
+			boolean addAll(Collection<? extends E> c);
+			boolean removeAll(Collection<?> c);
+			boolean retainAll(Collection<?> c);
+			
+			default void replaceAll(UnaryOperator<E> operator) {		//???
+				Objects.requireNonNull(operator);
+				final ListIterator<E> li = this.listIterator();
+				while (li.hasNext()) {
+					li.set(operator.apply(li.next()));
+				}
+			}
+			
+			@SuppressWarnings({"unchecked", "rawtypes"})
+			default void sort(Comparator<? super E> c) {
+				Object[] a = this.toArray();
+				Arrays.sort(a, (Comparator) c);
+				ListIterator<E> i = this.listIterator();
+				for (Object e : a) {
+					i.next();
+					i.set((E) e);
+				}
+			}
+			void clear();
+			boolean equals(Object o);
+			@Override
+			default Spliterator<E> spliterator() {			//???
+				return Spliterators.spliterator(this, Spliterator.ORDERED);
+			}
+			
+			/* 以下是list所特有的接口 */
+			E get(int index);				//根据索引获得list中的元素
+			E set(int index, E element);	//设置某个索引中的数据
+			void add(int index, E element);	//添加元素
+			E remove(int index);			//移除指定索引的元素
+			int indexOf(Object o);			//查询某个元素的索引，从头开始。
+			int lastIndexOf(Object o);		//查询某个元素的索引，从尾巴开始。
+			ListIterator<E> listIterator();	//获得链表迭代器
+			ListIterator<E> listIterator(int index);		//获得从指定索引开始的链表迭代器
+			List<E> subList(int fromIndex, int toIndex);	//获得子链表
+		}
+		
+	
+三、抽象类
+	
+四、具体实现
+	1.ArrayList相关的类
+		这是一个实现了List接口的，大小可变的数组。除了实现List，此类还提供了操作内部用于存储列表数组大小的内存的方法。
+		1).ArrayList
+		public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
+			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;	//数组的最大元素个数...
+			private static final int DEFAULT_CAPACITY = 10;			//初始化容量为10
+			private static final Object[] EMPTY_ELEMENTDATA = {};	//???
+			private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};	//???
+			transient Object[] elementData;		//实际保存元素的数组
+			private int size;		//记录元素个数
+			
+			//构造函数
+			public ArrayList(int initialCapacity);		//根据初始化容量，初始化elementData
+			public ArrayList();							//根据默认初始化容量，初始化elementData
+			public ArrayList(Collection<? extends E> c);//????
+			
+			//公共方法
+			public void trimToSize();					//将arraylist对象的capacity修剪为实际大小。(将没有用到的空间给释放掉)
+			public void ensureCapacity(int minCapacity);//增加capacity的实例容量，以能容纳指定的minCapacity.
+			public int size();							//可用元素的个数，非capacity
+			public boolean isEmpty();					//判断size是否为0
+			public int indexOf(Object o);				//返回对象的索引，判断是否相等用o.equals.若不存在该对象，返回-1。从开始向末尾遍历，找到就直接返回，因此返回的是第一个该对象的索引。
+			public int lastIndexOf(Object o);			//和indexOf功能相同，但是从末尾向前遍历，找到就返回，因此返回的是最后一个该对象的索引。
+			public boolean contains(Object o);			//return indexOf(o) >= 0;判断该对象是否存在
+			public Object clone()；						//克隆当前对象。对象中元素和原对象中的元素是相同的。(若元素是对象，则引用值相同)
+			public Object[] toArray();					//将ArrayList的数组中的元素给copy到新的数组中，新的数组对象大小为size而非capacity。
+			public <T> T[] toArray(T[] a);				//若数组a足够大(可以容纳size大小的元素)，那么将对象中的所有内容放在a中的最前面(后面的元素不会被修改的)。若a不够大，那么返回一个新的数组，该数组的大小和a相同，可以放多少arraylist中的元素就放多少。
+			public E get(int index);					//等价于elementData[index]，获取指定索引的元素。有范围检查。
+			public E set(int index, E element);			//设置新的元素到指定索引中，返回旧元素。有范围检查。
+			public boolean add(E e);					//添加一个新元素。添加新元素的时候要进行capacity grow的检查。返回始终为true。
+			public void add(int index, E element);		//在制定的索引出添加新的元素 elementData[index]将为element, index+1到末尾的元素，全部向后移1格。
+			public E remove(int index);					//将index处的元素删除，后面的元素往前顶1个。
+			public boolean remove(Object o);			//删除指定的元素。通过o.equals来判断是否为指定独享的。只移除第一个o。
+			public void clear();						//将所有内容都设定为null。
+			public boolean addAll(Collection<? extends E> c);	//将c中的全部元素添加到elementData的后面。步骤是复制出c中的元素(toArray)，然后判断是否扩展capacity，最后将c中复制出的元素再复制到elementData中。			
+			public boolean addAll(int index, Collection<? extends E> c);	//和上面相同，不过是在index处进行的添加。
+			public boolean removeAll(Collection<?> c);						//从listArray中移除在c中存在的元素。
+			public boolean retainAll(Collection<?> c);						//和removeAll相反，在listArray中保留c中存在的元素。(从listarray中移除c中不存在的元素)
+			public ListIterator<E> listIterator(int index);					//获取一个从指定索引开始的list迭代器。
+			public ListIterator<E> listIterator();							//获取一个从首元素开始的列表迭代器。
+			public Iterator<E> iterator();									//获取一个迭代器。
+			public List<E> subList(int fromIndex, int toIndex);				//返回子lsit。
+			public void forEach(Consumer<? super E> action);				//对所有的元素执行某个回调操作。
+			public Spliterator<E> spliterator();							//????
+			public boolean removeIf(Predicate<? super E> filter);			//根据filter中指定的条件，来对元素进行移除。???
+			public void replaceAll(UnaryOperator<E> operator);				//对所有元素执行某个回调操作，该操作的返回值将会重置该索引上的元素。
+			public void sort(Comparator<? super E> c);						//根据传入的比较类来进行排序
+			
+			//私有方法
+			private void rangeCheck(int index);			//范围检查，错了直接抛出异常。
+			private void rangeCheckForAdd(int index);	//对于添加时候的范围检查。
+			private void grow(int minCapacity);			//增加容量，以确保能装下由最小容量参数指定的元素数。每次增加原容量的1/2，若还是不能容纳则直接将容量设定为指定容量。容量指定好后，就用Arrays.copyOf(elementData, newCapacity)来创建新的数组，该数组大小为newCapacity，元素内容和之前相同，多出来的是null。
+			E elementData(int index);					//等价于elementData[index]，获取指定索引的元素。并没有范围检查。
+			private void fastRemove(int index)；		//快速移除指定索引, 就是少了一个范围检查。
+			protected void removeRange(int fromIndex, int toIndex);	//将指定范围的元素删除，后面的元素往前顶。
+			private boolean batchRemove(Collection<?> c, boolean complement);	//根据c批量异常。是removeAll和retainAll的基础，complement用于选择如何移除。????
+			
+			//内部类
+			private class Itr implements Iterator<E>;	//普通迭代器的实现，用私用类来实现。
+			private class ListItr extends Itr implements ListIterator<E>;	//列表迭代器的实现
+			private class SubList extends AbstractList<E> implements RandomAccess;
+			static final class ArrayListSpliterator<E> implements Spliterator<E>;
+		}
+		
+		2).Itr
+		private class Itr implements Iterator<E> {
+			int cursor;       //这个光标指示的是【下一个】返回的元素的索引，因此初始化为0。
+			int lastRet = -1; //最近次取出的元素。因此初始是-1。
+			int expectedModCount = modCount;
+			
+			//公共方法
+			public boolean hasNext();	//根据下一个索引(cursor)是否超出size来判断是否还有元素
+			public E next();			//返回下一个元素，并移动cursor(cursor+1)以及设置lastRet为返回元素的索引，若超出了大小，抛出异常。
+			public void remove();		//lastRef是最近取出的元素(当前元素)，若有效则移除该元素。也因此最近移出元素已经不在，因此lastRet会重置为-1。
+			public void forEachRemaining(Consumer<? super E> consumer);	//对余下的元素进行foreach。结束的时候cursor和lastRet都要重置。
+		}
+		
+		3).ListItr
+			private class ListItr extends Itr implements ListIterator<E> {	//直接继承Itr
+				//构造函数
+				ListItr(int index);		//{super();cursor = index;}，主要是cursor=index，这样next将会是index索引的元素。
+				
+				//公共函数
+				public boolean hasPrevious();	//判断cursor是否为0，为0那么前面就木有了。
+				public int nextIndex();			//就是cursor
+				public int previousIndex();		//return cursor-1;
+				public E previous();			//返回cursor-1的元素。lastRet将会是该元素的索引。
+				public void set(E e);			//将lastRet的索引进行设置，lastRet并不会重置。可以反复设置上一次出来的索引位置的元素。
+				public void add(E e);			//在cursor处添加一个元素，cursor向下移动一格。意思就是cursor并没有指向新添加的元素，而是原来的那个元素。。。
+			}
