@@ -1,0 +1,6 @@
+package com.lsj.util;
+
+public interface LCollection<T> extends LIterable<T>{
+	int size();
+	
+}

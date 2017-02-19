@@ -1,0 +1,11 @@
+package com.lsj.util;
+
+import java.util.Iterator;
+
+public interface LCollection<T> extends LIterable<T>{
+	int size();
+	了Iterator<T> itertor();
+	boolean contains(T o);
+	boolean add(T nv);
+	boolean remove(T o);
+}
