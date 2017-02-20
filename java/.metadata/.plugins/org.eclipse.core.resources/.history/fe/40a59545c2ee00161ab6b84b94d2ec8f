@@ -1,5 +1,0 @@
-package com.lsj.jvm.gc;
-
-public class testAllocation {
-
-}

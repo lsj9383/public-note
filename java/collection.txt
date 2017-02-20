@@ -156,7 +156,68 @@
 		
 	
 三、抽象类
-	
+	1.AbstractCollection
+		这是一个集合的骨架实现
+			要实现不可修改的集合，只需要重写iterator()方法与size()方法。
+			要实现可以修改的集合，还需要重写add方法(否则抛出不支持添加异常)，并且返回的迭代器必须实现remove方法。
+		public abstract class AbstractCollection<E> implements Collection<E> {
+			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;		//最大容量
+		
+			//构造函数
+			 protected AbstractCollection() {}					//空
+			 
+			//公共方法
+			public abstract Iterator<E> iterator();				//返回迭代器
+			public abstract int size();							//返回大小
+			public boolean isEmpty() {return size() == 0;}		//判断是否为空，利用size
+			public boolean contains(Object o);					//判断是否存在o，利用o.equals和迭代器。
+			public Object[] toArray();							//将所有元素复制到数组中。利用迭代器。
+			public <T> T[] toArray(T[] a);
+			public boolean add(E e) {throw new UnsupportedOperationException();}	//默认抛出异常
+			public boolean remove(Object o);					//利用迭代器实现删除
+			public boolean containsAll(Collection<?> c);		//判断集合中是否包含c集合中的元素。
+			public boolean addAll(Collection<? extends E> c);	//添加集合中所有的元素，利用add。
+			public boolean removeAll(Collection<?> c);			//从本集合中删除存在于c中的元素。
+			public boolean retainAll(Collection<?> c);			//在本集合中保留在c中存在的元素。
+			public void clear();								//利用迭代器实现清空
+			
+			//私有方法
+			private static <T> T[] finishToArray(T[] r, Iterator<?> it);	//???
+			private static int hugeCapacity(int minCapacity);				//???
+		}
+	2.AbstractList
+		提供了list的骨架实现
+		要实现不可修改的list，只需要覆盖get方法和size方法。
+		要实现可以修改的list，需要覆盖set方法(否则抛出不支持设置异常)。
+		要实现可以添加的list，需要覆盖add方法 remove方法。
+		public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
+			//构造函数
+			protected AbstractList() {}
+			
+			//公共函数
+			abstract public E get(int index);						//获得索引index位置的元素
+			public boolean add(E e) {add(size(), e);return true;}	//在末尾添加元素
+			public void add(int index, E element){throw new UnsupportedOperationException();}	//在指定位置添加索引
+			public E set(int index, E element) {throw new UnsupportedOperationException();}		//设置指定索引处的元素
+			public E remove(int index) {throw new UnsupportedOperationException();}				//移除指定索引处的元素
+			public int indexOf(Object o);														//查询o的索引，利用o.equals和list迭代器实现
+			public int lastIndexOf(Object o);													//和indexOf差不多，但后面查询。
+			public void clear();																//清空list中的元素
+			public boolean addAll(int index, Collection<? extends E> c);						//将c中的元素复制到index处
+			public Iterator<E> iterator() {return new Itr();}									//返回迭代器实现
+			public ListIterator<E> iterator() {return new listIterator(0);}						//返回从头开始的list迭代器实现
+			public ListIterator<E> listIterator(final int index);								//返回从指定索引开始的list迭代器实现
+			public List<E> subList(int fromIndex, int toIndex);									//返回SubList
+			public boolean equals(Object o);													//比较两个list中的元素是否相同。是通过元素的equals方法来判断的。
+			public int hashCode();
+			
+			//私有方法
+			protected void removeRange(int fromIndex, int toIndex);								//移除指定范围内的元素。利用迭代器实现。
+			
+			//内部类
+			private class Itr implements Iterator<E>;
+			private class ListItr extends Itr implements ListIterator<E>;
+		}
 四、具体实现
 	1.ArrayList相关的类
 		这是一个实现了List接口的，大小可变的数组。除了实现List，此类还提供了操作内部用于存储列表数组大小的内存的方法。
@@ -187,7 +248,7 @@
 			public Object[] toArray();					//将ArrayList的数组中的元素给copy到新的数组中，新的数组对象大小为size而非capacity。
 			public <T> T[] toArray(T[] a);				//若数组a足够大(可以容纳size大小的元素)，那么将对象中的所有内容放在a中的最前面(后面的元素不会被修改的)。若a不够大，那么返回一个新的数组，该数组的大小和a相同，可以放多少arraylist中的元素就放多少。
 			public E get(int index);					//等价于elementData[index]，获取指定索引的元素。有范围检查。
-			public E set(int index, E element);			//设置新的元素到指定索引中，返回旧元素。有范围检查。
+			public E set(int index, E element);			//设置新的元素到指定索引中，返回旧元素。有范围检查，要求index在范围内。
 			public boolean add(E e);					//添加一个新元素。添加新元素的时候要进行capacity grow的检查。返回始终为true。
 			public void add(int index, E element);		//在制定的索引出添加新的元素 elementData[index]将为element, index+1到末尾的元素，全部向后移1格。
 			public E remove(int index);					//将index处的元素删除，后面的元素往前顶1个。
@@ -249,3 +310,78 @@
 				public void set(E e);			//将lastRet的索引进行设置，lastRet并不会重置。可以反复设置上一次出来的索引位置的元素。
 				public void add(E e);			//在cursor处添加一个元素，cursor向下移动一格。意思就是cursor并没有指向新添加的元素，而是原来的那个元素。。。
 			}
+	2.LinkedList
+		这是一个双向链表，查询操作是基于从开始或结尾遍历的。
+		public class LinkedList<E>
+			extends AbstractSequentialList<E>
+			implements List<E>, Deque<E>, Cloneable, java.io.Serializable{
+			
+			transient int size = 0;			//指定大小, transient不参与序列化
+			transient Node<E> first;		//第一个节点
+			transient Node<E> last;			//末尾的节点
+			
+			//构造函数
+			public LinkedList();			//空的
+			public LinkedList(Collection<? extends E> c);	//将集合中的元素全部添加到链表中
+			
+			//公共方法
+			public int size();								//直接返回size，链表元素节点/元素个数
+			public E getFirst();							//获得首个元素
+			public E getLast();								//获得末尾元素
+			public E removeFirst();							//删除首个元素，利用unlinkFirst()方法
+			public E removeLast();							//删除末尾元素，利用unlinkLast()方法
+			public void addFirst(E e);						//在起始位置添加元素，利用linkFirst()方法
+			public void addLast(E e);						//在末尾添加元素，利用linkLast()方法
+			public boolean add(E e);						//和addLast等同，始终返回true.在末尾处添加元素
+			public boolean remove(Object o);				//删除元素，通过o.equals判断对象是否相等，相等就删除该节点(利用unlink)。删除的是首个找到的节点。
+			public boolean addAll(Collection<? extends E> c);			//将集合中的所有元素添加到链表尾，利用addAll(index, c)方法.
+			public boolean addAll(int index, Collection<? extends E> c)	//将集合中的所有元素添加到index处。
+			public void clear();										//清空所有节点
+			public E get(int index);									//返回指定索引的元素。通过node(index)找到指定节点，该寻找方法是遍历，然后返回对应的元素。
+			public E set(int index, E element);							//设置index位置处的元素为element。要求index在范围内。
+			public void add(int index, E element);						//在指定索引出添加新元素
+			public E remove(int index);									//删除指定索引的元素，并返回该元素。
+			public int indexOf(Object o);								//返回o的索引，利用o.equals来判断是否存在o，不存在o返回-1。
+			public int lastIndexOf(Object o);							//和indexOf效果一样，不过是从后面开始判断。
+			public boolean contains(Object o);							//判断o是否存在，利用indexOf(o)是否小于0，若小于0那么不存在，否则存在对象。
+			public E peek();											//返回首元素，节点f为null返回null。
+			public E element();											//还是返回首元素，节点f为null抛出异常。
+			public E poll();											//返回首元素，并且删除首元素
+			public E remove();											//删除首元素，并返回该元素。
+			public boolean offer(E e);									//等同于add(e);
+			public boolean offerFirst(E e);								//等同于addFirst(e);
+			public boolean offerLast(E e);								//等同于addLast(e);
+			public E peekFirst();										//取出首元素
+			public E peekLast();										//取出末尾元素
+			public E pollFirst();										//取出并删除首元素
+			public E pollLast();										//取出并删除尾元素
+			public void push(E e);										//等同于addFirst
+			public E pop();												//等同于removeFirst
+			public boolean removeFirstOccurrence(Object o);				//等同于remove(e);删除首个o。
+			public boolean removeLastOccurrence(Object o);				//等同于removeFirstOccurrence, 但是从最后开始。
+			public Object clone();										//把元素全部复制出来。显然，元素都是引用。
+			public Object[] toArray();									//把元素复制出来，放在数组里。元素都是引用。
+			public <T> T[] toArray(T[] a);								//把元素复制到a中，若a太小，则搞个新的a用来保存所有的元素，返回新的a。若a大小够用，就直接在a中填充。
+			public ListIterator<E> listIterator(int index);				//返回从index位置开始的list迭代器。
+			public Iterator<E> descendingIterator();					//返回递减迭代器。
+			
+			
+			//私有方法
+			private void linkFirst(E e);					//创建一个元素为e的新的首节点(在链表头增加元素e)
+			void linkLast(E e);								//创建一个元素为e的新的尾节点(在链表结尾增加元素e)
+			void linkBefore(E e, Node<E> succ);				//插入一个元素为e的新节点在succ的前面
+			private E unlinkFirst(Node<E> f);				//f为首节点，删除f，以下一个节点为首节点，返回刚刚删除节点的元素
+			private E unlinkLast(Node<E> l);				//l为尾节点，删除l，以上一个节点为尾节点，返回刚刚删除节点的元素
+			E unlink(Node<E> x);							//将节点x给删除(通过将x的prev和next节点相连，而绕开x)，返回刚刚删除节点的元素
+			private boolean isElementIndex(int index);		//判断index是否在范围内
+			private void checkElementIndex(int index);		//判断是否在范围内，不在抛出异常
+			Node<E> node(int index);						//返回指定索引的节点，根据索引是在前半部分或是后半部分来决定从起始开始遍历还是从末尾开始遍历
+			private LinkedList<E> superClone();				//???
+			
+			//内部类
+			private class ListItr implements ListIterator<E>;		//list迭代器
+			private static class Node<E>;							//节点实现
+			private class DescendingIterator implements Iterator<E>;//递减迭代器
+		}
+	3.HashSet
+		
