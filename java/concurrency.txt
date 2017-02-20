@@ -197,11 +197,126 @@
 			- 忽略中断继续执行。通过Thread.currentThread().interrupt()可以重置线程的中断位。
 	5.同步工具类
 		1).闭锁
+			闭锁用于确保线程在满足条件的情况下才继续运行，否则阻塞等待。
+			Java使用CountDownLatch实现了闭锁，该类可以使一个或多个线程等待一组事件发生。
+			闭锁的本质是一个计数器，计数器初始化为一个正数，每当一个事件发生闭锁的计数减一，而闭锁的await方法会阻塞线程直到计数到0为止。
+			CountDownLatch gate = new CountDownLatch(n);
+			thread1: gate.await();		//阻塞，直到gate内部计数器到0.
+			thread2: gate.countDown();	//计数器减1.
+			在实际使用过程中，常常会使用双闭锁的策略。一个是起始门，另一个是结束门。
+			起始门用于主线程协调所有的任务线程同时执行任务，结束门用于告知主线程所有的任务线程已经完成。
 		2).FutureTask
+			FutureTask<T>是一个包装器，它包装了一个Callable<T>，并且FutureTask<T>实现了Runnable和Future<T>接口。
+			也就是说，FutureTask<T>将一个Callable<T>转化为了Runnable(FutureTask<T>就是Runnable)，可以直接通过这个FutureTask<T>对象来获得Callable<T>的返回值。
+			FutureTask<T>实现了Runnable，因此可以交给Thread.run()方法运行。
+			FutureTask<T>实现了Future<T>，因此可以通过get()方法获得结果。当任务运行完成，直接获得结果，否则阻塞直到任务完成或是抛出异常。
+			可以通过FutureTask<T>来表示一些任务结果。更进一步，可以作为缓存避免反复计算相同的任务。
 		3).信号量
+			计数信号量，用于控制同时访问某个特定资源的操作数量。许可的初始数量通过构造函数来制定。
+			acquire()方法将阻塞到有许可。
+			release()方法将增加许可。
+			二元信号量又称为互斥信号量，是互斥锁的基本实现。
 		4).栅栏
+			栅栏用于进行线程之间的协调，用于等待其他线程。
+			CyclicBarrier是其Java实现。当现场到达栅栏位置时，将调用await()方法，该方法将阻塞线程知道所有线程都到达栅栏位置(也就是都调用了await方法)。
+			await将会被超时和中断打断。
 	6.构建高效且可伸缩结果缓存
+		缓存接口应该和Map的接口类似：
+		interface IMemoizer<K, V>{
+			V get(K key, Callable<V> callable);		//当key不存在于缓存中时，将会使用Callable进行计算并将结果缓存。
+		}
 
+		class Memorizer<K, V> implements IMemoizer<K, V>{
+			private final Map<K, FutureTask<V>> map = new ConcurrentHashMap<>();		//通过FutureTask表示计算缓存结果或者是任务。
+
+			@Override
+			V get(K key, Callable<V> callable){
+				FutureTask<V> future = map.get(key);
+				if(future == null){
+					newfuture = new FutureTask<V>(callable);
+					future = map.putIfAbsent(key, newfuture);			//没有该任务时添加新任务，若有了则不会添加新任务并且会返回老任务。
+					if(future == null){									//没有老任务
+						future = newfuture;
+					}
+				}
+				return future.get();
+			}
+		}
 九、图形用户界面应用程序
+	GUI线程由EventQueue来进行管理，EventQueue中实现了一个队列，可以将事件添加进去，并且其中有个EDT(Event Dispatch Thread, 事件分发线程)用于读取队列中的任务，并进行执行。
+	这个EventQueue的EDT类似一个只有1个线程容量的线程池。
+	1.swing单线程
+		如果gui使用多线程，容易产生竞争，死锁等问题，因此采用单线程来进行。如果程序员需要使用多线程时，应该自行实现。下面实现一个Swing工具：
+		public class GuiExecutor extends AbstractExecutorSevice{
+			private static final GuiExecutor instance = new GuiExecutor();	//单例
+			private GuiExecutor(){}
+			public static GuiExecutor instance(){ return instance;}
+			public void execute(Runnalbe r){								//gui框架执行任务r，这个r应该是和gui框架紧密结合的
+				if(SwingUtilities.isEventDispatchThread()){					//如果当前线程就是gui框架的单线程，则直接执行.
+					r.run();
+				}else{														//如果当前线程是其余线程，则将该任务放到队列中，而后交由EDT处理。
+					SwingUtilities.invokeLater(r);
+				}
+			}
+		}
+	2.短时间gui任务
+		短时间任务非常简单，可以直接执行解决，不会带来gui框架响应迟钝的情况。
+		button.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				doShortTimeTask();
+			}
+		});
+	3.长时间gui任务
+		长时间任务如果直接运行，那么会很严重人机交互效果，有明显的迟钝现象。因此需要开启多线程，由另一个线程处理，处理的结果需要再交给gui框架进行渲染。
+		1).多线程处理
+			ExecutorService backgroundExec = Executors.newCachedThreadPool();		//线程池，用于执行多线程任务。
 
+			button.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e){
+					button.setEnable(false);
+					backgroundExec.exec(new Runnable(){
+						@Override
+						public run(){
+							Object obj = doLongTimeTask();
+							SwingUtilities.invokeLater(new Runnalbe(){
+								obj结果渲染
+								button.setEnable(true);
+							});
+						}						
+					});
+				}
+			});
+		2).可以取消的多线程处理
+			ExecutorService backgroundExec = Executors.newCachedThreadPool();		//线程池，用于执行多线程任务。
+
+			Future<?> runningTask = null;	//线程封闭
+			startButton.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e){
+					startButton.setEnable(false);
+					runningTask = backgroundExec.submit(new Runnable(){
+						@Override
+						public void run(){
+							try{
+								Object obj = doLongTimeTask();
+							}finally{		//不管是被打断，还是停止了，都执行finally
+								SwingUtilities.invokeLater(new Runnalbe(){
+									startButton.setEnable(true);
+								});
+							}							
+						}
+					});
+				}
+			});
+
+			cancelButton.addActionListener(new ActionListener(){
+				@Override
+				public void actionPerformed(ActionEvent e){
+					if(runningTask != null){
+						runningTask.canncel(true);
+					}
+				}
+			});
 十一、性能与可伸缩性
