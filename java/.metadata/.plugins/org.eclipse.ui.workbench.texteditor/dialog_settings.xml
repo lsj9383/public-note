@@ -2,12 +2,18 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="Itr" key="selection"/>
+		<item value="computeIfAbsent" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="computeIfAbsent"/>
+			<item value="&gt;&gt;&gt;"/>
+			<item value="iterator"/>
+			<item value="contains("/>
+			<item value="contains"/>
+			<item value="set"/>
 			<item value="Itr"/>
 		</list>
 		<list key="replacehistory">
@@ -17,7 +23,7 @@
 		<item value="300" key="DIALOG_WIDTH"/>
 		<item value="1|微软雅黑|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|微软雅黑" key="DIALOG_FONT_NAME"/>
 		<item value="409" key="DIALOG_HEIGHT"/>
-		<item value="541" key="DIALOG_X_ORIGIN"/>
-		<item value="100" key="DIALOG_Y_ORIGIN"/>
+		<item value="1038" key="DIALOG_X_ORIGIN"/>
+		<item value="67" key="DIALOG_Y_ORIGIN"/>
 	</section>
 </section>

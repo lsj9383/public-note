@@ -154,7 +154,63 @@
 			List<E> subList(int fromIndex, int toIndex);	//获得子链表
 		}
 		
-	
+	6.Set接口
+		一种不包含重复元素的集合
+		public interface Set<E> extends Collection<E> {
+			int size();								//set大小
+			boolean isEmpty();						//判断set是否为空
+			boolean contains(Object o);				//判断set是否包含o
+			Iterator<E> iterator();					//返回set的迭代器
+			Object[] toArray();						//返回set中的所有元素的副本
+			<T> T[] toArray(T[] a);
+			boolean add(E e);						//添加新元素
+			boolean remove(Object o);				//移除指定元素
+			boolean containsAll(Collection<?> c);	//判断是否包含c中的所有元素
+			boolean addAll(Collection<? extends E> c);
+			boolean retainAll(Collection<?> c);
+			boolean removeAll(Collection<?> c);
+			void clear();
+			@Override								//???
+			default Spliterator<E> spliterator() {
+				return Spliterators.spliterator(this, Spliterator.DISTINCT);
+			}
+		}
+	7.Map
+		public interface Map<K,V> {
+			int size();								//返回kv对个数
+			boolean isEmpty();
+			boolean containsKey(Object key);		//判断map中的key是否包含指定的key
+			boolean containsValue(Object value);	//判断map中的value是否包含指定的value
+			V get(Object key);						//根据key获得value，如果没有对应的key，返回null
+			V put(K key, V value);					//添加一个新的kv对，若k重复覆盖旧的，并将旧的kv对返回
+			void putAll(Map<? extends K, ? extends V> m);	//将m中的kv对添加到本map中
+			void clear();									//清空kv对
+			Collection<V> values();							//返回值的集合
+			Set<Map.Entry<K, V>> entrySet();				//返回所有的kv对，kv对保存在set中
+			boolean equals(Object o);
+			int hashCode();
+			default V getOrDefault(Object key, V defaultValue);
+			default void forEach(BiConsumer<? super K, ? super V> action);						//做了默认的foreach实现
+			default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function);	//遍历kv对，每次都将kv输入给function，该操作返回一个新的值，该值做为当前kv对的新的value
+			default V putIfAbsent(K key, V value);												//当key不存在的时候才put，否则put失败。put失败将会返回存在的那个kv对的value。
+			default boolean remove(Object key, Object value);									//存在指定的kv对时，将该kv对删除
+			default boolean replace(K key, V oldValue, V newValue);								//将newValue替换掉key-oldValue的value。先找到这个kv对，然后再覆盖。若没有这个kv对那么是操作失败，返回false。
+			default V replace(K key, V value);													//key存在，那么就用value作为其新值。返回旧值
+			default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);	//若key不存在，则将mappingFunction的输出作为value，组建成行的kv对进行put。
+			default V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);	//若key存在，则将remappingFunction的输出作为该key的新的value值。若该values值是null，则删除该kv对。
+			default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);			//将remappingFunction的输出作为value，将kv对进行put。若value是null，则需要确保map中没有该key的kv对。
+			
+			//内部接口类
+			interface Entry<K,V>{					//entry即记录，代表了kv对
+				K getKey();							//获得key
+				V getValue();						//获得value
+				V setValue(V value);				//设置value
+				public static <K extends Comparable<? super K>, V> Comparator<Map.Entry<K,V>> comparingByKey();
+				public static <K, V extends Comparable<? super V>> Comparator<Map.Entry<K,V>> comparingByValue();
+				public static <K, V> Comparator<Map.Entry<K, V>> comparingByKey(Comparator<? super K> cmp);
+				public static <K, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp);
+			}
+		}
 三、抽象类
 	1.AbstractCollection
 		这是一个集合的骨架实现
@@ -384,4 +440,27 @@
 			private class DescendingIterator implements Iterator<E>;//递减迭代器
 		}
 	3.HashSet
-		
+		public class HashSet<E>
+			extends AbstractSet<E>
+			implements Set<E>, Cloneable, java.io.Serializable{
+			
+			private transient HashMap<E,Object> map;				//实际保存元素的内存。HashSet的元素，都是存放在HashMap的key中。
+			private static final Object PRESENT = new Object();		//hashMap是个kv对集合，用该对象代表value。
+			
+			//构造函数
+			public HashSet() {map = new HashMap<>();}				//初始化一个hashmap
+			public HashSet(Collection<? extends E> c);				//初始化一个hashmap，并将集合中的元素复制到当前set中
+			public HashSet(int initialCapacity, float loadFactor);	//指定初始化容量和加载因子，这两个参数用来初始化HashMap
+			public HashSet(int initialCapacity);					//指定初始化容量，这个参数用来初始化HashMap
+			HashSet(int initialCapacity, float loadFactor, boolean dummy);
+			
+			//公共函数
+			public Iterator<E> iterator();							//返回迭代器，实际是map的key值的迭代器。map.keySet().iterator();
+			public int size();										//返回大小，就是map的大小, map.size()
+			public boolean isEmpty();								//返回map.isEmpty
+			public boolean contains(Object o);						//判断set中是否存在对象o，实际上是map.containsKey(o)，即判断map的key是否存在o元素
+			public boolean add(E e);								//添加一个新元素，实际上是map.put(e, PRESENT)，很明显新的元素添加到map的key处，操作成功返回true，否则false。
+			public boolean remove(Object o);						//移除指定的元素，实际上是map.remove(o);操作成功返回true，否则false
+			public void clear();									//清空set的所有元素，实际上是map.clear();
+			public Object clone();									//复制set中的所有元素，返回新的集合。实际上就是调用map.clone()。
+		}

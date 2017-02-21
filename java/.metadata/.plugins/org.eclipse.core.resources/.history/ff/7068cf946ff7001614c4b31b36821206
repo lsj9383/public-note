@@ -1,0 +1,22 @@
+package demo;
+
+import java.util.List;
+
+public class Main {
+
+	public static void main(String[] args) {
+		List lis = null;
+	}
+
+}
+
+
+class Fruit {}
+class Apple extends Fruit {}
+
+class Plate<T>{
+    private T item;
+    public Plate(T t){item=t;}
+    public void set(T t){item=t;}
+    public T get(){return item;}
+}

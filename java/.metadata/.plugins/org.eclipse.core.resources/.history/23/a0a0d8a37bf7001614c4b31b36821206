@@ -1,0 +1,17 @@
+package demo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+
+	public static void main(String[] args) {
+		List<? extends Fruit> flist = new ArrayList<>();
+	}
+
+}
+
+
+class Fruit {}
+class Apple extends Fruit {}
+class Orange extends Fruit{}
