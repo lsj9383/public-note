@@ -274,6 +274,52 @@
 			private class Itr implements Iterator<E>;
 			private class ListItr extends Itr implements ListIterator<E>;
 		}
+	3.
+	4.
+	5.AbstractMap
+		提供了Map骨架实现。
+		要实现不可修改的Map，需要实现其entrySet()方法，返回的Set需要实现AbstractSet并且不应该支持添加删除，其迭代器不应支持remove方法。
+		要实现可以修改的Map，需要覆盖put()方法，否则会抛出不支持异常，并且entrySet()返回的迭代器应该支持remove方法。
+		public abstract class AbstractMap<K,V> implements Map<K,V> {
+			transient volatile Set<K>        keySet;
+			transient volatile Collection<V> values;
+
+			//构造函数
+			protected AbstractMap() {}
+			
+			//公共方法
+			public int size(){return entrySet().size();}		//Map的大小就是entrySet的大小.
+			public boolean isEmpty() {return size() == 0;}		//判断Map是否为空
+			public boolean containsValue(Object value);			//判断Map是否包含Value，利用entrySet().iterator()和value.equals()实现。
+			public boolean containsKey(Object key);				//判断Map是否包含key，利用entrySet().iterator()和key.equals()实现。
+			public V get(Object key);							//返回key对应的value，利用entrySet().iterator()的遍历实现。
+			public V put(K key, V value);						//throw new UnsupportedOperationException();
+			public V remove(Object key);						//删除对应的key-value，并返回原value。利用entrySet().iterator()遍历实现。
+			public void putAll(Map<? extends K, ? extends V> m);//将m的所有内容复制到本Map中。
+			public void clear();								//entrySet.clear()
+			public Set<K> keySet();								//返回keySet，若keySet为空创建一个AbstractSet<K>的匿名类。匿名类中利用keySet.iterator()实现该集合的iterator。
+			public Collection<V> values();						//返回values，若values为空创建一个AbstractCollection<V>的匿名类。原理同keySet()
+			public abstract Set<Entry<K,V>> entrySet();			//留待子类实现。
+			public boolean equals(Object o);					//判断所有的entry是否相同，存在不同就认为这两个Map不同。
+			public int hashCode();								//将所有的entry hashCode相加作为Map的hashCode。
+			
+			//内部类
+			public static class SimpleEntry<K,V>
+				implements Entry<K,V>, java.io.Serializable{
+				private final K key;
+				private V value;
+				
+				public SimpleEntry(K key, V value);
+				public SimpleEntry(Entry<? extends K, ? extends V> entry);
+				
+				public K getKey();
+				public V getValue();
+				public V setValue(V value);
+			}
+			
+			public static class SimpleImmutableEntry<K,V> implements Entry<K,V>, java.io.Serializable;	//相比与上者，这是个不可变类。不具备set方法。
+			
+		}
 四、具体实现
 	1.ArrayList相关的类
 		这是一个实现了List接口的，大小可变的数组。除了实现List，此类还提供了操作内部用于存储列表数组大小的内存的方法。
@@ -281,8 +327,8 @@
 		public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
 			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;	//数组的最大元素个数...
-			private static final int DEFAULT_CAPACITY = 10;			//初始化容量为10
-			private static final Object[] EMPTY_ELEMENTDATA = {};	//???
+			private static final int DEFAULT_CAPACITY = 10;						//初始化容量为10
+			private static final Object[] EMPTY_ELEMENTDATA = {};					//???
 			private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};	//???
 			transient Object[] elementData;		//实际保存元素的数组
 			private int size;		//记录元素个数
@@ -463,4 +509,72 @@
 			public boolean remove(Object o);						//移除指定的元素，实际上是map.remove(o);操作成功返回true，否则false
 			public void clear();									//清空set的所有元素，实际上是map.clear();
 			public Object clone();									//复制set中的所有元素，返回新的集合。实际上就是调用map.clone()。
+		}
+	4.HashMap
+		public class HashMap<K,V> extends AbstractMap<K,V>
+		implements Map<K,V>, Cloneable, Serializable {
+		
+			//static字段
+			static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;		//初始化容量，应该是2的n次方
+			static final int MAXIMUM_CAPACITY = 1 << 30;			//最大容量
+			static final float DEFAULT_LOAD_FACTOR = 0.75f;			//默认加载因子, 用于计算threshold的.
+			static final int TREEIFY_THRESHOLD = 8;					//当一个桶中的链表达到这个数值，考虑采用TreeNode替换。
+			static final int UNTREEIFY_THRESHOLD = 6;				//???
+			static final int MIN_TREEIFY_CAPACITY = 64;				//当桶中的链表达到TREEIFY_THRESHOLD，并且桶个数超过64，那么就用TreeNode替换。
+			
+			//static方法
+			static final int hash(Object key);						//计算key的hash值。计算公式是 hc^(hc>>>16)。hc是key.hashCode()，意味着key的hash仅仅和hashCode()有关，因此hash是否相等看hashCode即可。
+			static Class<?> comparableClassFor(Object x);			//如果x实现了Comparable接口，那么返回x.getClass()，否则返回null;
+			static int compareComparables(Class<?> kc, Object k, Object x);		//当x的类型为kc时，返回k.compareTo(x), 否则返回0;
+			static final int tableSizeFor(int cap);								//对于给定的cap，返回一个2^n大小的容量。有限幅。
+			
+			//实例字段
+			transient Node<K,V>[] table;							//table应该是个Entry-Node数组换句话说，每个数组元素都是个Entry链表。
+			transient Set<Map.Entry<K,V>> entrySet;
+			transient int size;
+			transient int modCount;									//当前HashMap被修改的次数
+			int threshold;											//当size==threshold时，就会Map就会resize，即扩展大小。
+			final float loadFactor;									//threshold = cap * factor
+			
+			//构造函数
+			public HashMap(int initialCapacity, float loadFactor);	//指定了Map的初始容量和加载因子。由于指定的初始容量可能并非2^n，用threshold = tableSizeFor(initialCapacity)来保存一个2^n。
+			public HashMap(int initialCapacity);					//实际调用this(initialCapacity, DEFAULT_LOAD_FACTOR);
+			public HashMap();										//分配一个空的Map，该构造实际操作只有this.loadFactor = DEFAULT_LOAD_FACTOR。
+			public HashMap(Map<? extends K, ? extends V> m);		//???
+			public int size();										//返回大小
+			public boolean isEmpty();								//判断size是否为0
+			public V get(Object key);								//通过getNode(hash(key), key)来得到value
+			public boolean containsKey(Object key);					//通过getNode(hash(key), key)判断是否为null对象来判断是否包含该关键词
+			public V put(K key, V value);							//实质上是调用putVal(hash(key), key, value, false, true);
+			public void putAll(Map<? extends K, ? extends V> m);	//将m中的kv放到当前map中。实际调用putMapEntries(m, true);
+			public V remove(Object key);							//删除关键词为key的节点，利用e = removeNode(hash(key), key, null, false, true)实现，返回被删节点的value。
+			public void clear();									//情况table中的数据。创建新的table，并把以前table中的所有元素置为null。
+			public boolean containsValue(Object value);				//判断是否包含value。访问table数组和每个桶中的所有节点元素，找到一个value就退出。通过value.equals()来找。
+			public Set<K> keySet();									//返回keySet。若实例字段中的keySet为null，那么创建新的keySet，并返回。
+			public Collection<V> values();
+			public Set<Map.Entry<K,V>> entrySet();					//返回entrySet。若实例字段中的entrySet为null，那么创建新的entrySet，并返回。
+			public V getOrDefault(Object key, V defaultValue);		//getNode，若没取到则用defaultValue返回。
+			public V putIfAbsent(K key, V value);					//不存在才put，存在则取消put操作。
+			
+			
+			//私有方法
+			final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict);		//???
+			final Node<K,V> getNode(int hash, Object key);									//通过hash从节点数组(table[(table.length-1)&hash])中获取一个界定啊，然后通过key值(key.equals)来从节点链表中获取一个value。节点也可能是treeNode，那就调用getTreeNode(hash, key);====>hash&(length-1)相当于hash%length
+			final V putVal(int hash, K key, V value, boolean onlyIfAbsent,boolean evict);	//当table为空时，会通过resize()方法初始化一个table。kv对江湖put到这个table中。想通过key的hash取出数组中的链表节点，若该节点为null直接初始化一个链表节点放在该数组处，若链表非空则遍历链表查看是否有相同的，有相同的就替换掉，没有就放到链表节点的末尾。放置完成后，再根据size是否等于threshold来进行resize()。当一个桶中放了过多的元素的时候，可能会转换为treeNode的方式进行存储，这样避免了转换为纯链表。
+			final Node<K,V>[] resize();														//扩容完全就是扩展table数组的长度。capacity和threshold分布扩展一倍，若原table会将原table中的数据全部放到新的table中。由于table数组的长度会影响key存放在哪个桶中，这里需要计每个key在新的table中的通位置。
+			final void treeifyBin(Node<K,V>[] tab, int hash);								//putVal时，若桶中元素过多，会调用该函数，创建treeNode以避免纯链表带来的效率降低。
+			final Node<K,V> removeNode(int hash, Object key, Object value, boolean matchValue, boolean movable)		//支持仅匹配key和匹配kv对两种模式的删除。
+			
+			
+			//内部类
+			static class Node<K,V> implements Map.Entry<K,V>;		//这是一个具备Entry性质的节点。用于组成链表，每一个节点的数据就是Entry的数据，并且称数组的元素为桶。Node的相等判断依赖于key和value，和next的节点无关。
+			final class KeySet extends AbstractSet<K>;				//KeySet。
+			final class Values extends AbstractCollection<V>;		//values。
+			final class EntrySet extends AbstractSet<Map.Entry<K,V>>//entrySet。在这三个类中，并没有维护数据的存放，而是通过实现Iterator。Iterator对象是直接从HashMap的Node中取值的。该类的toString就是由父类实现，并通过iterator来获取值。
+			
+			//内部类迭代器
+			abstract class HashIterator;
+			final class KeyIterator extends HashIterator;
+			final class ValueIterator extends HashIterator;
+			final class EntryIterator extends HashIterator;
 		}

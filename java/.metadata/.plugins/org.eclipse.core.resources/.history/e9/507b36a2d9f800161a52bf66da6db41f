@@ -1,0 +1,19 @@
+package demo;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Map<Fruit, String> properties = new HashMap<Fruit, String>(3);
+		properties.put(new Fruit(), "efg");
+		properties.put(new Fruit(), "efg");
+		properties.put(new Fruit(), "efg");
+		properties.put(new Fruit(), "efg");
+	}
+	
+	class Fruit{};
+
+}
+
