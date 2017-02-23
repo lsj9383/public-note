@@ -1,0 +1,12 @@
+package encoder;
+
+public class App {
+
+	public static void main(String[] args) {
+		
+		String name = "I am 君山";
+		byte[] iso8859 = name.getBytes("ISO-8859-1");
+		
+	}
+
+}
