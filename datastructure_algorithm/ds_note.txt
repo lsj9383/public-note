@@ -1,0 +1,65 @@
+一、表、栈和队列
+	抽象数据类型，是带有一组操作的一些对象集合。就是数学的抽象。比如最贱的Integer就是一个抽象数据类型，它表示类【整数】这一类数，也就是整数的抽象。
+	1.Java Collections API中的ADT
+		1).Collection接口
+			有一组简单的操作:
+				public interface Collection<T> extends Iterable<T>{
+					int size();			//返回项的个数
+					boolean isEmpty();	//个数为0返回true，否则false
+					void clear();		//清空
+					boolean contains(T x);	//判断x是否包含在集合当中
+					boolean add(T x);		//添加操作，若成功返回true，非抛出异常的失败返回false，比如插入重复项可以让add返回false
+					boolean remove(T x);	//删除操作，若成功返回true，非抛出异常的失败返回false，比如删除不存在的项可以让remove返回false
+					Iterator<T> iterator();	//迭代器
+				}
+		2).Ierator接口
+			通过iterator方法，每个集合均可以创建并返回客户一个实现Iterator接口的UI想，并将【当前位置】的概念在对象内部存储起来。可以通过调用next遍历集合。
+			next返回的是下一项。Iterator接口提供简洁的操作。
+				public interface Iterator<T>{
+					boolean hasNext();
+					T next();
+					void remove();
+				}
+			iterator的remove方法非常好用，
+				一方面，collection的remove需要找到对象的具体位置才能删除(比如linkedlist的remove)，但使用iterator是已经保存了最近位置的。
+				一方面，使用iterator时，若对collection对象用了remove add等改变结构的方法， 那么iterator将会失效，切抛出ConcurrentModificationException异常。而使用自带的remove方法不会有影响。
+		3).List接口
+			public interface List<T> extends Collection<T>{
+				T get(int idx);
+				T set(int idx, T nv);
+				void add(int idx, T x);
+				void remove(int idx);
+			}
+			具体说来，list提供了在指定索引上进行操作的方法，而collection是没有索引操作的，collection只能保证对象放在了集合中或是从集合中删除了。
+			list翻译过来就是表，表很明显需要索引操作的。
+		4).ListIterator接口
+			public interface LiistItertor<T> extends Iterator<T>{
+				boolean hasPrevious();
+				T previous();
+				
+				void add(T x);
+				void set(T nv);
+			}
+	2.内部类和嵌套类
+		java结构支持嵌套类和内部类，嵌套类和内部类都指在class中再定义一个class。
+		1).嵌套类
+			static class就是嵌套类，它就是一个类和对象是无关的。它和其外部class相对独立，只是表示结构关系而把它放在里面。
+			如LinkedList的Node类，就是一个嵌套类。Node类仅由LinkedList类使用，因此还是private的。
+		2).内部类
+			不加static的class就是内部类，它是和外部class实例相关的，并依赖其生存。
+			内部类是可以使用外部类的实例域的，因为它和外部类的实例是相关联的。外部类的名字若为Outer，则在内部类中用Outer.this来应用外部类的实例。
+			内部类对象只能由实例方法(非static)来实例化，因为这样才能和进行实例化的那个外部类对象建立关联。
+	3.ArrayList和LinkedList类的实现
+		过于简单就不提了。
+	4.栈的应用
+		栈用ArrayList或是LinkedList来实现，都是非常高效的。
+		1).平衡符号
+			检查一段代码中的{[()]}等成对出现符号的对称问题。
+			出现左符号，如{、[、(。那么将入栈。若出现右符号，就检查栈顶是否为对应的左符号，是则出栈，不是那么不对称，抛出异常。
+		2).后缀表达式
+			后缀表达式，又称逆波兰记法。
+			计算方法非常简单，遇到一个数字就将数字入栈，遇到操作符就将两个数字出栈并将计算结果再入栈。
+		3).中缀到后缀的转换
+			这个稍微麻烦一些。
+			从左往右扫描表达式，遇到数字就输出，遇到操作符就判断栈中是否有优先级高的操作符，若有则将优先级高的操作符出栈直到同级操作符出现。
+			遇到左括弧，则将左括弧进栈，左括弧在栈里是等级最低的，因此除非遇到右括弧其不会出去。当遇到右括弧，将左括弧之前的符号全部输出。左括弧弹出但不输出。
