@@ -63,3 +63,182 @@
 			这个稍微麻烦一些。
 			从左往右扫描表达式，遇到数字就输出，遇到操作符就判断栈中是否有优先级高的操作符，若有则将优先级高的操作符出栈直到同级操作符出现。
 			遇到左括弧，则将左括弧进栈，左括弧在栈里是等级最低的，因此除非遇到右括弧其不会出去。当遇到右括弧，将左括弧之前的符号全部输出。左括弧弹出但不输出。
+			
+二、树
+	对于大量的输入数据，链表的线性访问时间太慢，因此常用二叉查找树(binary search tree)。这是TreeSet和TreeMap实现的基础。大部分操作的时间复杂度平均为o(logN)
+	1.基础知识
+		【树】，就是一个节点，该节点上可以有多个非空的子树，也可以为空。
+		【树叶】，没有子节点的节点，也称为叶节点。
+		【兄弟】，具有相同父亲节点的节点之间称为兄弟。
+		【路径】，从节点n1到nk的路径为其所经过的节点序列n1 n2 n3 ... nk
+		【长】，路径上的边数。自己到直接的长为0，因为0条边。
+		【深度】，节点ni的深度为从根到ni的唯一的路径的长。因此根的深度为0。
+		【高度】，节点ni的高度是ni到【最远】叶节点的长。
+		【祖先】，若n1到n2存在一条路径，那么n1是n2的祖先。
+	2.树的实现
+		节点上出来数据外，还应该有到子节点的连接集合，当然这个集合可以用数组，也可以用链表。通常用的二叉树，因此可以放置直接的连接。但注意，若是多叉树，应该考虑用链表。
+		class Treeode{
+			Object element;
+			TreeNode firstChild;
+			TreeNode nextSibling;
+		}
+	3.树的遍历
+		1)先序遍历
+			对节点的处理工作是在对子节点遍历之前进行的。比如一个打印目录树中所有目录名和文件名的程序，为了更好的显示目录的级别，应该先打印出当前的目录然后在递归打印其子目录和子节点。
+			void process(){
+				processNode(node);
+				for(Node child:node.children){
+					process(child);
+				}
+			}
+		2).后序遍历	
+			顾名思义，节点的处理工作是再对子节点遍历完成之后进行的。这个蛮常用的，经常都要先计算出子节点的情况再来计算当前节点的情况。比如打印每个目录中中文件的个数，只有先递归计算出所有子目录中的文件数才能计算出当前目录中的文件数。
+			void process(){
+				for(Node child:node.children){
+					process(child);
+				}
+				processNode(node);
+			}
+		3).中序遍历
+			中序遍历通常针对二叉树类型的结构，先遍历左子树，然后处理当前节点，最后遍历右子树。这个并不常用。比如可以根据表达式数，生成表达式的中缀表示。
+			void process(){
+				process(node.left);
+				processNode(node);
+				process(node.right);
+			}
+		4).层序遍历
+			这个更为特殊，前面3种遍历方式都属于深度优先搜索，这个属于广度优先搜索。所有深度为d的节点要在d+1的节点之前进行处理。不是递归的，一般使用队列。
+			void process(){
+				queue.enqueue(root);
+				while(!queue.isEmpty()){
+					Node node = queue.dequeue();
+					processNode(node);
+					for(Node child:node.children){
+						process(child);
+					}
+				}
+			}
+	4.二叉查找树(binary search tree)
+		1).二叉树
+			每个节点都不能有多于两个子节点的树。
+			class BinaryNode{
+				Object element;
+				BinaryNode left;
+				BinaryNode right;
+			}
+		2).二叉查找性质
+			首先，得是一个二叉树
+			其次，满足左子树中的所有项的值小于本节点，右子树中的所有项的值大于本节点。
+		3).二叉查找树类
+			public class BinarySearchTree<T extends Comparable<? super T>>{
+				private BinaryNode<T> root;
+				
+				public BinarySerachTree(){
+					root = null;
+				}
+				/**
+				 * 对外开放的公共方法
+				 */
+				public void makeEmpty();
+				public boolean isEmpty();
+				public boolean contains(T x);
+				public T findMin();
+				public T findMax();
+				public void insert(T x);
+				public void remove(T x);
+				public void printTree();
+				
+				/**
+				 * 节点类
+				 */
+				private static class BinaryNode<T>{
+					T element;
+					BinaryNode<T> left;
+					BinaryNode<T> right;
+					
+					BinaryNode(T theElement){
+						this.BinaryNode(theElement, null, null);
+					}
+					
+					BinaryNode(T theElement, BinaryNode<T> lt, BinaryNode<T> rt){
+						element = theElement;
+						left = lt;
+						right = rt;
+					}
+				}
+			}
+			
+			这里需要强调一下<T extends Comparable<? super T>>这个结构，这个结构说的是泛型T应该继承了Comparable这个泛型类。
+			而Comparable这个泛型类中的类型，应该是T的父类。
+			这是因为若某个类实现了泛型类，class A implements Comparable<A>类，那么其子类clas B extends A，B类实现的是Comparable<A>，而不是Comparable<B>。
+			因此Comparable<? super T>正是为了应对B类的情况。
+			总之<T extends Comparable<? super T>>，意味输入的类型T实现了Comparable泛型类，且Comparable泛型类的参数类型是T或者其父类。
+		4).个别方法的实现
+			contains、findMin、findMax都非常简单。
+			a).insert方法
+				这个只需要找到插入的位置即可，但是不做平衡容易降低查询效率。
+				还有个比较特别的是，对于重复插入，可以在节点中保留一个附加于以指示发送的频率。不过一般都是将旧的覆盖掉。
+				普通的插入，都会插入到叶节点。简单来说
+					和当前节点的大小相比，若值小于当前节点，则插入到左子树中。若大于当前节点，则插入到右子树中。直至插入到叶节点上。
+			b).remove方法
+				删除通常考虑采用懒惰删除，当一个元素要被删除时，并不实际将其删除，而是标记其为删除。更广泛的来说，可以留一个附加的域指明该对象元素的个数，这样insert和remove方法直接就在其个数上操作。
+				不过，往往我们也要实际删除的，实际的方法是：
+					删除节点为叶节点，直接置为null。
+					删除节点有一个节点，将该节点给其父节点。
+					删除节点有两个节点，将右节点最小的节点置为该节点，然后再删除右节点中最小的节点(就是删掉刚刚换过去的那个节点)。
+		5).AVL树
+			AVL是三个人的名字，这是一个带有平衡条件的二叉查找树。
+			理想的平衡树，平衡条件要求左子树和右子树具有相同的高度，这太过于严格。
+			AVL树，其平衡条件要求左子树和右子树的高度最多差为1。
+			AVL树，除去插入和删除外，所有的方法都可以以时间O(logN)执行，当插入和删除时，需要更新根节点路径上那些节点的所有平衡信息。插入和删除可能会破坏AVL的树平衡状态。
+			a).旋转
+				对于一个节点a，会造成不平衡的插入主要体现在以下4种情况:
+					i).对a的左儿子的左子树进行一次插入
+					ii).对a的左儿子的右子树进行一次插入
+					iii).对a的右儿子的左子树进行一次插入
+					iv).对a的右儿子的右子树进行一次插入
+				i和iv是镜像的, 采用单旋转。
+				ii和iii是镜像的，采用双旋转。
+				(1).单旋转
+					单旋转的情况比较近简单，既然节点a不平衡了，不是左边高了，就是右边高了，只需要将高的那边往上一提，矮的那边往下一按，这样相对高度就没有了。
+				(2).双旋转
+					这种情况，因为是内部的树过高，内部的是不能简单一次性提起来的。而是需要将内部的树又分为左右子树，将这两棵树往上面接。相当于要做两次单旋转。
+				旋转不是很容易描述，具体看图和程序。
+			b).avl部分实现
+				private static class AvlNode<T>{
+					T element;
+					AvlNode<T> left;
+					AvlNode<T> right;
+					int height;
+					
+					AvlNode(T e){this(e, null, null);}
+					AvlNode(T e, AvlNode<T> lt, AvlNode<T> rt){
+						element = e;
+						left = lt;
+						right = rt;
+					}
+				}
+				(1).插入
+					插入子节点后，判断当前节点是否需要平衡，不平衡就旋转。根据子节点的情况来进行旋转的选择。
+					先判断左右子节点哪边高，高的那边就是有新的子节点插入。假如左节点的树更高，然后判断左节点中的左子树和右子树中哪个更高，就可以判断是插入的左左还是左右。另一边同理。
+					对于具体的编程来说，只需要实现普通的二叉查找树的插入，然后判断当前节点是否平衡，不平衡则旋转。
+				(2).删除
+					删除只需要实现普通二叉查找树的删除，然后判断当前节点是否平衡，不平衡就调整。
+	5.Btree
+		B树常在数据库等技术中使用，若将一个map存储在磁盘中，由于磁盘读写的缓慢会带来大量的延迟。另外，保存在磁盘上的，一般都是大量的数据，例如1kw个entry。若将key通过avl树的形式保存，深度最深有log1kw层，大约是25。因此最坏的情况会读写25次磁盘，读写次数过多，非常缓慢。
+		很明显，只要将层数降低，就能避免最坏情况带来的大延迟。avl树已经非常接近完全平衡的二叉树了，因此二叉树是不能完成该任务的。只能用多叉树。
+		1).M阶的B数具有以下特点:
+			a).数据存储在叶节点上。(非叶结点不保存数据，仅保存关键词)
+			b).非叶节点上可以保存的关键词个数<=M-1
+			c).根节点要么全是叶节点，要么是[2, M]个子节点。
+			d).非根非叶的节点，其子节点个数范围是[M/2, M]。
+			e).所有的输液都在相同的深度上存在[L/2, L]个数范围内的数据项。
+			另外，关键词的特性是，节点上的关键词i，是该节点i+1子树中的最小值。很明显，B树是通过比较关键词大小来进行子节点选择的。
+		2).M和L的计算
+			每个节点代表一个磁盘区块，意思就是说，要调整L和M，使每个节点的大小可以容纳与一个磁盘区中。
+			现在设1个关键词大小为keyBytes，1个值大小为valueBytes，一个区块大小为blockSize。
+				一个key节点上有M-1个关键词，那么一个关键词节点占大小(M-1)*keyBytes，那么有M = blockSize/keyBytes + 1。
+				一个value节点上上有L个数据项，那么一个value节点占大小valueBytes*L，那么有L = blockSize/valueBytes。
+				最坏的情况是logN / log(M/2)
+		3).算法
+			对应的插入和取出算法就不给出了。取出相对简单，插入需要进行平衡的调整。

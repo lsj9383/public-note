@@ -1,5 +1,5 @@
 package com.lsj.util;
 
-public interface LIterable {
-
+public interface LIterable<T> {
+	LIterator<T> iterator();
 }

@@ -1,0 +1,18 @@
+package com.lsj.util;
+
+import java.util.Iterator;
+
+public interface LList<T> extends LCollection<T>{
+	/* 从LCollection中继承的方法 */
+	int size();
+	Iterator<T> itertor();
+	boolean contains(T o);
+	boolean add(T nv);
+	boolean remove(T o);
+	
+	
+	/* 新的方法 */
+	void add(int idx, T nv);
+	void remove(int idx);
+	void set(int idx, T nv);
+}

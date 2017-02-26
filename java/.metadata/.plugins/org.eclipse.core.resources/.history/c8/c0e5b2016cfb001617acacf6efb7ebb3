@@ -1,0 +1,11 @@
+package com.lsj.util;
+
+public interface LIterator<T> {
+	
+	boolean hasNext();
+	T next();
+	default void remove(){
+		throw new UnsupportedOperationException("remove");
+	}
+
+}

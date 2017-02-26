@@ -1,0 +1,18 @@
+package com.lsj.util;
+
+public interface LIterator<T> {
+	
+	/**
+	 * 判断是否存在下一个元
+	 * 
+	 * @return true or false
+	 */
+	boolean hasNext();
+	
+	T next();
+	
+	default void remove(){
+		throw new UnsupportedOperationException("remove");
+	}
+
+}

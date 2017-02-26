@@ -12,4 +12,8 @@
 	<section name="UseSupertypeWizard">
 		<item value="false" key="rewriteInstanceOf"/>
 	</section>
+	<section name="InferTypeArguments">
+		<item value="true" key="leaveUnconstrainedRaw"/>
+		<item value="true" key="assumeCloneReturnsSameType"/>
+	</section>
 </section>
