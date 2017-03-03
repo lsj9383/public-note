@@ -1,7 +1,0 @@
-<configuration>
-<!-- 指定mr框架为yarn方式 -->
-<property>
-	<name>mapreduce.framework.name</name>
-	<value>yarn</value>
-</property>
-</configuration>	
