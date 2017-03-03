@@ -1,0 +1,74 @@
+package com.lsj.util;
+
+public class BinarySearchTreeMap<K, V> implements LMap<K, V> {
+
+	private int size = 0;
+	
+	@Override
+	public int size() {
+		return size;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return (size == 0);
+	}
+
+	@Override
+	public boolean containsKey(Object key) {
+		return false;
+	}
+
+	@Override
+	public boolean containsValue(Object value) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public V get(Object key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public V put(K key, V value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private V getNode(K key){
+		
+	}
+
+	@Override
+	public LCollection<V> values() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	static private class Node<K, V>{
+		K key;
+		V val;
+		Node<K, V> lft;
+		Node<K, V> rgt;
+		
+		Node(K key, V val){
+			this(key, val, null, null);
+		}
+		
+		Node(K key, V val, Node<K, V> lft, Node<K, V> rgt){
+			this.key = key;
+			this.val = val;
+			this.lft = lft;
+			this.rgt = rgt;
+		}
+	}
+	
+}

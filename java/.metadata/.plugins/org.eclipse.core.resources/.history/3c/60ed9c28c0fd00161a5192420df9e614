@@ -1,0 +1,5 @@
+package com.lsj.util;
+
+public class AVLMap<K, V> implements LMap<K, V>{
+
+}

@@ -182,6 +182,7 @@
 			boolean containsKey(Object key);		//判断map中的key是否包含指定的key
 			boolean containsValue(Object value);	//判断map中的value是否包含指定的value
 			V get(Object key);						//根据key获得value，如果没有对应的key，返回null
+			V remove(Object key);					//删掉一个，并且返回删掉的这个节点的value。
 			V put(K key, V value);					//添加一个新的kv对，若k重复覆盖旧的，并将旧的kv对返回
 			void putAll(Map<? extends K, ? extends V> m);	//将m中的kv对添加到本map中
 			void clear();									//清空kv对
