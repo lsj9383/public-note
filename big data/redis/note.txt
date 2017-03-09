@@ -1,0 +1,203 @@
+一 简介
+    开源免费，遵循BSD协议.是一种面向"key/value"的【内存】数据库。
+    1.特点:
+        1).数据持久化，重启的时候可以再次加载并进行使用。
+        2).支持主从结构(master-slave, 负载均衡， 高可用)。
+        3).支持持久化。
+        4).集群。
+    2.优势:
+        1).性能高，读速度是11W次/s，写速度是8.1w次/s。
+        2).丰富的数据类型支持。
+        3).原子性，所有操作都是院子的。
+        4).其他特性，支持publish/subscribe, 通知, key过期等。
+    3.安装和使用
+        1).安装
+        2).服务端
+            默认有16个数据库 0~15，数据库数量在再配置文件中有配置。数据库名称只能说数字，不能是字符串。
+        3).客户端
+            redis-cli -h <server-ip> -p <port> 连接到服务器，并进入redis控制台。默认进入0号数据库。
+            redis-cli 等价于 redis-cli -h 127.0.0.1 -p 6379 写死了的。
+            redis-cli shutdown 或是在redis-cli控制台下执行shutdown，关掉服务端redis进程。
+            select 1，进入1号数据库。
+            quit    退出redis控制台
+        4).基础指令
+            keys <通配符>  查询数据库中满足通配符的所有key，*代表任意字符，?代表1个任意字符，[0-9]代表1个数字
+            del <key>       删除一个kv对，返回删除了几个
+            exists <key>    判断是否存在这个键
+            type <key>      返回key所对应的value类型
+            help @<GROUP>   操作指定GROUP所涉及到的所有方法，GROUP是数据类型名称，比如string。
+    4.值支持的数据类型
+        1).String
+            redis是kv数据库，key仅支持string。
+            值支持String，由于String是二进制安全的，因此也可以用来保存字节数组。
+            String buffer = new String(originData);     //解码，将模式编码模式转换为Unicode。
+            byte[] recoverData = buffer.getBytes();     //编码，将Unicode的字节数据转换为默认编码模式的字节数据。
+        2).Hash
+            值可以是HashMap。
+        3).List
+            值也可以是List。
+        4).Set
+            值还可以是Set，不重复，无序。
+        5).zset
+            值也能使Zset，不重复，有序。
+        6).HyperLogLog
+            很少用。
+    5.配置
+        配置文件是安装目录下的redis.conf。
+        可以通过CONFIG命令 查看 或 设置 命令项。
+        1).读取配置
+            CONFIG GET * 获得所配置项。
+            CONFIG GET <config-key> 可以获取对应名字的配置项。
+        2).编辑配置
+            CONFIG SET <config-key> <config-value> 将对应名字的配置设置为<config-value>
+二 指令
+    以下指令和数据类型是强相关的，每个指令操作的数据类型是固定的。
+    若指令对应的数据类型是不对的，那么将会报错，不过set指令比较特殊，会无视<value>，直接用新的<string-value>覆盖。
+    1.String相关指令
+        set <key> <string-value> 设置<key>的value为<string-value>。若<string-value>中有空格，可以用冒号来标识。
+        append <key> <string-value> 在<key>的<value>后面拼接一个字符串。
+        mset <key1> <string-value1> <key2> <string-value2> ...    设置多个键值对
+        setnx <key> <string-value> 键存在则赋值，否则放弃
+        incr <key> 递增，只要<string-value>数据可以转换为数字，那么是可以递增和递减的，非数字则失败。
+        decr <key> 递减。
+        incrby <key> <number>  每次递增<number>, number不能是小数。
+        decrby <key> <number>  每次递减<number>, number不能是小数。
+        incrbyfloat <key> <number> number可以是小数。
+    2.hash
+        hash中可以保存多个键值对，这里面的键值类型只能说【string】。
+        hset <key> <hash-key> <hash value> 在<key>中添加一对<hash-kv>键值。
+        hget <key> <hash-key> 获取<key>对象中<hash-key>的<hash-value>。
+        hexists <key> <hash-key> 判断<key>中的<hash-key>是否存在。
+        hdel <key> <hash-key> 删除<key>中的<hash-key>。
+        hkeys <key> 获得<key>中的所有的键。
+        hkeys <key> 获得<key>中所有的值。
+        hlen <key> 获取<key>中有多少个字段。
+    3.list
+        lpush <key> <list-value1> <list-value2> ... 往<key>的左边中添加指定的元素集合。
+        lpop <key> 从<key>的左边弹出元素，相当于出栈。
+        rpush <key> <list-value> 往<key>的右边中添加元素。
+        rpop <key> 从<key>的右边弹出元素，相当于出栈。
+        lrange <key> <index1> <index2> 获取下标index1到index2的元素，index若是负数，则代表倒数第index个元素。-1就代表倒数第一个元素(最后的元素)。
+        llen <key> 获得<key>列表的长度
+        lrem <key> <count> <list-value> 删除左边的count个<list-value>，若count为负数，那么就是删除右边的|count|个<list-value>，若count为0，那么把列表中的<list-value>清空。
+        linsert <key> <before/after> <value-in-list> <new-list-value> 在指定的值前面或者后面插入数据。
+        rpoplpush <key1> <key2> 将表<key1>的末尾元素，插入到表<key2>的左边。
+        ltrim <key> <index1> <index2> 将表<key>的范围内元素截取出来作为这个表的值。
+    4.set
+        相比list，存储内容是一样，但是set唯一的，且是无序的。
+        sadd <key> <set-value>  往集合<key>中添加元素。
+        smembers <key>  显示集合<key>中的所有元素，和插入顺序无关。
+        srem <key> <set-value> 从集合<key>中删除元素。
+        sdiff <key1> <key2> 把集合<key1>中有的元素，而<key2>中没有的元素返回。
+        sinter <key1> <key2> 求两个集合的交集。
+        sunion <key1> <key2> 求两个集合的并集。
+        sinterstore <save-key> <key1> <key2> 将交集结果保存到<save-key>集合中。
+        sunionstore <save-key> <key1> <key2> 将并集结果保存到<save-key>集合中。
+        scard <key> 计算结果中的元素个数。
+        srandmembers <key> <num> 随机从集合中取出指定数量的元素。num若是正数，保证返回的元素是不同的，num若是负数，返回的元素可能是相同的。
+    5.zset
+        zadd <key> <score> <value> 往集合中添加指定【分值】的元素，拍下是根据这个分值来排序的。
+        zscore <key> <value> 得到集合中指定元素的分值。
+        zrange <key> <index1> <index2>     得到集合中的元素，升序。
+        zrevrange <key> <index1> <index2>  得到集合中的元素，降序。
+        zrangebyscore <key> <score1> <score2> 得到集合中分值范围内的元素。
+        zcard <key> 返回集合中的元素格式。
+        zrem <key> <value> 删除集合中的指定元素。
+        zremrangebyrank <key> <index1> <index2> 删除下标范围内的元素。
+        zremrangebyscore <key> <score1> <score2> 删除分值范围内的元素。
+        +inf 意味着 正无穷的分值。
+        -inf 意味着 负无穷的分值。
+    6.其他指令
+        expire <key> <s> 设置<key>的生存时间
+        pexpire <key> <ms> 毫秒级设置
+        ttl <key>   返回<key>的生存时间，倒计时阶段大于-1，若为-1则<key>不作倒计时，若为-2则不长脑子
+        pttl <key> 毫秒级显示
+        persist <key> 取消生存时间，不作倒计时
+        sort <key> 将<key>列表里面的数据 排序显示，默认升序，后加desc代表降序，后面加store <key>可以将排序结果放到新的<key>中
+        sort <key> by <key通配符> by后面是<key>排序的参考键，参考的排序值是<key>中的元素放到<key通配符>对应的value
+            sort list by stu:*, 安装stu:*表的数据进行拍下，stu:*是个String
+            sort list by stu:*->score, 按照stu:*所有表的score进行排序，这里的stu:*表是个hash
+            sort list by stu:*->score get # get stu:*->score， 排序list，并根据结果显示对应的stu:*->score的数据。如果不加get #只会显示get后面的字段，get #代表获取元素本身。
+            
+三 事务
+    是一组命令的集合，事务是最小执行单位，要么都执行，要么都不执行，主要是想保证其原子性，相当于同步。
+    multi 开启事务
+    事务期间的操作，都不进行操作，需要等到提交的时候才执行。(包括get指令，是无法读取到数据的)
+    exec 事务结束, 相当于提交事务，将期间的命令进行执行。
+    错误处理:
+        1).语法错误，致命错误，直接放弃事务内的所有操作。
+        2).运行错误，不会影响事务其他命令的错误。
+    watch <key> 监听关键词是否被修改，当执行完一个事物，将会取消掉key的监控状态，若被修改下一个在事物中修改该值将不会成功，再下一个事务又可以修改了。
+四 发布订阅模式
+    subscribe <key> 订阅一个频道(字段)，将会一直等待频道的消息。
+    publish <key> <msg> 向订阅的频道发送消息，订阅该频道的客户端将会收到消息。
+    订阅的时候，可以通过通配符可以订阅满足通配符的频道。
+五 管道
+    不用管道指令，客户端执行多条指令，需要一条一条的发送请求，并且获取回应，交互次数较多。
+    使用管道指令，一次请求中包含了多条指令，将多次交互压缩成两次交互。
+    Pipeline pipeline = jedis.pipelined();
+    pipleline.set...;
+    List<Object> syncAndReturn = pipeline.syncAndReturnAll();
+    管道要求多条命令之间是彼此独立的，也因此不应该认为管道操作是原子的，这和事务不同。
+六 持久化
+    两种持久方式，每次重新启动都会读取持久化的数据加载到数据库里面。
+    1.RDB方式(默认)
+        通过快照完成。当符合一定条件，会自动将内存中的所有数据执行快照操作，保存在redis根目录下的dump.rdb。
+        在启动redis时，会自动将dump.rdb读取出来恢复数据。
+        快照条件:
+            1).自动备份
+                900s 只要有1个修改，就会备份。
+                300s 有10个修改，就会备份。
+                60s  有1k个修改，就会备份。
+                在配置文件中修改:
+                    save 900 1
+                    save 300 10
+                    save 60 1000
+            2).手动备份
+                bgsave 在后台运行备份，不会阻塞。
+                save 在前台运行备份，会阻塞。
+        快照机制:
+            fork，拷贝副本进程，父进程继续处理客户端的命令，而子进程将内存中的所有数据写入到硬盘的临时文件中，
+            临时文件写完后，才会替换dump.rdb.
+    2.AOF方式
+        是一种日志记录方式，服务器的redis会将所有会影响数据库内容的命令都记录下来，这样子只要在redis开启的时候，将以前的命令执行一次，就会恢复最后的数据。
+        通过在配置文件中设置appendonly.aof开启。日志文件保存在redis根目录的appendonly.aof文件中。
+        机制:
+            默认每秒进行一次同步。即将所有的键写入到aof文件中。
+            在配置文件中通过appendfsync aways 可以在每次指令时，都会将指令放到日志文件中。
+            配置文件设置appendfsync no 不主动进行同步，有操作系统30s同步一次。
+            在适当时机还会进行重写，会查看数据库当前时刻的kv，并进行记录set k v，以忽略之前的指令，用于减少日志文件大小。
+            至于重写时机，日志文件达到64M 或者 ，也可以通过bgrewrited手工重写。
+    若两种方式都开启了，会默认使用aof方式，这是因为aof可以保证数据库的【完全】恢复。
+三 基本编程
+    1.jedis类
+        public void test1(){
+            Jedis jedis = new Jedis(host, port);
+        }
+
+        public void test2(){
+            JedisPoolConfig poolConfig = new JedisPoolConfig();
+            poolConfig.setMaxTotal(100);        //总连接数
+            poolConfig.setMaxIdle(10);          //空闲连接数
+            poolConfig.setMaxWaitMillis(3000);  //创建连接的超时时间
+            poolConfig.setTestOnBorrow(true);   //在创建连接时会测试
+            JedisPool jedisPool = new JedisPool(poolConfig, host, port);
+            Jedis jedis = jedisPool.getResource();  //从连接池中获得jedis
+            ...
+            jedisPool.returnResourceObject(jedis);   //返回给连接池
+        }
+        使用连接池主要有两方面原因:
+            1).虽然redis操作是原子的，但是jedis并不是线程安全的，他提供的方法是有现场安全的。虽然用不同的jedis，但jedis本质上是发送请求到服务器，服务器执行redis的操作是原子的。
+            2).连接池的创建较为花时间，因为有大量的通信操作，因此最好缓存起来。
+    2.事务
+        public void incr(){
+            jedis.watch("<key>");
+            Transaction multi = jedis.multi();
+            multi.set("<key>", <value>);
+            List<Object> exec = multi.exec();
+            if(exec==null || exec.size==0){
+                incr();
+            }
+        }
+        在当前线程(jedis)中，执行了watch后，<key>将会被监控，用于确定在下一个事务期间<key>未被修改，若被修改，那么事务将会失败。执行完一个事务后，<key>的值会取消watch。也因此需要循环执行，这里是通过递归来循环的。
+        总而言之，watch监听<key>在下次事务的时间内，是否被修改了。

@@ -465,3 +465,58 @@ CLASS_PATH就是import的路径，换句话说，就是程序里面使用的class的路径。
 		* 无界通配符
 			<?>即无界通配符，无界通配符可以被认为是装饰，但它也有其价值，主要是想程序员声明之用，就像是注释。
 			声明了“本来想用泛型来编写这段代码，但是在当前这种情况下，泛型参数可以持有任何类型”。和原生类型不同的是，<?>声明的泛型类对象，不可以调用涉及了泛型参数的方法。
+* 序列化
+	对象都可以作序列化，但是前提是对象的类需要实现Serializable接口，这样对象才能支持序列化。
+	若没有实现Serializable，则会抛出java.io.NotSerializableException异常。
+	需要注意的是，对象的序列化是会将实例引用也进行序列化的，这样需要引用的对象实现了序列化接口，否则也会抛出异常。
+	1.序列化版本
+		类中可以指定serialVersionUID，这个是用来检测类版本是否一致的。
+		在反序列化的时候，会将字节流中的serialVersionUID与本地相应实体了的serialVersionUID进行比较，如果版本不同，则会出现序列化不一致并抛出异常。
+	2.序列号
+		用于解决对象引用的问题。
+		在序列化一个对象时，对其中的引用也会进行序列化，并且每个对象都会分配一个序列号。在一次序列化过程中，当第一次遇到这个序列号，会将对象序列化保存，若第二次遇到这个序列号时，则不会保存该对象了，因为之前已经保存过了，而是保存序列号以标定使用的是哪个对象。
+	3.transient
+		用于声明对象中的实例的，声明为transient的实例，是不会被序列化的，并以null代替(若是int double等基本数据，则用0代替)。
+
+* jdk动态代理
+	jdk动态代理，会通过字节码生成的方式来生成一个实现指定接口的对象，并且这个对象中有一个Handler对象，Handler对象用来拦截对这个对象的所有调用。一个动态代理对象的反java代码形如下所示:
+	1.动态代理对象形式
+		public Proxy implements IA{
+			InvocationHandler handler;
+			
+			@Override
+			void method1(){
+				handler.invoke(this, IA.interfaceObject.getMethod("method1", <parameter>), null);
+			}
+			
+			@Override
+			String method2(int a){
+				return handler.invoke(this, IA.interfaceObject.getMethod("method1", <parameter>), null);
+			}
+			
+			...		//把接口中的方法都进行了重写
+		}
+	2.InvocationHandler
+		既然是代理，那肯定有个原始对象，而在上述形式中并未看到会代理的原始对象，那么原始对象是放在哪里的呢？答案是一般放在处理器Handler中的。
+		public class ProxyHandler implements InvocationHandler{
+			Object object;		//保存原始对象
+			
+			public DrocProxyHandler(Object object){
+				this.object = object;	//交给Handler原始对象
+			}
+			
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				....
+				Object result = method.invoke(object, args);
+				...
+				return result;
+			}
+		}
+	3.生成动态代理对象，并交给它处理器
+		Object ori = new Object();
+		Object obj = 
+				Proxy.newProxyInstance(
+						ClassLoader,					//用来加载目标类的类加载器。
+						new Class<?>[]{...},			//重写的接口。
+						new ProxyHandler(origin));		//这里交给动态对象Handler，并且指定了Handler的原始对象，也就是会被代理的对象。
