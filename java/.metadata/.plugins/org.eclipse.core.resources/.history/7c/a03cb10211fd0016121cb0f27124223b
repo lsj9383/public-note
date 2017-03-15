@@ -1,5 +1,0 @@
-package LAbstractList;
-
-public interface LIterable<T> {
-	LIterator<T> iterator();
-}

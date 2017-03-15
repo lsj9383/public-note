@@ -1,6 +1,0 @@
-package com.lsj.util;
-
-public interface LList extends LCollection{
-	/* 从LCollection中继承的方法 */
-	boolean add(int idx);
-}

@@ -1,5 +1,0 @@
-package com.lsj.util;
-
-public abstract class LAbstractLis implements List{
-
-}

@@ -1,9 +1,0 @@
-package com.lsj.util;
-
-public interface LQueue<T> {
-	int size();
-	boolean isEmpty();
-	boolean add(T element);	//入队
-	T poll();				//出queue，若queue为空，则返回null
-	T remove();				//和poll一样，但是若queue为空，则抛出异常
-}

@@ -11,18 +11,24 @@
         4).Resource
             有多种Resource，有的基于Classpath，有的基于FileSystem，通过Resource类，将不同资源获取inputstream的接口统一。
     2.spring架构
-        1.ApplicationContext
+        1).ApplicationContext
             ApplicationContext中有一个BeanFactory，且是ResouceLoader的一个子类
             在refresh时，都会把之前用的BeanFactory销毁掉，创建一个新BeanFactory。还是会创建一个XmlBeanDefinitionReader，用来读取Xml文件的BeanDefinition并缓存起来。
             ApplicationContext的loadBeanDefinition方法，实际上就是创建Reader，然后拿到自己实现的Resource，再将Resource和beanFactory交给Reader进行loadBeanDefinition。
-        2.Reader
+        2).Reader
             Reader，这里面有ResourceLoader，BeanFactory等对象，Reader执行loadBeanDefinitions后，将会把指定location中的bean生成BeanDefinition并交给beanFactory。
             需要强调的是，ResourceLoader就是ApplicationContext实例本身，因为这个实例是ResourceLoader的子类，并且实现了自己需要的Resource获取。
-        3.Resource
-        4.DefaultListableBeanFactory
+        3).Resource
+        4).DefaultListableBeanFactory
             这个类中有个HashMap保存了所有的BeanDefinition，Reader读取解析出BeanDefinition后，应该就交给它了。更正确的说，在Reader得到一个BeanDefinition后，将会使用beanFactory的registerBeanDefinition(beanName, beanDefinition)来注册beanDefinition。这样Reader解析完所有的BeanDefinition，并向beanFactory中注册beanDefinition，就完成了IoC容器的初始化过程，是后面依赖注入的基础。
     3.IoC依赖注入
-        发生依赖注入的过程，是用户第一次向IoC容器所要Bean时触发，即用到哪个对象再实例化哪个对象，当然它所依赖的对象也会实例化。也可以用lazy-init属性来让容器完成Bean的预实例化，即在容器初始化完成时就进行实例化。
+        发生依赖注入的过程，是用户第一次向IoC容器所要Bean时触发，即用到哪个对象再实例化哪个对象，当然它所依赖的对象也会实例化。
+		lazy-init，延迟初始化控制了是否在上下文初始化完成时，遍历getBean来进行初始化。为false时会在上下文完成时进行预初始，为true时会在首次用户调用getBean时进行初始化。默认为false。
+		1).getBean
+		2).createBean
+		3).lazy-init
+		4).factoryBean
+		
 二 Spring MVC
     1.ContextLoaderListener
         这个是在web.xml中配置的监听器，在加载springmvc的bean之前，会先通过该监听器加载一些用户定义的bean。在这里面形容的容器，被称为【根上下文】

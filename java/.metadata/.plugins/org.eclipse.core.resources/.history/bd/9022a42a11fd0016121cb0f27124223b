@@ -1,7 +1,0 @@
-package com.lsj.util;
-
-import java.util.Collection;
-
-public class LAbstractCollection implements Collection<E>{
-
-}
