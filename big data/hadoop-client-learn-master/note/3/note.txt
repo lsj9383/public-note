@@ -21,7 +21,7 @@
 			reducer是在接收完所有mapper输出的数据后，才执行的。因此reducer将缓存大量的key-value.
 			reducer在接收完key-value后，会对key-value进行预处理:
 				预处理筛选出所有相同的key，将其value保存在一个集合中，用迭代器进行表示。
-				会将数据按key排序(字典顺序)。
+				会将数据按key排序(字典顺序)。+
 				最后reducer的输入将会是key-values.
 		3).序列化
 			这些key和value都是对象，要走网络，要序列化。

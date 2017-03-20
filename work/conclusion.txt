@@ -8,6 +8,8 @@
             dao层的服务应该是数据库中最基本，最底层的服务，比如crud。service将会使用多个dao方法来完成服务。
     2.sql助手
         在web开发时，可以为了方便写sql语句，可以写个sql助手，利用数据库系统表来生成各表的crud语句。
+    3.excel解析
+        通过poi.jar进行excel表格的数据解析，将解析的结果封装为model放到数据库中。
 二 安全与用户体验
     1.防止xss攻击
         需要添加给所有的url添加要给过滤器，该过滤器中将request封装在HttpServletRequestWrapper类中，

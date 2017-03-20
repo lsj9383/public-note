@@ -71,7 +71,7 @@
 								....................--------> fetch------------------>|---->merge--->reducer--->output
 								                                     partition2       |
 								....................--------> fetch------------------>|
-											  
+	split : 就是map task处理进程的东西，每个split交给一个map task处理，也就是说有多个split就有多少个map task。split将block进行了划分。
 	buffer in memory :	本地内存区域。默认100M(io.sort.mb)，map输出的内容很可能大于100M，也就是缓存不下。
 						具体来说，达到阈值0.8(io.sort.spil.percent)，就属于达到缓存顶点。
 						缓存不下就溢出到本地磁盘中的小文件。小文件大小有限制，写满一个小文件就写一个新的小文件。
@@ -93,10 +93,16 @@
 		h.输出到文件。
 		
 	3).mapreduce其他组件：
-		IO:
-			InputFormat: 接口。有个默认的InputFormat，处理方式就是一行一行读取，key是起始偏移量，value是这一行的数据。
-			OutputFormat:接口。 将有个默认的OutputFormat，这里面包括了写出的文件名。文件的位置默认也是在hdfs中。
-			可以换自定义这些IO组件。
+		InputFormat: 接口。有个默认的InputFormat，处理方式就是一行一行读取，key是起始偏移量，value是这一行的数据。
+		OutputFormat:接口。 将有个默认的OutputFormat，这里面包括了写出的文件名。文件的位置默认也是在hdfs中。
+		当job没有指定使用哪个InputFormat和OutputFormat时，会采用TextInputFormat和TextOutputFormat，这是mr的默认处理类，针对的是普通文件。
+		1).InputFormat
+			文中每一行作为一个kv记录，key是每一行在文件中的起始偏移，每一行的内容为value。也就是说默认以\n作为一行记录。
+		2).自定义io组件
+			继承FileInputFormat，重写里面的getSplits(JobContext context)方法，重写createRecordReader(InputSplit split, TaskAttemptContext context)方法。
+	4).split
+		在mapreduce开始前，原始数据会被分割为若干个split，每个split作为一个map任务输入，在map用户代码执行前，split又会被分割为一条条的记录(kv对)，map依次处理每条记录。
+		一个split，就对应了一个map task进程。
 		
 4.并发map
 	在计算mapreduce计算计算文件夹时，这个文件夹下的所有文件都会被计算。
