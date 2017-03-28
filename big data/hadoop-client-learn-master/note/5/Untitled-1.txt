@@ -1,0 +1,109 @@
+package demo;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) throws Exception {
+		Scanner input = new Scanner(System.in);
+		String ops = input.next();
+		input.close();
+		
+		Map<String, Integer> status = new HashMap<String, Integer>();
+		status.put("左", 1);
+		status.put("右", 2);
+		status.put("前", 3);
+		status.put("后", 4);
+		status.put("上", 5);
+		status.put("下", 6);
+		
+		for(int index=0; index<ops.length(); index++){
+			char op = ops.charAt(index);
+			switch(op){
+			case 'L':left(status);break;
+			case 'R':right(status);break;
+			case 'F':forward(status);break;
+			case 'B':backward(status);break;
+			case 'A':arot(status);break;
+			case 'C':crot(status);break;
+			default:break;
+			}
+		}
+		
+		System.out.println(String.format("%s%s%s%s%s%s", status.get("左"),status.get("右"),status.get("前"),status.get("后"),status.get("上"),status.get("下")));
+	}
+	
+	static private void left(Map<String, Integer> status){
+		Integer left = status.get("左");
+		Integer right = status.get("右");
+		Integer top = status.get("上");
+		Integer bottom = status.get("下");
+		
+		status.put("左", top);
+		status.put("右", bottom);
+		status.put("上", right);
+		status.put("下", left);
+	}
+	
+	static private void right(Map<String, Integer> status){
+		Integer left = status.get("左");
+		Integer right = status.get("右");
+		Integer top = status.get("上");
+		Integer bottom = status.get("下");
+		
+		status.put("左", bottom);
+		status.put("右", top);
+		status.put("上", left);
+		status.put("下", right);
+	}
+	
+	static private void forward(Map<String, Integer> status){
+		Integer forward = status.get("前");
+		Integer backword = status.get("后");
+		Integer top = status.get("上");
+		Integer bottom = status.get("下");
+		
+		status.put("前", top);
+		status.put("后", bottom);
+		status.put("上", backword);
+		status.put("下", forward);
+	}
+	
+	static private void backward(Map<String, Integer> status){
+		Integer forward = status.get("前");
+		Integer backward = status.get("后");
+		Integer top = status.get("上");
+		Integer bottom = status.get("下");
+		
+		status.put("前", bottom);
+		status.put("后", top);
+		status.put("上", forward);
+		status.put("下", backward);
+	}
+	
+	static private void arot(Map<String, Integer> status){
+		Integer forward = status.get("前");
+		Integer backword = status.get("后");
+		Integer left = status.get("左");
+		Integer right = status.get("右");
+		
+		status.put("前", left);
+		status.put("后", right);
+		status.put("左", backword);
+		status.put("右", forward);
+	}
+	
+	static private void crot(Map<String, Integer> status){
+		Integer forward = status.get("前");
+		Integer backward = status.get("后");
+		Integer left = status.get("左");
+		Integer right = status.get("右");
+		
+		status.put("前", right);
+		status.put("后", left);
+		status.put("左", forward);
+		status.put("右", backward);
+	}
+}

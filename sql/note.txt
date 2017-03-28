@@ -1,156 +1,156 @@
-һ����
-table��һ�ֽṹ�����ļ������������洢�ض����͵����ݡ����е��н����ֶΣ��н�����¼��
-ÿһ���ֶζ��У��ֶ����ơ��ֶ��������͡��ֶ�Լ�����ֶγ��ȡ�
+一、表
+table是一种结构化的文件，可以用来存储特定类型的数据。表中的列叫做字段，行叫做记录。
+每一个字段都有：字段名称、字段数据类型、字段约束、字段长度。
 
-����SQL�ķ���
-SQL-�ṹ����ѯ���ԣ���һ��׼��׼��
-DBMS�����ݿ�ϵͳ��ͨ��ִ��SQL����������ײ����ݿ��е����ݡ�
-1.���ݲ�ѯ����(DQL)�������ؼ��� select	��ѯ
-2.���ݲ�������(DML)�������ؼ��� insert delete update	��ɾ�� �ǶԱ������ݲ���
-3.���ݶ�������(DDL)�������ؼ��� create drop alter		��ɾ�� �ǶԱ��Ľṹ����
-4.�����������(TCL): �����ؼ��� commit rollback
-5.���ݿ�������(DCL): �����ؼ��� grant revoke			���û���Ȩ�޿���
+二、SQL的分类
+SQL-结构化查询语言，是一种准标准。
+DBMS是数据库系统，通过执行SQL语句来操作底层数据库中的数据。
+1.数据查询语言(DQL)：代表关键字 select	查询
+2.数据操纵语言(DML)：代表关键字 insert delete update	增删改 是对表的数据操作
+3.数据定义语言(DDL)：代表关键字 create drop alter		增删改 是对表的结构操作
+4.事物控制语言(TCL): 代表关键字 commit rollback
+5.数据控制语言(DCL): 代表关键字 grant revoke			对用户的权限控制
 
-��������ָ��
-0.����
-	��ѯ��汾 mysql --version
-	�������ݿ� net start mysql (windows)
-	�ر����ݿ� net stop  mysql (windows)
-	��¼���ݿ� mysql -u<user> -p<password>
+三、常用指令
+0.其他
+	查询库版本 mysql --version
+	启动数据库 net start mysql (windows)
+	关闭数据库 net stop  mysql (windows)
+	登录数据库 mysql -u<user> -p<password>
 	
-1.�����
-	��ʾ��: show databases;
-	�����⣺create database <base-name>;
-	ɾ����: drop database <base-name>;
-	ѡ���: use <base-name>;
-	��ǰ��: select database();	��ʾ��ǰ�õ����ݿ�
-	�����: source <path>;
-	��ʾ��: show tables;
+1.库操作
+	显示库: show databases;
+	创建库：create database <base-name>;
+	删除库: drop database <base-name>;
+	选择库: use <base-name>;
+	当前库: select database();	显示当前用的数据库
+	导入库: source <path>;
+	显示表: show tables;
 	
-2.������
-	��ʾ��: show tables; ��ʾ��ǰ���еı� | show tables from <base-name> ������ʾ�������еı�
-	���ṹ: desc <table-name>;
+2.表操作
+	显示表: show tables; 显示当前库中的表 | show tables from <base-name> 可以显示其他库中的表
+	表结构: desc <table-name>;
 
-sql�������û��˫���ţ��ַ���ֻ���õ����ţ�mysql����Ҳ֧��˫���ţ�����˫���Ų�ͨ�ã�
+sql语句里面没有双引号，字符串只能用单引号（mysql里面也支持双引号，但是双引号不通用）
 
-���ݿ��е���������:
-int		������
-double	������
-varchar	�ɱ䳤�ַ���
-char	�����ַ���
-date	��������
+数据库中的数据类型:
+int		整数型
+double	浮点型
+varchar	可变长字符串
+char	定长字符串
+date	日期类型
 	
-�ġ���ѯ(���µ����в�������ֻ����ʾ����������ڲ�����)
-1.�򵥲�ѯ
-	1).��ѯһ���ֶ�	: select <field> from <table-name>;
-	2).��ѯ����ֶ�	: select <field1>,<field2>,... from <table-name>;
-	3).��ѯ�����ֶ�	: select * from <table-name>, ���ַ�ʽ�ɶ��Բ飬��Ϊ��֪��������Щʲô�ֶΣ�����ִ�е�ʱ��Ҫ��*ת�������Ч�ʵͣ�������д�������С�
-	4).�޸��ֶ�ֵ	: select fun(<field>) from <table-name>;
-	5).�ֶ�������	: select <field> [as] <new-name> from <table-name>;
-	6).distinct		: select distinct <field1>, <field2>.. from <table=name> ȥ���ظ���¼. distinct�ֶ�ֻ����Ϊ���ֶΡ�ȥ���ظ���¼��ָ��{<field1>, <field2>, <field3> ...}��ȫ������ͬ�ġ�
-					  ��{1, 2, 3}��{1, 2, 4}�����ļ�¼����Ȼǰ�������ֶ�ֵ��ͬ���������һ���ֶ�ֵ��ͬ����һ���¼Ҳ��Ϊ��ͬ��
+四、查询(以下的所有操作，都只是显示，不会更改内部数据)
+1.简单查询
+	1).查询一个字段	: select <field> from <table-name>;
+	2).查询多个字段	: select <field1>,<field2>,... from <table-name>;
+	3).查询所有字段	: select * from <table-name>, 这种方式可读性查，因为不知道到底有些什么字段，并且执行的时候要将*转换，因此效率低，不建议写到代码中。
+	4).修改字段值	: select fun(<field>) from <table-name>;
+	5).字段重命名	: select <field> [as] <new-name> from <table-name>;
+	6).distinct		: select distinct <field1>, <field2>.. from <table=name> 去除重复记录. distinct字段只能作为首字段。去除重复记录是指的{<field1>, <field2>, <field3> ...}是全部不相同的。
+					  即{1, 2, 3}和{1, 2, 4}这样的记录，虽然前面两个字段值相同，但是最后一个字段值不同，这一组记录也视为不同。
 	
-	��Ҫע����ǣ�ÿ������֮��������ֶ�������󶼻��ӡ������������ֶ����漰���������㣬����ʾָ�������㣬���Ҫ��as�޸�Ϊ֮ǰ���ֶ�����
-	select sale*12 from emp;	�ֶ���������ʾsale*2, Ҫ��as�����ָ�Ϊyear_sale��
-2.������ѯ
-	ͳһ��ʽ: select <fields> from <table-name> where ��������; ��ʾ������������������м�¼��
-	�������� => ����1 [and|or] ����2 ...	ͨ��and �� or�����������(ע�⣬����ͨ��������ȷ�����ȼ�)
-	���������﷨�ǣ�
-		1).between	: <field> between <start> and <end>	���������˼���൱��>= <=
-		2).in		: <field> in (value1, value2)		��ѡ�����˼���൱�ڻ�
-	��������:
-		1).����		: =
-		2).������	: <>��!=
-		3).����С��	: < <= > >=
-		4).Ϊ��		: is null
-		5).��Ϊ��	: is not null
-		6).����		: and
-		7).��		: not,  �����ֶ�֮������֮ǰ.
-		8).ģ����ѯ	: like, ��������һ��O��: <field-varchar> like '%O%' 
-						ģ����ѯ�ķ��ţ�(������������)
-							%, ��������n���ַ�
-							_, ��������1���ַ�
-3.����
-	1).���ֶ�����select <fields> from <table-name> order by <field> [asc|desc]; asc������desc�ǽ�����Ĭ�ϲ�������
-	2).���ֶ�����: ��ѯ order by <field1>, <field2>, <field3>;	ע��: <field1>���������ȼ���ߣ�<field3>���������ȼ���͡����Ȱ����ȼ��ߵ��ţ�����ͬ��������ٰ������ȼ����ֶ��š�
-	3).�ֶα������: ��ѯ order by <number>, <number>���ֶεı�ţ�Ҳ�൱����ָ�����ֶΡ�
+	需要注意的是，每个逗号之间隔开的字段名，最后都会打印出来，因此若字段名涉及了数据运算，会显示指定的运算，因此要用as修改为之前的字段名。
+	select sale*12 from emp;	字段名最后会显示sale*2, 要用as将它恢复为year_sale。
+2.条件查询
+	统一格式: select <fields> from <table-name> where 过滤条件; 显示出满足过滤条件的所有记录。
+	过滤条件 => 条件1 [and|or] 条件2 ...	通过and 和 or可以组合条件(注意，可以通过括号来确认优先级)
+	过滤条件语法糖：
+		1).between	: <field> between <start> and <end>	是区间的意思，相当于>= <=
+		2).in		: <field> in (value1, value2)		是选项的意思，相当于或
+	具体条件:
+		1).等于		: =
+		2).不等于	: <>或!=
+		3).大于小于	: < <= > >=
+		4).为空		: is null
+		5).不为空	: is not null
+		6).并且		: and
+		7).非		: not,  用在字段之后，条件之前.
+		8).模糊查询	: like, 比如找有一个O的: <field-varchar> like '%O%' 
+						模糊查询的符号：(仅仅有了两个)
+							%, 代表任意n个字符
+							_, 代表任意1个字符
+3.排序
+	1).单字段排序：select <fields> from <table-name> order by <field> [asc|desc]; asc是升序，desc是降续，默认采用升序。
+	2).多字段排序: 查询 order by <field1>, <field2>, <field3>;	注意: <field1>的排序优先级最高，<field3>的排序优先级最低。首先按优先级高的排，有相同的情况，再按次优先级的字段排。
+	3).字段编号排序: 查询 order by <number>, <number>是字段的编号，也相当于是指定了字段。
 	
-�塢���д�������
-���д���������һ�������Ӧһ�������������֮���Ƕ����ģ����������н������㡣
+五、单行处理函数
+单行处理函数，一行输入对应一行输出。行与行之间是独立的，不会行与行进行运算。
 
-���ݴ����������Ǿ������ݿ���ɫ�ģ�Ҳ���ǿ����ڱ�����ݿⲻ���ڡ�
-�п�ֵ�μӵ����㣬�����ȻΪ�գ�
-1.��ͨ����
-	1).תСд ��д:	select {upper|lower}(<field>) from <table-name>;
-	2).��ȡ�ַ���:  select substr(<field>, index, length) from <table-name>
-	3).ȡ����	 :	length(<field>)
-	4).ȡǰ��հ�:	trim(<field>)
-	5).ȡ����	 :	round(<field>)
-	6).���������:	rand(number...)
-	7).��ֵ����  :	ifnull(<field>, <value>)
-2.���ڴ���:
-	���ڴ����ڸ������еĴ��������ǲ�ͬ�ģ���˳���ͨ�á���ˣ���ʵ������У����еĶ���ΪDATA���͵�������١�
-	=>��ʵ�ʵĿ����У�һ���ʹ��"�����ַ���"����ʾ���ڡ�
-	���ڣ������ݿⱾ�������⣬Ҳ�����ݿⱾ�����Ƶ���Ҫ���ݡ�MySQL�ṩ���������ڴ�������:1)str_to_data.2)data_format
+数据处理函数，是具有数据库特色的，也就是可能在别的数据库不存在。
+有空值参加的运算，结果仍然为空！
+1.普通处理
+	1).转小写 大写:	select {upper|lower}(<field>) from <table-name>;
+	2).截取字符串:  select substr(<field>, index, length) from <table-name>
+	3).取长度	 :	length(<field>)
+	4).取前后空白:	trim(<field>)
+	5).取整数	 :	round(<field>)
+	6).生成随机数:	rand(number...)
+	7).空值处理  :	ifnull(<field>, <value>)
+2.日期处理:
+	日期处理在各个库中的处理机制是不同的，因此程序不通用。因此，在实际情况中，表中的定义为DATA类型的情况很少。
+	=>在实际的开发中，一般会使用"日期字符串"来表示日期。
+	日期，是数据库本身的特殊，也是数据库本身机制的重要内容。MySQL提供了两个日期处理函数:1)str_to_data.2)data_format
 	1).str_to_date
-		��"�����ַ���"ת��Ϊ�����������ݡ�varchar => date
-		i). ʹ�ø�ʽ: str_to_date('�����ַ���', '���ڸ�ʽ')
-		ii).���ڸ�ʽ:
-			a).java�е����ڸ�ʽ
-				yyyy��
-				MM	��
-				dd	��
-				HH	ʱ
-				mm	��
-				ss	��
-				SSS	����
+		将"日期字符串"转换为日期类型数据。varchar => date
+		i). 使用格式: str_to_date('日期字符串', '日期格式')
+		ii).日期格式:
+			a).java中的日期格式
+				yyyy年
+				MM	月
+				dd	日
+				HH	时
+				mm	分
+				ss	秒
+				SSS	毫秒
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				Date  date = sdf.parse("1970-10-10");
-			b).mysql�����ڸ�ʽ
-				%Y	��
-				%m	��
-				%d	��
-				%H	ʱ
-				%i	��
-				%s	��
-				MYSQLĬ�ϵ����ڸ�ʽ��%Y-%m-%d, ����Ҫ�õ������ڵ�ʱ�����������ַ������Ὣ���������ʽ��"�����ַ���"��ת��Ϊ���ڸ�ʽ��
-		iii).����
-			���µ�hiredate��date��ʽ��
-			select * from emp where hiredate='1980-12-17';�����Զ�����ת��,���������ַ�����ת��Ϊdate
-			select * from emp where hiredate=str_to_date('12-17-1980', '%m-%d-%Y');��ʾ����ת����
-		str_to_date��ͨ��ʹ���ڲ��������С���Ϊ����������varchar����Ҫת��Ϊdate���ͽ��в��롣
+			b).mysql的日期格式
+				%Y	年
+				%m	月
+				%d	日
+				%H	时
+				%i	分
+				%s	秒
+				MYSQL默认的日期格式是%Y-%m-%d, 在需要用到该日期的时候，若给的是字符串，会将满足这个格式的"日期字符串"，转换为日期格式。
+		iii).测试
+			以下的hiredate是date格式。
+			select * from emp where hiredate='1980-12-17';存在自动类型转换,将“日期字符串”转换为date
+			select * from emp where hiredate=str_to_date('12-17-1980', '%m-%d-%Y');显示日期转换。
+		str_to_date，通常使用在插入数据中。因为输入往往是varchar，需要转换为date类型进行插入。
 	2).date_format
-		��dateת��Ϊ �ض���ʽ ��"�����ַ���"(VARCHAR)��
-		ʹ�ø�ʽ : date_format(�����������ݣ�'���ڸ�ʽ')
+		将date转换为 特定格式 的"日期字符串"(VARCHAR)。
+		使用格式 : date_format(日期类型数据，'日期格式')
 
-�������麯��/���д�������
-��������Ϊ���������룬��һ�������Ҳ����������֮������صģ����������������㡣
-������Щ���������޷�ʹ����where������档����where sal > ave(sal)�������Ǵ��ģ�where���治����ave���ַ��麯����
-1).ͳ�� count(<field>), ͳ���ֶ��з�NULL�ļ�¼��ʽ��
-2).��� sum(<field>), ��ͣ���NULL���������㡣
-3).��ƽ�� avg(<field>)
-4).����� max(<field>)
-5).����С min(<field>)
-���Ϻ������ὲֵΪNULL�ļ�¼�������㡣Ҳ�����Զ����Կ�ֵ��
-6).���⣺select MultiFunc(*) where <table-name> where condition; ���������������м�¼�����ܺ͡�
-where�ؼ��ֺ��治��ֱ��ʹ�÷��麯������Ϊ���麯�������ڷ�����ɺ�ִ�У���������Ҫgroup by��Ȼ��group by��where֮��ִ�С�
+六、分组函数/多行处理函数
+将多行作为函数的输入，算一个结果。也就是行与行之间是相关的，会结合起来进行运算。
+以下这些函数，都无法使用在where语句里面。比如where sal > ave(sal)，这样是错的，where里面不能用ave这种分组函数。
+1).统计 count(<field>), 统计字段中非NULL的记录格式。
+2).求和 sum(<field>), 求和，非NULL不参与运算。
+3).求平均 avg(<field>)
+4).求最大 max(<field>)
+5).求最小 min(<field>)
+以上函数不会讲值为NULL的记录代入运算。也就是自动忽略空值。
+6).特殊：select MultiFunc(*) where <table-name> where condition; 将满足条件的所有记录条数总和。
+where关键字后面不能直接使用分组函数。因为分组函数必须在分组完成后执行，而分组需要group by，然而group by在where之后执行。
 
-�ߡ������ѯ
+七、分组查询
 1.group by
-��ʾͨ���ĸ�����Щ�ֶν��з��顣
-�磺�ҳ�ÿ��������λ�����нˮ�����Ȱ��չ�����λ���飬��ʹ��max��ÿһ������нˮ��
+表示通过哪个或哪些字段进行分组。
+如：找出每个工作岗位的最高薪水。（先按照工作岗位分组，再使用max求每一组的最高薪水）
 	select max(sal) from emp group by job;
 	select job, max(sal) from emp group by job;
-	select ename, job, max(sal) from emp group by job; mysql�ɲ�ѯ�����ǽ�������塣orcale���ǲ����Եġ�
-����group by��ʱ��select��ֻ�ܸ������ֶΣ��Լ����麯�����������ֶβ��ܸ��ģ�������ˣ���ѯ�����ˣ����Ҳ��û������ġ�
-�����ѯ�������Ͼ���Ϊ����Ϸ��麯��ʹ�õģ�Ϊ�˽����麯�����ڶ��顣
-�÷� select <field1> <field2> proc(<field0>) group by <field1>, <field2>..
-������ֶ�������������һ���ֶ� ���з��顣��distinct���ơ�
+	select ename, job, max(sal) from emp group by job; mysql可查询，但是结果无意义。orcale中是不可以的。
+【用group by的时候，select后只能跟分组字段，以及分组函数】，其他字段不能跟的，就算跟了，查询出来了，结果也是没有意义的。
+分组查询，本质上就是为了配合分组函数使用的，为了将分组函数用于多组。
+用法 select <field1> <field2> proc(<field0>) group by <field1>, <field2>..
+将多个字段联合起来看做一个字段 进行分组。和distinct类似。
 2.having
-having���ڴ���where������ݵĹ��ˣ���������������������group by֮��ִ�С�
-����where���ˣ�������where����Ϊwhere���Թ��˵�һЩ ���÷�������ݡ���ÿ�ζ���having���ˣ��ὫһЩ�����Ͳ�Ҫ�����ݽ��з��飬�����ή��Ч�ʡ�
+having用于代替where完成数据的过滤，后面添加条件，但它在group by之后执行。
+能用where过滤，尽量用where。因为where可以过滤掉一些 不用分组的数据。若每次都用having过滤，会将一些本来就不要的数据进行分组，这样会降低效率。
 
-��:�ҳ�ÿ��������λ��ƽ��нˮ��Ҫ����ʾƽ��нˮ����1500�ļ�¼��
+如:找出每个工作岗位的平均薪水，要求显示平均薪水大于1500的记录。
 select job, avg(sal) from emp group by job having having sal>avg(sal);
 
 select
@@ -166,43 +166,43 @@ having
 order by
   ....
   
-���Ϲؼ���˳���ܱ䡣ִ��˳��:	1.from, 	��ĳ�ű���������
-								2.where, 	����ĳ��������
-								3.group by,	Ȼ�����
-								4.having,	����֮�����⣬�ٹ���
-								5.select,	��ѯ����
-								6.order by,	������� 
+以上关键字顺序不能变。执行顺序:	1.from, 	从某张表检索数据
+								2.where, 	经过某条件过滤
+								3.group by,	然后分组
+								4.having,	分组之后不满意，再过滤
+								5.select,	查询出来
+								6.order by,	排序输出 
 
-�ˡ����Ӳ�ѯ
-ʵ�ʿ����ܣ����ݲ��Ǵ洢��һ�ű��еģ�����ͬʱ�洢�ڶ��ű��еġ���Щ���ͱ�֮����ڹ�ϵ�����Ǽ�����ʱ��ͨ������Ҫ�����ű���������ȡ����Ч���ݣ����ֶ���ѯ������Ϊ���Ӳ�ѯ��
-���Ӳ�ѯ���ݳ����������:
-	SQL92��1992�����ϵ�DBA����Ա�����ܻ����á�
-	SQL99��1999, ��Ҫ��
-���Ӳ�ѯ�������ӷ�ʽ���Է�Ϊ
-	�����ӣ����ű����ӣ���ʾ����ȫƥ��Ľ��������ʡ��inner�ؼ��֡�
-		* ��ֵ����
-		* �ǵ�ֵ����
-		* ������
-	�����ӣ����ű������ӣ�������ȫƥ��ļ�¼�����н�һ����������ȫչ�ֳ��ˡ�����ʡ��outer�ؼ��֡�
-		* ��������(������)�������������ȫ����ʾ������
-		* ��������(������)�����ұ�������ȫ����ʾ������
-		������ �����ӣ���ʵ�ǵȼ۵ģ������໥д��
-	ȫ���ӡ����ԣ����á�
+八、连接查询
+实际开发总，数据不是存储在一张表中的，而是同时存储在多张表中的。这些表和表之间存在关系，我们检索的时候，通常是需要将多张表联合起来取得有效数据，这种夺标查询，被称为连接查询。
+连接查询根据出现年代分了:
+	SQL92【1992】，老的DBA程序员，可能还在用。
+	SQL99【1999, 主要】
+连接查询根据连接方式可以分为
+	内连接：多张表连接，显示出完全匹配的结果。可以省略inner关键字。
+		* 等值连接
+		* 非等值连接
+		* 自连接
+	外连接：多张表的连接，除了完全匹配的记录，其中将一方的内容完全展现出了。可以省略outer关键字。
+		* 左外连接(左连接)，将左表的数据全部显示出来。
+		* 右外连接(右连接)，将右表的数据全部显示出来。
+		左连接 右连接，其实是等价的，可以相互写。
+	全连接【忽略，少用】
 	
-�ڽ��ж�����Ӳ�ѯʱ����������ȡ������	
-�������ѯ��ʱ�����յĲ�ѯ������ǣ������б��ļ�¼�����˻����ⱻ��Ϊ�ѿ����˻������� select e.ename, d.name from emp e, dept d;
-Ϊ�˱��������ķ�����������б����ӵ�ʱ��������������������������ʹ������������������ƥ��Ĵ���û�м��ٵģ�ֻ�ǽ��������Ч��¼��
-����1.��ʾ����Ա�����ڵĲ�������
-	��sql92�﷨�� : select e.name, d.name from emp e, dept d where e.deptno = d.deptno; ���������еĵ�ֵ���ӡ�
-	��sql99�﷨�� : select e.name, d.name from emp e join dept d on e.deptno = d.deptno;���������еĵ�ֵ���ӡ�99�ѱ����Ӳ���ȫ����������ˡ�
-����2.��ʾ����Ա���Ĺ��ʵȼ�
-	��sql99�﷨�� : select e.ename,e.sal,s.grade from emp e join salgrade s on e.sal between s.losal and s.hisal;
-	��sql92�﷨�� : select e.ename,e.sal,s.grade from emp e , salgrade s where e.sal between s.losal and s.hisal;
-����3.�ҳ�ÿһ��Ա������һ���쵼����ʾ��Ա�����Լ��ϼ��쵼����
-	select e1.name, e2.name from emp e1 join emp e2 on e1.mgr = e2.empon; �����������е������ӡ������Ӿ���˵��һ�ű����������ӡ�(��һ�ű��������ű�)
-����4.�ҳ�ÿһ��Ա����Ӧ�Ĳ������ƣ�Ҫ��������ȫ����ʾ��
-	select e.name, d.name from emp e ��right��join dept d on e.deptno = d.deptno; ��������
-���ű����б����ӵ��﷨��ʽ:
+在进行多表连接查询时，尽量给表取别名。	
+若多表查询的时候，最终的查询结果总是，是所有表的记录条数乘积，这被称为笛卡尔乘积现象。如 select e.ename, d.name from emp e, dept d;
+为了避免该现象的发生，必须进行表连接的时候，添加限制条件。不过，就算使用了限制条件，但是匹配的次数没有减少的，只是结果都是有效记录。
+案列1.显示所有员工所在的部门名称
+	【sql92语法】 : select e.name, d.name from emp e, dept d where e.deptno = d.deptno; 是内连接中的等值连接。
+	【sql99语法】 : select e.name, d.name from emp e join dept d on e.deptno = d.deptno;是内连接中的等值连接。99把表连接操作全部分离出来了。
+案列2.显示所有员工的工资等级
+	【sql99语法】 : select e.ename,e.sal,s.grade from emp e join salgrade s on e.sal between s.losal and s.hisal;
+	【sql92语法】 : select e.ename,e.sal,s.grade from emp e , salgrade s where e.sal between s.losal and s.hisal;
+案列3.找出每一个员工的上一级领导，显示出员工名以及上级领导名。
+	select e1.name, e2.name from emp e1 join emp e2 on e1.mgr = e2.empon; 属于内连接中的自连接。自连接就是说在一张表里面做连接。(将一张表看做多张表)
+案列4.找出每一个员工对应的部门名称，要求部门名称全部显示。
+	select e.name, d.name from emp e 【right】join dept d on e.deptno = d.deptno; 右外连接
+多张表进行表连接的语法格式:
 select 
 	xxx
 from
@@ -210,296 +210,290 @@ from
 join
 	b
 on
-	����
+	条件
 join
 	c
 on
-	����
-ԭ����a��b�����б�����֪����a���ں�c�����б����ӡ�
+	条件
+原理：a和b表进行表连接知乎，a表在和c表进行表连接。
 
-�š��Ӳ�ѯ
-�Ӳ�ѯ����Ƕ��select���.���Գ�����: 
+九、子查询
+子查询就是嵌套select语句.可以出现在: 
 	
 where..(select)..
-	��where��������Ӳ�ѯ�����ǽ�select�Ľ����Ϊһ��ֵʹ�ã��Ա�д�������������ҳ�нˮ�ȹ�˾ƽ��нˮ�ߵ�Ա����
-	select ename, sal from emp where sal > avg(sal); ����
+	在where里面出现子查询，这是将select的结果作为一个值使用，以编写条件。案例，找出薪水比公司平均薪水高的员工。
+	select ename, sal from emp where sal > avg(sal); 错误。
 	select ename, sal from emp where sal > (select avg(sal) from emp);
 from..(select)..
-	��from��������Ӳ�ѯ�����ǽ��ڲ���ѯ��Ϊ��ʱ��ʹ�õġ�
-	�������ҳ�ÿ�����ŵ�ƽ��нˮ������Ҫ����ʾƽ��нˮ��нˮ�ȼ���
+	在from里面出现子查询，这是将内部查询作为临时表使用的。
+	案例，找出每个部门的平均薪水，并且要求显示平均薪水的薪水等级。
 	select avge.deptno, avge.avg, s.grade from (select deptno, avg(sal) as avg from emp group by deptno) avge join salgrade s on avge.avg between s.losal and s.hisal;
 	
-ʮ��union��limit
+十、union和limit
 1.union
-	�����������кϲ���
-	�﷨�� select union select 
-	�磺 	select ename,job from emp where job'SALE'
+	将多个结果进行合并。
+	语法： select union select 
+	如： 	select ename,job from emp where job'SALE'
 			union
 			select ename,job from emp where job='MANAGER'
-	Ҫ����������ĵ��������ֶ�������Ҫ��ȡ���orcale��Ҫ�������еĶ�Ӧ���ֶε�����Ӧ��һ�£�mysql�޸�Ҫ��
+	要求两个结果的的列数（字段数）需要相等。在orcale中要求多个表中的对应的字段的类型应该一致，mysql无该要求。
 2.limit
-	��ȡһ�ű���ĳ�������ݣ���mysql���ݿ�����⣬��sql��׼��
-	select .. limit <start>,<length>; ָ���Ǵӱ��м�¼�±�<start>��ʼ��ȡ<length>�����±��0��ʼ�ġ�����0��ʼʱ������ʡ��<start>��
-3.limit����������ҳ
-	���������Ϊ��ҳ��ÿҳ����ָ�������ļ�¼��
-	ÿҳ��ʾpageSize����¼����pageNoҳ��limit���Ӧ����
+	获取一张表的某部分数据，是mysql数据库的特殊，非sql标准。
+	select .. limit <start>,<length>; 指的是从表中记录下标<start>开始，取<length>条。下标从0开始的。当从0开始时，可以省略<start>。
+3.limit可以用作分页
+	将结果设置为多页，每页设置指定条数的记录。
+	每页显示pageSize条记录，第pageNo页的limit语句应该是
 	... limit (pageNo-1)*pageSize, pageSize;
 	
-ʮһ����
-����ʾ����ʱ�򣬿�������:
-	set character_set_results = "GBK"; ����ǽ���ǰ�Ự�Ľ����ʾ��ʽ������ΪGBK��ע�⣬���½���Ự��������Ϊutf8����ʾ��ʽ��
-�鿴mysql����ַ����뷽ʽ:
+十一、表
+在显示表的时候，可以设置:
+	set character_set_results = "GBK"; 这个是将当前会话的结果显示方式，设置为GBK。注意，重新进入会话，会重置为utf8的显示方式。
+查看mysql相关字符编码方式:
 	show variables like '%char%';
-��ȡϵͳ��ǰʱ��:
+获取系统当前时间:
 	select now();
-0.��������
-	VARCHAR	�ɱ䳤�ַ��������Զ�̬�ж����ݵ�ʵ�ʳ��ȣ�������ʵ�ʿռ䣬�����ɳ�����ʼ����󳤶ȡ�VARCHAR(MAX_LENGTH)�����������2�ı���������洢���ġ�
-	CHAR	�����ַ���������ʵ�ʴ�Ŀռ��Ƕ�󣬶��Ƿ���ָ���Ŀռ䡣CHAR(LENGTH)
-	INT		�����͡�INT(NUMBER), ��ʾ��NUMBER��INT���֡�
-	BIGINT	�����͡��൱��long��
-	FLOAT	������
-	DOUBLE	˫���ȸ�����
-		DOUBLE(M, N) ��ʾM����Ч���֣�С�����N�����֡�
-	DATE	������
-	BLOB	Binary Large Object�����ƴ���� ����Ƕ�ý����󣬱�����Ƶ����Ƶ����Ƭ��
-	CLOB	Character Large Object	�ַ�����󣬿��Դ洢�ϴ���ı���
-1.������
+0.数据类型
+	VARCHAR	可变长字符串。可以动态判断数据的实际长度，来分配实际空间，但不可超过初始的最大长度。VARCHAR(MAX_LENGTH)，长度最好是2的倍数，方便存储中文。
+	CHAR	定长字符串。不管实际存的空间是多大，都是分配指定的空间。CHAR(LENGTH)
+	INT		整数型。INT(NUMBER), 表示有NUMBER个INT数字。
+	BIGINT	长整型。相当于long。
+	FLOAT	浮点型
+	DOUBLE	双精度浮点型
+		DOUBLE(M, N) 表示M个有效数字，小数点后N个数字。
+	DATE	日期型
+	BLOB	Binary Large Object二进制大对象， 存的是多媒体对象，比如视频、音频、照片。
+	CLOB	Character Large Object	字符大对象，可以存储较大的文本。
+1.创建表
 	create table <table-name>(
 		<field1> <Type1>(<length1>),
 		<field2> <Type2>(<length2>),
 		...
 	);
-	Ĭ������£���һ�ű����������ֶο���ΪNULL���ֶε�Ĭ��ֵΪNULL��Ĭ��ֵ��ָ����һ����¼ʱ�������ֶ�û��ָ��ֵ����ʹ�ó�ʼֵ��
-	1).����Ĭ��ֵ
-		�ڴ���һ���ֶε�ʱ��
-		<field> <Type>(<length>) ��default <default-value>���������͸����ֶ�������Ĭ��ֵ
-	2).���ĸ���
-		create table <new-table-name> as ��select <field>.. from <table-name>��;�����߲�ѯ��������ڴ����±����±���Ϊ<new-table-name>
-2.ɾ����
-	drop table [if exists] <table-name> ɾ������[if exists]��mysql���еģ�������û�иñ�ʱ�������ڱ�����
+	默认情况下，当一张表被创建后，字段可以为NULL，字段的默认值为NULL。默认值是指插入一条记录时，若该字段没有指定值，则使用初始值。
+	1).设置默认值
+		在创建一个字段的时候
+		<field> <Type>(<length>) 【default <default-value>】，这样就给该字段设置了默认值
+	2).表的复制
+		create table <new-table-name> as 【select <field>.. from <table-name>】;将后者查询结果，用于创建新表，新表名为<new-table-name>
+2.删除表
+	drop table [if exists] <table-name> 删除表格，[if exists]是mysql独有的，用于在没有该表时，不至于报错。
 
-3.��/ɾ/�ı��ṹ(DDL)
-	1).�����ֶ�: alter table <table-name> add ��<field> <Type>(<length>)��
-	2).�޸��ֶ�: alter table <table-name> modify <filed> ��<Type>(<length>)�� �����е��ֶ�����Ϊ�����е�����
-	3).ɾ���ֶ�: alter table <table-name> drop <field>	ɾ�������ֶ�
+3.增/删/改表结构(DDL)
+	1).添加字段: alter table <table-name> add 【<field> <Type>(<length>)】
+	2).修改字段: alter table <table-name> modify <filed> 【<Type>(<length>)】 将表中的字段设置为方括中的内容
+	3).删除字段: alter table <table-name> drop <field>	删除表中字段
 
-4.��/ɾ/�ı�����(DML)
-	1).�������� insert
-		�������ݱ���ʹ��insert�����ڵײ����ݱ���������¼��
-		�﷨��ʽ��insert into <table-name> (<field1>, <field2>, ...) VALUES(<value1>, <value2>, ...); �ֶκ�ֵ����һһ��Ӧ���������������ͣ�������ͬ��
-		��д: insert into <table-name>() values (<value1>, <value2>, ...);	��Ĭ�ϰ���ƥ���ֶΡ�������Ҫ��ֵ�ø�����������ֶθ���ƥ�䡣������ʡ�ԣ�����ɶ��Ժͽ�׳�Բ�����
-		�����������У�
-			insert into <table-name> ��select <> frome <> ...�� ����ѯ�������һ�����У���ȻҪ���ֶεĸ���������ƥ�俩��
-	2).�������� update
-		���²����������޸ĵײ����ݿ����Ѿ����ڵ����ݡ�
-		�﷨��ʽ update <table-name> set <field1>=<value1>, <field2>=<value2>, ... where <condition> �����������ļ�¼���ֶθ���
-		update���û���������ƵĻ����Ὣ���е������ֶ�����ȫ�����¡�
-	3).ɾ������ delete
-		delete from <table-name> where <conditon> �����������ļ�¼�ӱ���ɾ����
+4.增/删/改表数据(DML)
+	1).插入数据 insert
+		插入数据必须使用insert，会在底层数据表中新增记录。
+		语法格式：insert into <table-name> (<field1>, <field2>, ...) VALUES(<value1>, <value2>, ...); 字段和值必须一一对应：个数和数据类型，必须相同。
+		简写: insert into <table-name>() values (<value1>, <value2>, ...);	会默认挨着匹配字段。不过，要求值得个数，必须和字段个数匹配。不建议省略，程序可读性和健壮性不够。
+		将结果插入表中：
+			insert into <table-name> 【select <> frome <> ...】 将查询结果插入一个表中，当然要求字段的个数和类型匹配咯。
+	2).更改数据 update
+		更新操作，用于修改底层数据库中已经存在的数据。
+		语法格式 update <table-name> set <field1>=<value1>, <field2>=<value2>, ... where <condition> 将满足条件的记录的字段更新
+		update语句没有条件限制的话，会将表中的所有字段数据全部更新。
+	3).删除数据 delete
+		delete from <table-name> where <conditon> 将满足条件的记录从表中删除。
 		
-ʮ����Լ��
-Լ��-constraint, ʵ���Ͼ��Ǳ������ݵ���������������Ƽ���Լ��������Ϊ�˱�֤���еļ�¼��������Ч��
-Լ�����ݣ�
-	1.�ǿ�Լ��		: not null, �ֶβ�����Ϊnullֵ����������������ݡ�
+十二、约束
+约束-constraint, 实际上就是表中数据的限制条件。表设计加入约束，就是为了保证表中的记录完整和有效。
+约束内容：
+	1.非空约束		: not null, 字段不可以为null值，必须给定具体数据。
 		create table <table-name> (
 			<filed> not null
 		);
-	2.Ψһ��Լ��	: unique���ֶξ���Ψһ�ԣ����м�¼�ĸ��ֶα�֤���ظ���
+	2.唯一性约束	: unique，字段具有唯一性，所有记录的该字段保证不重复。
 		create table <table-name> (
 			<filed> unique
 		);
-		�ֶ��䲻���ظ���������Ϊnull��
-		not null �� unique��������ʹ�ã��Դﵽ��Ϊ�գ��Ҳ�Ψһ��Ŀ�ġ�
-	3.����Լ��		: primary key�����pk��һ�ű�ֻ����һ������Լ����
-		���е�ĳ���ֶ�������Լ��֮�󣬸��ֶα���Ϊ�������ֶΡ��������ֶ��г��ֵ�ÿ�����ݶ�����Ϊ������ֵ����
-		��ĳ���ֶ���������Լ���󣬸��ֶβ����ظ���Ҳ����Ϊ�գ�Ч����"not null unique"��ͬ������֮�⣬����Լ������Ĭ�� ����������
-		һ�ű�Ӧ�������ֶΣ���û�У������ֱ���ʧ�ܵġ�������ֵ���ǵ�ǰ�����ݵ�Ψһ��ʶ��
-		�������ö�������ֶΣ��γɡ�����������������������һ��������Լ��
-		��������:
-			1).��Ȼ����
-				��������һ����Ȼ���������Ȼ���͵�ǰҵ��û���κι�ϵ����������������Ȼ������
-			2).ҵ������
-				����ֵ���ε�ǰ����ҵ�������صģ�������������Ϊҵ����������ҵ��ı�ʱ������������Ӱ�졣����ʹ����Ȼ������
-		����������
-			����ֵ�����û�ά����Ҳ����Ҫ�û��ṩ����sql�Զ����ɡ�
-			��1��ʼ����1������
+		字段虽不可重复，但可以为null。
+		not null 和 unique可以联合使用，以达到不为空，且不唯一的目的。
+	3.主键约束		: primary key，简称pk，一张表只能有一个主键约束。
+		表中的某个字段添加逐渐约束之后，该字段被称为【主键字段】。主键字段中出现的每个数据都被称为【主键值】。
+		给某个字段添加主键约束后，该字段不可重复，也不可为空，效果和"not null unique"相同。除此之外，主键约束还会默认 添加索引。
+		一张表应有主键字段，若没有，则这种表是失败的。【主键值】是当前行数据的唯一标识。
+		可以设置多个主键字段，形成【复合主键】，复合主键是一个主按键约。
+		主键分类:
+			1).自然主键
+				主键若是一个自然数，这个自然数和当前业务没有任何关系，这种主键叫做自然主键。
+			2).业务主键
+				主键值若何当前表中业务紧密相关的，这种主键被称为业务主键。当业务改变时，该主键会受影响。建议使用自然主键。
+		主键自增：
+			主键值不需用户维护，也不需要用户提供，由sql自动生成。
+			从1开始，以1递增。
 			<field> primary key auto_increment;
-	4.���Լ��		: foreign key
-		���Լ������һ����򸴺���� �� һ�����Լ����
-		����ֶΣ� �������Լ������ֶΡ�
-		���ֵ������ֶ��е�ÿһ�����ݶ������ֵ��
-		һ�ű��п����ж������ֶΡ�
-		��ǰ����ĳ���ֶΣ����ֶκ����������ֶ�������Ϊ�˱�֤���ֶ��ڵ�ǰ�������壬���Ҫ�����ֶ���Ϊ���Լ�����Ա�������������и��ֶβ����ڵ�ֵ��
-		��������Ҫע�����:
-			1),����ֶο���Ϊ�ա�
-			2).����ֶ����������������ֶ�ʱ�������õ��ֶΣ��������Ψһ�ԡ�
-			3).�����������֮�󣬱��и���֮�֣��������ֶεı��Ǹ�������������õı����ӱ����мǸ��Ӽ�Ĳ���˳����ɾ�����ݣ���ɾ�ӱ����ݣ��������ݣ��Ȳ常�����ݣ��������Ƚ�������
-		�﷨��foreign key(<field>) reference <table-name>(<field>), mysql�����Լ��û���м�Լ����ֻ�б������巽ʽ��
-		��������
-			���¸����������ֶε�����ʱ���ӱ�������ֶε�ֵ���Ÿ��¡�
-			<���Լ��> on update cascade;
-		����ɾ��
-			ɾ�����������ݵ�ʱ�򣬼���ɾ���ӱ��е����ݡ�
-			<���Լ��> on delete cascade
-		�������ºͼ���ɾ������ʹ�á�
+	4.外键约束		: foreign key
+		外键约束，单一外键或复合外键 是 一个外键约束。
+		外键字段， 添加外界约束后的字段。
+		外键值，外键字段中的每一个数据都是外键值。
+		一张表中可以有多个外键字段。
+		当前表的某个字段，该字段和其他表的字段相连，为了保证该字段在当前表有意义，因此要将该字段设为外键约束，以避免出现其他表中该字段不存在的值。
+		不过，需要注意的是:
+			1),外键字段可以为空。
+			2).外键字段在引用其他表的字段时，被引用的字段，必须具有唯一性。
+			3).有了外键引用之后，表有父子之分，被引用字段的表是父表，有外键引用的表是子表，切记父子间的操作顺序。如删除数据，先删子表数据；插入数据，先插父表数据；建表，先建父表。
+		语法：foreign key(<field>) reference <table-name>(<field>), mysql中外键约束没有列级约束，只有表级定义方式。
+		级联更新
+			更新父表被引用字段的数据时候，子表的外键字段的值跟着跟新。
+			<外键约束> on update cascade;
+		级联删除
+			删除父表中数据的时候，级联删除子表中的数据。
+			<外键约束> on delete cascade
+		级联更新和级联删除谨慎使用。
 		
-	5.���Լ��(MYSQL��֧��, orcale֧��)
+	5.检查约束(MYSQL不支持, orcale支持)
 	
-����Լ��
+表级约束
 	1).
 	create table <table-name>(
 		<field> ..
 		...
-		unqiue(<field1>, <field2>, ...) ����Լ�������⼸���ֶ�������һ�𣬲����ظ���
+		unqiue(<field1>, <field2>, ...) 表级约束。是这几个字段联合在一起，不能重复。
 	);
 
-	2).Լ��������
+	2).约束命名：
 	create table <>(
 		constraint <constraint-name> unique(...)
 	)
 	
-	3).��ѯԼ����
-	information_schema �� table_constarints ר�����ڱ���Լ����Ϣ��
+	3).查询约束名
+	information_schema 的 table_constarints 专门用于保存约束信息。
 	
-ʮ�����洢���桾MySQL���С�
-�洢������һ�ִ洢��ʽ��ÿ����������ָ��ʹ�õĴ洢���档
+十三、存储引擎【MySQL特有】
+存储引擎是一种存储方式，每个表都可以指定使用的存储引擎。
 
-��ʾMySQL�����д洢���棺show engines;
-show create table <table-name>����ʾ���������ʱ�����Ϣ������ʹ�õĴ洢���档
+显示MySQL的所有存储引擎：show engines;
+show create table <table-name>，显示创建这个表时候的信息，包括使用的存储引擎。
 
-��3�����õĴ洢����:
-	1).MyISAM����õ�����
-		��֧������
-		ʹ��3���ļ����һ����:
-			��ʽ�ļ�(.frm) - �洢���ṹ�Ķ���, DDL�޸ĵ�
-			�����ļ�(.MYD) - �洢���е�����, DML�޸ĵ�
-			�����ļ�(.MYI) - �洢���ϵ�����
-		��Щ�ļ����Խ���ѹ��������ֻ�������ٴ洢�ռ䣬���Ч�ʡ�
-		�����ʺ��ڡ����������ݶ��������������ݸ��²�������
+有3个常用的存储引擎:
+	1).MyISAM，最常用的引擎
+		由于采用表级锁，因此不支持事务(表级锁相当于最高级的事务)。
+		【最适合于】大量的数据读，而少量的数据更新操作(更新操作会将表给锁住，因此对于大量的更新操作而言，伸缩性太弱，所有的并行读写操作都将变成单线程)。
 	2).Memory
-		�ٶ���졣
-		���ݿ�Ŀ¼�У�ÿ������.frm��ʽ���ļ���ʾ��
-		�����ݺ��������洢���ڴ��С�Ҳ����޷��־û���
-		������Ӧ�ڡ��洢��������Ҫ�����ݣ�������ʱ�ı���
-	3).InnoDB, Ĭ������
-		֧������
-		InnoDB�������ݿ�Ŀ¼����.frm��ʽ�ļ���ʾ��
-		MySQK���������������Զ��ָ���ԭ��״̬��
-		֧�ּ������ºͼ���ɾ����
-		�����ʺ��ڡ��϶�����ݸ��²�����
+		速度最快。
+		数据库目录中，每个表以.frm格式的文件表示。
+		表数据和索引被存储在内存中。也因此无法持久化。
+		【最适应于】存储非永久需要的数据，创建临时的表。
+	3).InnoDB, 默认引擎
+		采用行级锁，支持事务。事务的实现就是通过对表在不同的时间加不同的行级锁来实现的。有死锁的风险。
+		MySQK服务器崩溃，会自动恢复到原先状态。
+		支持级联更新和级联删除。
+		【最适合于】较多的数据更新操作。
 		
-ʮ�ġ�����
-Transaction, ����:
-	* ��һ����С�ģ������ٷֵĹ�����Ԫ��
-	* ͨ��һ�������Ӧ��һ��������ҵ��
-	* һ��������ҵ����Ҫһ��������DML��乲ͬ������ɡ�
-	* DML����������
-	* �����������ġ�������DML��䡱���ж�����DML��䣬����;���ҵ���йء�
+十四、事务
+Transaction, 事务:
+	* 是一个最小的，不可再分的工作单元。
+	* 通常一个事务对应了一个完整的业务。
+	* 一个完整的业务，需要一个批量的DML语句共同联合完成。
+	* DML语句才有事务。
+	* 以上所描述的“批量的DML语句”共有多少条DML语句，这个和具体业务有关。
 
-�������ڱ�֤һ��������Ԫ������DML���Ҫ��ͬʱ�ɹ���ͬʱʧ�ܣ���Ϊһ��������Ԫ�����ٷ֡�		
-�ĸ����ԣ�
-	- ԭ����(A) ��������С�Ĺ�����Ԫ�������ٷ֡�
-	- һ����(C) ��������DML����������ͬʱ�ɹ���ʧ�ܡ�
-	- ������(I) ����A������B���и��롣
-	- �־���(D) ����ı��ϣ������ս�ı�־�����ڴ��е����ݳ־õ�Ӳ���ļ��С�
-���
-	- ��������: Start Transaction
-		�κ�һ����DML���ִ�У���־����Ŀ�����
-	- �������: End Transaction
-		�����ı�־��
-			�ύ���ɹ��Ľ�����������DML��������ʷ��¼�͵ײ�Ӳ���ļ�����ͬ����
-			�ع���ʧ�ܵĽ�����������DML��������ʷ��¼ȫ����ա�
-	- �ύ����: Commit Transaction
-		��MySQL�У�Ĭ������£��������Զ��ύ�ġ�Ҳ����˵ִ��һ��dml��䣬���������񣬲��һ��ύ����
-		���ֶ���������: 	
+事务，用于保证一个工作单元的所有DML语句要求同时成功或同时失败，因为一个工作单元不能再分。		
+四个特性：
+	- 原子性(A) 事务是最小的工作单元，不可再分。
+	- 一致性(C) 事务所有DML操作，必须同时成功或失败。
+	- 隔离性(I) 事务A和事务B具有隔离。
+	- 持久性(D) 事务的保障，事务终结的标志。【内存中的数据持久到硬盘文件中】
+术语：
+	- 开启事务: Start Transaction
+		任何一条的DML语句执行，标志事务的开启。
+	- 事务结束: End Transaction
+		结束的标志：
+			提交：成功的结束，将所有DML语句操作历史记录和底层硬盘文件进行同步。
+			回滚：失败的结束，将所有DML语句操作历史记录全部清空。
+	- 提交事务: Commit Transaction
+		在MySQL中，默认情况下，事务是自动提交的。也就是说执行一条dml语句，开启的事务，并且会提交事务。
+		【手动开启事务】: 	
 			1).	start transaction;
-				DML���
-				DML���
-				DML���
-				commit;/rollback;		//�ύ����ȡ����������
-			2).Ҳ����
-				set autocommit = off;	//�ر��Զ��ύֻ�Ե�ǰ�Ự��Ч
-				set seesion autocommit = on;	//���´�
-	- �ع�����: Rollback Transaction
+				DML语句
+				DML语句
+				DML语句
+				commit;/rollback;		//提交或者取消以上事务
+			2).也可以
+				set autocommit = off;	//关闭自动提交只对当前会话有效
+				set seesion autocommit = on;	//重新打开
+	- 回滚事务: Rollback Transaction
 
-����������У�δ����֮ǰ��DML����ǲ�����ĵײ����ݿ��ļ��ġ�ֻ�ǽ���ʷ������¼�����ڴ�����ɼ�¼��ֻ�������������ʱ�򣬶����ǳɹ��Ľ������Ż��޸ĵײ�Ӳ���ļ��е����ݡ�
-������뼶��:
-	1).����A������B֮�䣬����һ���ĸ����ԡ�
-		A��B��ȫ�����ǲ����������̡߳�
+在事务进行中，未结束之前，DML语句是不会更改底层数据库文件的。只是将历史操作记录，在内存中完成记录。只有在事务结束的时候，而且是成功的结束，才会修改底层硬盘文件中的数据。
+事务隔离级别:
+	1).事务A和事务B之间，具有一定的隔离性。
+		A和B完全可能是并发的两个线程。
 		
-	2).�������и��뼶��(4):
-		- ��δ�ύ	��read uncommitted��
-			��͸�����һ���������ϴ��ڣ����ݿ�Ĭ�ϵĸ��뼶�������ߡ�
-			����Aδ�ύ�����ݣ�����B�����ύ�������ȡ�������ݿ�����Ϊ�������ݻ������(Dirty Read)��
-		
-		- �����ύ	��read committed��
-			����A�ύ�����ݣ�����B���ܶ�ȡ�������Ա�����������ݡ�
-			���ǻᵼ������B�����ݡ������ظ���ȡ����������һ��������(����B)��ȡ�������ݻ᲻һ����
-			Orcale��Ĭ�ϸ��뼶��
+	2).隔离性有隔离级别(4):
+		- 读未提交	【read uncommitted】
+			最低隔离界别。一般是理论上存在，数据库默认的隔离级别比这个高。
+			事务A未提交的数据，事务B可以提交。这个读取到的数据可以认为是脏数据或是脏读(Dirty Read)。
 			
-		- ���ظ���	��repeatable read��
-			����B�������ڼ䣬��ȡ�����ݱ�֤һ�¡�
-			����������A�ύ�����ݣ�������B���ǲ����ȡ�ġ�
-			���ǻᵼ�»����������B��ȡ�Ĳ�����ʵ��Ӳ�����ݣ���
-			MySQL��Ĭ�ϸ��뼶��
+			实现的本质是在更新该行时加写锁，【更新】完成释放写锁。
+
+		- 读已提交	【read committed】
+			事务A提交的数据，事务B才能读取到。可以避免读到脏数据。
+			但是会导致事务B对数据【不可重复读取】，这样在一个事务内(事务B)读取到的数据会不一样。
+			Orcale的默认隔离级别。
 			
-		- ���л�	��serializable��
-			����A�ڲ������ݿ���е����ݵ�ʱ������Bֻ���Ŷӵȴ���
-			������뼶�����ʹ�ã�������̫�ͣ��û����鲻�á�
-			���Ա���������ÿ�ζ�ȡ�Ķ������ݿ������ʵ�ļ�¼��
-			����A������B�ᴮ��ִ�У�����������
-	3).����/�鿴���뼶��
-		a).�޸�my.ini�����ļ�
+			实现的本质是在更新该行时加写锁，【事务】完成时释放写锁。
+		- 可重复读	【repeatable read】
+			事务B开启的期间，读取的数据保证一致。
+			这样，事务A提交的数据，在事务B中是不会读取的。
+			但是会导致幻象读（事务B读取的不是真实的硬件数据）。
+			MySQL的默认隔离级别。
+			
+			实现的本质是在读取该行时加锁，【事务】完成时释放锁。这样可以避免其他事务修改。
+		- 串行化	【serializable】
+			事务A在操作数据库表中的数据的时候，事务B只能排队等待。
+			这个隔离级别很少使用，吞吐量太低，用户体验不好。
+			可以避免幻想读，每次读取的都是数据库表中真实的记录。
+			事务A和事务B会串行执行，不带并发。
+
+			更新/插入操作直接加表级锁，事务完成时才释放表级锁。
+	3).设置/查看隔离级别
+		a).修改my.ini配置文件
 			------------------------my.ini-------------------
 			[mysqld]
-			transaction-isolation=<���뼶��>
+			transaction-isolation=<隔离级别>
 			------------------------my.ini-------------------
-		b).�����ʽ����
-			set [session/global] transaction isolaction level <���뼶��>
-			session�ǵ�ǰ�Ự��global��ȫ�֣���ʡ�ԣ�Ҳ��session��
-		c).�鿴���뼶��
-			select @@tx_isolation;			�Ự�ĸ��뼶��
-			select @@global.tx_isolaction;	ȫ�ֵĸ��뼶��
+		b).命令格式设置
+			set [session/global] transaction isolaction level <隔离级别>
+			session是当前会话，global是全局，若省略，也是session。
+		c).查看隔离级别
+			select @@tx_isolation;			会话的隔离级别
+			select @@global.tx_isolaction;	全局的隔离级别
 
-ʮ�塢����(�˽�)
-����index, �൱��Ŀ¼��ʹ��������������߳���ļ���Ч�ʡ�
-�����Զ����������������ܹ�ͨ����������������������
-�����ͱ���ͬ������һ�����󣬱��Ǵ洢��Ӳ���ļ��еģ���ô�����Ǳ���һ���֡�
-һ�ű���ÿ���ֶζ��ǿ������������ġ�
-�������������
-	- ���ֶ��������Ӵ�
-	- ���ֶκ��ٵ�dml������
-	- ���ֶξ���������where�������С�
-	
-������ɾ��:
-	create [unique] index <index-name> on <table-name>(<field>) ���ƶ������ֶ��������������Զ�����ֶ�����ΨһԼ����
-	drop index <index-name>	on <table-name> ɾ���ƶ�������
-
-ʮ������ͼ
-create view <view-name> as ������select�Ľ���� �� create view <view-name> as ��select * from emp��
-��ͼ�������ݺ�ԭ���е�һģһ��������ͼ�еĲ����ᷴӦ��ԭ�����ֶ��С�
-��ͼ�൱�����м����һ���㣬ʹ����ͼ���ˣ�������Ҫ�˽�ʵ�ʵı��ṹ��
-
-ʮ�ߡ�DBA
-�������ݿ�: mysqldump <base-name> > <sql-path> -u<user> -p<password>
-�������ݿ�: ��ѡ�������ݿ��ǰ���� -> source <sql-path>
-���ϵ�sql-path��sql�ű��ļ���·���������ű��ļ���ʹ��source����˵�����source��
-
-ʮ�ˡ����ݿ��������ʽ
-������ݿ��ʱ�������ݵĹ淶����������
-	1).������������Ҫ��ÿһ���ֶ�ԭ���Բ����ٷ֡�
-	2).Ҫ�����з������ֶΣ���ȫ���������ֶΣ����ܲ�����������:
-		�����������ͻ���ɲ����������������ֶ�û�е���������һ�������ֶΡ�
-		���TABLE�У�a�ֶ�������A�ֶΣ�b�ֶ�������B�ֶΡ�
-		����Խ� a�ֶκ�A�ֶ� ���һ������ b�ֶκ�B�ֶ����һ������
-		Ȼ������һ������������������֮����໥��ϵ��
-		�������γɵ�3����������Ƚ�����͡�
-	3).���з������ֶκ������ֶμ䣬���ܲ�������������
-		�ֶ�A�������ֶ�B���ֶ�Bʵ���������ֶ�C,�����Ͳ��������������������ࡣ
+十五、索引(了解)
+	索引index, 相当于目录。使用索引，可以提高程序的检索效率。
+	主键自动添加索引，所以能够通过用主键检索就用主键。
+	索引和表相同，都是一个对象，表是存储在硬盘文件中的，那么索引是表的一部分。
+	一张表的每个字段都是可以添加索引的。
+	加索引的情况：
+		- 该字段数据量庞大。
+		- 该字段很少的dml操作。
+		- 该字段经常出现在where条件当中。
 		
-������Ʒ�����
-	1). һ��һ:
-		a).�����ű��洢������������
-		b).�����ű��洢�����Ψһ��
-	2). һ�Զࣺ�ڶ���ҷ��������������������һ��һ�������ֶΡ�
-	3). ��Զࣺ�����ű��洢��
+	创建与删除:
+		create [unique] index <index-name> on <table-name>(<field>) 给制定表的字段添加索引。可以额外给字段添加唯一约束。
+		drop index <index-name>	on <table-name> 删除制定索引。
+
+十六、视图
+	create view <view-name> as 【其他select的结果】 如 create view <view-name> as 【select * from emp】
+	视图，的内容和原表中的一模一样，对视图中的操作会反应在原表的字段中。
+	视图相当于在中间加了一个层，使用视图的人，并不需要了解实际的表结构。
+
+十七、DBA
+	导出数据库: mysqldump <base-name> > <sql-path> -u<user> -p<password>
+	导入数据库: 在选择了数据库的前提下 -> source <sql-path>
+	以上的sql-path是sql脚本文件的路径，启动脚本文件是使用source，因此导入用source。
+
+十八、数据库设计三范式
+	设计数据库表时候所依据的规范，供三个：
+		1).每一个字段原子性不可再分。
+		2).非主键字段不能仅仅依赖联合主键的部分。
+		3).非主键字段必须完全依赖于主键，不能依赖于其他字段。
+			
+	经典设计范例：
+		1). 一对一:
+			a).分两张表存储，共享主键。
+			b).分两张表存储，外键唯一。
+		2). 一对多：在多的乙方添加外键，这个外键引用一对一的主键字段。
+		3). 多对多：分三张表存储。
