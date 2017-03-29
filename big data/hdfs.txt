@@ -1,0 +1,49 @@
+一 简介
+    当数据集的大小超过一台独立的物理计算机的存储能力时，就有必要存储到若干台单独的计算机上。管理如此存储的文件系统称为分布式文件系统。
+    Hadoop Distributed Filesyste即HDFS。
+    数据块：
+        hdfs将文件分割为多个块来进行存储，不同的快存储在不同的集群机器上。默认的块大小为64MB。
+        块非常适合用于数据备份 进而提供容错能力和可用性。也就是说会将同一个块复制到少数几个独立的机器上(默认为3个)，可以确保在块 磁盘或机器发生故障后数据不会丢失。
+二 机制
+    1.角色
+        hdfs集群有两类节点以管理者-工作者的模式运行。管理者为namenode，工作者为datanode。
+        1).datanode
+            文件系统的工作节点，是文件数据块存放的地方。datanode会定期向namenode发送它们所存储块的列表。
+        2).namenode
+            管理文件系统的命名空间(就是文件存放的路径)，namenode的【内存】中保存了所有文件的数据块和存放该块的datanode的映射。
+            客户端和hdfs集群交互的入口就是namenode，客户端的相关操作都会以请求的方式发送到namenode，namenode再返回对应的信息。namenode的磁盘中将会以日志的形式保存这些操作。
+            由于有所有日志的记录，因此当namenode重启后，会通过日志来重建内存映射。很明显namenode的内存将会是存储数据量提升的瓶颈。
+    2.读
+        客户端通过DistrubutedFileSystem对象的open()方法来打开希望读取的文件，这时对象会向namenode发送请求(RPC实现)，namenode将会放回文件中所有副本块的datanode地址。
+        这些datanode根据它们与客户端的距离来排序(如果客户端本身就是个datanode，就返回该客户端自己)
+        客户端会通过FSDataInputStream对象的read方法来读取块中的数据，当于datanode通信遇到错误时，会尝试从另一个最近的datanode读取数据。
+    3.写
+        客户端通过DistrubutedFileSystem对象的create()方法来新建文件，这时会向namenode发送请求(RPC实现)，namenode会执行各种检查以确保可以创建，若不能创建就会向客户端抛出异常。
+        若namenode可以新建文件，则会进行记录。客户端进一步会通过FSDataOutputStream负责处理与datanode和namenode之间的通信。
+        FSDataOutputStream会将写入的数据分成一个一个的数据包，并写入内部队列。
+        更进一步，写入时会向namenode请求分配合适的新块来存储副本，namenode会返回datanode组成一个管线。
+        管线中有多个(副本个数)datanode的地址，写入的时候就会向datanode中写入，datanode又会向其他datanode写入。
+        当调用close()方法，将会把剩余的所有数据包写入datanode管线，并且联系namenode。
+三 关键问题
+    1.namenode的日志记录
+        namenode的日志记录在本机，但是日志记录的过程实际上是发生在其他机器上的，该机器被称为SecondaryNamenode。
+        namenode会将日志首先记录在内存中，当内存记录满便需要将内存中的记录合并到磁盘中记得记录，内存中的记录被称为edits log，磁盘中的日志被称为fsimage。
+        nn通知sn可以合并记录了，就会将edits log和fsimage中的数据发送到sn，sn便可以开始进行合并，这样减轻了nn的工作压力。
+        在合并的过程中，nn可以继续接受操作，新操作的日志记录在new edits log中。
+        sn合并完成后将会返回新的edits log，nn接收到再把new edits log改为edits log，到此合并完成。
+    2.hdfs的一致性
+        一致性是指更新文件后是否立即可见。在hdfs中写入文件的内容并不保证能立即可见。
+        hdfs只能保证在写入一个数据块后，该数据块可见。正在写入的数据块是不可见的。客户端正在写入的文件时，可以通过sync方法来强行进行同步来达到可见。
+        另外，hdfs的close方法里面含有sync方法的执行。
+    3.hdfs的可靠性
+        可靠性是保证hdfs的namenode宕机后，重新上线还可以继续提供服务。
+        由于namenode里面有所有的操作记录，因此当namenode重新启动时，会根据操作记录恢复宕机时的内存情况，这样便能继续提供服务了。
+    4.hdfs的容错性
+        主要指当节点中的数据块发生错误时，可以通过其副本来恢复错误。
+    5.hdfs的高可用
+        namenode若失效，所有的hdfs应用包括mapreduce作业，均无法进行。因此需要考虑如何保证namenode的高可用。
+        通常采用一对namenode节点，配置为活动-备用模式。当前namenode失效，备用namenode将会接替失效namenode的任务。
+        因为传统模式下namenode中保存了edits log于内存中，备用的nn无法获得这个editslog也就无法替换原namenode(因为无法获得edits log进行还原)。
+        因此edits log保存在namenode外面，有点像redis提供数据。这样active的nn和standby的nn都可以获取到edits log的数据。
+        edits log的保存也需要高可用的，采用qjournal，这是一个基于zookeeper设计的服务。
+        也需要避免active的nn假死，造成standby的nn切换为active，此时将会有两个active的nn。因此当standby切换为active时，原active的nn必须得死，比如说强制性kill掉进程。

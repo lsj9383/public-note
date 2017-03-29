@@ -1,11 +1,11 @@
-NameNode£¬Í¨³£Ò»¸ö
-DataNode£¬ºÜ¶à
+NameNodeï¼Œé€šå¸¸ä¸€ä¸ª
+DataNodeï¼Œå¾ˆå¤š
 Secondary NameNode
 
             CLIENT API
 			     |
 				 |
-				 |·ÃÎÊ
+				 |è®¿é—®
 				 |
 				\|/
            hdfs://nn:9000/
@@ -13,198 +13,198 @@ Secondary NameNode
          NN    DN    DN    DN
 ---------------------------------------
 
-¿Í»§¶Ë·ÃÎÊµÄÊÇnamenodeµÄhdfs£¬nnÌá¹©Ê÷×´ÎÄ¼ş½á¹¹¡£
-±£´æÎÄ¼ş£º
-	¿Í»§¶ËÕÒµ½nn£¬namenodeÖĞ²éÑ¯ÔªÊı¾İ£¬nnÏìÓ¦¿Í»§¶Ë±£´æÔÊĞí¡£ÈôhdfsÖĞÒÑ¾­ÓĞÁËÎÄ¼ş£¬¾Í²»ÄÜ´æÁË£¨Í¬Ãû£©
-	Èô¿ÉÒÔ´æ£¬ÔòÏìÓ¦¿Í»§¶ËÄÄĞ©dn¿ÉÒÔ±£´æ£¬ÒÔ¼°ÈçºÎ·Ö¿é´æ·Å¡£¾ßÌå·Ö¸î²Ù×÷ÊÇÔÚ¿Í»§¶ËÍê³ÉµÄ¡££¨×¼È·ËµÊÇ¿Í»§¶ËµÄHADOOP API£©
-	Ğ´¸±±¾µÄ·½·¨£º
-		1).¿Í»§¶ËÒ»¸ö¿éÒªĞ´N¸ö¿½±´£¬²ÅËã³É¹¦¡£
-		2).¿Í»§¶ËÒ»¸ö¿éÖ»Ğ´1¸ö¿½±´£¬¾ÍËã³É¹¦¡£È»ºóÔÚhdfsÄÚ²¿½«Æä¸´ÖÆN-1¸ö¿½±´£¨¼´datanodeÏò±ğµÄdatanode¿½±´£©£¬ÕâĞ©¶¼ÊÇÒì²½µÄ¡£
+å®¢æˆ·ç«¯è®¿é—®çš„æ˜¯namenodeçš„hdfsï¼Œnnæä¾›æ ‘çŠ¶æ–‡ä»¶ç»“æ„ã€‚
+ä¿å­˜æ–‡ä»¶ï¼š
+	å®¢æˆ·ç«¯æ‰¾åˆ°nnï¼Œnamenodeä¸­æŸ¥è¯¢å…ƒæ•°æ®ï¼Œnnå“åº”å®¢æˆ·ç«¯ä¿å­˜å…è®¸ã€‚è‹¥hdfsä¸­å·²ç»æœ‰äº†æ–‡ä»¶ï¼Œå°±ä¸èƒ½å­˜äº†ï¼ˆåŒåï¼‰
+	è‹¥å¯ä»¥å­˜ï¼Œåˆ™å“åº”å®¢æˆ·ç«¯å“ªäº›dnå¯ä»¥ä¿å­˜ï¼Œä»¥åŠå¦‚ä½•åˆ†å—å­˜æ”¾ã€‚å…·ä½“åˆ†å‰²æ“ä½œæ˜¯åœ¨å®¢æˆ·ç«¯å®Œæˆçš„ã€‚ï¼ˆå‡†ç¡®è¯´æ˜¯å®¢æˆ·ç«¯çš„HADOOP APIï¼‰
+	å†™å‰¯æœ¬çš„æ–¹æ³•ï¼š
+		1).å®¢æˆ·ç«¯ä¸€ä¸ªå—è¦å†™Nä¸ªæ‹·è´ï¼Œæ‰ç®—æˆåŠŸã€‚
+		2).å®¢æˆ·ç«¯ä¸€ä¸ªå—åªå†™1ä¸ªæ‹·è´ï¼Œå°±ç®—æˆåŠŸã€‚ç„¶ååœ¨hdfså†…éƒ¨å°†å…¶å¤åˆ¶N-1ä¸ªæ‹·è´ï¼ˆå³datanodeå‘åˆ«çš„datanodeæ‹·è´ï¼‰ï¼Œè¿™äº›éƒ½æ˜¯å¼‚æ­¥çš„ã€‚
 
-NNµÄÔªÊı¾İ¹ÜÀí£º
-	Ò»¸ö¿éÕ¼ÔªÊı¾İ150Byte	
+NNçš„å…ƒæ•°æ®ç®¡ç†ï¼š
+	ä¸€ä¸ªå—å å…ƒæ•°æ®150Byte	
 	Metadata(Name relicas blocks, blocks-hosts) 
-	Èç : /test/a/log, 3, {blk_1, blk_2}, {blk_1:[h0,h1,h3], blk_2:[h0,h2,h4]}
+	å¦‚ : /test/a/log, 3, {blk_1, blk_2}, {blk_1:[h0,h1,h3], blk_2:[h0,h2,h4]}
 	
-	2.¹ÜÀíĞÎÊ½
-		ÒÔÈÕÖ¾µÄĞÎÊ½£¬¼ÇÂ¼ÔÚÒ»¸ö×¨ÃÅµÄÎÄ¼ş(edits log)Àï¡£
-		´ÅÅÌÖĞµÄfsimageÊÇNNÄÚ´æÔÚ´ÅÅÌÖĞµÄÍêÕûÓ³Éä¡£
-		µ±edits logÂúÁË£¬¾Í½«ÕâĞ©ĞÂµÄÔªÊı¾İĞ´Èë´ÅÅÌÎÄ¼şfsimage£¨¼´edits logºÍfsimageºÏ²¢£©.
-		¶ÔÓÚedits logºÍfsimageºÏ²¢£¬»áÔÚsecondaryNameNodeÖ÷»úÉÏ×÷ºÏ²¢£¬ÕâÑù¼õÇáNameNodeµÄ¹¤×÷Á¿¡£
-	3.±£´æÎÄ¼ş²½Öè,
-		1).clientÉÏ´«ÎÄ¼şÊ±£¬NNÔÚedits logÖĞ¼ÇÂ¼ÔªÊı¾İ²Ù×÷ÈÕÖ¾¡£
-		2).client¿ªÊ¼ÉÏ´«ÎÄ¼ş£¬Íê³Éºó·µ»Ø³É¹¦ĞÅÏ¢¸øNN¡£
-		3).NN¾ÍÔÚÄÚ´æÖĞ¼ÓÔØÕâ´ÎÉÏ´«²Ù×÷µÄĞÂ²úÉúµÄÔªÊı¾İĞÅÏ¢¡£
-	4.ºÏ²¢²½Öè£¬
-		1).NNÍ¨ÖªSN½øĞĞcheckpoint£¨ºÏ²¢£©²Ù×÷
-		2).snÍ¨ÖªNN¿ÉÒÔ½øĞĞºÏ²¢²Ù×÷£¬Òò´Ënn²»ÄÜÔÙ¸üĞÂedits log¡£
-		3).ÕâÊ±ºòÈônn½ÓÊÕµ½¿Í»§¶ËµÄĞÂÇëÇó£¬ÄÇÃ´NN»áÔÚedits.newÖĞĞ´£¬×÷Îªedits logµÄÒ»¸ö»º³å¡£
-		4).snÏÂÔØfsimageºÍedits logµ½±¾µØ¡£
-		5).snÖ÷»úÉÏ½øĞĞºÏ²¢µÃµ½fsimage.chkpointÎÄ¼ş¡£
-		6).ÉÏ´«fsimage.chkpointÎÄ¼şµ½nnÖ÷»ú¡£
-		7).nn½«editsÉ¾³ı£¬²¢½«edits.newÖØÃüÃûÎªedits log,fsimage.chkpointÖØÃüÃûÎªfsimage
-	5.checkpointÌõ¼ş
-		1) edits log´ïµ½fs.checkpoint.size(Ä¬ÈÏ64M)£¬chekcpointÒ»´Î.
-		2) edits log¸ôfs.checkpoint.period(Ä¬ÈÏ3600Ãë)£¬checkpointÒ»´Î.
-		3) ÕâĞ©²ÎÊıÔÚhdfs-site.xml£¬»áÉúĞ§¡£
-	6.nnÖ°Ôğ
-		1) Î¬»¤ÔªÊı¾İĞÅÏ¢¡£
-		2) Î¬»¤hdfsµÄÄ¿Â¼Ê÷¡£
-		3) ÏìÓ¦¿Í»§¶ËÇëÇó¡£
+	2.ç®¡ç†å½¢å¼
+		ä»¥æ—¥å¿—çš„å½¢å¼ï¼Œè®°å½•åœ¨ä¸€ä¸ªä¸“é—¨çš„æ–‡ä»¶(edits log)é‡Œã€‚
+		ç£ç›˜ä¸­çš„fsimageæ˜¯NNå†…å­˜åœ¨ç£ç›˜ä¸­çš„å®Œæ•´æ˜ å°„ã€‚
+		å½“edits logæ»¡äº†ï¼Œå°±å°†è¿™äº›æ–°çš„å…ƒæ•°æ®å†™å…¥ç£ç›˜æ–‡ä»¶fsimageï¼ˆå³edits logå’Œfsimageåˆå¹¶ï¼‰.
+		å¯¹äºedits logå’Œfsimageåˆå¹¶ï¼Œä¼šåœ¨secondaryNameNodeä¸»æœºä¸Šä½œåˆå¹¶ï¼Œè¿™æ ·å‡è½»NameNodeçš„å·¥ä½œé‡ã€‚
+	3.ä¿å­˜æ–‡ä»¶æ­¥éª¤,
+		1).clientä¸Šä¼ æ–‡ä»¶æ—¶ï¼ŒNNåœ¨edits logä¸­è®°å½•å…ƒæ•°æ®æ“ä½œæ—¥å¿—ã€‚
+		2).clientå¼€å§‹ä¸Šä¼ æ–‡ä»¶ï¼Œå®Œæˆåè¿”å›æˆåŠŸä¿¡æ¯ç»™NNã€‚
+		3).NNå°±åœ¨å†…å­˜ä¸­åŠ è½½è¿™æ¬¡ä¸Šä¼ æ“ä½œçš„æ–°äº§ç”Ÿçš„å…ƒæ•°æ®ä¿¡æ¯ã€‚
+	4.åˆå¹¶æ­¥éª¤ï¼Œ
+		1).NNé€šçŸ¥SNè¿›è¡Œcheckpointï¼ˆåˆå¹¶ï¼‰æ“ä½œ
+		2).sné€šçŸ¥NNå¯ä»¥è¿›è¡Œåˆå¹¶æ“ä½œï¼Œå› æ­¤nnä¸èƒ½å†æ›´æ–°edits logã€‚
+		3).è¿™æ—¶å€™è‹¥nnæ¥æ”¶åˆ°å®¢æˆ·ç«¯çš„æ–°è¯·æ±‚ï¼Œé‚£ä¹ˆNNä¼šåœ¨edits.newä¸­å†™ï¼Œä½œä¸ºedits logçš„ä¸€ä¸ªç¼“å†²ã€‚
+		4).snä¸‹è½½fsimageå’Œedits logåˆ°æœ¬åœ°ã€‚
+		5).snä¸»æœºä¸Šè¿›è¡Œåˆå¹¶å¾—åˆ°fsimage.chkpointæ–‡ä»¶ã€‚
+		6).ä¸Šä¼ fsimage.chkpointæ–‡ä»¶åˆ°nnä¸»æœºã€‚
+		7).nnå°†editsåˆ é™¤ï¼Œå¹¶å°†edits.newé‡å‘½åä¸ºedits log,fsimage.chkpointé‡å‘½åä¸ºfsimage
+	5.checkpointæ¡ä»¶
+		1) edits logè¾¾åˆ°fs.checkpoint.size(é»˜è®¤64M)ï¼Œchekcpointä¸€æ¬¡.
+		2) edits logéš”fs.checkpoint.period(é»˜è®¤3600ç§’)ï¼Œcheckpointä¸€æ¬¡.
+		3) è¿™äº›å‚æ•°åœ¨hdfs-site.xmlï¼Œä¼šç”Ÿæ•ˆã€‚
+	6.nnèŒè´£
+		1) ç»´æŠ¤å…ƒæ•°æ®ä¿¡æ¯ã€‚
+		2) ç»´æŠ¤hdfsçš„ç›®å½•æ ‘ã€‚
+		3) å“åº”å®¢æˆ·ç«¯è¯·æ±‚ã€‚
 DN:
-	Ìá¹©ÕæÊµÎÄ¼şÊı¾İµÄ´æ´¢·şÎñ¡£
-	ÎÄ¼ş¿é(block)£¬×î»ù±¾´æ´¢µ¥Î»¡£Æä´óĞ¡dfs.block.sizeÄ¬ÈÏ128M£¬ÔÚhdfs-site.xmlÖĞÅäÖÃ¡£
-	Replication, Ã¿¸ö¿é(ÎÄ¼ş)µÄ¸±±¾Êı¡£
+	æä¾›çœŸå®æ–‡ä»¶æ•°æ®çš„å­˜å‚¨æœåŠ¡ã€‚
+	æ–‡ä»¶å—(block)ï¼Œæœ€åŸºæœ¬å­˜å‚¨å•ä½ã€‚å…¶å¤§å°dfs.block.sizeé»˜è®¤128Mï¼Œåœ¨hdfs-site.xmlä¸­é…ç½®ã€‚
+	Replication, æ¯ä¸ªå—(æ–‡ä»¶)çš„å‰¯æœ¬æ•°ã€‚
 
 java hdfs client programe:
-	ÅäÖÃjar°ü:
-		1.¹¤³ÌÊôĞÔ
+	é…ç½®jaråŒ…:
+		1.å·¥ç¨‹å±æ€§
 		2.Java Build Path
-		3.LibrariesÑ¡Ïî¿¨
+		3.Librariesé€‰é¡¹å¡
 		4.Add Library--->User Library--->next--->User Libraries
-		5.New ´´½¨ĞÂµÄlibrary
-		6.Add External Jars¸øĞÂµÄlibraryÌí¼Ó°ü
-		5.$HADOOP_HOME/share/hadoop/hdfsµÄºËĞÄ°üÒÔ¼°libÎÄ¼ş¼ĞÖĞµÄËùÓĞ°ü
-		6.$HADOOP_HOME/share/hadoop/commonµÄºËĞÄ°ü¼°libÎÄ¼ş¼ĞÖĞµÄËùÓĞ°ü
-	³õÊ¼»¯±à³Ì:
-		1.»ñÈ¡ÏµÍ³ÅäÖÃÎÄ¼ş: Configuration conf = new Configuration();
-			¸Ãº¯ÊıÌáÈ¡ÏµÍ³µÄxmlÖĞµÄÅäÖÃ¡£±ØĞëÅäÖÃfs.defaultFS="hdfs://weekend110:9000/"¡£
-			·ñÔòÄ¬ÈÏµÄÊÇ±¾µØÎÄ¼şÏµÍ³£¬ÄÇÃ´new Path();ÎŞ·¨»ñµÃhdfsµÄÂ·¾¶£¬ÒòÎª²»ÈÏÊ¶¸ÃÀàĞÍÂ·¾¶¡£
-		2.ÉèÖÃÅäÖÃÎÄ¼ş
-			ÎÄ¼şÏµÍ³ÉèÖÃ:conf.set("fs.defaultFS", "hdfs://weekend110:9000");
-			È¨ÏŞÉèÖÃ:..., ÅäÖÃµÄÊÇeclipseÏÂµÄ¾Ö²¿»·¾³±äÁ¿
+		5.New åˆ›å»ºæ–°çš„library
+		6.Add External Jarsç»™æ–°çš„libraryæ·»åŠ åŒ…
+		5.$HADOOP_HOME/share/hadoop/hdfsçš„æ ¸å¿ƒåŒ…ä»¥åŠlibæ–‡ä»¶å¤¹ä¸­çš„æ‰€æœ‰åŒ…
+		6.$HADOOP_HOME/share/hadoop/commonçš„æ ¸å¿ƒåŒ…åŠlibæ–‡ä»¶å¤¹ä¸­çš„æ‰€æœ‰åŒ…
+	åˆå§‹åŒ–ç¼–ç¨‹:
+		1.è·å–ç³»ç»Ÿé…ç½®æ–‡ä»¶: Configuration conf = new Configuration();
+			è¯¥å‡½æ•°æå–ç³»ç»Ÿçš„xmlä¸­çš„é…ç½®ã€‚å¿…é¡»é…ç½®fs.defaultFS="hdfs://weekend110:9000/"ã€‚
+			å¦åˆ™é»˜è®¤çš„æ˜¯æœ¬åœ°æ–‡ä»¶ç³»ç»Ÿï¼Œé‚£ä¹ˆnew Path();æ— æ³•è·å¾—hdfsçš„è·¯å¾„ï¼Œå› ä¸ºä¸è®¤è¯†è¯¥ç±»å‹è·¯å¾„ã€‚
+		2.è®¾ç½®é…ç½®æ–‡ä»¶
+			æ–‡ä»¶ç³»ç»Ÿè®¾ç½®:conf.set("fs.defaultFS", "hdfs://weekend110:9000");
+			æƒé™è®¾ç½®:..., é…ç½®çš„æ˜¯eclipseä¸‹çš„å±€éƒ¨ç¯å¢ƒå˜é‡
 			fs = FileSystem.get(new URI("hedfs://weekend110:9000/"), conf, "hadoop");
-		3.³õÊ¼»¯ÎÄ¼şÏµÍ³:FileSystem fs = FileSystem.get(conf);
-			¸ù¾İconfµÄÅäÖÃ£¬³õÊ¼»¯ÎÄ¼şÏµÍ³£¬Èç¹ûÅäÖÃÁËhdfs£¬ÄÇÃ´³õÊ¼»¯µÄÎÄ¼şÏµÍ³ÎªhdfsÎÄ¼şÏµÍ³¡£
-	»ñµÃhdfsµÄÎÄ¼şÊäÈëÊä³öÁ÷:
+		3.åˆå§‹åŒ–æ–‡ä»¶ç³»ç»Ÿ:FileSystem fs = FileSystem.get(conf);
+			æ ¹æ®confçš„é…ç½®ï¼Œåˆå§‹åŒ–æ–‡ä»¶ç³»ç»Ÿï¼Œå¦‚æœé…ç½®äº†hdfsï¼Œé‚£ä¹ˆåˆå§‹åŒ–çš„æ–‡ä»¶ç³»ç»Ÿä¸ºhdfsæ–‡ä»¶ç³»ç»Ÿã€‚
+	è·å¾—hdfsçš„æ–‡ä»¶è¾“å…¥è¾“å‡ºæµ:
 		FSDataInputStream in = fs.open(new Path("hdfs://weekend110:9000/...."));
 		FSDataOutputStream in = fs.open(new Path("hdfs://weekend110:9000/...."));
 	
-	hdfsµÄÖ÷Òª²Ù×÷º¯Êı:
-		IOUtils.copy(input, output);				½«ÊäÈëÁ÷µÄÊı¾İÈ«²¿¸´ÖÆµ½Êä³öÁ÷
-		fs.copyFromLocalFile(Path src,Path dst);	½«±¾µØÎÄ¼ş¿½±´µ½hdfs¡£srcÊÇ±¾µØ£¬dstÊÇÔ¶³Ì
-		fs.copyToLocalFile(Path src, Path dst);		½«Ô¶³ÌÎÄ¼ş¿½±´µ½±¾µØ¡£srcÊÇÔ¶³Ì£¬dstÊÇ±¾µØ
-		fs.mkdirs(new Path("/aaa/bbb/ccc"));		´´½¨Â·¾¶ÎÄ¼ş¼Ğ
-		fs.delete(Path, true);						½«Ö¸¶¨Â·¾¶ÏÂµÄÎÄ¼ş¼ĞÈ«²¿É¾³ı.
-		fs.rename(old path, new path);				ÖØÃüÃûÏàµ±ÓÚÒÆ¶¯.
-		RemoteIterator<LocatedFileStatus> fs.listFile(Path, true);		·µ»ØÔ¶³ÌÎÄ¼şµü´úÆ÷,LocatedFileStatusÊÇÄ³¸öÎÄ¼şµÄ¾ßÌåÊôĞÔ
-		FileStatus[] listStatus = fs.listStatus(path);	·µ»ØÔ¶³ÌitemµÄ×´Ì¬, item¿ÉÒÔÊÇÎÄ¼şÒ²¿ÉÒÔÊÇÎÄ¼ş¼Ğ
-	×¢Òâ£¬ÔÚĞ´Ô¶³Ì¶ËÂ·¾¶Ê±£¬ÓÉÓÚÒÑ¾­ÔÚconfÅäÖÃÁËÔ¶³Ì¶ËÖ÷»úrootµØÖ·£¬Òò´ËÆäÊµ¿ÉÒÔÖ±½ÓÒÔ"/"±íÊ¾Ô¶³Ì¶Ë¸ùµØÖ·¡£
-RPC£º
-	Remote Process Call£¬Ô¶³Ì¹ı³Ìµ÷ÓÃ£¬¾ÍÊÇÁ½¸ö½ø³Ì¼äµÄµ÷ÓÃ¡£
-	hadoop¸÷¸ö½Úµã£¨Ö÷»ú£©¼äµÄÍ¨ĞÅ£¬¾ù²ÉÓÃRPC¡£
-	±¾µØ»úÔ¶³ÌÄÃµ½Êı¾İ£¬Ò²ÊÇÍ¨¹ırpcºÍnnÒÔ¼°dnÁ¬½Ó¡£
-	hadoop½«Ô¶³Ì¹ı³Ìµ÷ÓÃ³é³öÀ´£¬ÒÔÃâÔÚÃ¿¸ö¼ÆËã»úÉÏ¶¼¶îÍâĞ´Ïà¹ØµÄµ÷ÓÃ¡£
-	ÕâÑù£¬Ö±½Ó¾ÍÔÚ±¾µØ¼ÆËã»úµÃµ½ÁËÔ¶³ÌÊµÀıµÄ´úÀí¡£Ö±½Ó²Ù×÷´úÀí£¬´úÀí¹ÜÀíºÍÔ¶³Ì»úµÄÍ¨ĞÅÓë¹ı³Ìµ÷ÓÃ¡£
-	µ×²ã»úÖÆ£º
-		1¡¢±¾µØ¼ÆËã»ú½«ÒªÓÃµÄÀà¡¢¶ÔÓ¦µÄ·½·¨¡¢²ÎÊı£¬Í¨¹ısocket´«Êäµ½Ô¶³Ì¼ÆËã»ú¡£
-		2¡¢Ô¶³Ì¼ÆËã»ú·´Éä³ö¶ÔÓ¦µÄÀàµÄÊµÀı£¬µ÷ÓÃÏàÓ¦·½·¨¡£
-		3¡¢½«½á¹ûÍ¨¹ısocket·µ»Ø¸ø±¾»ú¼ÆËã»ú¡£
-	RPCÊµÏÖ»úÖÆ£º
-		1.Ã÷È·Ò»¸öÕæÊµÀàµÄ½Ó¿Ú£¬Ä¿±ê»úµÄÕæÊµÀàºÍ±¾µØ»úµÄ´úÀíÀà¶¼Ó¦¸Ã¼Ì³Ğ¸Ã½Ó¿Ú¡£
-		2.±àĞ´ÕæÊµÀàµÄ½Ó¿ÚÊµÏÖ·½·¨¡£
-		3.Ä¿±ê»úºÍ±¾µØ»ú£¬¶¼ÓĞsocket³ÌĞò¡£
-		4.´úÀíÀà´úÀíµÄÊÇclient socket, ·şÎñÆ÷¶ËÓĞ¸ö¹¤¾ßÀàskt°üº¬ÁËservice socket.
-		4.proxy.method(args)£¬½«µ÷ÓÃsocketÍ¨¹ısendMsg()·¢ËÍÊı¾İ¸øÄ¿±ê»ú
-		5.Ä¿±ê»úµÄsktµÄsocket½ÓÊÕµ½Êı¾İ£¬½«·´Éä³öÕæÊµÀàµÄÊµ¼Ê¶ÔÏó£¬È»ºó´«Èë²ÎÊı£¬µ÷ÓÃ·½·¨£¬È»ºó·µ»ØÊı¾İ
-		6.proxyµÄsocket½ÓÊÕµ½Êı¾İ¡£
-	RPCÊµÏÖ²½Öè£º
-		1.Éú³Éµ÷ÓÃ¶Ësocket³ÌĞò¶¯Ì¬´úÀí¶ÔÏó
-		2.Í¨¹ıproxyµ÷ÓÃ·½·¨
-		3.µ÷ÓÃsocketÇëÇó·½·¨
-		4.·¢ËÍµ÷ÓÃÇëÇó
-		5.·şÎñÆ÷¶ËÉú³É¶¯Ì¬´úÀí¶ÔÏó
-		6.µ÷ÓÃ´úÀí¶ÔÏóµÄ¾ßÌå·½·¨
-		7.»ñÈ¡µ÷ÓÃ½á¹û
-		8.socket·µ»Øµ÷ÓÃ½á¹û
-		9.proxy·µ»Ø½á¹û
-	RPCÊ¹ÓÃ£º
-		1.RPC´úÀíµÄÊ¹ÓÃÓ¦¸Ã×ñÑ­protocol(Ğ­Òé)£¬Ğ­ÒéÊÇÖ¸µÄ¶ÔÀàµÄÊ¹ÓÃĞ­Òé£¬Ò²¾ÍÊÇ½Ó¿Ú¡£
-		2.ÓÉÓÚ·şÎñÆ÷¶ÔÓÚÍ¬ÑùµÄ·şÎñ£¬¿ÉÄÜÓĞ²»Í¬µÄ°æ±¾£¬Òò´ËĞ­ÒéÖĞÓ¦¸ÃÓĞversionID£¬ÒÔÖ¸¶¨°æ±¾ºÅ¡£
-		3.·şÎñÆ÷·¢·ÅÀà·şÎñ:
-			1).ÖÆ¶¨Ğ­Òé
-			2).ÖÆ¶¨ÕæÊµÀà£¬ÃèÊöÊ¹ÓÃÏ¸½Ú
-			3).½«builderÅäÖÃºÃ£¬ÆäÖĞ°üÀ¨·şÎñµÄµØÖ·(±¾µØip)£¬·şÎñËùÔÚµÄ¶Ë¿Ú£¬·şÎñËùÓÃµÄĞ­Òé£¬·şÎñµÄÊµ¼ÊÀà¡£
-			4).´´½¨·şÎñ,Server ser = builder.build();
-			5).ÔËĞĞ·şÎñ,ser.start();µ±Ç°Ïß³Ì×èÈû¡£
-		4.¿Í»§¶ËÊ¹ÓÃ´úÀí·şÎñ:
-			1).¸´ÖÆ·şÎñÆ÷Ğ­Òé
-			2).»ñµÃ´úÀíInterface proxy = (Interface)RPC.getProxy(protocol, versionID, InetSocketAdder, Configuration);
-			3).¿ÉÖ±½ÓÊ¹ÓÃ´úÀíÁË
-hdfsÔ´ÂëÒªµã:
+	hdfsçš„ä¸»è¦æ“ä½œå‡½æ•°:
+		IOUtils.copy(input, output);				å°†è¾“å…¥æµçš„æ•°æ®å…¨éƒ¨å¤åˆ¶åˆ°è¾“å‡ºæµ
+		fs.copyFromLocalFile(Path src,Path dst);	å°†æœ¬åœ°æ–‡ä»¶æ‹·è´åˆ°hdfsã€‚srcæ˜¯æœ¬åœ°ï¼Œdstæ˜¯è¿œç¨‹
+		fs.copyToLocalFile(Path src, Path dst);		å°†è¿œç¨‹æ–‡ä»¶æ‹·è´åˆ°æœ¬åœ°ã€‚srcæ˜¯è¿œç¨‹ï¼Œdstæ˜¯æœ¬åœ°
+		fs.mkdirs(new Path("/aaa/bbb/ccc"));		åˆ›å»ºè·¯å¾„æ–‡ä»¶å¤¹
+		fs.delete(Path, true);						å°†æŒ‡å®šè·¯å¾„ä¸‹çš„æ–‡ä»¶å¤¹å…¨éƒ¨åˆ é™¤.
+		fs.rename(old path, new path);				é‡å‘½åç›¸å½“äºç§»åŠ¨.
+		RemoteIterator<LocatedFileStatus> fs.listFile(Path, true);		è¿”å›è¿œç¨‹æ–‡ä»¶è¿­ä»£å™¨,LocatedFileStatusæ˜¯æŸä¸ªæ–‡ä»¶çš„å…·ä½“å±æ€§
+		FileStatus[] listStatus = fs.listStatus(path);	è¿”å›è¿œç¨‹itemçš„çŠ¶æ€, itemå¯ä»¥æ˜¯æ–‡ä»¶ä¹Ÿå¯ä»¥æ˜¯æ–‡ä»¶å¤¹
+	æ³¨æ„ï¼Œåœ¨å†™è¿œç¨‹ç«¯è·¯å¾„æ—¶ï¼Œç”±äºå·²ç»åœ¨confé…ç½®äº†è¿œç¨‹ç«¯ä¸»æœºrootåœ°å€ï¼Œå› æ­¤å…¶å®å¯ä»¥ç›´æ¥ä»¥"/"è¡¨ç¤ºè¿œç¨‹ç«¯æ ¹åœ°å€ã€‚
+RPCï¼š
+	Remote Process Callï¼Œè¿œç¨‹è¿‡ç¨‹è°ƒç”¨ï¼Œå°±æ˜¯ä¸¤ä¸ªè¿›ç¨‹é—´çš„è°ƒç”¨ã€‚
+	hadoopå„ä¸ªèŠ‚ç‚¹ï¼ˆä¸»æœºï¼‰é—´çš„é€šä¿¡ï¼Œå‡é‡‡ç”¨RPCã€‚
+	æœ¬åœ°æœºè¿œç¨‹æ‹¿åˆ°æ•°æ®ï¼Œä¹Ÿæ˜¯é€šè¿‡rpcå’Œnnä»¥åŠdnè¿æ¥ã€‚
+	hadoopå°†è¿œç¨‹è¿‡ç¨‹è°ƒç”¨æŠ½å‡ºæ¥ï¼Œä»¥å…åœ¨æ¯ä¸ªè®¡ç®—æœºä¸Šéƒ½é¢å¤–å†™ç›¸å…³çš„è°ƒç”¨ã€‚
+	è¿™æ ·ï¼Œç›´æ¥å°±åœ¨æœ¬åœ°è®¡ç®—æœºå¾—åˆ°äº†è¿œç¨‹å®ä¾‹çš„ä»£ç†ã€‚ç›´æ¥æ“ä½œä»£ç†ï¼Œä»£ç†ç®¡ç†å’Œè¿œç¨‹æœºçš„é€šä¿¡ä¸è¿‡ç¨‹è°ƒç”¨ã€‚
+	åº•å±‚æœºåˆ¶ï¼š
+		1ã€æœ¬åœ°è®¡ç®—æœºå°†è¦ç”¨çš„ç±»ã€å¯¹åº”çš„æ–¹æ³•ã€å‚æ•°ï¼Œé€šè¿‡socketä¼ è¾“åˆ°è¿œç¨‹è®¡ç®—æœºã€‚
+		2ã€è¿œç¨‹è®¡ç®—æœºåå°„å‡ºå¯¹åº”çš„ç±»çš„å®ä¾‹ï¼Œè°ƒç”¨ç›¸åº”æ–¹æ³•ã€‚
+		3ã€å°†ç»“æœé€šè¿‡socketè¿”å›ç»™æœ¬æœºè®¡ç®—æœºã€‚
+	RPCå®ç°æœºåˆ¶ï¼š
+		1.æ˜ç¡®ä¸€ä¸ªçœŸå®ç±»çš„æ¥å£ï¼Œç›®æ ‡æœºçš„çœŸå®ç±»å’Œæœ¬åœ°æœºçš„ä»£ç†ç±»éƒ½åº”è¯¥ç»§æ‰¿è¯¥æ¥å£ã€‚
+		2.ç¼–å†™çœŸå®ç±»çš„æ¥å£å®ç°æ–¹æ³•ã€‚
+		3.ç›®æ ‡æœºå’Œæœ¬åœ°æœºï¼Œéƒ½æœ‰socketç¨‹åºã€‚
+		4.ä»£ç†ç±»ä»£ç†çš„æ˜¯client socket, æœåŠ¡å™¨ç«¯æœ‰ä¸ªå·¥å…·ç±»sktåŒ…å«äº†service socket.
+		4.proxy.method(args)ï¼Œå°†è°ƒç”¨socketé€šè¿‡sendMsg()å‘é€æ•°æ®ç»™ç›®æ ‡æœº
+		5.ç›®æ ‡æœºçš„sktçš„socketæ¥æ”¶åˆ°æ•°æ®ï¼Œå°†åå°„å‡ºçœŸå®ç±»çš„å®é™…å¯¹è±¡ï¼Œç„¶åä¼ å…¥å‚æ•°ï¼Œè°ƒç”¨æ–¹æ³•ï¼Œç„¶åè¿”å›æ•°æ®
+		6.proxyçš„socketæ¥æ”¶åˆ°æ•°æ®ã€‚
+	RPCå®ç°æ­¥éª¤ï¼š
+		1.ç”Ÿæˆè°ƒç”¨ç«¯socketç¨‹åºåŠ¨æ€ä»£ç†å¯¹è±¡
+		2.é€šè¿‡proxyè°ƒç”¨æ–¹æ³•
+		3.è°ƒç”¨socketè¯·æ±‚æ–¹æ³•
+		4.å‘é€è°ƒç”¨è¯·æ±‚
+		5.æœåŠ¡å™¨ç«¯ç”ŸæˆåŠ¨æ€ä»£ç†å¯¹è±¡
+		6.è°ƒç”¨ä»£ç†å¯¹è±¡çš„å…·ä½“æ–¹æ³•
+		7.è·å–è°ƒç”¨ç»“æœ
+		8.socketè¿”å›è°ƒç”¨ç»“æœ
+		9.proxyè¿”å›ç»“æœ
+	RPCä½¿ç”¨ï¼š
+		1.RPCä»£ç†çš„ä½¿ç”¨åº”è¯¥éµå¾ªprotocol(åè®®)ï¼Œåè®®æ˜¯æŒ‡çš„å¯¹ç±»çš„ä½¿ç”¨åè®®ï¼Œä¹Ÿå°±æ˜¯æ¥å£ã€‚
+		2.ç”±äºæœåŠ¡å™¨å¯¹äºåŒæ ·çš„æœåŠ¡ï¼Œå¯èƒ½æœ‰ä¸åŒçš„ç‰ˆæœ¬ï¼Œå› æ­¤åè®®ä¸­åº”è¯¥æœ‰versionIDï¼Œä»¥æŒ‡å®šç‰ˆæœ¬å·ã€‚
+		3.æœåŠ¡å™¨å‘æ”¾ç±»æœåŠ¡:
+			1).åˆ¶å®šåè®®
+			2).åˆ¶å®šçœŸå®ç±»ï¼Œæè¿°ä½¿ç”¨ç»†èŠ‚
+			3).å°†builderé…ç½®å¥½ï¼Œå…¶ä¸­åŒ…æ‹¬æœåŠ¡çš„åœ°å€(æœ¬åœ°ip)ï¼ŒæœåŠ¡æ‰€åœ¨çš„ç«¯å£ï¼ŒæœåŠ¡æ‰€ç”¨çš„åè®®ï¼ŒæœåŠ¡çš„å®é™…ç±»ã€‚
+			4).åˆ›å»ºæœåŠ¡,Server ser = builder.build();
+			5).è¿è¡ŒæœåŠ¡,ser.start();å½“å‰çº¿ç¨‹é˜»å¡ã€‚
+		4.å®¢æˆ·ç«¯ä½¿ç”¨ä»£ç†æœåŠ¡:
+			1).å¤åˆ¶æœåŠ¡å™¨åè®®
+			2).è·å¾—ä»£ç†Interface proxy = (Interface)RPC.getProxy(protocol, versionID, InetSocketAdder, Configuration);
+			3).å¯ç›´æ¥ä½¿ç”¨ä»£ç†äº†
+hdfsæºç è¦ç‚¹:
 ----------------------------------------------
 |	FileSystem fs = FileSystem.get(conf);    |
 |	DFSInputStream is = fs.open(src);        |
 |	...                                      |
 ----------------------------------------------
-	fsµÃµ½nnÖĞµÄĞÅÏ¢£¬ÊÇÍ¨¹ıRPCProxy£¬ÊµÏÖµÄ½Ó¿ÚÊÇºÍnn»úÆ÷ÉÏµÄ¾ßÌåÊµÏÖÀàÒ»ÖÂ¡£
-	ÕâÑùÍ¨¹ıRPCProxy¿ÉÒÔµÃµ½nnµÄĞÅÏ¢¡£ÀıÈçµÃµ½µÃµ½¿éÎ»ÖÃ¡£
-	±¾»úÄÃµ½¿éÎ»ÖÃºó£¬»¹»áÓĞRPXProxy£¬´úÀíÁËºÍdn»úÆ÷ÉÏµÄÀà£¬ÒÔ»ñÈ¡ÕâĞ©Ô¶³ÌdnÖ÷»úµÄÊı¾İ¡£
+	fså¾—åˆ°nnä¸­çš„ä¿¡æ¯ï¼Œæ˜¯é€šè¿‡RPCProxyï¼Œå®ç°çš„æ¥å£æ˜¯å’Œnnæœºå™¨ä¸Šçš„å…·ä½“å®ç°ç±»ä¸€è‡´ã€‚
+	è¿™æ ·é€šè¿‡RPCProxyå¯ä»¥å¾—åˆ°nnçš„ä¿¡æ¯ã€‚ä¾‹å¦‚å¾—åˆ°å¾—åˆ°å—ä½ç½®ã€‚
+	æœ¬æœºæ‹¿åˆ°å—ä½ç½®åï¼Œè¿˜ä¼šæœ‰RPXProxyï¼Œä»£ç†äº†å’Œdnæœºå™¨ä¸Šçš„ç±»ï¼Œä»¥è·å–è¿™äº›è¿œç¨‹dnä¸»æœºçš„æ•°æ®ã€‚
 	1.FileSyste fs = FileSystem.get(conf);
-		->return get(getDefaultUri(conf), conf);		½«confµÄuriÄÃµ½("hdfs://weekend110:9000")
-			->String scheme = uri.getScheme();			ÄÃµ½ÎÄ¼şÏµÍ³"hdfs"
-			->String authority = uri.getAuthority();	ÄÃµ½Ö÷»úÃûºÍ¶Ë¿ÚºÅ"weekend110:9000"
-			->if(scheme==null && authority==null)		Ã»ÓĞÖ¸¶¨£¬·µ»Ø±¾µØÖ÷»úÎÄ¼şÏµÍ³
+		->return get(getDefaultUri(conf), conf);		å°†confçš„uriæ‹¿åˆ°("hdfs://weekend110:9000")
+			->String scheme = uri.getScheme();			æ‹¿åˆ°æ–‡ä»¶ç³»ç»Ÿ"hdfs"
+			->String authority = uri.getAuthority();	æ‹¿åˆ°ä¸»æœºåå’Œç«¯å£å·"weekend110:9000"
+			->if(scheme==null && authority==null)		æ²¡æœ‰æŒ‡å®šï¼Œè¿”å›æœ¬åœ°ä¸»æœºæ–‡ä»¶ç³»ç»Ÿ
 			->return CACHE.get(uri, conf);
-				->Key key = new Key(uri, conf);			ÓÃ»§·ÃÎÊĞÅÏ¢,Ïàµ±ÓÚÓÃ»§Á¬½Ó¸ÃÔ¶³Ì»úµÄ±êÖ¾¡£
-				->return getInternal(uri, conf, key)£»
+				->Key key = new Key(uri, conf);			ç”¨æˆ·è®¿é—®ä¿¡æ¯,ç›¸å½“äºç”¨æˆ·è¿æ¥è¯¥è¿œç¨‹æœºçš„æ ‡å¿—ã€‚
+				->return getInternal(uri, conf, key)ï¼›
 					->FileSystem fs = null;
-					->fs = map.get(key);	¸ù¾İ·ÃÎÊ±êÖ¾£¬µÃµ½Ò»¸öÒÑ¾­´æÔÚ»ònullµÄfs£¬¶ÔÓÚÏàÍ¬µÄÓÃ»§¶ÔÏàÍ¬Ö÷»úµÄ·ÃÎÊ£¬·´¸´¶à´Î¶¼·´¸´µÄÊÇÍ¬Ò»µÄfs.Ïàµ±ÓÚµ¥ÀûÄ£Ê½
+					->fs = map.get(key);	æ ¹æ®è®¿é—®æ ‡å¿—ï¼Œå¾—åˆ°ä¸€ä¸ªå·²ç»å­˜åœ¨æˆ–nullçš„fsï¼Œå¯¹äºç›¸åŒçš„ç”¨æˆ·å¯¹ç›¸åŒä¸»æœºçš„è®¿é—®ï¼Œåå¤å¤šæ¬¡éƒ½åå¤çš„æ˜¯åŒä¸€çš„fs.ç›¸å½“äºå•åˆ©æ¨¡å¼
 					->if(fs == null) fs = createSystem(uri, conf);
-						->class<?> clazz = getFileSystemClass(uri.getScheme(), conf);	ÄÃµ½ÎÄ¼şÏµÍ³µÄÀàĞÍ£¬¿ÉÄÜÊÇdfs£¬ftp£¬ntfs£¬ext3µÈµÈµÈµÈ
+						->class<?> clazz = getFileSystemClass(uri.getScheme(), conf);	æ‹¿åˆ°æ–‡ä»¶ç³»ç»Ÿçš„ç±»å‹ï¼Œå¯èƒ½æ˜¯dfsï¼Œftpï¼Œntfsï¼Œext3ç­‰ç­‰ç­‰ç­‰
 							->clazz = null;
-							->if(clazz==null) return SERVICE_FILE_SYSTEM.get(scheme);	ÄÃµ½·şÎñÆ÷ÎÄ¼şÏµÍ³ÀàĞÍ 
+							->if(clazz==null) return SERVICE_FILE_SYSTEM.get(scheme);	æ‹¿åˆ°æœåŠ¡å™¨æ–‡ä»¶ç³»ç»Ÿç±»å‹ 
 							->return clazz;
-						->FileSystem fs = (FileSystem)ReflectionUtils.newInstance(clazz, conf);	·´Éä³öÒ»¸öÎ´³õÊ¼»¯µÄÊµÀı.
+						->FileSystem fs = (FileSystem)ReflectionUtils.newInstance(clazz, conf);	åå°„å‡ºä¸€ä¸ªæœªåˆå§‹åŒ–çš„å®ä¾‹.
 						->fs.initialize(uri, conf);
-							->setConf(conf);		½«conf¿½±´µ½fsÖĞ
-							->host = uri.getHost();	»ñµÃÖ÷»úÃû
-							->this.dfs = new DFSClient();	·Ö²¼Ê½ÎÄ¼şÏµÍ³£¬ÀïÃæº¬ÓĞrpc´úÀí¶ÔÏó:ClientProtocol namenode
-								->this(namenodeUri, null, conf, stats);	»»ÁË¸ö¹¹Ôìº¯Êı
-									->NameNodeProxies.ProxyAndInfo<ClientProtocol> proxyInfo = null;						±£´æ´úÀí¶ÔÏóÒÔ¼°ÆäËûĞÅÏ¢µÄ
-									->proxyInfo = NameNodeProxies.createProxy(conf, nameNodeUri, ClientProtocol.class);		´´½¨´úÀí¶ÔÏóµÄ
+							->setConf(conf);		å°†confæ‹·è´åˆ°fsä¸­
+							->host = uri.getHost();	è·å¾—ä¸»æœºå
+							->this.dfs = new DFSClient();	åˆ†å¸ƒå¼æ–‡ä»¶ç³»ç»Ÿï¼Œé‡Œé¢å«æœ‰rpcä»£ç†å¯¹è±¡:ClientProtocol namenode
+								->this(namenodeUri, null, conf, stats);	æ¢äº†ä¸ªæ„é€ å‡½æ•°
+									->NameNodeProxies.ProxyAndInfo<ClientProtocol> proxyInfo = null;						ä¿å­˜ä»£ç†å¯¹è±¡ä»¥åŠå…¶ä»–ä¿¡æ¯çš„
+									->proxyInfo = NameNodeProxies.createProxy(conf, nameNodeUri, ClientProtocol.class);		åˆ›å»ºä»£ç†å¯¹è±¡çš„
 										->T proxy;
-										->proxy = (T) createNNProxyWithClientProtocol(nnAdr, conf, ugi, withRetries);		½øÒ»²½´´½¨´úÀíÀà
-											->proxy = RPC.getProtoProxy(ClientNameNodeProtocolPB.class, version, address, ugi, conf);	ÖÕÓÚÄÃµ½nn´úÀíÁË
+										->proxy = (T) createNNProxyWithClientProtocol(nnAdr, conf, ugi, withRetries);		è¿›ä¸€æ­¥åˆ›å»ºä»£ç†ç±»
+											->proxy = RPC.getProtoProxy(ClientNameNodeProtocolPB.class, version, address, ugi, conf);	ç»ˆäºæ‹¿åˆ°nnä»£ç†äº†
 											->return proxy;
-									->this.namenode=proxyInfo.getProxy();		ÄÃµ½´úÀí¸ønamenode
-							->this.uri = getUri...; 			¾ÍÊÇÔ¶³ÌÖ÷»úµÄ¸ùÄ¿Â¼
+									->this.namenode=proxyInfo.getProxy();		æ‹¿åˆ°ä»£ç†ç»™namenode
+							->this.uri = getUri...; 			å°±æ˜¯è¿œç¨‹ä¸»æœºçš„æ ¹ç›®å½•
 							->this.workingDir = getHomeDirectory();
 						->return fs;
-					->map.put(key, fs);						½«¸Ã´Î·ÃÎÊ»º´æ
-					->return fs;							ÖÁ´Ë£¬ÄÃµ½ÁËFileSystem
-		¿ÉÒÔ¿´µ½FileSystem.get(conf)£¬Êµ¼ÊÍê³ÉÁË¶ÔÔ¶³ÌÖ÷»úµÄÁ¬½Ó£¬²¢ÇÒÖ¸¶¨ÎÄ¼şÏµÍ³¡£
-		ÕâĞ©ĞÅÏ¢¶¼ÔÚconfÖĞÖ¸¶¨¡£Ô¶³ÌÁ¬½ÓÖ÷ÒªÊÇ»ñµÃÔ¶³ÌÖ÷»únamenodeµÄÊµ¼Ê²Ù×÷ÀàµÄÔ¶³Ì´úÀí¡£
-		Òò´Ëfs.dfs.namenode¾ÍÊÇnamenode»úµÄ´úÀíÀà¡£
+					->map.put(key, fs);						å°†è¯¥æ¬¡è®¿é—®ç¼“å­˜
+					->return fs;							è‡³æ­¤ï¼Œæ‹¿åˆ°äº†FileSystem
+		å¯ä»¥çœ‹åˆ°FileSystem.get(conf)ï¼Œå®é™…å®Œæˆäº†å¯¹è¿œç¨‹ä¸»æœºçš„è¿æ¥ï¼Œå¹¶ä¸”æŒ‡å®šæ–‡ä»¶ç³»ç»Ÿã€‚
+		è¿™äº›ä¿¡æ¯éƒ½åœ¨confä¸­æŒ‡å®šã€‚è¿œç¨‹è¿æ¥ä¸»è¦æ˜¯è·å¾—è¿œç¨‹ä¸»æœºnamenodeçš„å®é™…æ“ä½œç±»çš„è¿œç¨‹ä»£ç†ã€‚
+		å› æ­¤fs.dfs.namenodeå°±æ˜¯namenodeæœºçš„ä»£ç†ç±»ã€‚
 	2.fs.open()
-		Ê×ÏÈºÍnnÍ¨ĞÅ£¬ÄÃµ½ÎÄ¼şµÄblockµÄĞÅÏ¢£¬ÈçÎ»ÖÃÁ¬½ÓblockµÄdatanode£¬Ë³Ğò½«blk1 blk2 ...Æ´½ÓÆğÀ´.
+		é¦–å…ˆå’Œnné€šä¿¡ï¼Œæ‹¿åˆ°æ–‡ä»¶çš„blockçš„ä¿¡æ¯ï¼Œå¦‚ä½ç½®è¿æ¥blockçš„datanodeï¼Œé¡ºåºå°†blk1 blk2 ...æ‹¼æ¥èµ·æ¥.
 		FSDataInputStream is = fs.open(new Path("....."));
-		->return open(f, getConf().getInt("io.file.buffer.size", 4096))£»
-			->Path absF = fixRelativePart(f);		½«Ïà¶ÔÂ·¾¶¸Ä³É¾ø¶ÔÂ·¾¶£¨ÒòÎªÓĞÊ±ºò¼òĞ´£¬ÕâÀï°ÑÎÄ¼şÏµÍ³£¬Ö÷»úÃû£¬¶Ë¿ÚºÅ¶¼¼Ó½øÈ¥£©
+		->return open(f, getConf().getInt("io.file.buffer.size", 4096))ï¼›
+			->Path absF = fixRelativePart(f);		å°†ç›¸å¯¹è·¯å¾„æ”¹æˆç»å¯¹è·¯å¾„ï¼ˆå› ä¸ºæœ‰æ—¶å€™ç®€å†™ï¼Œè¿™é‡ŒæŠŠæ–‡ä»¶ç³»ç»Ÿï¼Œä¸»æœºåï¼Œç«¯å£å·éƒ½åŠ è¿›å»ï¼‰
 			return new FileSystemLinkResolve<FSDataInputStream>(){
-				public FSDataInputStream doCall(final Path p){	»ñµÃÁ÷
-					return new HdfsDataInpuStream(dfs.open(getPathName(p)), buffersize, verifyChecksum);	Ò²¾ÍÊÇFSDataInputStreamÀïÃæ°ü×°ÁË¸ödfsÁ÷
+				public FSDataInputStream doCall(final Path p){	è·å¾—æµ
+					return new HdfsDataInpuStream(dfs.open(getPathName(p)), buffersize, verifyChecksum);	ä¹Ÿå°±æ˜¯FSDataInputStreamé‡Œé¢åŒ…è£…äº†ä¸ªdfsæµ
 				}
-			}.resolve(this, absF);				·µ»ØÁ÷,ÊµÖÊµ÷ÓÃµÄÄäÃû¶ÔÏóµÄdoCall
-		Ò²¾ÍÊÇÊµÖÊÉÏdfs´ò¿ªµÄÎÄ¼şÁ÷,ÕâÀïÔÙ¿´dfsµÄopen(·µ»ØDFSInputStream)
+			}.resolve(this, absF);				è¿”å›æµ,å®è´¨è°ƒç”¨çš„åŒ¿åå¯¹è±¡çš„doCall
+		ä¹Ÿå°±æ˜¯å®è´¨ä¸Šdfsæ‰“å¼€çš„æ–‡ä»¶æµ,è¿™é‡Œå†çœ‹dfsçš„open(è¿”å›DFSInputStream)
 		return dfs.open(src, buffersize, verifyChecksum);
 			->return new DFSInputStream(this, src, buffersize, verifyChecksum);
-				->this.dfsClient = dfsClient;	Á÷³ÖÓĞdfsClient£¬·½±ãµÃµ½nn£¬ºÍnamenodeÍ¨ĞÅ
-				->this.src = src;				Òª´ò¿ªµÄÎÄ¼şÂ·¾¶
-				->openInfo();					¼ÓÔØÒ»ÇĞĞèÒªµÄĞÅÏ¢£¬ÀıÈçlocatedBlocks(¿éÎ»ÖÃĞÅÏ¢), blockReaderµÈ
-					->lastBlockBeingWrittenLength=fetchLocatedBlocksAndGetLastBlockLength();	»ñÈ¡¿éÎ»ÖÃ²¢ÇÒÈ¡×îºóÒ»¿éµÄ´óĞ¡
-						->final locatedBlocks newInfo = dfsClient.getLocatedBlocks(src, 9);		¸Ãº¯ÊıÄÚ²¿Í¨¹ı´úÀí»ñµÃ¿éÎ»ÖÃĞÅÏ¢£¬ÕâÀïÍ¨¹ısocketºÍnamenodeÍ¨ĞÅ£¬namenodeÖ÷»úÖ´ĞĞÃüÁî£¬ÔÙÍ¨¹ısocket·µ»ØÖ´ĞĞ½á¹û
+				->this.dfsClient = dfsClient;	æµæŒæœ‰dfsClientï¼Œæ–¹ä¾¿å¾—åˆ°nnï¼Œå’Œnamenodeé€šä¿¡
+				->this.src = src;				è¦æ‰“å¼€çš„æ–‡ä»¶è·¯å¾„
+				->openInfo();					åŠ è½½ä¸€åˆ‡éœ€è¦çš„ä¿¡æ¯ï¼Œä¾‹å¦‚locatedBlocks(å—ä½ç½®ä¿¡æ¯), blockReaderç­‰
+					->lastBlockBeingWrittenLength=fetchLocatedBlocksAndGetLastBlockLength();	è·å–å—ä½ç½®å¹¶ä¸”å–æœ€åä¸€å—çš„å¤§å°
+						->final locatedBlocks newInfo = dfsClient.getLocatedBlocks(src, 9);		è¯¥å‡½æ•°å†…éƒ¨é€šè¿‡ä»£ç†è·å¾—å—ä½ç½®ä¿¡æ¯ï¼Œè¿™é‡Œé€šè¿‡socketå’Œnamenodeé€šä¿¡ï¼Œnamenodeä¸»æœºæ‰§è¡Œå‘½ä»¤ï¼Œå†é€šè¿‡socketè¿”å›æ‰§è¡Œç»“æœ
 						
 						
-		locatedBlocksÖĞµÄĞÅÏ¢ÓÉ£º
+		locatedBlocksä¸­çš„ä¿¡æ¯ç”±ï¼š
 		{
-			fileLength = ...; ÎÄ¼ş´óĞ¡
-			underConstruction=false; 	ÎÄ¼şÔÚhdfsÊÇÕı³£×´Ì¬£¬ ¹¹ÔìÍê³ÉÁËµÄ£¬°üÀ¨¸±±¾µÈµÈ¡£
-			blocks=[LocatedBlock{¼¯Èº±êÊ¾ : blk1ÎÄ¼şÃû: BlockSize; corrupt; offset; locs=[host1:port1;host2:port2...]},
-					LocatedBlock{¼¯Èº±êÊ¾ : blk2ÎÄ¼şÃû: BlockSize; corrupt; offset; locs=...}
+			fileLength = ...; æ–‡ä»¶å¤§å°
+			underConstruction=false; 	æ–‡ä»¶åœ¨hdfsæ˜¯æ­£å¸¸çŠ¶æ€ï¼Œ æ„é€ å®Œæˆäº†çš„ï¼ŒåŒ…æ‹¬å‰¯æœ¬ç­‰ç­‰ã€‚
+			blocks=[LocatedBlock{é›†ç¾¤æ ‡ç¤º : blk1æ–‡ä»¶å: BlockSize; corrupt; offset; locs=[host1:port1;host2:port2...]},
+					LocatedBlock{é›†ç¾¤æ ‡ç¤º : blk2æ–‡ä»¶å: BlockSize; corrupt; offset; locs=...}
 					]		
 		}
-		¼¯Èº±êÊ¾ÓÃÀ´±êÊ¾Õâ¸öÎÄ¼ş¿éËùÔÚµÄ¼¯Èº¡£¼¯Èº±êÊ¾ÀïÃæÓĞ¸önamenodeµÄipµØÖ·¡£
-		BlockSizeÊÇ¸Ã¿é´óĞ¡£¬corrupt±êÖ¾¿éÊÇ·ñÆÆËğ£¬offsetÊÇ¸Ã¿éÔÚÎÄ¼şÖĞµÄÆ«ÒÆ£¬locsÊÇ¸Ã¿éËù×øÂäµÄÖ÷»ú¡£
-		BlockReaderÊÇ¸ö½Ó¿Ú£¬×îºó¹¹ÔìµÄRemoteBlockReaderÀàµÄÊµÀı.
-		RemoteBlockReaderÓĞdatanode
+		é›†ç¾¤æ ‡ç¤ºç”¨æ¥æ ‡ç¤ºè¿™ä¸ªæ–‡ä»¶å—æ‰€åœ¨çš„é›†ç¾¤ã€‚é›†ç¾¤æ ‡ç¤ºé‡Œé¢æœ‰ä¸ªnamenodeçš„ipåœ°å€ã€‚
+		BlockSizeæ˜¯è¯¥å—å¤§å°ï¼Œcorruptæ ‡å¿—å—æ˜¯å¦ç ´æŸï¼Œoffsetæ˜¯è¯¥å—åœ¨æ–‡ä»¶ä¸­çš„åç§»ï¼Œlocsæ˜¯è¯¥å—æ‰€åè½çš„ä¸»æœºã€‚
+		BlockReaderæ˜¯ä¸ªæ¥å£ï¼Œæœ€åæ„é€ çš„RemoteBlockReaderç±»çš„å®ä¾‹.
+		RemoteBlockReaderæœ‰datanode
