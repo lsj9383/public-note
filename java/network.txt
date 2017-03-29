@@ -1,116 +1,148 @@
-һ�������׽���
-	1.����ӿ���ط���
-		Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();	//��ñ�������ӿ��б�
-		String name = iface.getName();							//�������ӿڵ�����
-		Enumeration<InetAddress> = iface.getInetAddress();		//�������ӿڵ�����ip��ַ	
-	2.IP��ַ���
-		InetAddress[] address = InetAddress.getAllByName(host);	//������������е�ַ
-		InetAddress addr = InetAddress.getByName(host);			//��ȡ������һ����ַ
-		byte[] parts = addr.getAddress();	//��õ�ַ��ÿ���ֽ�
-		String s = addr.getHostName();		//��õ�ַ����������
-		String s = addr.getHostAddress();	//��õ�ַ��Ӧ��ip�ַ���
-		String s = addr.toString();			//�����������Ľ��
+一、基本套接字
+	1.网络接口相关方法
+		Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();	//获得本机网络接口列表
+		String name = iface.getName();							//获得网络接口的名字
+		Enumeration<InetAddress> = iface.getInetAddress();		//获得网络接口的所有ip地址	
+	2.IP地址相关
+		InetAddress[] address = InetAddress.getAllByName(host);	//获得域名的所有地址
+		InetAddress addr = InetAddress.getByName(host);			//获取域名的一个地址
+		byte[] parts = addr.getAddress();	//获得地址的每个字节
+		String s = addr.getHostName();		//获得地址的主机域名
+		String s = addr.getHostAddress();	//获得地址对应的ip字符串
+		String s = addr.toString();			//是上面两个的结合
 	3.TCP Client
-		1).����socketʵ����
-			Socket�������ǲ��ɱ�ġ�
-			Socket(InetAddress remoteAddr, int remotePort);	//ͬ��
-			Socket(String remoteHost, int remotePort);		//������ֱ�����ӵ�Զ�̵�ַ�Ͷ˿ںţ����䷵�ظ����򡣱��صĵ�ַ�Ͷ˿���Ĭ��ѡȡ�ġ���ȻҲ����ָ����
-			Socket();										//����û�����ӵ��׽��֣�����ͨ��connect()�����������ӡ�
-		2).ͨ���׽��ֵ�IO����ͨ�ţ�Socket������InputStream��OutputStream��
+		1).创建socket实例。
+			Socket创建后，是不可变的。
+			Socket(InetAddress remoteAddr, int remotePort);	//同下
+			Socket(String remoteHost, int remotePort);		//阻塞，直到连接到远程地址和端口号，将其返回给程序。本地的地址和端口是默认选取的。当然也可以指定。
+			Socket();										//创建没有连接的套接字，可以通过connect()方法进行连接。
+		2).通过套接字的IO进行通信，Socket包含了InputStream和OutputStream。
 			void connect(SocketAddress destination);
-			void connect(SocketAddress destination, int timeout);		//����ָ�����ӵĳ�ʱʱ�䡣
+			void connect(SocketAddress destination, int timeout);		//可以指定连接的超时时间。
 			
-			InputStream getInputStream();		//��Ҫע����ǣ��������ڴ������Ӻ�ſ��Ի�������������������ݣ���û�л�������ݣ��������ȴ���
-			OutputStream getOutputStream();		//�����ͬ�ϡ�
-			void shutdownInput();				//�ر�������������û�ж�ȡ������������
-			void shutdownOutput();				//�ر����������������д���ݡ������Ѿ�д������һ�㻹���Է��͹�ȥ��
-		3).ͨ��close()�����ر����ӡ�
-			��һ���ر����ӣ���һ�����껺���������ݺ󣬾���Ҳ�����������ˣ�ֱ�ӷ���-1��
-		4).Socket�������
+			InputStream getInputStream();		//需要注意的是，【必须在创建连接后才可以获得输入流】。读出数据，若没有缓冲的数据，则阻塞等待。
+			OutputStream getOutputStream();		//输出流同上。
+			void shutdownInput();				//关闭输入流，放弃没有读取到的所有数据
+			void shutdownOutput();				//关闭输出流，不可以在写数据。但是已经写的数据一般还可以发送过去。
+		3).通过close()方法关闭连接。
+			当一方关闭连接，另一方读完缓冲区的内容后，就再也读不出东西了，直接返回-1。
+		4).Socket相关属性
 			getInetAddress();
 			getPort();
 			getLocalAddress();
 			getLocalPort();
 	4.TCP Server
-		1).����һ��ServerSocketʵ�������ƶ����ض˿ڡ�
-			ServerSocket servSock = new ServerSocket(port);		һ����������ʼ���ڼ������յ��ͻ��˵�tcp���󣬾ͽ����µ�socket�Ϳͻ��˶Խӣ������µ�socket�����ڶ����С�
-		2).accept(); �������Ի�ȡһ��Socketʵ������ʵ��������ĳ���ͻ��˵����ӡ�
-			����������socket��ȡ��������ͨ�š���������û��socket������ֱ�����ڡ�
-		3).ʹ�ø�socketʵ����InputStream��OutputStream�Ϳͻ���ͨ�š�		
-		4).ͨ����ɣ�ʹ��close()�����رտͻ����׽������ᡣ
-	5.���������
+		1).创建一个ServerSocket实例，并制定本地端口。
+			ServerSocket servSock = new ServerSocket(port);		一旦创建，就始终在监听。收到客户端的tcp请求，就建立新的socket和客户端对接，并将新的socket保存在队列中。
+		2).accept(); 方法可以获取一个Socket实例，该实例管理和某个客户端的连接。
+			若队列中有socket，取出来用于通信。若队列中没有socket，阻塞直到存在。
+		3).使用该socket实例的InputStream和OutputStream和客户端通信。		
+		4).通信完成，使用close()方法关闭客户端套接字连结。
+	5.输入输出流
 		1.inputstrea
-			1).readʱ����û�����ݣ���Զ�̶˵�������Ѿ��رգ��򷵻�-1��
-			2).readʱ����û�����ݣ���Զ�̶˵����������򿪣���������
-			3).read����һ���������ֽ�����������ŷ��أ�ʵ����ֻҪ���ˣ������ͷ��ء�
-		2).outputstream��write�ڻ���������ʱ�򣬻������������������������
+			1).read时，若没有数据，且远程端的输出流已经关闭，则返回-1。
+			2).read时，若没有数据，且远程端的输出流保存打开，则阻塞。
+			3).read并不一定在整个字节数组填满后才返回，实际上只要有了，立马就返回。
+		2).outputstream的write在缓冲区满的时候，会阻塞。尽量避免这种情况。
 	6.UDP
 		1).DatagramPacket
-			���ͺͽ��յĻ�����λ�������װ��һ���ֽ����飬�൱�ڽ��ֽ���������ݴ�������ֽ������е����ݡ����ͳ�ȥ���򡾽��յ����ء���
-			DatagramPacket(byte[] data, int length);										//��һ���ֽ�������Ϊһ��packet����Ҫ���ڽ��գ����յ����������ֱ�������С�
-			DatagramPacket(byte[] data, int length, InetAddress remoteAddr, int port);		//�������������ƶ������͵�λ�á�
+			发送和接收的基本单位，里面封装了一个字节数组，相当于将字节数组的内容打包，将字节数组中的内容【发送出去】或【接收到本地】。
+			DatagramPacket(byte[] data, int length);										//将一个字节数组打包为一个packet，主要用于接收，接收的内容在这个直接数组中。
+			DatagramPacket(byte[] data, int length, InetAddress remoteAddr, int port);		//将数组打包，并制定包发送的位置。
 			
-			InetAddress addr = packet.getAddress();	//��øð��ĵ�ַ(���հ����õ�Դ��ַ;���Ͱ����õ��˵�ַ)
-			int getPort();							//��øð��Ķ˿�
-			int getLength();	//���ݳ���
+			InetAddress addr = packet.getAddress();	//获得该包的地址(接收包，得到源地址;发送包，得到端地址)
+			int getPort();							//获得该包的端口
+			int getLength();	//数据长度
 			byte[] getData();
 			void setData(byte[] data);
 		2).DatagramSocket
-			DatagramPacket();	//����udp socket��û��ָ���˿ڣ���ô������Զ�ѡ��󶨶˿ڡ�
+			DatagramPacket();	//创建udp socket，没有指定端口，那么计算机自动选择绑定端口。
 			
-			connect(remoteAddr, remotePort);	//һ�����ӳɹ������׽���ֻ����ָ���ĵ�ַ�Ͷ˿�ͨ�š�ͨ�����Բ��������ӡ�
-			disconnect();						//�������
-			setSoTimeout(int timeoutMillis);	//����receive()��ʱʱ��(ms)
-			int getSoTimeout();					//���receive()��ʱʱ��
+			connect(remoteAddr, remotePort);	//一旦连接成功，该套接字只能与指定的地址和端口通信。通常可以不建立连接。
+			disconnect();						//清除连接
+			setSoTimeout(int timeoutMillis);	//设置receive()超时时间(ms)
+			int getSoTimeout();					//获得receive()超时时间
 
-			void send(DatagramPacket packet);	//��packet�����ݷ��ͳ�ȥ��packet���Ѿ�ָ���˷��͵�ַ�ˡ���connect������ô��ֻ����ָ���ĵ�ַ�Ͷ˿ڷ����ˡ�
-			void receive(DatagramPacket packet);//�����ȴ���ֱ�����յ����ݱ��ġ����յ���packet��串�Ǿɵ�packet��
-�������߳�ִ��
-	1.��־��¼
-		�������Ὣ�û��Ļ��¼д����־��java�Դ�����־�࣬��������һ�����󡣲�����֮�ᶼ���̰߳�ȫ�ġ�
-		1).����
-			static Logger getLogger(String name);	//��̬�������ڷ���ָ�����ֵ���־����ÿ�����ֵ���־�����ǵ����ġ��������ڸ����ֵĶ���ʹ����µģ�������ֱ���ҵ������ء�
-		2).��¼��־��Ϣ
-			ÿ����־��Ϣ�����еȼ��ģ���˼�¼��־��Ϣ��ʱ����Ҫָ���ȼ��ġ�һ�����߸��ȼ���
-			void severe(String msg);			//�Ͼ���
-			void warning(String msg);			//�����
+			void send(DatagramPacket packet);	//将packet的数据发送出去，packet中已经指定了发送地址了。若connect过，那么就只能向指定的地址和端口发送了。
+			void receive(DatagramPacket packet);//阻塞等待，直到接收到数据报文。接收到的packet填充覆盖旧的packet。
+二、多线程执行
+	1.日志记录
+		服务器会将用户的活动记录写入日志。java自带了日志类，可以满足一般需求。并且日之泪都是线程安全的。
+		1).创建
+			static Logger getLogger(String name);	//静态方法用于返回指定名字的日志对象。每个名字的日志对象都是单例的。即不存在改名字的对象就创建新的，存在则直接找到并返回。
+		2).记录日志信息
+			每个日志信息都是有等级的，因此记录日志信息的时候是要指定等级的。一共有七个等级。
+			void severe(String msg);			//严峻的
+			void warning(String msg);			//警告的
 			void info(String msg);				//
 			void config(String msg);
 			void fine(String msg);
 			void finer(String msg);
 			void finest(String msg);
 			void log(Level level, String msg);
-		3).����/��ȡ��־�ȼ�
-			��־�������ݵȼ�ȥ��¼��־��Ϣ������logger��ǰ�ȼ�����Ϣ����������
+		3).设置/获取日志等级
+			日志对象会根据等级去记录日志信息，低于logger当前等级的消息将被抛弃。
 			Level getLevel();
 			void setLevel(Level newLevel);
 			boolean isLoggable(Level level);
-		4).����/��ȡ��־������
-			���������ڷ���һ����Ϣ����˴������������������, Ĭ���������һ��ConsoleHandler��������Ϣ��ӡ��System.err�С�
-			��Ҫע����ǣ�ÿ��handlerҲ����С��־�ȼ�������handler�ĵȼ����ܷ�������־��Ϣ��Ҳ����˵������һ����Ϣ�ɴ���������־һ�����ơ�
-			Handlers[] getHandlers();			//������д�����
-			void addHandler(Handler handler);	//���Ӵ�����
-	2.���̷߳���
-		1).һ�ͻ�һ�߳�
-			Ϊÿ�����Ӷ�����һ���µ��߳���������
-		2).�̳߳�
-			Ԥ�ȴ���һ���̣߳�Ȼ�����߳��������accept�ͻ���socket�Ͳ�������
-		3).ϵͳ��������, Executor�ӿ�
-			�����ʵ�Ƿ�װ�õ��̳߳�
-			Executor executor = Executors.newFixedThreadPool(poolSize);		//�߳���������̳߳�.
-			Executor executor = Executors.newCachedThreadPool();			//�߳����ɱ���̳߳�, �̲߳���ʱ�Զ����ӣ��߳̿��й����Զ�ɾ��.
-			Executor executor = Executor.newSingleThreadExecutor();			//��һ�߳�.
-	3.�����볬ʱ
-		1)��ȡ
+		4).设置/获取日志处理器
+			处理器用于发布一条消息，因此处理器和输出流相连接, 默认情况下又一个ConsoleHandler用来将消息打印到System.err中。
+			需要注意的是，每个handler也有最小日志等级，大于handler的等级才能发布该日志消息。也就是说，发布一条消息由处理器和日志一起限制。
+			Handlers[] getHandlers();			//获得所有处理器
+			void addHandler(Handler handler);	//添加处理器
+	2.多线程方法
+		1).一客户一线程
+			为每个链接都创建一个新的线程来处理。
+		2).线程池
+			预先创建一批线程，然后在线程里面进行accept客户端socket和并处理。
+		3).系统管理调度, Executor接口
+			这个其实是封装好的线程池
+			Executor executor = Executors.newFixedThreadPool(poolSize);		//线程数不变的线程池.
+			Executor executor = Executors.newCachedThreadPool();			//线程数可变的线程池, 线程不够时自动添加，线程空闲过久自动删除.
+			Executor executor = Executor.newSingleThreadExecutor();			//单一线程.
+	3.阻塞与超时
+		1)获取
 			accept()
 			read()
 			receive()
-			���Ϸ�����û�����ݿɶ�ʱ������������ͨ����socket����setSoTimeout()���������������ʱ�䡣�����ָ����ʱ������û�з��ؽ����׳�һ��InterruptedIOException�쳣��
-		2).������д����
-			a).��ͨ�����캯��ֱ�ӽ�socket��Ŀ�����ӣ���ô����Ҫ�����ӳɹ���Ż᷵�ء�Ҫ������������Խ����޲ε�Scoket����ͨ��connect()�����������ӣ��÷����������ó�ʱʱ�䡣
-			   Զ�̶˵�ServSocket���������������󣬽���������Ŀͻ���socket��ȡ���������ζ�����ӳɹ���
-			b).write()�������û������ȴ���ֱ�����һ���ֽڳɹ�д�뵽TCPʵ�ֵġ����ػ��桿�С������Ǳ��ػ��������������ֱ����Զ�̶�ȡ���ݣ��Ż����д�롣
-			   ���write()�������µ�����ȡ����д������ݳ����Լ����ӵ���һ�ˡ��ź�����java��write()������û���ṩ��ʱ��������
-		3).����������ÿ���ͻ��˵�ʱ��
-			�ڷ�������������ÿ���ͻ������ӵ�ʱ�䳬ʱ���Զ���ֹ��
-			
+			以上方法在没有数据可读时会阻塞，可以通过对socket调用setSoTimeout()，设置其阻塞的最长时间。如果在指定的时间阻塞没有返回将会抛出一个InterruptedIOException异常。
+		2).连接与写数据
+			a).若通过构造函数直接将socket与目标连接，那么必须要在连接成功后才会返回。要解决这个问题可以建立无参的Scoket，再通过connect()方法进行连接，该方法可以设置超时时间。
+			   远程端的ServSocket监听到了连接请求，将连接请求的客户端socket获取到并入队意味着连接成功。
+			b).write()方法调用会阻塞等待，直到最后一个字节成功写入到TCP实现的【本地缓存】中。但若是本地缓存满了则会阻塞直到有远程读取数据，才会继续写入。
+			   因此write()方法导致的阻塞取决于写入的数据长度以及连接的另一端。遗憾的是java对write()阻塞【没有提供超时处理】。
+		3).服务器限制每个客户端的时间
+			在服务器端限制与每个客户端连接的时间超时后自动终止。
+
+六 深入剖析
+	Socket是指的Java应用层面的抽象，例如Socket，DatagramSocket，ServerSocket。RecvQ连接的是InputStream, SendQ连接的是OutputStream。
+	socket是指的底层抽象，所有的网络程序都是使用的这一个抽象。这一个抽象里面主要的结构是：localPort，localIP，remote port，remote IP，RecvQ，SendQ。
+	不同的Socket其方法执行起来是不同的，例如写Socket的OutputStream都必须被保存，直到接收端成功接收，并且write后并不会立即发送数据，就算用flush也不行，这由系统控制。
+	DatagramSocket是UDP的Socket，调用send后会直接 发送数据，并且不会为重传而缓存数据，
+	1.缓冲和TCP
+		TCP的socket存在两个缓冲区：SendQ和RecvQ。
+		通过out.write()方法，将会在SendQ后面追加数据。通过in.read()方法，将会把RecvQ中指定大小的数据给读取出来，并返回实际读取到的数据个数。
+		采用SendQ，RecvQ这种机制，一方面是为了失败重传作保证，一方面是为了增大吞吐量(若没有缓存，那么发送n个字节数据，需要发送n次)。
+	2.死锁风险
+		这种缓存机制会带来死锁的风险，风险主要是由【流量控制】带来的。
+		SendQ和RecvQ的容量必定会受到限制，否则会被恶意的消耗系统内存。当接收端的RecvQ满了，TCP的流量控制机制就会起作用，将会阻止发送端的SendQ中发送任何数据，直到RecvQ中有空。
+		换句话说，若RecvQ中满了，那么out.write()将会阻塞，知道接收端调用in.read()。这非常类似于生产-消费者模式。
+		死锁风险可以通过nio来避免。
+	3.生命周期
+		1).连接
+			socket的连接主要是tcp的三次握手的过程。
+			a).服务器端
+				服务器首先创建一个ServerSocket，一旦创建成功ServerSocket就开始监听客户端发送来的连接请求(三次握手请求)。
+				当客户端的连接请求到来时，将会为连接创建一个新的套接字结构，并返回客户端一个响应。这个新套接字处于【正在连接】状态，因为服务器还需要等待客户端的回应。
+				一旦客户端响应了服务器后，三次握手完成，新套接字完成连接的建立，并将新套接字放到一个套接字列表中等待取出，在这个等待期间这些套接字的RecvQ是可以接收客户端数据的。
+				通过ServerSocket的accept()方法，可以取出套接字列表中的套接字，这些套接字都是新完成连接的。若列表为空，则【阻塞】。
+				需要注意的是，这个新套接字的port和对应的ServerSocket的port是一样的。
+			b).客户端
+				客户端通过指定服务器ip地址和其port创建一个套接字，套接字一旦创立，便进入【正在连接】状态， 这时会发送一个连接请求到服务器。
+				一旦收到服务器的响应，该新套接字就进入【连接完成】状态，并发送一个响应到服务器。
+				若tcp中并未有监听该port的套接字，那么服务器的tcp就会返回拒绝消息，客户端的构造函数将会抛出一个IOException异常。
+				通过构造函数返回的就是一个已经连接完成的套接字。
+		2).关闭
+			关闭主要是四次挥手。
+			首先进行socket.close()的一端，会将SendQ中的数据全部发送出去(当然，会受RecvQ空间大小的影响)，然后进一步发送关闭TCP连接的握手消息，这时套接字进入Closing状态。
+			收到关闭握手确认后，套接字进入【半关闭】状态，这种状态一直持续，直到收到另一边发送的关闭握手请求。
