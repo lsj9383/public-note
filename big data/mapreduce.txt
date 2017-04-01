@@ -1,0 +1,41 @@
+一、简介
+	mapreduce2中采用yarn作为计算的管理机制，这不同于mapreduce1.
+	在mapreduce1中，对于节点数超出4000的大型集群来说，就遇到扩展性瓶颈。因为所有节点的计算都由jobtracker node进行记录，分配和管理，jobtracker node的能力限制了工作节点的进一步扩大。
+	在yarn机制中，resource manager仅仅用于管理资源的分配，并不会对node manager上执行的任务进行管理，这些任务由专门的master进程管理。
+	【每个job】都会分配【一个】nm来运行【master进程】。将对多个Job的管理分布在了多个运行master进程的namenode中，将压力分布开了。
+二、关键机制
+	1.YARN机制
+		yarn集群中主要有两个角色：resource manager和node manager。
+		1).作业提交
+			本地执行的代码中遇到waitForCompletion()方法，便会阻塞等待job完成。更进一步，会将Job提交到resouce manager上，并获得该job的id。
+			客户端检查job的输出说明，计算输入分片，并将作业资源(作业的jar包，配置和分片信息)放到hdfs上，以共享这些数据。
+			完成上述操作后，便会通过进一步提交作业(客户端执行submitApplication()方法)，告知rm客户端已经完成准备，等待执行结果。
+		2).作业初始化
+			rm收到客户端的submitApplication方法，便将请求传递给调度器。调度器在在node manager上分配一个容器。并且nm将会执行master进程，master对作业进行初始化。
+			这里是按照某个策略来从集群中的众多namenode选择一个node作为管理该job的master。
+			接下来，master决定如何运行mapreduce的作业：若作业很小，就将作业放在该节点中的jvm运行。因为小作业花费在分配任务上的成本会大于其运行成本。
+			小任务是指：小于10个mapper且只有1个reducer且输入文件小于1个hdfs块的任务。
+		3).任务分配
+			若不是小任务，那么master就会为该作业中的所有map任务和reduce任务向资源管理器请求容器。也就是说这里是由运行master的nm来申请分配具体的资源。
+		4).任务执行
+			master与运行任务的nm通信来启动运行任务的容器。该任务的主类是YarnChild的Java应用程序。
+			任务执行前，会先将任务需要的资源本地化，包括作业的配置，JAR文件和所有来自分布式缓存的文件，接着运行map任务和reduce任务。
+		5).进度和状态更新
+			运行任务的YarnChild每三秒会想master汇报进度和状态。
+		6).作业完成
+			客户端每秒向master查询进度。
+	2.异常处理
+	3.shuffle(混洗)
+		1).map端
+			输入是一个split中的所有数据(默认一个split就是一个block)。输出的kv对将会写到缓冲区中，缓冲区大小为100MB。一旦缓冲内容达到阈值0.8，有一个后台线程会将内容写到磁盘上。
+			在写到磁盘的过程中，map的输出会继续写到缓冲区，直到把缓冲区写满就阻塞写入。
+			在缓冲区数据写到硬盘之前，会根据要传输的reducer，将数据划分成不同的分区(partition)，不同的partition对应不同的reducer。
+			在不同的partition中，线程对其进行排序，并且如果有配置combiner，那么会在排序后的输出上运行combiner。
+		2).reduce端
+			map任务完成后，将会通知master。reducer中的一个线程会定期查询master以便获取所有map的位置。
+			每个map任务完成的时间可能不同，只要有一个任务完成，reduce任务就开始复制其输出。
+			若map的输出很小，那么就直接把数据放到jvm的内存中。否则将会被复制到本地磁盘。
+			所有map工作完成，并且map的输出都复制到reduce中后，reduce边进入合并阶段，将会合并所有map的输出，即将相同key的value合并到一起。
+			合并完成后，便正式开始reduce任务执行阶段，把数据输入reduce函数。输出知己写到hdfs中。
+
+三、基本使用
