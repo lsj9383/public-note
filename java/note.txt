@@ -1,21 +1,21 @@
-* »·¾³±äÁ¿
-PathÊÇÖ¸ÁîµÄËÑÑ°Â·¾¶¡£ÃüÁîÐÐÖ´ÐÐÒ»¸öÖ¸Áî£¬¶¼ÊÇµ½»·¾³±äÁ¿µÄpathÏÂÈ¥Ñ°ÕÒµÄ¡£java¡¢javacµÈµÈ¶¼ÊÇ¿ÉÖ´ÐÐ³ÌÐò£¬ÒªÈÃÃüÁîÄ£Ê½ÏÂÖ´ÐÐÕâÐ©³ÌÐò£¬ÈôÃ»ÓÐÅäÖÃÕâÐ©³ÌÐòµÄÂ·¾¶£¬ÄÇ»á·Ç³£Âé·³¡£Òò´Ë¿ÉÒÔ½«ÕâÐ©¿ÉÖ´ÐÐµÄ³ÌÐòÅäÖÃµ½pathÂ·¾¶ÏÂ¡£
-JAVA_HOMEÊÇÒ»¸öÆÕÍ¨±äÁ¿ËüÓ¦¸ÃÊÇjdkµÄÂ·¾¶£¬¿ÉÒÔÔÚpathÖÐÖ±½ÓÒýÓÃ£¬ÕâÑù×öÊÇÎªÁË·½±ã¡£ÆäÊµÓÐºÜ¶àºÍjavaÏà¹ØµÄµÚÈý·½Èí¼þ£¬¶¼ÊÇÍ¨¹ýJAVA_HOMEÕâ¸ö»·¾³±äÁ¿À´ÕÒµ½jdkÂ·¾¶µÄ¡£
-CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
+* çŽ¯å¢ƒå˜é‡
+Pathæ˜¯æŒ‡ä»¤çš„æœå¯»è·¯å¾„ã€‚å‘½ä»¤è¡Œæ‰§è¡Œä¸€ä¸ªæŒ‡ä»¤ï¼Œéƒ½æ˜¯åˆ°çŽ¯å¢ƒå˜é‡çš„pathä¸‹åŽ»å¯»æ‰¾çš„ã€‚javaã€javacç­‰ç­‰éƒ½æ˜¯å¯æ‰§è¡Œç¨‹åºï¼Œè¦è®©å‘½ä»¤æ¨¡å¼ä¸‹æ‰§è¡Œè¿™äº›ç¨‹åºï¼Œè‹¥æ²¡æœ‰é…ç½®è¿™äº›ç¨‹åºçš„è·¯å¾„ï¼Œé‚£ä¼šéžå¸¸éº»çƒ¦ã€‚å› æ­¤å¯ä»¥å°†è¿™äº›å¯æ‰§è¡Œçš„ç¨‹åºé…ç½®åˆ°pathè·¯å¾„ä¸‹ã€‚
+JAVA_HOMEæ˜¯ä¸€ä¸ªæ™®é€šå˜é‡å®ƒåº”è¯¥æ˜¯jdkçš„è·¯å¾„ï¼Œå¯ä»¥åœ¨pathä¸­ç›´æŽ¥å¼•ç”¨ï¼Œè¿™æ ·åšæ˜¯ä¸ºäº†æ–¹ä¾¿ã€‚å…¶å®žæœ‰å¾ˆå¤šå’Œjavaç›¸å…³çš„ç¬¬ä¸‰æ–¹è½¯ä»¶ï¼Œéƒ½æ˜¯é€šè¿‡JAVA_HOMEè¿™ä¸ªçŽ¯å¢ƒå˜é‡æ¥æ‰¾åˆ°jdkè·¯å¾„çš„ã€‚
+CLASS_PATHå°±æ˜¯importçš„è·¯å¾„ï¼Œæ¢å¥è¯è¯´ï¼Œå°±æ˜¯ç¨‹åºé‡Œé¢ä½¿ç”¨çš„classçš„è·¯å¾„ã€‚
 
-ÖÁÓÚeclipseµÈide¹¤¾ß£¬ËüÃÇºÜ¶à×Ô´øÁËjdkµÄjar°ü¡£ÔÚ´´½¨¹¤³ÌµÄÊ±ºò£¬¿ÉÒÔÓÃËüÃÇ×Ô¼º´øµÄjar°ü£¬Ò²¿ÉÒÔÖ¸¶¨ÓÃÎÒÃÇ¸ø¶¨µÄjdkÀïÃæµÄ»ù´¡jar°ü¡£
+è‡³äºŽeclipseç­‰ideå·¥å…·ï¼Œå®ƒä»¬å¾ˆå¤šè‡ªå¸¦äº†jdkçš„jaråŒ…ã€‚åœ¨åˆ›å»ºå·¥ç¨‹çš„æ—¶å€™ï¼Œå¯ä»¥ç”¨å®ƒä»¬è‡ªå·±å¸¦çš„jaråŒ…ï¼Œä¹Ÿå¯ä»¥æŒ‡å®šç”¨æˆ‘ä»¬ç»™å®šçš„jdké‡Œé¢çš„åŸºç¡€jaråŒ…ã€‚
 
 * IO
-	1.Á÷
-		0).¸ù¾ÝÁ÷³öÏÖµÄÎ»ÖÃ£¬¿ÉÒÔ·ÖÎª°ü×°Á÷ºÍ½ÚµãÁ÷¡£
-		1).¸ù¾Ý·½Ïò£¬¿ÉÒÔ·ÖÎª¡¾Êä³öÁ÷¡¿ºÍ¡¾ÊäÈëÁ÷¡¿
-			ÊäÈëºÍÊä³öÊÇÏà¶ÔÓÚÄÚ´æ¶øÑÔµÄ¡£µ½ÄÚ´æÖÐ¾ÍÊÇÊäÈëÁ÷¡¢´ÓÄÚ´æ³öÀ´¾ÍÊÇÊä³öÁ÷¡£
-			ÊäÈëÁ÷: InputStream£¬ÓÖ½ÐRead
-			Êä³öÁ÷: OutputStream, ÓÖ½ÐWrite
-		2).¸ù¾Ý¶ÁÐ´·½Ê½£¬¿ÉÒÔ·ÖÎª¡¾×Ö½ÚÁ÷¡¿ºÍ¡¾×Ö·ûÁ÷¡¿
-			×Ö½ÚÁ÷Ò»´Î²Ù×÷Ò»¸ö×Ö½Ú£¬ÊÊºÏ¶ÁÈ¡ÊÓÆµ¡¢ÉùÒô¡¢Í¼Æ¬µÈ¶àÃ½Ìå¶þ½øÖÆÎÄ¼þ¡£javaÖÐÒÔStream½áÎ²¡£
-			×Ö·ûÁ÷Ò»´Î²Ù×÷Ò»¸ö×Ö·û£¬Ò»¸ö×Ö·ûµÈÓÚÁ½¸ö×Ö½Ú¡£ÊÊºÏ¶ÁÈ¡¡¾´¿ÎÄ±¾ÎÄ¼þ¡¿¡£º¬ÓÐReader»òWriter¡£
-		3).ÖØÒªµÄÁ÷
+	1.æµ
+		0).æ ¹æ®æµå‡ºçŽ°çš„ä½ç½®ï¼Œå¯ä»¥åˆ†ä¸ºåŒ…è£…æµå’ŒèŠ‚ç‚¹æµã€‚
+		1).æ ¹æ®æ–¹å‘ï¼Œå¯ä»¥åˆ†ä¸ºã€è¾“å‡ºæµã€‘å’Œã€è¾“å…¥æµã€‘
+			è¾“å…¥å’Œè¾“å‡ºæ˜¯ç›¸å¯¹äºŽå†…å­˜è€Œè¨€çš„ã€‚åˆ°å†…å­˜ä¸­å°±æ˜¯è¾“å…¥æµã€ä»Žå†…å­˜å‡ºæ¥å°±æ˜¯è¾“å‡ºæµã€‚
+			è¾“å…¥æµ: InputStreamï¼Œåˆå«Read
+			è¾“å‡ºæµ: OutputStream, åˆå«Write
+		2).æ ¹æ®è¯»å†™æ–¹å¼ï¼Œå¯ä»¥åˆ†ä¸ºã€å­—èŠ‚æµã€‘å’Œã€å­—ç¬¦æµã€‘
+			å­—èŠ‚æµä¸€æ¬¡æ“ä½œä¸€ä¸ªå­—èŠ‚ï¼Œé€‚åˆè¯»å–è§†é¢‘ã€å£°éŸ³ã€å›¾ç‰‡ç­‰å¤šåª’ä½“äºŒè¿›åˆ¶æ–‡ä»¶ã€‚javaä¸­ä»¥Streamç»“å°¾ã€‚
+			å­—ç¬¦æµä¸€æ¬¡æ“ä½œä¸€ä¸ªå­—ç¬¦ï¼Œä¸€ä¸ªå­—ç¬¦ç­‰äºŽä¸¤ä¸ªå­—èŠ‚ã€‚é€‚åˆè¯»å–ã€çº¯æ–‡æœ¬æ–‡ä»¶ã€‘ã€‚å«æœ‰Readeræˆ–Writerã€‚
+		3).é‡è¦çš„æµ
 			FileInputStream
 			FileOutputStream
 			FileReader
@@ -32,13 +32,13 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 			ObjectInputStream
 			ObjectOutputStream
 			
-			//×Ö½ÚÁ÷ºÍ×Ö·ûÁ÷µÄ×ª»»
+			//å­—èŠ‚æµå’Œå­—ç¬¦æµçš„è½¬æ¢
 			InputStreamReader
 			OutputStreamWriter
 			
 			PrintWriter
 			PrintStream
-		4).Àà½á¹¹
+		4).ç±»ç»“æž„
 			Object <|-- InputStream <|-- FileInputStream
 				|				 |__<|-- ObjectInputStream
 				|				 |__<|-- FilterInputStream <|-- BufferedInputStream
@@ -57,82 +57,82 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 				            |__<|-- BufferedWriter
 							|__<|-- PrintWriter
 				   
-				   InputStreamÊµÏÖÁËCloseable½Ó¿Ú
-				   InputStreamÊµÏÖÁËCloseable½Ó¿ÚºÍFlusable½Ó¿Ú, FlusableÓÐflush()·½·¨½øÐÐË¢ÐÂ£¬½«»º³åµÄÄÚÈÝÈ«²¿Ð´³öÈ¥¡£
-				   ReaderÊµÏÖÁËCloseable½Ó¿Ú
-				   WriterÊµÏÖÁËCloseable½Ó¿ÚºÍFlusable½Ó¿Ú
+				   InputStreamå®žçŽ°äº†CloseableæŽ¥å£
+				   InputStreamå®žçŽ°äº†CloseableæŽ¥å£å’ŒFlusableæŽ¥å£, Flusableæœ‰flush()æ–¹æ³•è¿›è¡Œåˆ·æ–°ï¼Œå°†ç¼“å†²çš„å†…å®¹å…¨éƒ¨å†™å‡ºåŽ»ã€‚
+				   Readerå®žçŽ°äº†CloseableæŽ¥å£
+				   Writerå®žçŽ°äº†CloseableæŽ¥å£å’ŒFlusableæŽ¥å£
 		5).FileInputStream
-			½«Ó²ÅÌµÄÎÄ¼þÊý¾Ý¶ÁÈ¡µ½ÄÚ´æÖÐ
-			int data = fis.read()			//¶ÁÈ¡²¢·µ»Ø1¸ö×Ö½Ú, Èô·µ»Ø-1£¬ÎÄ¼þ¶ÁÍê¡£¸Ã·½·¨Æµ·±·ÃÎÊ´ÅÅÌ»áÉËº¦´ÅÅÌ£¬²¢ÇÒÐ§ÂÊµÍÏÂ¡£
-			int length = fis.read(byte[] b);//Ò»´Î¶ÁÈ¡¶à¸öÖ±½Ó×Ö½Ú£¬½«Êý×éÌî³äÂú£¬·µ»ØÊµ¼Ê¶ÁÈ¡µ½µÄ×Ö½ÚÊý¡£ÈôÒ»¸ö¶¼Ã»¶ÁÈ¡µ½£¬·µ»Ø-1
-			fis.skip(n);					//Ìø¹ýµÄ×Ö½ÚÊý
-			int length = fis.available();	//·µ»Ø»¹ÓÐ¶àÉÙ¸öÖ±½Ó¿ÉÒÔ¶ÁÈ¡¡£
+			å°†ç¡¬ç›˜çš„æ–‡ä»¶æ•°æ®è¯»å–åˆ°å†…å­˜ä¸­
+			int data = fis.read()			//è¯»å–å¹¶è¿”å›ž1ä¸ªå­—èŠ‚, è‹¥è¿”å›ž-1ï¼Œæ–‡ä»¶è¯»å®Œã€‚è¯¥æ–¹æ³•é¢‘ç¹è®¿é—®ç£ç›˜ä¼šä¼¤å®³ç£ç›˜ï¼Œå¹¶ä¸”æ•ˆçŽ‡ä½Žä¸‹ã€‚
+			int length = fis.read(byte[] b);//ä¸€æ¬¡è¯»å–å¤šä¸ªç›´æŽ¥å­—èŠ‚ï¼Œå°†æ•°ç»„å¡«å……æ»¡ï¼Œè¿”å›žå®žé™…è¯»å–åˆ°çš„å­—èŠ‚æ•°ã€‚è‹¥ä¸€ä¸ªéƒ½æ²¡è¯»å–åˆ°ï¼Œè¿”å›ž-1
+			fis.skip(n);					//è·³è¿‡çš„å­—èŠ‚æ•°
+			int length = fis.available();	//è¿”å›žè¿˜æœ‰å¤šå°‘ä¸ªç›´æŽ¥å¯ä»¥è¯»å–ã€‚
 		6).FileOutputStream
-			½«ÄÚ´æÖÐµÄÊý¾ÝÐ´µ½Ó²ÅÌÎÄ¼þÖÐ
-			FileOutputStream fos = new FileOutputStream("<file>", boolean append);	appendÊÇÖ¸¶¨ÊÇ·ñÔÚÎÄ¼þÄ©Î²½øÐÐ¡£Èôfile²»´æÔÚ£¬½«»á´´½¨ÐÂÎÄ¼þ¡£
-			fos.write(byte[] bytes); 	½«bytesÊý×éÖÐµÄËùÓÐÊý¾ÝÐ´Èë
-			fos.write(byte[] bytes, start, length);	´Óstart¿ªÊ¼Ð´Èëlength¸ö
-		7).FileReaderºÍFileWriter
-			½«Ç°ÃæµÄbyte[]»»³ÉÁËchar[]£¬²¢ÇÒFileWriterÔËÐÐÐ´Èë×Ö·û´®:fw.write("xxxx");
+			å°†å†…å­˜ä¸­çš„æ•°æ®å†™åˆ°ç¡¬ç›˜æ–‡ä»¶ä¸­
+			FileOutputStream fos = new FileOutputStream("<file>", boolean append);	appendæ˜¯æŒ‡å®šæ˜¯å¦åœ¨æ–‡ä»¶æœ«å°¾è¿›è¡Œã€‚è‹¥fileä¸å­˜åœ¨ï¼Œå°†ä¼šåˆ›å»ºæ–°æ–‡ä»¶ã€‚
+			fos.write(byte[] bytes); 	å°†bytesæ•°ç»„ä¸­çš„æ‰€æœ‰æ•°æ®å†™å…¥
+			fos.write(byte[] bytes, start, length);	ä»Žstartå¼€å§‹å†™å…¥lengthä¸ª
+		7).FileReaderå’ŒFileWriter
+			å°†å‰é¢çš„byte[]æ¢æˆäº†char[]ï¼Œå¹¶ä¸”FileWriterè¿è¡Œå†™å…¥å­—ç¬¦ä¸²:fw.write("xxxx");
 		8).BufferedReader
-			BufferedReader br = new BufferedReader(new FileReader("<file..>"));	//½«ÎÄ¼þ×Ö·ûÊäÈëÁ÷£¬°ü×°³É´øÓÐ»º³åÇøµÄÊäÈëÁ÷	
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("tmp")));		//¿ÉÒÔ½«×Ö½ÚÁ÷°ü×°³É×Ö·ûÁ÷£¬ÔÙ°ü×°³É´ø»º³åÇøµÄÁ÷¡£
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));	//½«±ê×¼ÊäÈëÁ÷InputStream°ü×°³É×Ö·ûÁ÷£¬È»ºóÔÙ×÷»º³åÇø°ü×°¡£
-			String res = br.readLine();		//¶ÁÈ¡ÎÄ±¾ÐÐ, Èô¶Á²»µ½£¬·µ»Ønull.µ«ÊÇ£¬¶ÁµÄÕâÒ»ÐÐ²»´ø»»ÐÐ·ûµÄ£¡
-			br.close();						//¹Ø±ÕÖ»ÐèÒª¹Ø±Õ×îÍâ²ãµÄ°ü×°Á÷¡£
+			BufferedReader br = new BufferedReader(new FileReader("<file..>"));	//å°†æ–‡ä»¶å­—ç¬¦è¾“å…¥æµï¼ŒåŒ…è£…æˆå¸¦æœ‰ç¼“å†²åŒºçš„è¾“å…¥æµ	
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("tmp")));		//å¯ä»¥å°†å­—èŠ‚æµåŒ…è£…æˆå­—ç¬¦æµï¼Œå†åŒ…è£…æˆå¸¦ç¼“å†²åŒºçš„æµã€‚
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));	//å°†æ ‡å‡†è¾“å…¥æµInputStreamåŒ…è£…æˆå­—ç¬¦æµï¼Œç„¶åŽå†ä½œç¼“å†²åŒºåŒ…è£…ã€‚
+			String res = br.readLine();		//è¯»å–æ–‡æœ¬è¡Œ, è‹¥è¯»ä¸åˆ°ï¼Œè¿”å›žnull.ä½†æ˜¯ï¼Œè¯»çš„è¿™ä¸€è¡Œä¸å¸¦æ¢è¡Œç¬¦çš„ï¼
+			br.close();						//å…³é—­åªéœ€è¦å…³é—­æœ€å¤–å±‚çš„åŒ…è£…æµã€‚
 		9).BufferedWriter
-			ºÍBufferedReader²î²»¶à£¬Ö»²»¹ýÊÇÊä³öµÄ¡£ÓÐ¸önewLineµÄ·½·¨£¬ÆäÊµÎÒ¾õµÃÃ»É¶ÒâË¼¡£
-			²»¹ý£¬ÓÉÓÚÆäwriteÊÇÏÈÐ´Èë»º³åÇø£¬ÔÚflushÊ±²ÅÐ´ÈëÊä³öÁ÷£¬Òò´ËÒªÔÚ±ØÒªµÄÊ±ºò¡¾Ë¢ÐÂ»º³åÇø¡¿¡£
+			å’ŒBufferedReaderå·®ä¸å¤šï¼Œåªä¸è¿‡æ˜¯è¾“å‡ºçš„ã€‚æœ‰ä¸ªnewLineçš„æ–¹æ³•ï¼Œå…¶å®žæˆ‘è§‰å¾—æ²¡å•¥æ„æ€ã€‚
+			ä¸è¿‡ï¼Œç”±äºŽå…¶writeæ˜¯å…ˆå†™å…¥ç¼“å†²åŒºï¼Œåœ¨flushæ—¶æ‰å†™å…¥è¾“å‡ºæµï¼Œå› æ­¤è¦åœ¨å¿…è¦çš„æ—¶å€™ã€åˆ·æ–°ç¼“å†²åŒºã€‘ã€‚
 		10).DataOutputStream
-			Êý¾ÝÖ±½ÓÊä³öÁ÷
-			½«¡°Êý¾Ý¡±Ð´Èëµ½Ó²ÅÌÎÄ¼þÖÐ£¬Ð´ÈëµÄ²»ÊÇ×Ö·û´®£¬¶øÊÇ¶þ½øÖÆÊý¾Ý¡£
+			æ•°æ®ç›´æŽ¥è¾“å‡ºæµ
+			å°†â€œæ•°æ®â€å†™å…¥åˆ°ç¡¬ç›˜æ–‡ä»¶ä¸­ï¼Œå†™å…¥çš„ä¸æ˜¯å­—ç¬¦ä¸²ï¼Œè€Œæ˜¯äºŒè¿›åˆ¶æ•°æ®ã€‚
 			DataOutputStream dos = new DataOutputStream(new FileOutputStream("<file>"));
 			dos.writeByte(byte b);
 			dos.writeInt(int i);
 			...
 		11).DataInputStream
-			ºÍDataoutputStreamÒìÇúÍ¬¹¤¡£ÇÒ±ØÐëÅäºÏÊ¹ÓÃ¡£
+			å’ŒDataoutputStreamå¼‚æ›²åŒå·¥ã€‚ä¸”å¿…é¡»é…åˆä½¿ç”¨ã€‚
 		12).PrintStream
-			±ê×¼Êä³öÁ÷¡£System.out,¾ÍÊÇÒ»ÖÖ£¬Ä¬ÈÏ´òÓ¡µ½¿ØÖÆÌ¨¡£
+			æ ‡å‡†è¾“å‡ºæµã€‚System.out,å°±æ˜¯ä¸€ç§ï¼Œé»˜è®¤æ‰“å°åˆ°æŽ§åˆ¶å°ã€‚
 			PrintStream out = new PrintStream(OutputStream);
-			System.setOut(OutputStream);¿ÉÒÔ¸Ä±äÄ¬ÈÏµÄÊä³öÁ÷
-			OutputStream¿ÉÒÔÊÇnew FileOutputStream("<...>");
-	2.ÐòÁÐ»¯
-		½«¶ÔÏó±£´æµ½Ó²ÅÌÖÐ£¬¾ÍÊÇ¶ÔÏóµÄÐòÁÐ»¯¡£´ÓÓ²ÅÌÖÐ»Ö¸´µ½ÄÚ´æÀï£¬¾ÍÊÇ·´ÐòÁÐ»¯¡£
+			System.setOut(OutputStream);å¯ä»¥æ”¹å˜é»˜è®¤çš„è¾“å‡ºæµ
+			OutputStreamå¯ä»¥æ˜¯new FileOutputStream("<...>");
+	2.åºåˆ—åŒ–
+		å°†å¯¹è±¡ä¿å­˜åˆ°ç¡¬ç›˜ä¸­ï¼Œå°±æ˜¯å¯¹è±¡çš„åºåˆ—åŒ–ã€‚ä»Žç¡¬ç›˜ä¸­æ¢å¤åˆ°å†…å­˜é‡Œï¼Œå°±æ˜¯ååºåˆ—åŒ–ã€‚
 		1).ObjectOutputStream
-			ÐòÁÐ»¯µ½Ó²ÅÌ
+			åºåˆ—åŒ–åˆ°ç¡¬ç›˜
 			ObjectOutputStream oos = new ObjectOutputStream(outputStream);
-			outputStream ¿ÉÒÔÊÇ new FileOutputStream("tmp8");
-			oos.writeObject(object);	//½«¶ÔÏóÐ´ÈëÊä³öÁ÷
+			outputStream å¯ä»¥æ˜¯ new FileOutputStream("tmp8");
+			oos.writeObject(object);	//å°†å¯¹è±¡å†™å…¥è¾“å‡ºæµ
 			
-			¡¾Ò»¸ö¶ÔÏóÒªÐòÁÐ»¯£¬±ØÐëÊµÏÖÐòÁÐ»¯½Ó¿Ú£¬·ñÔòÎÞ·¨Ö§³ÖÐòÁÐ»¯¡¿
+			ã€ä¸€ä¸ªå¯¹è±¡è¦åºåˆ—åŒ–ï¼Œå¿…é¡»å®žçŽ°åºåˆ—åŒ–æŽ¥å£ï¼Œå¦åˆ™æ— æ³•æ”¯æŒåºåˆ—åŒ–ã€‘
 			class OneClass implements Serializable{
 				...
 			}
-			Õâ¸ö½Ó¿ÚÊÇÃ»ÓÐ·½·¨µÄ£¬Ö»ÊÇÒ»¸ö±êÖ¾¡£°üÀ¨Cloneable½Ó¿Ú£¬Ò²Ã»·½·¨¡£
-			±êÊ¶½Ó¿ÚµÄ×÷ÓÃ£º
-				JVM¿´µ½¶ÔÏóÊµÏÖÁËÄ³¸ö±êÊ¶½Ó¿Ú£¬»á¶ÔËüÌØÊâ´ýÓö¡£
+			è¿™ä¸ªæŽ¥å£æ˜¯æ²¡æœ‰æ–¹æ³•çš„ï¼Œåªæ˜¯ä¸€ä¸ªæ ‡å¿—ã€‚åŒ…æ‹¬CloneableæŽ¥å£ï¼Œä¹Ÿæ²¡æ–¹æ³•ã€‚
+			æ ‡è¯†æŽ¥å£çš„ä½œç”¨ï¼š
+				JVMçœ‹åˆ°å¯¹è±¡å®žçŽ°äº†æŸä¸ªæ ‡è¯†æŽ¥å£ï¼Œä¼šå¯¹å®ƒç‰¹æ®Šå¾…é‡ã€‚
 		2).ObjectInputStream
-			·´ÐòÁÐ»¯µ½ÄÚ´æ
+			ååºåˆ—åŒ–åˆ°å†…å­˜
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream("tmp8"));
 			Object o = ois.readObject();
-			·´ÐòÁÐ»¯ÔÚ¹¹½¨¶ÔÏóµÄÊ±ºò£¬»áÓÃµ½¶ÔÓ¦µÄ.classÎÄ¼þ£¬·ñÔòÎÞ·¨ÖØ½¨¡£
+			ååºåˆ—åŒ–åœ¨æž„å»ºå¯¹è±¡çš„æ—¶å€™ï¼Œä¼šç”¨åˆ°å¯¹åº”çš„.classæ–‡ä»¶ï¼Œå¦åˆ™æ— æ³•é‡å»ºã€‚
 		3).serialVersionUID
-			JVM»á¸øÊµÏÖÁËSerializbleµÄÀà£¬ÔÚÐòÁÐ»¯µÄÊ±ºò£¬Ìí¼ÓÁËÒ»¸öserialVersionUIDÊôÐÔ£¬ÓÃÓÚÇø±ð²»Í¬µÄÀà¡£
-			¾ÍËãÀàÃûÍêÈ«ÏàÍ¬£¬µ«ÊÇUID²»Í¬£¬Ò²ÊÇÎÞ·¨·´ÐòÁÐ»¯µÄ¡£
-			a).ÐòÁÐ»¯°æ±¾ºÅÊÇ¿ÉÒÔÊÖ¶¯Ìá¹©µÄ¡£
-				Ö±½ÓÔÚÀàÀïÐ´£ºstatic final long serialVersionUID = xxxxxL;
-			b).¿ÉÒÔ½ûÖ¹Ä³¸öÊôÐÔÐòÁÐ»¯
+			JVMä¼šç»™å®žçŽ°äº†Serializbleçš„ç±»ï¼Œåœ¨åºåˆ—åŒ–çš„æ—¶å€™ï¼Œæ·»åŠ äº†ä¸€ä¸ªserialVersionUIDå±žæ€§ï¼Œç”¨äºŽåŒºåˆ«ä¸åŒçš„ç±»ã€‚
+			å°±ç®—ç±»åå®Œå…¨ç›¸åŒï¼Œä½†æ˜¯UIDä¸åŒï¼Œä¹Ÿæ˜¯æ— æ³•ååºåˆ—åŒ–çš„ã€‚
+			a).åºåˆ—åŒ–ç‰ˆæœ¬å·æ˜¯å¯ä»¥æ‰‹åŠ¨æä¾›çš„ã€‚
+				ç›´æŽ¥åœ¨ç±»é‡Œå†™ï¼šstatic final long serialVersionUID = xxxxxL;
+			b).å¯ä»¥ç¦æ­¢æŸä¸ªå±žæ€§åºåˆ—åŒ–
 				transient field;
-				·´ÐòÁÐ»¯Ê±£¬fieldÎªnull
+				ååºåˆ—åŒ–æ—¶ï¼Œfieldä¸ºnull
 	3.File
-		FileÊÇÎÄ¼þºÍÄ¿Â¼Â·¾¶ÃûµÄ³éÏó±íÊ¾ÐÎÊ½¡£Ò²¾ÍÊÇËµFile´ú±íÓ²ÅÌÉÏµÄDirectoryºÍfile¡£
+		Fileæ˜¯æ–‡ä»¶å’Œç›®å½•è·¯å¾„åçš„æŠ½è±¡è¡¨ç¤ºå½¢å¼ã€‚ä¹Ÿå°±æ˜¯è¯´Fileä»£è¡¨ç¡¬ç›˜ä¸Šçš„Directoryå’Œfileã€‚
 		File f = new File("<path>");
 		
-		f.exists();			·µ»Ø¸ÃÎÄ¼þ»òÄ¿Â¼ÊÇ·ñ´æÔÚ
-		f.mkdir();			´´½¨Ä¿Â¼
-		f.mkdirs();			´´½¨¶àÖØÄ¿Â¼£¨¼´µÝ¹é´´½¨£©
-		f.createNewFile();	´´½¨ÎÄ¼þ
+		f.exists();			è¿”å›žè¯¥æ–‡ä»¶æˆ–ç›®å½•æ˜¯å¦å­˜åœ¨
+		f.mkdir();			åˆ›å»ºç›®å½•
+		f.mkdirs();			åˆ›å»ºå¤šé‡ç›®å½•ï¼ˆå³é€’å½’åˆ›å»ºï¼‰
+		f.createNewFile();	åˆ›å»ºæ–‡ä»¶
 		f.canWrite();
 		f.canRead();
 		f.delete();
@@ -140,183 +140,183 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 		f.parentPath();
 		f.isDirectory();
 		f.length();
-		String[] res = f.list();	ÕÒ³öÄ¿Â¼ÏÂµÄËùÓÐÎÄ¼þÃû£¬ÕâÀïÒªÇófÊÇ¸öDirectory
-		File[] res = f.listFiles();	ÕÒ³öÄ¿Â¼ÏÂËùÓÐµÄFile
+		String[] res = f.list();	æ‰¾å‡ºç›®å½•ä¸‹çš„æ‰€æœ‰æ–‡ä»¶åï¼Œè¿™é‡Œè¦æ±‚fæ˜¯ä¸ªDirectory
+		File[] res = f.listFiles();	æ‰¾å‡ºç›®å½•ä¸‹æ‰€æœ‰çš„File
 		
-* Òì³£
-	javaÖÐ²ÉÓÃÀàÈ¥Ä£ÄâÒì³£¡£
-	Ò»¸öÒì³£Àà£¬´ú±íÒ»ÀàÒì³£¡£Ò»¸öÒì³£¶ÔÏó£¬ÊÇÒ»¸ö¾ßÌåµÄÒì³£ÊÂ¼þ¡£
-	Èô³öÏÖÁËÒì³£ÊÂ¼þ¡¾Ã»ÓÐ´¦Àí¡¿£¬ÔòºóÃæµÄ´úÂë²»»áÖ´ÐÐ£¬Ö±½ÓÍË³öJVM¡£
-	1.Òì³£Àà½á¹¹¹ØÏµ£º
+* å¼‚å¸¸
+	javaä¸­é‡‡ç”¨ç±»åŽ»æ¨¡æ‹Ÿå¼‚å¸¸ã€‚
+	ä¸€ä¸ªå¼‚å¸¸ç±»ï¼Œä»£è¡¨ä¸€ç±»å¼‚å¸¸ã€‚ä¸€ä¸ªå¼‚å¸¸å¯¹è±¡ï¼Œæ˜¯ä¸€ä¸ªå…·ä½“çš„å¼‚å¸¸äº‹ä»¶ã€‚
+	è‹¥å‡ºçŽ°äº†å¼‚å¸¸äº‹ä»¶ã€æ²¡æœ‰å¤„ç†ã€‘ï¼Œåˆ™åŽé¢çš„ä»£ç ä¸ä¼šæ‰§è¡Œï¼Œç›´æŽ¥é€€å‡ºJVMã€‚
+	1.å¼‚å¸¸ç±»ç»“æž„å…³ç³»ï¼š
 		Object <|-- Throwable <|-- Error
 							  <|-- Exception <|-- RuntimeException
-											 <|-- ±àÒëÊ±Òì³£Àà
+											 <|-- ç¼–è¯‘æ—¶å¼‚å¸¸ç±»
 							  
 		1).Throwable
-			¿ÉÅ×³ö£¬ËùÒÔÒì³£¶¼ÊÇ¿ÉÅ×³öµÄ¡£
-		2).Error ´íÎó
-			ÊÇÑÏÖØµÄ£¬ÎÞ·¨´¦Àí£¬Ö»ÄÜÖ±½ÓÍË³öjvm¡£
-			ÈçStackOverFlowError¡£
-		3).Exception Òì³£
-			Èô³ÌÐòÃ»ÓÐ´¦ÀíÒì³££¬³ÌÐòÖ±½ÓÍË³öjvm¡£
+			å¯æŠ›å‡ºï¼Œæ‰€ä»¥å¼‚å¸¸éƒ½æ˜¯å¯æŠ›å‡ºçš„ã€‚
+		2).Error é”™è¯¯
+			æ˜¯ä¸¥é‡çš„ï¼Œæ— æ³•å¤„ç†ï¼Œåªèƒ½ç›´æŽ¥é€€å‡ºjvmã€‚
+			å¦‚StackOverFlowErrorã€‚
+		3).Exception å¼‚å¸¸
+			è‹¥ç¨‹åºæ²¡æœ‰å¤„ç†å¼‚å¸¸ï¼Œç¨‹åºç›´æŽ¥é€€å‡ºjvmã€‚
 		4).RuntimeException
-			ÔËÐÐÊ±Òì³£.ÈçNullÒì³£¡¢³ýÁãÒì³£¡£
-			ÔËÐÐÊ±Òì³££¬ÊÇ²»ÓÃÐ´Òì³£´¦ÀíµÄ¡£µ±È»£¬Èô·¢ÉúÁË£¬Ã»´¦Àí£¬»áÖ±½ÓÍË³öjvm¡£
-			ÏÖÊµÖÐ£¬·¢ÉúµÄ¼¸ÂÊµÍ¡£
-		5).±àÒëÊ±Òì³£Àà
-			·ÇRuntimeExceptionµÄÒì³£¡£ÈçÎÄ¼þ²»´æÔÚÒì³£¡£
-			ÒªÇó³ÌÐòÔÚ±àÐ´³ÌÐò½×¶Î£¬±ØÐë¶ÔËü½øÐÐ´¦Àí£¬Èç¹û²»´¦Àí£¬±àÒëÎÞ·¨Í¨¹ý¡£
-			´¦ÀíÒì³£ÓÐÁ½ÖÖ·½Ê½:
-				a).²¶×½  try-catch
-				b).ÉùÃ÷Å×³ö ·½·¨ÉùÃ÷Ê¹ÓÃthrows¹Ø¼ü×Ö¡£
-			²»¶Ô±àÒëÊ±Òì³£½øÐÐÈçÉÏ´¦Àí£¬¸ù±¾±àÒë²»Í¨¹ý¡£Ò²¾ÍÊÇËµ£¬±àÒëÊ±Òì³£ÊÇ²»»áÔì³ÉÏµÍ³±ÀÀ£µÄ£¬ÒòÎªÔõÃ´Ëµ¶¼´¦ÀíÁË£¬³ý·ÇÔÚmain»¹Å×³ö¡£¡£¡£
-			·¢ÉúµÄ¼¸ÂÊ¸ß£¬Ò»°ã³£¼ûµÄÒì³£´¦Àí¶¼ÊÇÕë¶Ô±àÒëÊ±Òì³£µÄ¡£
-	2.´¦ÀíÒì³£
-		1).ÉùÃ÷Å×³ö throws
-			·½·¨ÉÏÉùÃ÷throws£¬ÒâÎ¶×Å¸Ã·½·¨¿ÉÄÜ»áÅ×³öÕâ¸öÒì³£¡£µ±·¢ÉúÒì³£Ê±£¬±ã»áÏò·½·¨µ÷ÓÃÕßÅ×³ö¸Ã·½·¨¡£
-			Èô·½·¨µÄº¯ÊýÌåÄÚ£¬ÓÐ¿ÉÄÜ·¢ÉúÒì³££¬ÔòÔÚ·¢ËÍÒì³£ÊÇ£¬½«»áÏòÉÏÅ×³ö¸ÃÒì³££¬¸Ã·½·¨·¢ËÍÒì³£µÄºóÃæµÄ´úÂë½«²»ÔÙÖ´ÐÐ¡£
-			Èô¶¼Å×Òì³£Å×µ½ÁËmainÍâÃæÈ¥ÁË£¬Ôòjvm´òÓ¡Òì³£ÐÅÏ¢²¢ÇÒÍË³öÖ´ÐÐ¡£
-		2).²¶×½ try-catch
+			è¿è¡Œæ—¶å¼‚å¸¸.å¦‚Nullå¼‚å¸¸ã€é™¤é›¶å¼‚å¸¸ã€‚
+			è¿è¡Œæ—¶å¼‚å¸¸ï¼Œæ˜¯ä¸ç”¨å†™å¼‚å¸¸å¤„ç†çš„ã€‚å½“ç„¶ï¼Œè‹¥å‘ç”Ÿäº†ï¼Œæ²¡å¤„ç†ï¼Œä¼šç›´æŽ¥é€€å‡ºjvmã€‚
+			çŽ°å®žä¸­ï¼Œå‘ç”Ÿçš„å‡ çŽ‡ä½Žã€‚
+		5).ç¼–è¯‘æ—¶å¼‚å¸¸ç±»
+			éžRuntimeExceptionçš„å¼‚å¸¸ã€‚å¦‚æ–‡ä»¶ä¸å­˜åœ¨å¼‚å¸¸ã€‚
+			è¦æ±‚ç¨‹åºåœ¨ç¼–å†™ç¨‹åºé˜¶æ®µï¼Œå¿…é¡»å¯¹å®ƒè¿›è¡Œå¤„ç†ï¼Œå¦‚æžœä¸å¤„ç†ï¼Œç¼–è¯‘æ— æ³•é€šè¿‡ã€‚
+			å¤„ç†å¼‚å¸¸æœ‰ä¸¤ç§æ–¹å¼:
+				a).æ•æ‰  try-catch
+				b).å£°æ˜ŽæŠ›å‡º æ–¹æ³•å£°æ˜Žä½¿ç”¨throwså…³é”®å­—ã€‚
+			ä¸å¯¹ç¼–è¯‘æ—¶å¼‚å¸¸è¿›è¡Œå¦‚ä¸Šå¤„ç†ï¼Œæ ¹æœ¬ç¼–è¯‘ä¸é€šè¿‡ã€‚ä¹Ÿå°±æ˜¯è¯´ï¼Œç¼–è¯‘æ—¶å¼‚å¸¸æ˜¯ä¸ä¼šé€ æˆç³»ç»Ÿå´©æºƒçš„ï¼Œå› ä¸ºæ€Žä¹ˆè¯´éƒ½å¤„ç†äº†ï¼Œé™¤éžåœ¨mainè¿˜æŠ›å‡ºã€‚ã€‚ã€‚
+			å‘ç”Ÿçš„å‡ çŽ‡é«˜ï¼Œä¸€èˆ¬å¸¸è§çš„å¼‚å¸¸å¤„ç†éƒ½æ˜¯é’ˆå¯¹ç¼–è¯‘æ—¶å¼‚å¸¸çš„ã€‚
+	2.å¤„ç†å¼‚å¸¸
+		1).å£°æ˜ŽæŠ›å‡º throws
+			æ–¹æ³•ä¸Šå£°æ˜Žthrowsï¼Œæ„å‘³ç€è¯¥æ–¹æ³•å¯èƒ½ä¼šæŠ›å‡ºè¿™ä¸ªå¼‚å¸¸ã€‚å½“å‘ç”Ÿå¼‚å¸¸æ—¶ï¼Œä¾¿ä¼šå‘æ–¹æ³•è°ƒç”¨è€…æŠ›å‡ºè¯¥æ–¹æ³•ã€‚
+			è‹¥æ–¹æ³•çš„å‡½æ•°ä½“å†…ï¼Œæœ‰å¯èƒ½å‘ç”Ÿå¼‚å¸¸ï¼Œåˆ™åœ¨å‘é€å¼‚å¸¸æ˜¯ï¼Œå°†ä¼šå‘ä¸ŠæŠ›å‡ºè¯¥å¼‚å¸¸ï¼Œè¯¥æ–¹æ³•å‘é€å¼‚å¸¸çš„åŽé¢çš„ä»£ç å°†ä¸å†æ‰§è¡Œã€‚
+			è‹¥éƒ½æŠ›å¼‚å¸¸æŠ›åˆ°äº†mainå¤–é¢åŽ»äº†ï¼Œåˆ™jvmæ‰“å°å¼‚å¸¸ä¿¡æ¯å¹¶ä¸”é€€å‡ºæ‰§è¡Œã€‚
+		2).æ•æ‰ try-catch
 				try{
-					¿ÉÄÜ³öÏÖExceptionµÄ´úÂë.
-				}catch(Òì³£ÀàÐÍ1 e1){
+					å¯èƒ½å‡ºçŽ°Exceptionçš„ä»£ç .
+				}catch(å¼‚å¸¸ç±»åž‹1 e1){
 				
-				}catch(Òì³£ÀàÐÍ2 e2){
+				}catch(å¼‚å¸¸ç±»åž‹2 e2){
 				
 				}
 				...
-			catchÖÐµÄÒì³£ÀàÐÍ£¬Ó¦¸Ã¸²¸ÇtryÓï¾ä¿éÖÐ´úÂëËùÓÐ¿ÉÄÜ³öÏÖµÄÒì³£ÀàÐÍ¡£
-			catchµÄÒì³£±ØÐë´ÓÉÏµ½ÏÂ£¬´ÓÐ¡µ½ÉÏ²¶×½¡£Ò²¾ÍÊÇËµ£¬ÈôÉÏÃæµÄcatchµÄÒì³£ÀàÐÍ£¬°üº¬ÁËÏÂÃæµÄcatchµÄÒì³£ÀàÐÍ£¬ÄÇÃ´±àÒë²»»áÍ¨¹ý£¬ÒòÎªÏÂÃæµÄcatchÒì³£²»»á±»Ö´ÐÐµ½¡£
-			try-catch×î¶àÖ´ÐÐ1¸öÓï¾ä¿é£¬ÒòÎªÓöµ½Òì³£ºó£¬ºóÃæµÄ´úÂë²»»áÖ´ÐÐ£¬Ö±½ÓÌøµ½catchÖÐ¡£
-			catchÖ´ÐÐÍêºó£¬¡¾»áÖ´ÐÐµ½·½·¨½áÊø¡¿¡£
-	3.Òì³£¶ÔÏó³£ÓÃ·½·¨
+			catchä¸­çš„å¼‚å¸¸ç±»åž‹ï¼Œåº”è¯¥è¦†ç›–tryè¯­å¥å—ä¸­ä»£ç æ‰€æœ‰å¯èƒ½å‡ºçŽ°çš„å¼‚å¸¸ç±»åž‹ã€‚
+			catchçš„å¼‚å¸¸å¿…é¡»ä»Žä¸Šåˆ°ä¸‹ï¼Œä»Žå°åˆ°ä¸Šæ•æ‰ã€‚ä¹Ÿå°±æ˜¯è¯´ï¼Œè‹¥ä¸Šé¢çš„catchçš„å¼‚å¸¸ç±»åž‹ï¼ŒåŒ…å«äº†ä¸‹é¢çš„catchçš„å¼‚å¸¸ç±»åž‹ï¼Œé‚£ä¹ˆç¼–è¯‘ä¸ä¼šé€šè¿‡ï¼Œå› ä¸ºä¸‹é¢çš„catchå¼‚å¸¸ä¸ä¼šè¢«æ‰§è¡Œåˆ°ã€‚
+			try-catchæœ€å¤šæ‰§è¡Œ1ä¸ªè¯­å¥å—ï¼Œå› ä¸ºé‡åˆ°å¼‚å¸¸åŽï¼ŒåŽé¢çš„ä»£ç ä¸ä¼šæ‰§è¡Œï¼Œç›´æŽ¥è·³åˆ°catchä¸­ã€‚
+			catchæ‰§è¡Œå®ŒåŽï¼Œã€ä¼šæ‰§è¡Œåˆ°æ–¹æ³•ç»“æŸã€‘ã€‚
+	3.å¼‚å¸¸å¯¹è±¡å¸¸ç”¨æ–¹æ³•
 		1).pprintStackTrace();
-			´òÓ¡Òì³£¶ÑÕ»ÐÅÏ¢£¬Ò»°ãÇé¿öÏÂ¶¼»áÊ¹ÓÃ¸Ã·½Ê½È¥µ÷ÊÔ³ÌÐò¡£
-			Èç:	java.io.FileNotFoundException: ab.txt (ÏµÍ³ÕÒ²»µ½Ö¸¶¨µÄÎÄ¼þ¡£)
+			æ‰“å°å¼‚å¸¸å †æ ˆä¿¡æ¯ï¼Œä¸€èˆ¬æƒ…å†µä¸‹éƒ½ä¼šä½¿ç”¨è¯¥æ–¹å¼åŽ»è°ƒè¯•ç¨‹åºã€‚
+			å¦‚:	java.io.FileNotFoundException: ab.txt (ç³»ç»Ÿæ‰¾ä¸åˆ°æŒ‡å®šçš„æ–‡ä»¶ã€‚)
 					at java.io.FileInputStream.open0(Native Method)
 					at java.io.FileInputStream.open(Unknown Source)
 					at java.io.FileInputStream.<init>(Unknown Source)
 					at java.io.FileInputStream.<init>(Unknown Source)
 					at com.lsj.exception.MyTest.m(MyTest.java:8)
 					at com.lsj.exception.MyTest.main(MyTest.java:13)
-			Å×³öÒì³£µÄ¹ý³Ì¼ÇÂ¼ÔÚ¶ÑÕ»ÖÐ¡£ÉÏÃæÊÇ×îÉîµÄÒì³£Å×³öÎ»ÖÃ¡£
+			æŠ›å‡ºå¼‚å¸¸çš„è¿‡ç¨‹è®°å½•åœ¨å †æ ˆä¸­ã€‚ä¸Šé¢æ˜¯æœ€æ·±çš„å¼‚å¸¸æŠ›å‡ºä½ç½®ã€‚
 		2).getMesssage
-			»ñµÃÒì³£µÄ½âÊÍ×Ö·û´®¡£
-	4.finallyÓï¾ä¿é
-		finallyÓï¾ä¿éÖÐµÄÄÚÈÝ£¬ÊÇÒ»¶¨»áÖ´ÐÐµÄ¡£¾ÍËãÔÚtryÓï¾äÖÐÓÐreturnÓï¾ä£¬Ò²ÊÇ»áÖ´ÐÐÍêÁËfinallyºó²Åreturn¡£
-		Ö»ÓÐÒ»ÖÖÇé¿öfinally²»»áÖ´ÐÐ£ºÔÚtryÖÐÓÃSystem.exit(0); ÍË³öÁËjvm¡£
-		¶ÔÓÚ
+			èŽ·å¾—å¼‚å¸¸çš„è§£é‡Šå­—ç¬¦ä¸²ã€‚
+	4.finallyè¯­å¥å—
+		finallyè¯­å¥å—ä¸­çš„å†…å®¹ï¼Œæ˜¯ä¸€å®šä¼šæ‰§è¡Œçš„ã€‚å°±ç®—åœ¨tryè¯­å¥ä¸­æœ‰returnè¯­å¥ï¼Œä¹Ÿæ˜¯ä¼šæ‰§è¡Œå®Œäº†finallyåŽæ‰returnã€‚
+		åªæœ‰ä¸€ç§æƒ…å†µfinallyä¸ä¼šæ‰§è¡Œï¼šåœ¨tryä¸­ç”¨System.exit(0); é€€å‡ºäº†jvmã€‚
+		å¯¹äºŽ
 			try{
 				return object;
 			} finally{
-				²Ù×÷object...
+				æ“ä½œobject...
 			}
-		µÈ¼ÛÓÚ
+		ç­‰ä»·äºŽ
 			try{
 				Object  = object;
 				return tmp;
 			} finally{
-				²Ù×÷object£¬Ò²¾Í²»»áÓ°ÏìfinallyÖÐµÄ·µ»ØÖµ¡£
+				æ“ä½œobjectï¼Œä¹Ÿå°±ä¸ä¼šå½±å“finallyä¸­çš„è¿”å›žå€¼ã€‚
 			}
-		ÓÉÓÚfinallyÒ»¶¨»áÖ´ÐÐ£¬ËùÒÔÍ¨³£ÔÚfinallyÖÐÊÍ·Å×ÊÔ´¡£
-		(	finalÐÞÊÎÀà£¬ÀàÎÞ·¨¼Ì³Ð¡£ÐÞÊÎ±äÁ¿Ãû£¬ÉèÖÃÎª³£Á¿
-			finalizeÊÇ·½·¨Ãû, À¬»ø»ØÊÕÆ÷»ØÊÕÇ°»áµ÷ÓÃ)
+		ç”±äºŽfinallyä¸€å®šä¼šæ‰§è¡Œï¼Œæ‰€ä»¥é€šå¸¸åœ¨finallyä¸­é‡Šæ”¾èµ„æºã€‚
+		(	finalä¿®é¥°ç±»ï¼Œç±»æ— æ³•ç»§æ‰¿ã€‚ä¿®é¥°å˜é‡åï¼Œè®¾ç½®ä¸ºå¸¸é‡
+			finalizeæ˜¯æ–¹æ³•å, åžƒåœ¾å›žæ”¶å™¨å›žæ”¶å‰ä¼šè°ƒç”¨)
 			
-	5.×Ô¶¨ÒåÒì³£ÓëÖ÷¶¯Å×³öÒì³£
-		±àÒëÊ±Òì³££¬Ö±½Ó¼Ì³ÐException¡£ÔËÐÐÊ±Òì³££¬Ö±½Ó¼Ì³ÐRuntimeException
+	5.è‡ªå®šä¹‰å¼‚å¸¸ä¸Žä¸»åŠ¨æŠ›å‡ºå¼‚å¸¸
+		ç¼–è¯‘æ—¶å¼‚å¸¸ï¼Œç›´æŽ¥ç»§æ‰¿Exceptionã€‚è¿è¡Œæ—¶å¼‚å¸¸ï¼Œç›´æŽ¥ç»§æ‰¿RuntimeException
 		class MyselfException extends Exception{
 			public IllegaNameException(){}
 			public IllegaNameException(String msg){super(msg);}
 		}
 		
 		method() throws MyselfException{
-			MyselfException e = new MyselfException("·¢ËÍÁËÒì³£");
+			MyselfException e = new MyselfException("å‘é€äº†å¼‚å¸¸");
 			throw e;
 		}
-		ºóÃæÈç¹û¼ÌÐøÏòÉÏÅ×£¬¶¼ÊÇ¶ÔÕâÊ±ºòÉú³ÉµÄÒì³£¼ÌÐøÅ×³ö£¡£¡Ò²¾ÍÊÇËµºóÃæµÄÉÏÅ×£¬²¢²»ÊÇ²úÉúÐÂÒì³££¬¶øÊÇ½«Ò»¸öÒÑ¾­´æÔÚµÄÒì³£¼ÌÐøÅ×³ö¡£
-		×ÓÀàµÄ·½·¨ ÎÞ·¨Å×³ö±È ¸¸ÀàÖÐµÄÏàÍ¬·½·¨ ¸ü¿íµÄÒì³£¡£
-		Èô¸¸ÀàÖÐµÄ¸Ã·½·¨Ã»ÓÐÅ×³öÒì³££¬ÖØÐ´µÄ·½·¨ÓÀÔ¶ÎÞ·¨Å×³öÒì³£¡£ÒòÎªÖ®ÀàÎÞ·¨Å×³ö±È¸¸Àà¸ü¶àµÄÒì³£¡£
-		Èô¸¸ÀàÅ×³öException£¬×ÓÀà¿ÉÒÔÅ×µÄ¾Í¶àÁË£¬ÔÚExceptionÀàÖÐµÄ¶¼¿ÉÒÔÅ×³ö¡£
-* ¿É±ä³¤²ÎÊý:
+		åŽé¢å¦‚æžœç»§ç»­å‘ä¸ŠæŠ›ï¼Œéƒ½æ˜¯å¯¹è¿™æ—¶å€™ç”Ÿæˆçš„å¼‚å¸¸ç»§ç»­æŠ›å‡ºï¼ï¼ä¹Ÿå°±æ˜¯è¯´åŽé¢çš„ä¸ŠæŠ›ï¼Œå¹¶ä¸æ˜¯äº§ç”Ÿæ–°å¼‚å¸¸ï¼Œè€Œæ˜¯å°†ä¸€ä¸ªå·²ç»å­˜åœ¨çš„å¼‚å¸¸ç»§ç»­æŠ›å‡ºã€‚
+		å­ç±»çš„æ–¹æ³• æ— æ³•æŠ›å‡ºæ¯” çˆ¶ç±»ä¸­çš„ç›¸åŒæ–¹æ³• æ›´å®½çš„å¼‚å¸¸ã€‚
+		è‹¥çˆ¶ç±»ä¸­çš„è¯¥æ–¹æ³•æ²¡æœ‰æŠ›å‡ºå¼‚å¸¸ï¼Œé‡å†™çš„æ–¹æ³•æ°¸è¿œæ— æ³•æŠ›å‡ºå¼‚å¸¸ã€‚å› ä¸ºä¹‹ç±»æ— æ³•æŠ›å‡ºæ¯”çˆ¶ç±»æ›´å¤šçš„å¼‚å¸¸ã€‚
+		è‹¥çˆ¶ç±»æŠ›å‡ºExceptionï¼Œå­ç±»å¯ä»¥æŠ›çš„å°±å¤šäº†ï¼Œåœ¨Exceptionç±»ä¸­çš„éƒ½å¯ä»¥æŠ›å‡ºã€‚
+* å¯å˜é•¿å‚æ•°:
 	void method(int... a){
 		...
-		//ÕâÀïa½ÓÊÕµ½µÄÊÇ¸öÊý×é
+		//è¿™é‡ŒaæŽ¥æ”¶åˆ°çš„æ˜¯ä¸ªæ•°ç»„
 	}
-	µ«ÈôÓÐ¾«È·Æ¥ÅäµÄ·½·¨£¬Ôò»áµ÷ÓÃ¾«È·Æ¥ÅäµÄ·½·¨
+	ä½†è‹¥æœ‰ç²¾ç¡®åŒ¹é…çš„æ–¹æ³•ï¼Œåˆ™ä¼šè°ƒç”¨ç²¾ç¡®åŒ¹é…çš„æ–¹æ³•
 	void method(int a){
 		...
 	}
-	method(3);	//»áµ÷ÓÃ¶¨³¤²ÎÊýµÄ
-	¡¾¿É±ä³¤²ÎÊýÖ»ÄÜ·ÅÔÚ²ÎÊýÁÐ±íµÄÄ©Î²¡¿
+	method(3);	//ä¼šè°ƒç”¨å®šé•¿å‚æ•°çš„
+	ã€å¯å˜é•¿å‚æ•°åªèƒ½æ”¾åœ¨å‚æ•°åˆ—è¡¨çš„æœ«å°¾ã€‘
 	
-* ÊôÐÔÎÄ¼þ:
-	.propertiesÕâÑùµÄÎÄ¼þ¿ÉÒÔ×÷ÎªÊôÐÔÅäÖÃÎÄ¼þ¡£ÓÃ.properties×÷Îªºó×º¡££¨ÆäÊµËæ±ã¶¼ÐÐ£¬Ö»ÊÇÎªÁËÇø·ÖÅäÖÃÎÄ¼þµÄÎÄ·¨ÀàÐÍÓëÆä×÷ÓÃ£¬ÒòÎª»¹ÓÐÆäËûÎÄ·¨µÄÅäÖÃÎÄ¼þ£¬±ÈÈç.xml .json£©
-	keyºÍvalueÖ®¼ä¿ÉÒÔÊ¹ÓÃ¡°¿Õ¸ñ¡± "Ã°ºÅ" "µÈºÅ"¡£²¢°´ÔÚ×îÇ°ÃæµÄ×÷Îª·Ö¸ô·û¡£
-	¶ÁÈ¡ÊôÐÔÎÄ¼þµÄ´úÂë£º
+* å±žæ€§æ–‡ä»¶:
+	.propertiesè¿™æ ·çš„æ–‡ä»¶å¯ä»¥ä½œä¸ºå±žæ€§é…ç½®æ–‡ä»¶ã€‚ç”¨.propertiesä½œä¸ºåŽç¼€ã€‚ï¼ˆå…¶å®žéšä¾¿éƒ½è¡Œï¼Œåªæ˜¯ä¸ºäº†åŒºåˆ†é…ç½®æ–‡ä»¶çš„æ–‡æ³•ç±»åž‹ä¸Žå…¶ä½œç”¨ï¼Œå› ä¸ºè¿˜æœ‰å…¶ä»–æ–‡æ³•çš„é…ç½®æ–‡ä»¶ï¼Œæ¯”å¦‚.xml .jsonï¼‰
+	keyå’Œvalueä¹‹é—´å¯ä»¥ä½¿ç”¨â€œç©ºæ ¼â€ "å†’å·" "ç­‰å·"ã€‚å¹¶æŒ‰åœ¨æœ€å‰é¢çš„ä½œä¸ºåˆ†éš”ç¬¦ã€‚
+	è¯»å–å±žæ€§æ–‡ä»¶çš„ä»£ç ï¼š
 		Properties p = new Properties();
-		p.load(new FileInputStream("<properties-file>"));	½«ÎÄ¼þÁ÷ÖÐµÄÊý¾Ý£¬¼ÓÔØµ½ÊôÐÔ¶ÔÏóÖÐÈ¥
-		String value = p.getProperty("<key>");		µÃµ½value
-* ·´Éä:
-	0.¹ØÁªÀà
+		p.load(new FileInputStream("<properties-file>"));	å°†æ–‡ä»¶æµä¸­çš„æ•°æ®ï¼ŒåŠ è½½åˆ°å±žæ€§å¯¹è±¡ä¸­åŽ»
+		String value = p.getProperty("<key>");		å¾—åˆ°value
+* åå°„:
+	0.å…³è”ç±»
 		java.lang.Class;
 		java.lang.reflect.Constructor;
 		java.lang.reflect.Field;
 		java.lang.reflect.Method;
 		java.lang.reflect.Modifier;
-		ºóËÄ¸öÓÉClassËù°üº¬¡£
+		åŽå››ä¸ªç”±Classæ‰€åŒ…å«ã€‚
 		
 		class User{
 			String name;
 			User(){}
 			public void ml(){}
 		}
-		Class´ú±íÕû¸öÀàµÄ½á¹¹¡£
+		Classä»£è¡¨æ•´ä¸ªç±»çš„ç»“æž„ã€‚
 	
-	1.·´Éä»úÖÆµÄ×÷ÓÃ:
-		1).·´±àÒë: .class->.java
-		2).Í¨¹ý·´Éä»úÖÆ·ÃÎÊjavaÀàµÄÊôÐÔ¡¢·½·¨¡¢¹¹ÔìÆ÷µÈ¡£
+	1.åå°„æœºåˆ¶çš„ä½œç”¨:
+		1).åç¼–è¯‘: .class->.java
+		2).é€šè¿‡åå°„æœºåˆ¶è®¿é—®javaç±»çš„å±žæ€§ã€æ–¹æ³•ã€æž„é€ å™¨ç­‰ã€‚
 		
-	2.»ñÈ¡ClassµÄÈýÖÖ·½Ê½
-		1).Class c1 = Class.forName("<class-name>");	Õâ¸öµÄÔËÐÐ£¬»á½«¶ÔÓ¦µÄclass¼ÓÔØµÄjvmÖÐ£¬Òò´Ë»áÖ´ÐÐstaticÓï¾ä¿é
-		2).javaÃ¿¸öÀà¶¼ÓÐ¸öclass¾²Ì¬ÊôÐÔ
-			Class c2 = <class-name>.class;				Õâ¸öµÄÖ´ÐÐ£¬ÊÇ²»»áÖ´ÐÐ¾²Ì¬Óï¾ä¿éµÄ¡£
-		3).javaÓïÑÔÖÐÈÎºÎÒ»¸öjava¶ÔÏó£¬¶¼ÓÐÒ»¸ögetClass·½·¨
+	2.èŽ·å–Classçš„ä¸‰ç§æ–¹å¼
+		1).Class c1 = Class.forName("<class-name>");	è¿™ä¸ªçš„è¿è¡Œï¼Œä¼šå°†å¯¹åº”çš„classåŠ è½½çš„jvmä¸­ï¼Œå› æ­¤ä¼šæ‰§è¡Œstaticè¯­å¥å—
+		2).javaæ¯ä¸ªç±»éƒ½æœ‰ä¸ªclassé™æ€å±žæ€§
+			Class c2 = <class-name>.class;				è¿™ä¸ªçš„æ‰§è¡Œï¼Œæ˜¯ä¸ä¼šæ‰§è¡Œé™æ€è¯­å¥å—çš„ã€‚
+		3).javaè¯­è¨€ä¸­ä»»ä½•ä¸€ä¸ªjavaå¯¹è±¡ï¼Œéƒ½æœ‰ä¸€ä¸ªgetClassæ–¹æ³•
 			Class c3 = <obj-name>.getClass();
-		Class¶ÔÏóÊÇµ¥ÀýÄ£Ê½£¬Ò²¾ÍÊÇËµÕâÈýÖÖ·½Ê½µÃµ½µÄÀà¶ÔÏó¶¼ÊÇÒ»ÑùµÄ¡£Ò»¸öÔËÐÐÊ±Àà¶ÔÏó£¬Ö»ÓÐÒ»¸ö¡£
+		Classå¯¹è±¡æ˜¯å•ä¾‹æ¨¡å¼ï¼Œä¹Ÿå°±æ˜¯è¯´è¿™ä¸‰ç§æ–¹å¼å¾—åˆ°çš„ç±»å¯¹è±¡éƒ½æ˜¯ä¸€æ ·çš„ã€‚ä¸€ä¸ªè¿è¡Œæ—¶ç±»å¯¹è±¡ï¼Œåªæœ‰ä¸€ä¸ªã€‚
 	
-	3.Í¨¹ý·´Éä´´½¨¶ÔÏó
-		ÔÚ»ñÈ¡ClassÀàÐÍµÄ¶ÔÏóºó£¬¿ÉÒÔ´´½¨Class¶ÔÓ¦µÄ¶ÔÏó¡£
-		Object = <Class-object>.newInstance();		//µ÷ÓÃÎÞ²Î¹¹Ôì·½·¨£¬·µ»ØÒ»¸öObjectÊµÀý
+	3.é€šè¿‡åå°„åˆ›å»ºå¯¹è±¡
+		åœ¨èŽ·å–Classç±»åž‹çš„å¯¹è±¡åŽï¼Œå¯ä»¥åˆ›å»ºClasså¯¹åº”çš„å¯¹è±¡ã€‚
+		Object = <Class-object>.newInstance();		//è°ƒç”¨æ— å‚æž„é€ æ–¹æ³•ï¼Œè¿”å›žä¸€ä¸ªObjectå®žä¾‹
 	
-	4.»ñÈ¡ÀàÖÐµÄÊôÐÔ¡¢·½·¨¡¢¹¹ÔìÆ÷ÒÔ¼°ÆäËû·½·¨
-		0).ÆäËû
-			<Class-Object>.	getName();			//»ñµÃÀàµÄÀàÈ«Ãû
-							.getSimpleName();	//»ñµÃ²»°üÀ¨Ç°×ºµÄÀàÃû
-		1).»ñÈ¡ÊôÐÔ
-			Field[] fs = c.getFields();			//»ñÈ¡ËùÓÐµÄpublicÐÞÊÎµÄÊôÐÔ
-			fs = c.getDeclaredFields();			//»ñµÃËùÓÐµÄÊôÐÔ
-			f = c.getDeclaredField("<field>");	//·µ»ØÌØ¶¨µÄÊôÐÔ
+	4.èŽ·å–ç±»ä¸­çš„å±žæ€§ã€æ–¹æ³•ã€æž„é€ å™¨ä»¥åŠå…¶ä»–æ–¹æ³•
+		0).å…¶ä»–
+			<Class-Object>.	getName();			//èŽ·å¾—ç±»çš„ç±»å…¨å
+							.getSimpleName();	//èŽ·å¾—ä¸åŒ…æ‹¬å‰ç¼€çš„ç±»å
+		1).èŽ·å–å±žæ€§
+			Field[] fs = c.getFields();			//èŽ·å–æ‰€æœ‰çš„publicä¿®é¥°çš„å±žæ€§
+			fs = c.getDeclaredFields();			//èŽ·å¾—æ‰€æœ‰çš„å±žæ€§
+			f = c.getDeclaredField("<field>");	//è¿”å›žç‰¹å®šçš„å±žæ€§
 			
-			f.getName();						//»ñµÃÊôÐÔµÄÃû×Ö
-			f.getType();						//»ñµÃÕâ¸öÊôÐÔµÄClass¶ÔÏó
-			f.getModifiers();					//»ñµÃÕâ¸öÊôÐÔµÄÐÞÊÎ·û, .toString()ÏÔÊ¾ÐÞÊÎ·ûÃû×Ö
-			f.get(o);							//»ñµÃ¶ÔÏóoµÄfs[0]ÊôÐÔµÄÖµ
-			f.set(o, value);					//ÉèÖÃ¶ÔÏóoµÄfs[0]ÊôÐÔµÄÖµ
-		2).»ñÈ¡·½·¨
-			ms = c.getDeclaredMethods();		//»ñÈ¡ËùÓÐ·½·¨
-			m = c.getDeclaredMethod(<method-name>, <param-list>);	//»ñµÃ¾ßÌåµÄ·½·¨,<param-list>ÊÇClassÀàÐÍµÄ±ä³¤²ÎÊý
+			f.getName();						//èŽ·å¾—å±žæ€§çš„åå­—
+			f.getType();						//èŽ·å¾—è¿™ä¸ªå±žæ€§çš„Classå¯¹è±¡
+			f.getModifiers();					//èŽ·å¾—è¿™ä¸ªå±žæ€§çš„ä¿®é¥°ç¬¦, .toString()æ˜¾ç¤ºä¿®é¥°ç¬¦åå­—
+			f.get(o);							//èŽ·å¾—å¯¹è±¡oçš„fs[0]å±žæ€§çš„å€¼
+			f.set(o, value);					//è®¾ç½®å¯¹è±¡oçš„fs[0]å±žæ€§çš„å€¼
+		2).èŽ·å–æ–¹æ³•
+			ms = c.getDeclaredMethods();		//èŽ·å–æ‰€æœ‰æ–¹æ³•
+			m = c.getDeclaredMethod(<method-name>, <param-list>);	//èŽ·å¾—å…·ä½“çš„æ–¹æ³•,<param-list>æ˜¯Classç±»åž‹çš„å˜é•¿å‚æ•°
 			
-			rt = m.getReturnType();				//»ñÈ¡·µ»ØÖµÀàÐÍ
-			methodName = m.getSimpleName();		//»ñÈ¡·½·¨Ãû
-			Class[] ps = m.getParameterTypes();	//»ñµÃ·½·¨µÄ²ÎÊýÁÐ±íÀàÐÍ
+			rt = m.getReturnType();				//èŽ·å–è¿”å›žå€¼ç±»åž‹
+			methodName = m.getSimpleName();		//èŽ·å–æ–¹æ³•å
+			Class[] ps = m.getParameterTypes();	//èŽ·å¾—æ–¹æ³•çš„å‚æ•°åˆ—è¡¨ç±»åž‹
 			
-			Object res = m.Invoke(o, <param-set>);			//ÓÃ²ÎÊý<param-set>µ÷ÓÃo¶ÔÏóµÄm·½·¨£¬<param-set>ÊÇObjectÀàÐÍµÄ±ä³¤²ÎÊý£¬·µ»ØÖµObjectÀàÐÍ¶ÔÏó
-		3).»ñÈ¡¹¹ÔìÆ÷
-			Ê¡
+			Object res = m.Invoke(o, <param-set>);			//ç”¨å‚æ•°<param-set>è°ƒç”¨oå¯¹è±¡çš„mæ–¹æ³•ï¼Œ<param-set>æ˜¯Objectç±»åž‹çš„å˜é•¿å‚æ•°ï¼Œè¿”å›žå€¼Objectç±»åž‹å¯¹è±¡
+		3).èŽ·å–æž„é€ å™¨
+			çœ
 
-* ¼¯ºÏ
-	¼¯ºÏÖ»ÄÜ±£´æÒýÓÃÀàÐÍ¡£
-	1.½á¹¹
+* é›†åˆ
+	é›†åˆåªèƒ½ä¿å­˜å¼•ç”¨ç±»åž‹ã€‚
+	1.ç»“æž„
 	Iterable <|-- Collection <|-- List <|-- ArrayList
 	                      |         |__<|-- LinkedList
 						  |         |__<|-- Vector
@@ -327,66 +327,66 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 	 |__<|-- HashTable <|-- Properties
 	 |__<|-- SortedMap <|-- TreeMap
 	 
-		1).µü´úÆ÷IterableµÄ×ÓÀà¶¼ÊÇ¿Éµü´úµÄ¡£ÓÐÒ»¸öiteratorµÄ·½·¨
-			IterableµÄ×ÓÀà¶¼ÊÇ¿Éµü´úµÄ¡£ÓÐÒ»¸öiteratorµÄ·½·¨,·µ»ØÒ»¸öIterator<T>ÀàÐÍµÄµü´úÆ÷£¬ÓÃÓÚ±éÀú¼¯ºÏ¡£
-			Iterator<T>ÓÐ3¸ö·½·¨:
+		1).è¿­ä»£å™¨Iterableçš„å­ç±»éƒ½æ˜¯å¯è¿­ä»£çš„ã€‚æœ‰ä¸€ä¸ªiteratorçš„æ–¹æ³•
+			Iterableçš„å­ç±»éƒ½æ˜¯å¯è¿­ä»£çš„ã€‚æœ‰ä¸€ä¸ªiteratorçš„æ–¹æ³•,è¿”å›žä¸€ä¸ªIterator<T>ç±»åž‹çš„è¿­ä»£å™¨ï¼Œç”¨äºŽéåŽ†é›†åˆã€‚
+			Iterator<T>æœ‰3ä¸ªæ–¹æ³•:
 				a).hasNext()
 				b).next()
 				c).remove()
-			javaSEÖÐµÄÃ¿ÖÖ¼¯ºÏÊµÏÖÀà£¬¶¼ÊµÏÖÁË×Ô¼ºµÄµü´úÆ÷£¬²¢ÇÒ·µ»ØËü¡£
-			³õÊ¼µü´úÆ÷ÊÇÖ¸ÏòµÚÒ»¸öÔªËØµÄ£¬next½«Ö¸ÏòµÄÔªËØ·µ»Ø£¬²¢ÒÆ¶¯µ½ÏÂÒ»¸öÔªËØ¡£
-			remove()·½·¨É¾µôµÄÊÇµ±Ç°ËùÖ¸ÔªËØµÄÇ°Ò»¸öÔªËØ¡£
+			javaSEä¸­çš„æ¯ç§é›†åˆå®žçŽ°ç±»ï¼Œéƒ½å®žçŽ°äº†è‡ªå·±çš„è¿­ä»£å™¨ï¼Œå¹¶ä¸”è¿”å›žå®ƒã€‚
+			åˆå§‹è¿­ä»£å™¨æ˜¯æŒ‡å‘ç¬¬ä¸€ä¸ªå…ƒç´ çš„ï¼Œnextå°†æŒ‡å‘çš„å…ƒç´ è¿”å›žï¼Œå¹¶ç§»åŠ¨åˆ°ä¸‹ä¸€ä¸ªå…ƒç´ ã€‚
+			remove()æ–¹æ³•åˆ æŽ‰çš„æ˜¯å½“å‰æ‰€æŒ‡å…ƒç´ çš„å‰ä¸€ä¸ªå…ƒç´ ã€‚
 			|_| <- lastRet
 			|_| <- cursor / next(lastRet)
 			|_| <- next(cursor)
-			next()£¬·µ»ØcursorËùÖ¸¶ÔÏó£¬²¢ÇÒcursorºÍlastRetÍùÏÂÒÆ¶¯¡£
-			remove(), É¾³ýlastRetËùÖ¸µÄ¶ÔÏó£¬cursor±£³ÖËùÖ¸µÄ¶ÔÏó£¨Ò²¾ÍÊÇcursorÇ°ÒÆÒ»²½£©
+			next()ï¼Œè¿”å›žcursoræ‰€æŒ‡å¯¹è±¡ï¼Œå¹¶ä¸”cursorå’ŒlastRetå¾€ä¸‹ç§»åŠ¨ã€‚
+			remove(), åˆ é™¤lastRetæ‰€æŒ‡çš„å¯¹è±¡ï¼Œcursorä¿æŒæ‰€æŒ‡çš„å¯¹è±¡ï¼ˆä¹Ÿå°±æ˜¯cursorå‰ç§»ä¸€æ­¥ï¼‰
 		2).Collection
-			Ö»ÄÜ´æ´¢ÒýÓÃÀàÐÍ£¬²¢ÇÒÖ»ÄÜµ¥¸ö´æ´¢¡£
-			boolean add(Object o);		Ïë¼¯ºÏÖÐÌí¼ÓÔªËØ
-			void clear();				Çå¿Õ
-			boolean isEmpty();			ÅÐ¶ÏÊÇ·ñÎª¿Õ
-			Iterator<E> iterator();		¡¾µü´úÆ÷¡¿
-			boolean remove(Object o);	É¾³ý¼¯ºÏÖÐÄ³¸öÔªËØ
-			int size();					»ñÈ¡¼¯ºÏÖÐÔªËØµÄ¸öÊý
-			Object[] toArray();			½«¼¯ºÏ×ª»»³ÉÊý×é
-			boolean contains(Object o );ÅÐ¶ÏoÊÇ·ñ´æÔÚ
-				a).¿ÉÒÔ¿´³ö£¬ CollectionÖ»ÄÜ´æ£¬²»ÄÜÈ¡¡£Ö»ÄÜ×ª»»³ÉÊý×é»òÊÇµü´úÆ÷À´È¡Êý¾Ý¡£
-				b).containsÀïÃæÊ¹ÓÃµÄÊÇequals·½·¨À´½øÐÐÏàµÈÅÐ¶Ï¡£
-				c).removeÒ²ÊÇÓÃµÄequals·½·¨
+			åªèƒ½å­˜å‚¨å¼•ç”¨ç±»åž‹ï¼Œå¹¶ä¸”åªèƒ½å•ä¸ªå­˜å‚¨ã€‚
+			boolean add(Object o);		æƒ³é›†åˆä¸­æ·»åŠ å…ƒç´ 
+			void clear();				æ¸…ç©º
+			boolean isEmpty();			åˆ¤æ–­æ˜¯å¦ä¸ºç©º
+			Iterator<E> iterator();		ã€è¿­ä»£å™¨ã€‘
+			boolean remove(Object o);	åˆ é™¤é›†åˆä¸­æŸä¸ªå…ƒç´ 
+			int size();					èŽ·å–é›†åˆä¸­å…ƒç´ çš„ä¸ªæ•°
+			Object[] toArray();			å°†é›†åˆè½¬æ¢æˆæ•°ç»„
+			boolean contains(Object o );åˆ¤æ–­oæ˜¯å¦å­˜åœ¨
+				a).å¯ä»¥çœ‹å‡ºï¼Œ Collectionåªèƒ½å­˜ï¼Œä¸èƒ½å–ã€‚åªèƒ½è½¬æ¢æˆæ•°ç»„æˆ–æ˜¯è¿­ä»£å™¨æ¥å–æ•°æ®ã€‚
+				b).containsé‡Œé¢ä½¿ç”¨çš„æ˜¯equalsæ–¹æ³•æ¥è¿›è¡Œç›¸ç­‰åˆ¤æ–­ã€‚
+				c).removeä¹Ÿæ˜¯ç”¨çš„equalsæ–¹æ³•
 		3).Map
-			ÒÔkv¼üÖµ¶Ô´æ´¢¡£keyÊÇÎÞÐò²»¿ÉÖØ¸´µÄ¡£
-	2.List¼¯ºÏ
-		ÌØµã:ÓÐÐò¡¢¿ÉÖØ¸´¡££¨ÓÐÐòÖ¸µÄ´æ½øÈ¥Ê²Ã´Ë³Ðò£¬È¡³öÀ´Ò²¾ÍÊ²Ã´Ë³Ðò£¬Ò²¾ÍÊÇË³Ðò²»»á¸ü¸Ä£©
-		0).³£ÓÃ·½·¨
-			get(int index);	//»ñµÃÖ¸¶¨Ë÷ÒýµÄÔªËØ
+			ä»¥kvé”®å€¼å¯¹å­˜å‚¨ã€‚keyæ˜¯æ— åºä¸å¯é‡å¤çš„ã€‚
+	2.Listé›†åˆ
+		ç‰¹ç‚¹:æœ‰åºã€å¯é‡å¤ã€‚ï¼ˆæœ‰åºæŒ‡çš„å­˜è¿›åŽ»ä»€ä¹ˆé¡ºåºï¼Œå–å‡ºæ¥ä¹Ÿå°±ä»€ä¹ˆé¡ºåºï¼Œä¹Ÿå°±æ˜¯é¡ºåºä¸ä¼šæ›´æ”¹ï¼‰
+		0).å¸¸ç”¨æ–¹æ³•
+			get(int index);	//èŽ·å¾—æŒ‡å®šç´¢å¼•çš„å…ƒç´ 
 		1).ArrayList
-			µ×²ã²ÉÓÃÊý×é´æ´¢ÔªËØ£¬Òò´ËÊÊºÏ²éÑ¯ºÍ¸³Öµ£¬µ«ÊÇ²»ÊÊÆµ·±µÄËæ»úÔöÉ¾ÔªËØ¡£
-			Ä¬ÈÏ³õÊ¼»¯ÈÝÁ¿ÊÇ10£¬°´1.5±¶½øÐÐÀ©ÈÝ¡£¿ÉÒÔÔÚ³õÊ¼»¯Ê±Ö¸¶¨½Ï´óÈÝÁ¿£¬ÒÔÃâÆµ·±À©ÈÝ¡£
+			åº•å±‚é‡‡ç”¨æ•°ç»„å­˜å‚¨å…ƒç´ ï¼Œå› æ­¤é€‚åˆæŸ¥è¯¢å’Œèµ‹å€¼ï¼Œä½†æ˜¯ä¸é€‚é¢‘ç¹çš„éšæœºå¢žåˆ å…ƒç´ ã€‚
+			é»˜è®¤åˆå§‹åŒ–å®¹é‡æ˜¯10ï¼ŒæŒ‰1.5å€è¿›è¡Œæ‰©å®¹ã€‚å¯ä»¥åœ¨åˆå§‹åŒ–æ—¶æŒ‡å®šè¾ƒå¤§å®¹é‡ï¼Œä»¥å…é¢‘ç¹æ‰©å®¹ã€‚
 		2).LinkedList
-			µ×²ã²ÉÓÃË«ÏòÁ´±í£¬ÊÊºÏÆµ·±ÔöÉ¾ÔªËØ£¬µ«²»ÊÊºÏËæ»ú²éÑ¯¡£
+			åº•å±‚é‡‡ç”¨åŒå‘é“¾è¡¨ï¼Œé€‚åˆé¢‘ç¹å¢žåˆ å…ƒç´ ï¼Œä½†ä¸é€‚åˆéšæœºæŸ¥è¯¢ã€‚
 		3).Vector
-			ºÍArrayListÏàÍ¬£¬µ«ÊÇÆäÏß³Ì°²È«¡£µ«Ð§ÂÊ½ÏµÍ£¬ºÜÉÙÊ¹ÓÃ¡£
-			Ä¬ÈÏ³õÊ¼»¯ÈÝÁ¿ÊÇ10£¬°´1.5±¶½øÐÐÀ©ÈÝ¡£
-	3.Set¼¯ºÏ
-		ÌØµã:ÎÞÐò£¬²»¿ÉÖØ¸´¡£(´æ½øÈ¥µÄË³ÐòºÍÈ¡³öÀ´µÄË³Ðò²»Ò»Ñù£¬Ò²¾ÍÊÇËµË³Ðò±»ÐÞ¸ÄÁËµÄ)
-		¶ÔÓÚSortedSet¼¯ºÏ£¬´æ½øÈ¥µÄË³ÐòÊÇÅÅÐòµÄ¡£(TreeSet½á¹¹±¾À´¾ÍÊÇ¶þ²æËÑË÷Ê÷)
+			å’ŒArrayListç›¸åŒï¼Œä½†æ˜¯å…¶çº¿ç¨‹å®‰å…¨ã€‚ä½†æ•ˆçŽ‡è¾ƒä½Žï¼Œå¾ˆå°‘ä½¿ç”¨ã€‚
+			é»˜è®¤åˆå§‹åŒ–å®¹é‡æ˜¯10ï¼ŒæŒ‰1.5å€è¿›è¡Œæ‰©å®¹ã€‚
+	3.Seté›†åˆ
+		ç‰¹ç‚¹:æ— åºï¼Œä¸å¯é‡å¤ã€‚(å­˜è¿›åŽ»çš„é¡ºåºå’Œå–å‡ºæ¥çš„é¡ºåºä¸ä¸€æ ·ï¼Œä¹Ÿå°±æ˜¯è¯´é¡ºåºè¢«ä¿®æ”¹äº†çš„)
+		å¯¹äºŽSortedSeté›†åˆï¼Œå­˜è¿›åŽ»çš„é¡ºåºæ˜¯æŽ’åºçš„ã€‚(TreeSetç»“æž„æœ¬æ¥å°±æ˜¯äºŒå‰æœç´¢æ ‘)
 		1).HashSet
-			HashSet¾ÍÊÇÒ»¸öÃ»ÓÐvalueµÄHashMap£¬Æäµ×²ãÊÇHash½á¹¹¡£
-			add(o); ÈôoÒÑ¾­´æÔÚ£¬ÄÇÃ´·ÅÆúadd£¬ÏàµÈÅÐ¶ÏÊÇÍ¨¹ýhashCodeºÍequals½øÐÐµÄ¡£
-					ÏÈÍ¨¹ýhashCodeÅÐ¶Ï£¬ÈôhashCodeÓÐÏàÍ¬µÄ£¬ÔÙµ½¸ÃÊý×éÀï£¬ÓÃequals¶Ôo½øÐÐÅÐ¶Ï¡£
-					ÈôhashCodeÖ±½Ó¾Í²»´æÔÚ£¬ÄÇÃ´¾ÍÔÚÊý×éÖÐÌí¼ÓÐÂµÄÔªËØ¡£hashCodeÏàÍ¬µÄÔªËØ£¬¶¼ÔÚÍ¬Ò»Êý×éÀï¡£
+			HashSetå°±æ˜¯ä¸€ä¸ªæ²¡æœ‰valueçš„HashMapï¼Œå…¶åº•å±‚æ˜¯Hashç»“æž„ã€‚
+			add(o); è‹¥oå·²ç»å­˜åœ¨ï¼Œé‚£ä¹ˆæ”¾å¼ƒaddï¼Œç›¸ç­‰åˆ¤æ–­æ˜¯é€šè¿‡hashCodeå’Œequalsè¿›è¡Œçš„ã€‚
+					å…ˆé€šè¿‡hashCodeåˆ¤æ–­ï¼Œè‹¥hashCodeæœ‰ç›¸åŒçš„ï¼Œå†åˆ°è¯¥æ•°ç»„é‡Œï¼Œç”¨equalså¯¹oè¿›è¡Œåˆ¤æ–­ã€‚
+					è‹¥hashCodeç›´æŽ¥å°±ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆå°±åœ¨æ•°ç»„ä¸­æ·»åŠ æ–°çš„å…ƒç´ ã€‚hashCodeç›¸åŒçš„å…ƒç´ ï¼Œéƒ½åœ¨åŒä¸€æ•°ç»„é‡Œã€‚
 			
-			Êý×é³õÊ¼»¯ÈÝÁ¿ÊÇ16£¬Ä¬ÈÏ¼ÓÔØÒò×ÓÊÇ0.75¡£
-			ÆäÖÐµÄÊý×éÔªËØ£¬Õ¼ÁË75%¾Í»á¿ªÊ¼À©ÈÝ¡£
+			æ•°ç»„åˆå§‹åŒ–å®¹é‡æ˜¯16ï¼Œé»˜è®¤åŠ è½½å› å­æ˜¯0.75ã€‚
+			å…¶ä¸­çš„æ•°ç»„å…ƒç´ ï¼Œå äº†75%å°±ä¼šå¼€å§‹æ‰©å®¹ã€‚
 			
-			´æ´¢ÔÚHashSetÐèÒªÖØÐ´hashCode·½·¨ºÍequals·½·¨ÒÔÂú×ãÏîÄ¿µÄÐèÇó¡£¾¡Á¿hash¾ùÔÈ·Ö²¼¡£
-			¶ÔÓÚÒ»¸ö¶ÔÏó£¬Èç¹ûÃ»ÓÐÖØÐ´hashCode£¬ÄÇÃ´Ëü·µ»ØµÄ¶¼²»Ò»Ñù£¬ÄÇÃ´hashSet¾ÍÍË»¯³ÉÒ»¸öÊý×éÁË¡£
-			Èç¹û½«hashCode·µ»ØÏàÍ¬µÄÖµ£¬ÄÇÃ´hashSet¾ÍÍË»¯³ÉÒ»¸öÁ´±íÁË¡£
+			å­˜å‚¨åœ¨HashSetéœ€è¦é‡å†™hashCodeæ–¹æ³•å’Œequalsæ–¹æ³•ä»¥æ»¡è¶³é¡¹ç›®çš„éœ€æ±‚ã€‚å°½é‡hashå‡åŒ€åˆ†å¸ƒã€‚
+			å¯¹äºŽä¸€ä¸ªå¯¹è±¡ï¼Œå¦‚æžœæ²¡æœ‰é‡å†™hashCodeï¼Œé‚£ä¹ˆå®ƒè¿”å›žçš„éƒ½ä¸ä¸€æ ·ï¼Œé‚£ä¹ˆhashSetå°±é€€åŒ–æˆä¸€ä¸ªæ•°ç»„äº†ã€‚
+			å¦‚æžœå°†hashCodeè¿”å›žç›¸åŒçš„å€¼ï¼Œé‚£ä¹ˆhashSetå°±é€€åŒ–æˆä¸€ä¸ªé“¾è¡¨äº†ã€‚
 		2).TreeSet
-			ÓÐÅÅÐò¹¦ÄÜ¡£ÔªËØÒ²²»ÄÜÖØ¸´¡£
-			TreeSetÌí¼ÓµÄ¶ÔÏó£¬ÐèÒªÖØÐ´Comparable¡£±È½ÏÊÇ·ñÏàµÈ£¬Ò²ÊÇÍ¨¹ýComparableµÄ½Ó¿Ú·½·¨ÊµÏÖµÄ¡£
-			Ò²¿ÉÒÔµ¥¶À±àÐ´Ò»¸ö±È½ÏÆ÷, ÔÙ´´½¨TreeSetµÄÊ±ºò£¬´«µÝ±È½ÏÆ÷:
+			æœ‰æŽ’åºåŠŸèƒ½ã€‚å…ƒç´ ä¹Ÿä¸èƒ½é‡å¤ã€‚
+			TreeSetæ·»åŠ çš„å¯¹è±¡ï¼Œéœ€è¦é‡å†™Comparableã€‚æ¯”è¾ƒæ˜¯å¦ç›¸ç­‰ï¼Œä¹Ÿæ˜¯é€šè¿‡Comparableçš„æŽ¥å£æ–¹æ³•å®žçŽ°çš„ã€‚
+			ä¹Ÿå¯ä»¥å•ç‹¬ç¼–å†™ä¸€ä¸ªæ¯”è¾ƒå™¨, å†åˆ›å»ºTreeSetçš„æ—¶å€™ï¼Œä¼ é€’æ¯”è¾ƒå™¨:
 				Set es = new TreeSet(new Comparator(){
 					@Override
 					public int compare(Object o1, Object o2) {
@@ -395,92 +395,92 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 					}
 				});
 	4.Map
-		0).³£ÓÃ·½·¨
+		0).å¸¸ç”¨æ–¹æ³•
 			boolean containsKey();
 			boolean containsValue();
 			
-			Object get(Object key);		Í¨¹ýkey»ñÈ¡value
-			Object put(key, value);		Ìí¼Ókv¶Ô
+			Object get(Object key);		é€šè¿‡keyèŽ·å–value
+			Object put(key, value);		æ·»åŠ kvå¯¹
 			
-			Set KeySet();				»ñÈ¡mapÖÐËùÓÐµÄKey
-			Collection<V> values();		»ñÈ¡mapÖÐËùÓÐµÄvalue
+			Set KeySet();				èŽ·å–mapä¸­æ‰€æœ‰çš„Key
+			Collection<V> values();		èŽ·å–mapä¸­æ‰€æœ‰çš„value
 			
 			
-			Set<Map.Entry<K,V>> entrySet();	·µ»Ø´ËÓ³ÉäÖÐ°üº¬µÄÓ³Éä¹ØÏµµÄSetÊÓÍ¼×Ö·û´®£¬Ïàµ±ÓÚ·µ»ØºÜ¶à¸ö"key=value"µÄ×Ö´®
+			Set<Map.Entry<K,V>> entrySet();	è¿”å›žæ­¤æ˜ å°„ä¸­åŒ…å«çš„æ˜ å°„å…³ç³»çš„Setè§†å›¾å­—ç¬¦ä¸²ï¼Œç›¸å½“äºŽè¿”å›žå¾ˆå¤šä¸ª"key=value"çš„å­—ä¸²
 			void clear();
-			Object remove(key);			¸ù¾Ýkey, É¾³ýÒ»¸ökv
+			Object remove(key);			æ ¹æ®key, åˆ é™¤ä¸€ä¸ªkv
 			boolean isEmpty();
-			int size();					»ñÈ¡mapÖÐkv¶Ô¸öÊý
+			int size();					èŽ·å–mapä¸­kvå¯¹ä¸ªæ•°
 			
 		1).HashMap
-			KeyÊÇ¸öHashSet¡£
-			³õÊ¼»¯ÈÝÁ¿ÊÇ16£¬Ä¬ÈÏ¼ÓÔØÊÇ0.75¡£
-			Èç¹ûkeyÖØ¸´ÁË£¬Ôò¸²¸Ç£¡
+			Keyæ˜¯ä¸ªHashSetã€‚
+			åˆå§‹åŒ–å®¹é‡æ˜¯16ï¼Œé»˜è®¤åŠ è½½æ˜¯0.75ã€‚
+			å¦‚æžœkeyé‡å¤äº†ï¼Œåˆ™è¦†ç›–ï¼
 		2).HashTable
-			Ïß³Ì°²È«, Ð§ÂÊµÍ¡£
-			Ä¬ÈÏ³õÊ¼»¯ÈÝÁ¿ÊÇ11£¬ Ä¬ÈÏ¼ÓÔØÒò×ÓÊÇ0.75¡£
+			çº¿ç¨‹å®‰å…¨, æ•ˆçŽ‡ä½Žã€‚
+			é»˜è®¤åˆå§‹åŒ–å®¹é‡æ˜¯11ï¼Œ é»˜è®¤åŠ è½½å› å­æ˜¯0.75ã€‚
 		3).Properties
-			keyºÍvalueÖ»ÄÜÊÇ×Ö·û´®ÀàÐÍ¡£
-			¹Ø¼üÊÇ¿ÉÒÔ½øÐÐ¼ÓÔØ£¬ÕâÑùµÄ»°¿ÉÒÔÍ¨¹ý¸ÃÀàÐÍ¶ÔÏó¶ÁÈ¡ÅäÖÃÎÄ¼þ¡£
+			keyå’Œvalueåªèƒ½æ˜¯å­—ç¬¦ä¸²ç±»åž‹ã€‚
+			å…³é”®æ˜¯å¯ä»¥è¿›è¡ŒåŠ è½½ï¼Œè¿™æ ·çš„è¯å¯ä»¥é€šè¿‡è¯¥ç±»åž‹å¯¹è±¡è¯»å–é…ç½®æ–‡ä»¶ã€‚
 			getProperty("<key>");
 			setProperty("<key>", "<value>");
-			load(InputStream);		//½«ÊäÈëÁ÷µÄkv¶Ô×Ö·û´®½øÐÐ½á¹¹»¯
+			load(InputStream);		//å°†è¾“å…¥æµçš„kvå¯¹å­—ç¬¦ä¸²è¿›è¡Œç»“æž„åŒ–
 		4).TreeMap
-			KeyÊÇ¸öTreeSet.
+			Keyæ˜¯ä¸ªTreeSet.
 	5.Collections
-		¼¯ºÏ¹¤¾ßÀà¡£ËûÌá¹©ÁËÒ»Ð©ÁÐµÄËã·¨£¬°üÀ¨ÅÅÐò£¬Çó×îÐ¡×î´óÖµ£¬Ïß³Ì°²È«×ª»»¡£
-		ÅÅÐòµÄÊµÏÖ£¬ÐèÒª¶ÔÏóÊµÏÖÁËComparable½Ó¿Ú¡£
+		é›†åˆå·¥å…·ç±»ã€‚ä»–æä¾›äº†ä¸€äº›åˆ—çš„ç®—æ³•ï¼ŒåŒ…æ‹¬æŽ’åºï¼Œæ±‚æœ€å°æœ€å¤§å€¼ï¼Œçº¿ç¨‹å®‰å…¨è½¬æ¢ã€‚
+		æŽ’åºçš„å®žçŽ°ï¼Œéœ€è¦å¯¹è±¡å®žçŽ°äº†ComparableæŽ¥å£ã€‚
 		sort();
-		synchronizedList(List list);	½«list¼¯ºÏ×ª»»ÎªÏß³Ì°²È«µÄ
-		synchronizedList(Set set);		½«set¼¯ºÏ×ª»»ÎªÏß³Ì°²È«µÄ
-	6.Êý×éºÍListµÄÏà»¥×ª»¯
-		Êý×éµ½ListµÄ×ª»»£ºList s = Arrays.asList(new String[]{"1", "2", "3"});
-		Listµ½Êý×éµÄ×ª»»: Object[] items = list.toArray();
-	7.·ºÐÍ
-		Èç¹û²»Ê¹ÓÃ·ºÐÍ£¬¼¯ºÏÖÐµÄÔªËØÀàÐÍ²»Í³Ò»£¬ÐèÒª´óÁ¿µÄÇ¿×ª£¬´úÂëºÜ³ó¡£²¢ÇÒ½«ÔËÐÐÊ±ÆÚµÄ´íÎó£¬ÒÆµ½ÁË±àÒëÊ±ÆÚ¡£
-* ·ºÐÍ
-	* ±ß½ç
-		±ß½çÊ¹µÃ³ÌÐòÔ±¿ÉÒÔÔÚ·ºÐÍÉÏÉèÖÃÏÞÖÆÌõ¼þ¡£class A <T extends B>ÓÃÓÚ¶Ô·ºÐÍÀàAµÄ¡¾ÀàÐÍ²ÎÊý¡¿½øÐÐÃèÊö¡£±ß½çÖ»ÓÐextends£¬Ã»ÓÐsuper¡£
-		<T extends A>ÉùÃ÷T¾ßÓÐÀàÐÍA»òÕß´ÓÀàÐÍAµ¼³öµÄÀàÐÍ¡£·ºÐÍÀàÐÍ²ÎÊý½«²Á³ýµ½ËüµÄµÚÒ»¸ö±ß½çÉÏ¡£
-	* Í¨Åä·û
-		·ºÐÍ±í´ïÊ½ÖÐµÄÎÊºÅ£¬¾ÍÊÇÍ¨Åä·û¡£A<? extends/super B>ÓÃÓÚ¶Ô¡¾·ºÐÍÀà¡¿½øÐÐÃèÊö¡£
-		Í¨Åä·ûÓÃÓÚ·ºÐÍµÄÏòÉÏ»òÏòÏÂ×ªÐÍ¡£±ÈÈçÈÝÆ÷ÀàÐÍºÍÊý×éÀàÐÍ²»Í¬£¬ÎÞ·¨×Ô¶¯ÏòÉÏ×ªÐÍ£¬ÕâÊÇ¾ÍÐèÒªÒÀ¿¿Í¨Åä·û¡£
+		synchronizedList(List list);	å°†listé›†åˆè½¬æ¢ä¸ºçº¿ç¨‹å®‰å…¨çš„
+		synchronizedList(Set set);		å°†seté›†åˆè½¬æ¢ä¸ºçº¿ç¨‹å®‰å…¨çš„
+	6.æ•°ç»„å’ŒListçš„ç›¸äº’è½¬åŒ–
+		æ•°ç»„åˆ°Listçš„è½¬æ¢ï¼šList s = Arrays.asList(new String[]{"1", "2", "3"});
+		Liståˆ°æ•°ç»„çš„è½¬æ¢: Object[] items = list.toArray();
+	7.æ³›åž‹
+		å¦‚æžœä¸ä½¿ç”¨æ³›åž‹ï¼Œé›†åˆä¸­çš„å…ƒç´ ç±»åž‹ä¸ç»Ÿä¸€ï¼Œéœ€è¦å¤§é‡çš„å¼ºè½¬ï¼Œä»£ç å¾ˆä¸‘ã€‚å¹¶ä¸”å°†è¿è¡Œæ—¶æœŸçš„é”™è¯¯ï¼Œç§»åˆ°äº†ç¼–è¯‘æ—¶æœŸã€‚
+* æ³›åž‹
+	* è¾¹ç•Œ
+		è¾¹ç•Œä½¿å¾—ç¨‹åºå‘˜å¯ä»¥åœ¨æ³›åž‹ä¸Šè®¾ç½®é™åˆ¶æ¡ä»¶ã€‚class A <T extends B>ç”¨äºŽå¯¹æ³›åž‹ç±»Açš„ã€ç±»åž‹å‚æ•°ã€‘è¿›è¡Œæè¿°ã€‚è¾¹ç•Œåªæœ‰extendsï¼Œæ²¡æœ‰superã€‚
+		<T extends A>å£°æ˜ŽTå…·æœ‰ç±»åž‹Aæˆ–è€…ä»Žç±»åž‹Aå¯¼å‡ºçš„ç±»åž‹ã€‚æ³›åž‹ç±»åž‹å‚æ•°å°†æ“¦é™¤åˆ°å®ƒçš„ç¬¬ä¸€ä¸ªè¾¹ç•Œä¸Šã€‚
+	* é€šé…ç¬¦
+		æ³›åž‹è¡¨è¾¾å¼ä¸­çš„é—®å·ï¼Œå°±æ˜¯é€šé…ç¬¦ã€‚A<? extends/super B>ç”¨äºŽå¯¹ã€æ³›åž‹ç±»ã€‘è¿›è¡Œæè¿°ã€‚
+		é€šé…ç¬¦ç”¨äºŽæ³›åž‹çš„å‘ä¸Šæˆ–å‘ä¸‹è½¬åž‹ã€‚æ¯”å¦‚å®¹å™¨ç±»åž‹å’Œæ•°ç»„ç±»åž‹ä¸åŒï¼Œæ— æ³•è‡ªåŠ¨å‘ä¸Šè½¬åž‹ï¼Œè¿™æ˜¯å°±éœ€è¦ä¾é é€šé…ç¬¦ã€‚
 		* extends
-			A<? extends B> a£¬´ú±í×ÅaÊÇÒ»¸ö ¡¾ÀàÐÍÊÇA¡¿£¬Æä¡¾·ºÐÍÀàÐÍ¿ÉÒÔÊÇBµÄ×ÓÀà(°üÀ¨B)¡¿µÄÈÎºÎ¶ÔÏó¡£
-			±ÈÈçÒÔÏÂ´úÂë
+			A<? extends B> aï¼Œä»£è¡¨ç€aæ˜¯ä¸€ä¸ª ã€ç±»åž‹æ˜¯Aã€‘ï¼Œå…¶ã€æ³›åž‹ç±»åž‹å¯ä»¥æ˜¯Bçš„å­ç±»(åŒ…æ‹¬B)ã€‘çš„ä»»ä½•å¯¹è±¡ã€‚
+			æ¯”å¦‚ä»¥ä¸‹ä»£ç 
 			class Fruit {}
 			class Apple extends Fruit {}
 			class Orange extends Fruit{}
 			
 			List<? extends Fruit> list = ....;
-			ÒòÎªList<? extends Fruit> ´ú±íÁËÒ»¸ö·ºÐÍÀàList ÀàÐÍ²ÎÊýÊÇFruit×ÓÀàµÄÈÎºÎ¶ÔÏó¶¼ÓÐ¿ÉÄÜ¡£ÕâÒ²¾ÍÒâÎ¶×ÅlistµÄ¶¯Ì¬ÀàÐÍ¿ÉÄÜÊÇList<Fruit> Ò²¿ÉÄÜÊÇList<Apple> Ò²¿ÉÄÜList<Orange>
-			µ±È»£¬ÕâÒ²¾ÍÒâÎ¶×ÅlistÊµ¼Ê±£´æµÄ¶ÔÏóºÍadd²Ù×÷µÄ¶ÔÏóÊÇ²»Í¬µÄ£¬ÎªÁË±ÜÃâÕâÑùµÄÇé¿ö·¢Éú£¬±àÒëÆ÷Ç¿ÖÆÐÔµÄ½ûÖ¹ÁËºÍ·ºÐÍÀàÐÍ²ÎÊýÓÐ¹ØµÄ·½·¨µÄÖ´ÐÐ¡£ÒòÎªadd·½·¨ÊÇadd(E e)£¬²ÎÊýeÉæ¼°ÁË·ºÐÍÀàÐÍ£¬Òò´ËaddÎÞ·¨µ÷ÓÃ¡£
+			å› ä¸ºList<? extends Fruit> ä»£è¡¨äº†ä¸€ä¸ªæ³›åž‹ç±»List ç±»åž‹å‚æ•°æ˜¯Fruitå­ç±»çš„ä»»ä½•å¯¹è±¡éƒ½æœ‰å¯èƒ½ã€‚è¿™ä¹Ÿå°±æ„å‘³ç€listçš„åŠ¨æ€ç±»åž‹å¯èƒ½æ˜¯List<Fruit> ä¹Ÿå¯èƒ½æ˜¯List<Apple> ä¹Ÿå¯èƒ½List<Orange>
+			å½“ç„¶ï¼Œè¿™ä¹Ÿå°±æ„å‘³ç€listå®žé™…ä¿å­˜çš„å¯¹è±¡å’Œaddæ“ä½œçš„å¯¹è±¡æ˜¯ä¸åŒçš„ï¼Œä¸ºäº†é¿å…è¿™æ ·çš„æƒ…å†µå‘ç”Ÿï¼Œç¼–è¯‘å™¨å¼ºåˆ¶æ€§çš„ç¦æ­¢äº†å’Œæ³›åž‹ç±»åž‹å‚æ•°æœ‰å…³çš„æ–¹æ³•çš„æ‰§è¡Œã€‚å› ä¸ºaddæ–¹æ³•æ˜¯add(E e)ï¼Œå‚æ•°eæ¶‰åŠäº†æ³›åž‹ç±»åž‹ï¼Œå› æ­¤addæ— æ³•è°ƒç”¨ã€‚
 		* super
-			ÕâÊÇ³¬ÀàÐÍÏÞ¶¨¡£
-			A<? super B> a£¬´ú±í×ÅaÊÇÒ»¸ö ¡¾ÀàÐÍÊÇA¡¿£¬Æä¡¾·ºÐÍÀàÐÍ¿ÉÒÔÊÇBµÄ¸¸Àà(°üÀ¨B)¡¿µÄÈÎºÎ¶ÔÏó¡£
-			ÒòÎªaµÄ·ºÐÍÀàÐÍÊÇB»òÕßBµÄ¸¸Àà£¬Òò´ËÓÃaµÄ·½·¨ÖÐ´«ÈëB»òÕßB×ÓÀàµÄ¶ÔÏóÊÇÃ»ÓÐÈÎºÎÎÊÌâµÄ¡£Èô¶ÔÏó·ÇBµÄ×ÓÀà£¬ÄÇÃ´±àÒëÆ÷½«±¨´í¡£
+			è¿™æ˜¯è¶…ç±»åž‹é™å®šã€‚
+			A<? super B> aï¼Œä»£è¡¨ç€aæ˜¯ä¸€ä¸ª ã€ç±»åž‹æ˜¯Aã€‘ï¼Œå…¶ã€æ³›åž‹ç±»åž‹å¯ä»¥æ˜¯Bçš„çˆ¶ç±»(åŒ…æ‹¬B)ã€‘çš„ä»»ä½•å¯¹è±¡ã€‚
+			å› ä¸ºaçš„æ³›åž‹ç±»åž‹æ˜¯Bæˆ–è€…Bçš„çˆ¶ç±»ï¼Œå› æ­¤ç”¨açš„æ–¹æ³•ä¸­ä¼ å…¥Bæˆ–è€…Bå­ç±»çš„å¯¹è±¡æ˜¯æ²¡æœ‰ä»»ä½•é—®é¢˜çš„ã€‚è‹¥å¯¹è±¡éžBçš„å­ç±»ï¼Œé‚£ä¹ˆç¼–è¯‘å™¨å°†æŠ¥é”™ã€‚
 			List<? extends Apple> list = ....;
-			a¿ÉÒÔÊÇList<Apple> Ò²¿ÉÒÔÊÇList<Fruit>¡£
+			aå¯ä»¥æ˜¯List<Apple> ä¹Ÿå¯ä»¥æ˜¯List<Fruit>ã€‚
 			
-		* ÎÞ½çÍ¨Åä·û
-			<?>¼´ÎÞ½çÍ¨Åä·û£¬ÎÞ½çÍ¨Åä·û¿ÉÒÔ±»ÈÏÎªÊÇ×°ÊÎ£¬µ«ËüÒ²ÓÐÆä¼ÛÖµ£¬Ö÷ÒªÊÇÏë³ÌÐòÔ±ÉùÃ÷Ö®ÓÃ£¬¾ÍÏñÊÇ×¢ÊÍ¡£
-			ÉùÃ÷ÁË¡°±¾À´ÏëÓÃ·ºÐÍÀ´±àÐ´Õâ¶Î´úÂë£¬µ«ÊÇÔÚµ±Ç°ÕâÖÖÇé¿öÏÂ£¬·ºÐÍ²ÎÊý¿ÉÒÔ³ÖÓÐÈÎºÎÀàÐÍ¡±¡£ºÍÔ­ÉúÀàÐÍ²»Í¬µÄÊÇ£¬<?>ÉùÃ÷µÄ·ºÐÍÀà¶ÔÏó£¬²»¿ÉÒÔµ÷ÓÃÉæ¼°ÁË·ºÐÍ²ÎÊýµÄ·½·¨¡£
-* ÐòÁÐ»¯
-	¶ÔÏó¶¼¿ÉÒÔ×÷ÐòÁÐ»¯£¬µ«ÊÇÇ°ÌáÊÇ¶ÔÏóµÄÀàÐèÒªÊµÏÖSerializable½Ó¿Ú£¬ÕâÑù¶ÔÏó²ÅÄÜÖ§³ÖÐòÁÐ»¯¡£
-	ÈôÃ»ÓÐÊµÏÖSerializable£¬Ôò»áÅ×³öjava.io.NotSerializableExceptionÒì³£¡£
-	ÐèÒª×¢ÒâµÄÊÇ£¬¶ÔÏóµÄÐòÁÐ»¯ÊÇ»á½«ÊµÀýÒýÓÃÒ²½øÐÐÐòÁÐ»¯µÄ£¬ÕâÑùÐèÒªÒýÓÃµÄ¶ÔÏóÊµÏÖÁËÐòÁÐ»¯½Ó¿Ú£¬·ñÔòÒ²»áÅ×³öÒì³£¡£
-	1.ÐòÁÐ»¯°æ±¾
-		ÀàÖÐ¿ÉÒÔÖ¸¶¨serialVersionUID£¬Õâ¸öÊÇÓÃÀ´¼ì²âÀà°æ±¾ÊÇ·ñÒ»ÖÂµÄ¡£
-		ÔÚ·´ÐòÁÐ»¯µÄÊ±ºò£¬»á½«×Ö½ÚÁ÷ÖÐµÄserialVersionUIDÓë±¾µØÏàÓ¦ÊµÌåÁËµÄserialVersionUID½øÐÐ±È½Ï£¬Èç¹û°æ±¾²»Í¬£¬Ôò»á³öÏÖÐòÁÐ»¯²»Ò»ÖÂ²¢Å×³öÒì³£¡£
-	2.ÐòÁÐºÅ
-		ÓÃÓÚ½â¾ö¶ÔÏóÒýÓÃµÄÎÊÌâ¡£
-		ÔÚÐòÁÐ»¯Ò»¸ö¶ÔÏóÊ±£¬¶ÔÆäÖÐµÄÒýÓÃÒ²»á½øÐÐÐòÁÐ»¯£¬²¢ÇÒÃ¿¸ö¶ÔÏó¶¼»á·ÖÅäÒ»¸öÐòÁÐºÅ¡£ÔÚÒ»´ÎÐòÁÐ»¯¹ý³ÌÖÐ£¬µ±µÚÒ»´ÎÓöµ½Õâ¸öÐòÁÐºÅ£¬»á½«¶ÔÏóÐòÁÐ»¯±£´æ£¬ÈôµÚ¶þ´ÎÓöµ½Õâ¸öÐòÁÐºÅÊ±£¬Ôò²»»á±£´æ¸Ã¶ÔÏóÁË£¬ÒòÎªÖ®Ç°ÒÑ¾­±£´æ¹ýÁË£¬¶øÊÇ±£´æÐòÁÐºÅÒÔ±ê¶¨Ê¹ÓÃµÄÊÇÄÄ¸ö¶ÔÏó¡£
+		* æ— ç•Œé€šé…ç¬¦
+			<?>å³æ— ç•Œé€šé…ç¬¦ï¼Œæ— ç•Œé€šé…ç¬¦å¯ä»¥è¢«è®¤ä¸ºæ˜¯è£…é¥°ï¼Œä½†å®ƒä¹Ÿæœ‰å…¶ä»·å€¼ï¼Œä¸»è¦æ˜¯æƒ³ç¨‹åºå‘˜å£°æ˜Žä¹‹ç”¨ï¼Œå°±åƒæ˜¯æ³¨é‡Šã€‚
+			å£°æ˜Žäº†â€œæœ¬æ¥æƒ³ç”¨æ³›åž‹æ¥ç¼–å†™è¿™æ®µä»£ç ï¼Œä½†æ˜¯åœ¨å½“å‰è¿™ç§æƒ…å†µä¸‹ï¼Œæ³›åž‹å‚æ•°å¯ä»¥æŒæœ‰ä»»ä½•ç±»åž‹â€ã€‚å’ŒåŽŸç”Ÿç±»åž‹ä¸åŒçš„æ˜¯ï¼Œ<?>å£°æ˜Žçš„æ³›åž‹ç±»å¯¹è±¡ï¼Œä¸å¯ä»¥è°ƒç”¨æ¶‰åŠäº†æ³›åž‹å‚æ•°çš„æ–¹æ³•ã€‚
+* åºåˆ—åŒ–
+	å¯¹è±¡éƒ½å¯ä»¥ä½œåºåˆ—åŒ–ï¼Œä½†æ˜¯å‰ææ˜¯å¯¹è±¡çš„ç±»éœ€è¦å®žçŽ°SerializableæŽ¥å£ï¼Œè¿™æ ·å¯¹è±¡æ‰èƒ½æ”¯æŒåºåˆ—åŒ–ã€‚
+	è‹¥æ²¡æœ‰å®žçŽ°Serializableï¼Œåˆ™ä¼šæŠ›å‡ºjava.io.NotSerializableExceptionå¼‚å¸¸ã€‚
+	éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œå¯¹è±¡çš„åºåˆ—åŒ–æ˜¯ä¼šå°†å®žä¾‹å¼•ç”¨ä¹Ÿè¿›è¡Œåºåˆ—åŒ–çš„ï¼Œè¿™æ ·éœ€è¦å¼•ç”¨çš„å¯¹è±¡å®žçŽ°äº†åºåˆ—åŒ–æŽ¥å£ï¼Œå¦åˆ™ä¹Ÿä¼šæŠ›å‡ºå¼‚å¸¸ã€‚
+	1.åºåˆ—åŒ–ç‰ˆæœ¬
+		ç±»ä¸­å¯ä»¥æŒ‡å®šserialVersionUIDï¼Œè¿™ä¸ªæ˜¯ç”¨æ¥æ£€æµ‹ç±»ç‰ˆæœ¬æ˜¯å¦ä¸€è‡´çš„ã€‚
+		åœ¨ååºåˆ—åŒ–çš„æ—¶å€™ï¼Œä¼šå°†å­—èŠ‚æµä¸­çš„serialVersionUIDä¸Žæœ¬åœ°ç›¸åº”å®žä½“äº†çš„serialVersionUIDè¿›è¡Œæ¯”è¾ƒï¼Œå¦‚æžœç‰ˆæœ¬ä¸åŒï¼Œåˆ™ä¼šå‡ºçŽ°åºåˆ—åŒ–ä¸ä¸€è‡´å¹¶æŠ›å‡ºå¼‚å¸¸ã€‚
+	2.åºåˆ—å·
+		ç”¨äºŽè§£å†³å¯¹è±¡å¼•ç”¨çš„é—®é¢˜ã€‚
+		åœ¨åºåˆ—åŒ–ä¸€ä¸ªå¯¹è±¡æ—¶ï¼Œå¯¹å…¶ä¸­çš„å¼•ç”¨ä¹Ÿä¼šè¿›è¡Œåºåˆ—åŒ–ï¼Œå¹¶ä¸”æ¯ä¸ªå¯¹è±¡éƒ½ä¼šåˆ†é…ä¸€ä¸ªåºåˆ—å·ã€‚åœ¨ä¸€æ¬¡åºåˆ—åŒ–è¿‡ç¨‹ä¸­ï¼Œå½“ç¬¬ä¸€æ¬¡é‡åˆ°è¿™ä¸ªåºåˆ—å·ï¼Œä¼šå°†å¯¹è±¡åºåˆ—åŒ–ä¿å­˜ï¼Œè‹¥ç¬¬äºŒæ¬¡é‡åˆ°è¿™ä¸ªåºåˆ—å·æ—¶ï¼Œåˆ™ä¸ä¼šä¿å­˜è¯¥å¯¹è±¡äº†ï¼Œå› ä¸ºä¹‹å‰å·²ç»ä¿å­˜è¿‡äº†ï¼Œè€Œæ˜¯ä¿å­˜åºåˆ—å·ä»¥æ ‡å®šä½¿ç”¨çš„æ˜¯å“ªä¸ªå¯¹è±¡ã€‚
 	3.transient
-		ÓÃÓÚÉùÃ÷¶ÔÏóÖÐµÄÊµÀýµÄ£¬ÉùÃ÷ÎªtransientµÄÊµÀý£¬ÊÇ²»»á±»ÐòÁÐ»¯µÄ£¬²¢ÒÔnull´úÌæ(ÈôÊÇint doubleµÈ»ù±¾Êý¾Ý£¬ÔòÓÃ0´úÌæ)¡£
+		ç”¨äºŽå£°æ˜Žå¯¹è±¡ä¸­çš„å®žä¾‹çš„ï¼Œå£°æ˜Žä¸ºtransientçš„å®žä¾‹ï¼Œæ˜¯ä¸ä¼šè¢«åºåˆ—åŒ–çš„ï¼Œå¹¶ä»¥nullä»£æ›¿(è‹¥æ˜¯int doubleç­‰åŸºæœ¬æ•°æ®ï¼Œåˆ™ç”¨0ä»£æ›¿)ã€‚
 
-* jdk¶¯Ì¬´úÀí
-	jdk¶¯Ì¬´úÀí£¬»áÍ¨¹ý×Ö½ÚÂëÉú³ÉµÄ·½Ê½À´Éú³ÉÒ»¸öÊµÏÖÖ¸¶¨½Ó¿ÚµÄ¶ÔÏó£¬²¢ÇÒÕâ¸ö¶ÔÏóÖÐÓÐÒ»¸öHandler¶ÔÏó£¬Handler¶ÔÏóÓÃÀ´À¹½Ø¶ÔÕâ¸ö¶ÔÏóµÄËùÓÐµ÷ÓÃ¡£Ò»¸ö¶¯Ì¬´úÀí¶ÔÏóµÄ·´java´úÂëÐÎÈçÏÂËùÊ¾:
-	1.¶¯Ì¬´úÀí¶ÔÏóÐÎÊ½
+* jdkåŠ¨æ€ä»£ç†
+	jdkåŠ¨æ€ä»£ç†ï¼Œä¼šé€šè¿‡å­—èŠ‚ç ç”Ÿæˆçš„æ–¹å¼æ¥ç”Ÿæˆä¸€ä¸ªå®žçŽ°æŒ‡å®šæŽ¥å£çš„å¯¹è±¡ï¼Œå¹¶ä¸”è¿™ä¸ªå¯¹è±¡ä¸­æœ‰ä¸€ä¸ªHandlerå¯¹è±¡ï¼ŒHandlerå¯¹è±¡ç”¨æ¥æ‹¦æˆªå¯¹è¿™ä¸ªå¯¹è±¡çš„æ‰€æœ‰è°ƒç”¨ã€‚ä¸€ä¸ªåŠ¨æ€ä»£ç†å¯¹è±¡çš„åjavaä»£ç å½¢å¦‚ä¸‹æ‰€ç¤º:
+	1.åŠ¨æ€ä»£ç†å¯¹è±¡å½¢å¼
 		public Proxy implements IA{
 			InvocationHandler handler;
 			
@@ -494,15 +494,15 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 				return handler.invoke(this, IA.interfaceObject.getMethod("method1", <parameter>), null);
 			}
 			
-			...		//°Ñ½Ó¿ÚÖÐµÄ·½·¨¶¼½øÐÐÁËÖØÐ´
+			...		//æŠŠæŽ¥å£ä¸­çš„æ–¹æ³•éƒ½è¿›è¡Œäº†é‡å†™
 		}
 	2.InvocationHandler
-		¼ÈÈ»ÊÇ´úÀí£¬ÄÇ¿Ï¶¨ÓÐ¸öÔ­Ê¼¶ÔÏó£¬¶øÔÚÉÏÊöÐÎÊ½ÖÐ²¢Î´¿´µ½»á´úÀíµÄÔ­Ê¼¶ÔÏó£¬ÄÇÃ´Ô­Ê¼¶ÔÏóÊÇ·ÅÔÚÄÄÀïµÄÄØ£¿´ð°¸ÊÇÒ»°ã·ÅÔÚ´¦ÀíÆ÷HandlerÖÐµÄ¡£
+		æ—¢ç„¶æ˜¯ä»£ç†ï¼Œé‚£è‚¯å®šæœ‰ä¸ªåŽŸå§‹å¯¹è±¡ï¼Œè€Œåœ¨ä¸Šè¿°å½¢å¼ä¸­å¹¶æœªçœ‹åˆ°ä¼šä»£ç†çš„åŽŸå§‹å¯¹è±¡ï¼Œé‚£ä¹ˆåŽŸå§‹å¯¹è±¡æ˜¯æ”¾åœ¨å“ªé‡Œçš„å‘¢ï¼Ÿç­”æ¡ˆæ˜¯ä¸€èˆ¬æ”¾åœ¨å¤„ç†å™¨Handlerä¸­çš„ã€‚
 		public class ProxyHandler implements InvocationHandler{
-			Object object;		//±£´æÔ­Ê¼¶ÔÏó
+			Object object;		//ä¿å­˜åŽŸå§‹å¯¹è±¡
 			
 			public DrocProxyHandler(Object object){
-				this.object = object;	//½»¸øHandlerÔ­Ê¼¶ÔÏó
+				this.object = object;	//äº¤ç»™HandleråŽŸå§‹å¯¹è±¡
 			}
 			
 			@Override
@@ -513,10 +513,10 @@ CLASS_PATH¾ÍÊÇimportµÄÂ·¾¶£¬»»¾ä»°Ëµ£¬¾ÍÊÇ³ÌÐòÀïÃæÊ¹ÓÃµÄclassµÄÂ·¾¶¡£
 				return result;
 			}
 		}
-	3.Éú³É¶¯Ì¬´úÀí¶ÔÏó£¬²¢½»¸øËü´¦ÀíÆ÷
+	3.ç”ŸæˆåŠ¨æ€ä»£ç†å¯¹è±¡ï¼Œå¹¶äº¤ç»™å®ƒå¤„ç†å™¨
 		Object ori = new Object();
 		Object obj = 
 				Proxy.newProxyInstance(
-						ClassLoader,					//ÓÃÀ´¼ÓÔØÄ¿±êÀàµÄÀà¼ÓÔØÆ÷¡£
-						new Class<?>[]{...},			//ÖØÐ´µÄ½Ó¿Ú¡£
-						new ProxyHandler(origin));		//ÕâÀï½»¸ø¶¯Ì¬¶ÔÏóHandler£¬²¢ÇÒÖ¸¶¨ÁËHandlerµÄÔ­Ê¼¶ÔÏó£¬Ò²¾ÍÊÇ»á±»´úÀíµÄ¶ÔÏó¡£
+						ClassLoader,					//ç”¨æ¥åŠ è½½ç›®æ ‡ç±»çš„ç±»åŠ è½½å™¨ã€‚
+						new Class<?>[]{...},			//é‡å†™çš„æŽ¥å£ã€‚
+						new ProxyHandler(origin));		//è¿™é‡Œäº¤ç»™åŠ¨æ€å¯¹è±¡Handlerï¼Œå¹¶ä¸”æŒ‡å®šäº†Handlerçš„åŽŸå§‹å¯¹è±¡ï¼Œä¹Ÿå°±æ˜¯ä¼šè¢«ä»£ç†çš„å¯¹è±¡ã€‚

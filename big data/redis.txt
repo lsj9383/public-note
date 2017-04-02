@@ -50,12 +50,9 @@
             CONFIG GET <config-key> 可以获取对应名字的配置项。
         2).编辑配置
             CONFIG SET <config-key> <config-value> 将对应名字的配置设置为<config-value>
-<<<<<<< HEAD
-=======
         需要知道的是，使用config指令，只能在当前的环境下生效，当redis重启后就使用默认的配置文件。
         因此如果需要永久性的设置，就需要修改到配置文件中去。
         config rewrite，可以将当前配置写到配置文件里面去。
->>>>>>> d248387dc9098d0a87ec15e5081df8767b94b805
 二 指令
     以下指令和数据类型是强相关的，每个指令操作的数据类型是固定的。
     若指令对应的数据类型是不对的，那么将会报错，不过set指令比较特殊，会无视<value>，直接用新的<string-value>覆盖。
@@ -129,11 +126,21 @@
     是一组命令的集合，事务是最小执行单位，要么都执行，要么都不执行，主要是想保证其原子性，相当于同步。
     multi 开启事务
     事务期间的操作，都不进行操作，需要等到提交的时候才执行。(包括get指令，是无法读取到数据的)
+    虽然操作不会实际执行，但是操作的指令还是会传到redis服务器去的，redis服务器会将这些操作放入队列。
     exec 事务结束, 相当于提交事务，将期间的命令进行执行。
     错误处理:
         1).语法错误，致命错误，直接放弃事务内的所有操作。
         2).运行错误，不会影响事务其他命令的错误。
-    watch <key> 监听关键词是否被修改，当执行完一个事物，将会取消掉key的监控状态，若被修改下一个在事物中修改该值将不会成功，再下一个事务又可以修改了。
+    watch <key> 监听关键词是否被修改，当执行完一个事务，将会取消掉key的监控状态，若被修改下一个则下一个事务会失败，再下一个事务又可以修改了。
+    也就是说，被watch的key值，一旦被修改，那么下一个事务必定会失败，就算该事务没有涉及到该key值。
+    通常采用
+        watch <key>
+        get <key>
+        multi
+        ...
+        exec
+    的方式来执行和<key>值相关的事务，否则无法根据<key>的值执行事务。这种机制又称为check-and-set(CAS)或者称为乐观锁。
+    更进一步，Lua脚本也能实现事务，并且更快更方便，官方的意思是后期可能会废除普通的事物机制。后面将会介绍Lua脚本。
 四 发布订阅模式
     subscribe <key> 订阅一个频道(字段)，将会一直等待频道的消息。
     publish <key> <msg> 向订阅的频道发送消息，订阅该频道的客户端将会收到消息。
@@ -174,9 +181,7 @@
             配置文件设置appendfsync no 不主动进行同步，有操作系统30s同步一次。
             在适当时机还会进行重写，会查看数据库当前时刻的kv，并进行记录set k v，以忽略之前的指令，用于减少日志文件大小。
             至于重写时机，日志文件达到64M 或者 ，也可以通过bgrewrited手工重写。
-    若两种方式都开启了，会默认使用aof方式，这是因为aof可以保证数据库的【完全】恢复。
-三 基本编程
-=======
+    若两种方式都开启了，会默认使用aof方式，这是因为aof可以让数据库恢复的更完全，丢失的数据不至于更多。
 
 七 安全策略
     默认redis不使用密码，因为redis一般用在内网，比较安全。
@@ -186,7 +191,7 @@
     可以在配置文件中设置bind 127.0.0.1 绑定到本机，这样只能使用redis-cli -h 127.0.0.1的方式来访问。
 八 redis的主从复制
     redis支持多个数据库之间的数据同步，一类是主数据库master，一类是从数据库slave。
-    master主要负责写操作，slave主要负责读操作，做到了读写分离，负载均衡，减轻了大量请求时候的压力，提高服务器负载能力。
+    master主要负责写操作，slave主要负责读操作，做到了【读写分离】，负载均衡，减轻了大量请求时候的压力，提高服务器负载能力。
     1.从数据库
         配置slaveof <master-ip> <master-port> 这样用来将本数据库配置为指定主数据库的从数据库。
         通过slaveof no one指令，可以让从数据库断开，成为1个独立的主数据库。
@@ -244,8 +249,90 @@
             ./redis-trib.rb reshared <ip:port> 重新对指定主机所在集群的hash槽进行一个分配，通过这个方法来向新添加进来的节点分配hash槽。在执行这个指令后，后续还会指定往哪个节点分配hash槽，以及将哪些节点的hash槽拿出来分配，可以用all来代表从所有的节点随机拿出部分来分配hash槽。
         4).删除主节点
             ./redis-trib.rb reshared <ip:port> 将要删除的master的hash槽给转出来。可以将hash槽转到的指定的节点。
-十 基本编程
->>>>>>> d248387dc9098d0a87ec15e5081df8767b94b805
+
+十 脚本
+    redis中内置了lua脚本解释器。客户端会将lua脚本传到redis服务器，redis服务器解释执行lua脚本，并且会缓存该脚本。
+    1.优点
+        1).减少网络开销。采用普通事务，每次指令都会发送请求并接收响应。脚本可以只发送一次请求执行原子操作。
+        2).原子操作。redis脚本将作为原子操作来执行，不会被别的指令插入。
+        3).复用。客户端发送的脚本会永远存储在redis中，意味着其他客户端可以复用这一脚本而不用额外再写脚本代码。
+    2.Lua基础
+        1).数据类型
+            - nil 空类型只包含一个值，就是nil。所有没有值得变量，值都是nil。
+            - boolean 包含true和false两种值。
+            - number 整数和浮点数的保存。
+            - string。
+            - table 
+                可以当作数组，也可以当作map。
+                local a={1, 2, 3, 4};
+                local b={1, 2, 3, 4, {5, 6}};
+                local c={}; c[0]=1; c[1]=2;
+                local d={}; d['field']='value';
+                local e={ name='lsj', age=24, sex="man" };
+            - function
+                local f = function (arg)
+                    ...
+                end
+                f('abc');       调用函数
+        2).变量
+            a).全局变量
+                没有声明就直接使用的变量，就是全局变量。redis的内置脚本解释器【不支持】全局变量。
+            b).局部变量
+                通过local声明的变量。
+        3).操作符
+            + - * / % ^，如果操作数是字符串，会自动转换为数字。
+            == ~= < > <= >=
+            如果需要比较字符串和数字，需要把字符串转换成数字1 == tonumber("1");
+            对于table类型，比较的是两者的引用。
+        4).逻辑控制
+            a).if
+                if <condition> then
+                else if <codition> then
+                else then
+                end
+            b).while
+                while <codition> do
+                end
+            c).for
+                for 变量=初值, 终值, 步进 do
+                end
+            在lua中，只有nil和false才为假，其他值均为真包括0;
+        5).标准库
+            string.len(str); 或 #str      获得字符串长
+            string.upper(str) string.lower(str) 大小写转换
+            string.sub(str, start [, end]) 截取字符串
+            table.connext(table, [, seq [, i [, j]]]) 将table中范围i-j的数组，通过seq符号连接起来输出字符串。seq默认为空。范围默认是1-表长度
+            table.insert(table, [pos ,] value) 往数组的pos位置插入元素value。默认在数组尾部插入。
+            table.remove(table, [, pos]) 从数组中删除指定位置元素，默认删除末尾元素。
+    3.redis与lua
+        服务器将执行lua脚本得到结果，而lua脚本会通过redis.call()或者redis.pcall的方式获得redis的结果。
+        a).因此存在redis数据转为lua数据，lua数据转为redis数据的过程：
+            redis整数 --> Lua的number
+            redis字符串 --> Lua的字符串
+            redis的多条回复 --> Lua的table(数组)
+            redis的状态回复 --> Lua表的ok域包含了状态信息
+            redis的错误回复 --> Lua表的err域包含了状态信息
+            redis的nil --> Lua的false值
+
+            Lua Number --> redis 整数回复
+            Lua String --> redis 字符串回复
+            Lua table  --> redis 多行字符串回复，这里的lua table只能是数组，不能是字典
+            Lua table带ok域  --> 状态回复
+            Lua table带err域 --> 错误回复
+        b).客户端提交脚本
+            eval "<Lua script>" keyNumber <key-1> ,... <key-keyNumber>, <arg-1>, ... <arg-n>
+            <key>需要是lua脚本中将涉及的键值，<arg>是执行中需要用到的参数。这里建议一定要把所用的键值写在<key>中，因为集群模式下只能这么用。统一这样的方式可以保证兼容性。
+            将键值写出来，方便找到集群中需要用到的结点。
+            在Lua脚本中，通过KEYS[1], KEYS[keyNumber], ARGV[1], ARGV[n]来获取输入的键值和参数。
+
+            当脚本提交过一次后，redis服务器将会缓存脚本，以后如果要执行相同的脚本，可以通过脚本的hash值来指定，这样可以节约网络中的lua脚本传输的带宽。
+            即 evalsha <hash-value> keyNumber <key-1> ,... <key-keyNumber>, <arg-1>, ... <arg-n>
+            可以通过script flush来情况redis中缓存的脚本。
+        c).Lua脚本执行
+            在Lua中通过redis.call()或redis.pcall()来执行redis指令。
+            call()的执行一旦发生错误，脚本立即退出返回错误。
+            pcall()的执行一旦发生错误，会记录错误，脚本继续执行。
+十一 基本编程
     1.jedis类
         public void test1(){
             Jedis jedis = new Jedis(host, port);
@@ -273,12 +360,10 @@
             List<Object> exec = multi.exec();
             if(exec==null || exec.size==0){
                 incr();
-<<<<<<< HEAD
             }
         }
         在当前线程(jedis)中，执行了watch后，<key>将会被监控，用于确定在下一个事务期间<key>未被修改，若被修改，那么事务将会失败。执行完一个事务后，<key>的值会取消watch。也因此需要循环执行，这里是通过递归来循环的。
         总而言之，watch监听<key>在下次事务的时间内，是否被修改了。
-=======
             } 
         }
         在当前线程(jedis)中，执行了watch后，<key>将会被监控，用于确定在下一个事务期间<key>未被修改，若被修改，那么事务将会失败。执行完一个事务后，<key>的值会取消watch。也因此需要循环执行，这里是通过递归来循环的。
@@ -295,4 +380,3 @@
             JedisCluster cluster = new JedisCluster(nodes, poolConfig);
             cluster.get(...);
         }
->>>>>>> d248387dc9098d0a87ec15e5081df8767b94b805
