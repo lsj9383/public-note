@@ -1,0 +1,57 @@
+一 简介
+    分布式部署mysql的主要目的是为了提升性能和高可用。
+    提升性能主要是利用【读写分离】技术来缓解读的压力，对于写的压力需要采用分区技术。
+    高可用主要是利用【双master】技术。
+二 复制机制
+    1.master-slave初始化同步
+        为master添加slave时，slave并没有master中现有的数据。这同redis不同，redis在添加slave时会自动将slave的数据向master同步。
+        需要将master的数据库进行备份，记下master的binlog位置，然后再在slave上恢复备份，并且配置slave从这个binlog开始复制。
+        而后，slave会从指定的binlog开始保持和master的同步。
+    2.二进制日志(binlog)
+        二进制日志是一系列的二进制数据，用于记录在master上执行的【会修改】数据库的请求。因此select这类的指令通常不会记录。
+        binlog用于slave向master同步，slave获取到master的binlog后就会执行里面的操作以同步到和master相同的状态。
+        binlog由【格式描述】 【日志轮换】 【Group】组成。
+            - 格式描述，文件头，包含了binlog文件的服务器信息。
+            - 日志轮换，binlog并非只有一个，每个binlog结尾都会描述下一个紧接的binlog的信息，其中包括了下一个binlog的位置信息。
+            - Group，每个事务都是一个Group，Group可以包含多个事件也可以只包含一个事件。单指令本身就是一个事务因此单指令是一个只有一个事件的Group。
+        有两种日志，一种【基于行】，一种【基于语句】，默认是【基于语句】的。
+    3.复制拓扑结构
+        不同的拓扑结构适合于不同的场景，有不同的目的。但有着基本的拓扑原则：一个slave只能有一个master，每个slave必须有一个serverID，一个master可以有多个slave。
+        1).一主多从
+            应对少量写和大量读的场景，可以利用读写分离的机制。
+        2).主动-主动
+            应对地理位置较远造成的网络拥阻。可以在不同的地方配置master，并且master之间时刻同步。最大的问题是如何解决冲突。用的其实较少。
+        3).主动-被动
+            应对容错性要求和高可用的场景。被动的服务器是只读的。
+        4).环形
+        5).树形
+            主要是为了减轻master的负担，若所有叶节点都连着master，那么master需要负责和大量的slave通信，而这个成本太高了。
+            主要问题是，中间层出现任何问题都会影响多个服务器。处理故障较为困难。
+三 横向(向外)扩展机制
+    当数据库服务器遇到性能瓶颈时，主要有两类解决方案：垂直(向上)扩展 和 横向扩展。
+    垂直扩展主要是指增强服务器单机性能，横向扩展主要指通过分布式连接多个服务器进行性能的扩展。
+    1.系统平均负载的计算
+        AuerageLoad = (readLoad + writeLoad) / capacity
+        其中capacity是系统每秒可以处理事务量，readLoad是系统每秒的读事务，writeLoad是系统每秒的写事务。
+        若有1个master和N-1个读写分离的slave，那么平均负载为(readLoad + N*writeLoad) / N*capacity。
+        每个写事务都会由master写到每个slave，因此总共的写事务是N*wirteLoad。
+        有N个节点，因此总的事务处理能力是N*capacity。
+        集群的读事务量仍然为readLoad。
+    2.复制的方式
+        - 同步，master的更新操作会等待更新所有的slave，所有的slave都保持同步后master才会返回客户端。redis的一致性解决方案。
+        - 异步，master的更新操作不会等待更新slave，而是另开一个后台进程将更新操作交给slave。主从mysql的默认方案。
+        - 半异步，master的更新操作会去更新一个slave，该slave同步后便返回客户端，不等待其他slave。类似zookeeper的一致性解决方案，只不过zookeeper是等待半数结点以上的同步。
+    3.读写分离
+        将主数据(master)备份多个从数据库(slave)。由master接收客户端的请求，并通过负载均衡将读请求交给slave完成。若是写请求则将请求的语句写入二进制日志，并更新master。
+        异步和半异步，都会造成slave滞后于master的数据，客户端需要进行额外的操作来保证从slave取出的数据是最新的。
+        比如zookeeper是客户端发送sync指令要求所连接的slave同步到master的状态。
+        mysql也是和zookeeper类似的同步机制：客户端获得数据库当前的binlog位置(通俗理解就是最新的更新操作编号)，在读取slave时会等待slave已经到了binlog的位置。
+四 高可用机制
+    有【热备份】和【双master】的高可用方案，一般采用双maser。双maser又分两种：
+        - active-active:
+            这样的方案有利于分割地理位置不同的区域，不同的区域由不同的master提供服务，而master之间会随时保持同步。
+            这样的方案比较严重的缺陷是：两个master更新相同的字段会造成冲突，并且两个master不一致的时候会造成崩溃。
+        - active-passive:
+            这类方案类似hdfs的namenode高可用方案，有两个master，一个master是活跃的，一个是备份的。
+            两个master同步，一般会通过master的操作更新备份的master，或是将数据存放在共享磁盘空间中。
+            这样的方案可能会出现split-brain的问题，需要kill掉原active。

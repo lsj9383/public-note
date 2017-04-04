@@ -76,6 +76,8 @@
         hkeys <key> 获得<key>中所有的值。
         hlen <key> 获取<key>中有多少个字段。
     3.list
+        lindex <key> <index> 获得指定<key>指定索引下的元素值
+        lset <key> <index> <value> 设置置顶索引下的元素值
         lpush <key> <list-value1> <list-value2> ... 往<key>的左边中添加指定的元素集合。
         lpop <key> 从<key>的左边弹出元素，相当于出栈。
         rpush <key> <list-value> 往<key>的右边中添加元素。
@@ -113,7 +115,7 @@
     6.其他指令
         expire <key> <s> 设置<key>的生存时间
         pexpire <key> <ms> 毫秒级设置
-        ttl <key>   返回<key>的生存时间，倒计时阶段大于-1，若为-1则<key>不作倒计时，若为-2则不长脑子
+        ttl <key>   返回<key>的生存时间，倒计时阶段大于-1，若为-1则<key>不作倒计时，若为-2则不存在
         pttl <key> 毫秒级显示
         persist <key> 取消生存时间，不作倒计时
         sort <key> 将<key>列表里面的数据 排序显示，默认升序，后加desc代表降序，后面加store <key>可以将排序结果放到新的<key>中
