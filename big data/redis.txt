@@ -290,7 +290,7 @@
             a).if
                 if <condition> then
                 else if <codition> then
-                else then
+                else
                 end
             b).while
                 while <codition> do
