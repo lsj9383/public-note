@@ -1,0 +1,31 @@
+package swing;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class Main {
+	public static void main(String[] args) throws InterruptedException {
+		Runnable r = new Runnable(){
+			@Override
+			public void run() {
+				while(true){
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						System.out.println("hello");
+						Thread.currentThread().interrupt();
+					}
+					System.out.println(Thread.currentThread().isInterrupted());
+				}
+			}
+		};
+		ScheduledExecutorService  pool = Executors.newScheduledThreadPool(3);
+		pool.scheduleAtFixedRate(r, 100, 0, TimeUnit.MILLISECONDS);
+		Future<?> future = pool.submit(r);
+		Thread.sleep(2000);
+		//future.cancel(true);
+	}
+}

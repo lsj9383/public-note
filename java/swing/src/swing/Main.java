@@ -1,26 +1,18 @@
 package swing;
 
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.concurrent.FutureTask;
-
-import javax.swing.JButton;
-import javax.swing.SwingUtilities;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Executors;
 
 public class Main {
-
-	public static void main(String[] args) {
-		EventQueue.isDispatchThread();
-		SwingUtilities.isEventDispatchThread();
-		JButton jbutton = new JButton();
-		jbutton.addActionListener(new ActionListener() {
-			
+	public static void main(String[] args) throws InterruptedException {
+		CompletionService<Object> pool = new ExecutorCompletionService<Object>(Executors.newFixedThreadPool(4));
+		pool.submit(new Callable<Object>(){
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				
+			public Object call() throws Exception {
+				return null;
 			}
 		});
 	}
-
 }
