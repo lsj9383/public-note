@@ -501,7 +501,7 @@ CLASS_PATH就是import的路径，换句话说，就是程序里面使用的clas
 		public class ProxyHandler implements InvocationHandler{
 			Object object;		//保存原始对象
 			
-			public DrocProxyHandler(Object object){
+			public ProxyHandler(Object object){
 				this.object = object;	//交给Handler原始对象
 			}
 			
