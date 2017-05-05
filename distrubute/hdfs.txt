@@ -47,3 +47,4 @@
         因此edits log保存在namenode外面，有点像redis提供数据。这样active的nn和standby的nn都可以获取到edits log的数据。
         edits log的保存也需要高可用的，采用qjournal，这是一个基于zookeeper设计的服务。
         也需要避免active的nn假死，造成standby的nn切换为active，此时将会有两个active的nn。因此当standby切换为active时，原active的nn必须得死，比如说强制性kill掉进程。
+		至于fsimage，在每次SecondaryNamenode合并完成后，就可以传一份给standby的namenode
