@@ -1,5 +1,5 @@
-¼¯ºÏÏê½â£º
-Ò»¡¢¼Ì³Ğ¹ØÏµ£º
+é›†åˆè¯¦è§£ï¼š
+ä¸€ã€ç»§æ‰¿å…³ç³»ï¼š
 	Iterable <|-- Collection <|-- List <|-- ArrayList
 							  |         |__<|-- LinkedList
 							  |         |__<|-- Vector
@@ -10,47 +10,47 @@
 	 |__<|-- HashTable <|-- Properties
 	 |__<|-- SortedMap <|-- TreeMap
  
-¶ş¡¢¼¯ºÏ½Ó¿Ú
-	¼ÇÂ¼ÕâĞ©½Ó¿ÚËùÓµÓĞµÄ·½·¨ ¼°Æä×÷ÓÃ¡£
-	1.Iterable½Ó¿Ú
+äºŒã€é›†åˆæ¥å£
+	è®°å½•è¿™äº›æ¥å£æ‰€æ‹¥æœ‰çš„æ–¹æ³• åŠå…¶ä½œç”¨ã€‚
+	1.Iterableæ¥å£
 		public interface Iterable<T>{
-			Iterator<T> iterator();		//·µ»Øµü´úÆ÷
+			Iterator<T> iterator();		//è¿”å›è¿­ä»£å™¨
 			
-			default void forEach(Consumer<? super T> action) {		//foreach·½·¨£¬´«ÈëÃ¿¸öÔªËØµÄ²Ù×÷·½·¨, default·½·¨¿ÉÒÔÈÃ½Ó¿Ú½øĞĞÒ»Ğ©Ä¬ÈÏ·½·¨µÄÊµÏÖ£¬ÓĞµã·´´«Í³¡£
+			default void forEach(Consumer<? super T> action) {		//foreachæ–¹æ³•ï¼Œä¼ å…¥æ¯ä¸ªå…ƒç´ çš„æ“ä½œæ–¹æ³•, defaultæ–¹æ³•å¯ä»¥è®©æ¥å£è¿›è¡Œä¸€äº›é»˜è®¤æ–¹æ³•çš„å®ç°ï¼Œæœ‰ç‚¹åä¼ ç»Ÿã€‚
 				Objects.requireNonNull(action);
 				for (T t : this) {
 					action.accept(t);
 				}
 			}
 			
-			default Spliterator<T> spliterator() {		//»¹²»Çå³ş
+			default Spliterator<T> spliterator() {		//è¿˜ä¸æ¸…æ¥š
 				return Spliterators.spliteratorUnknownSize(iterator(), 0);
 			}
 		}
 		
-	2.Iterator½Ó¿Ú
-		¿´Ñù×ÓÌá¹©ÁËÏòºóÒÆ¶¯ºÍÉ¾³ıµÄ½Ó¿Ú¡£
+	2.Iteratoræ¥å£
+		çœ‹æ ·å­æä¾›äº†å‘åç§»åŠ¨å’Œåˆ é™¤çš„æ¥å£ã€‚
 		public interface Iterator<E>{
-			boolean hasNext();				//Èç¹ûµü´úÆ÷»¹ÓĞ¸ü¶àµÄÔªËØ£¬Ôò·µ»Øtrue¡£
-			E next();						//·µ»Øµü´úÆ÷µÄ¡¾ÏÂÒ»¸ö¡¿ÔªËØ¡£»»¾ä»°Ëµ£¬µü´úÆ÷"Ö¸Õë"ÔÚ×î¿ªÊ¼µÄÊ±ºòÊÇÔÚÊ×¸öÔªËØÖ®Ç°µÄ¡£
-			default void remove() {			//Ä¬ÈÏ²»Ö§³ÖÉ¾³ı²Ù×÷
+			boolean hasNext();				//å¦‚æœè¿­ä»£å™¨è¿˜æœ‰æ›´å¤šçš„å…ƒç´ ï¼Œåˆ™è¿”å›trueã€‚
+			E next();						//è¿”å›è¿­ä»£å™¨çš„ã€ä¸‹ä¸€ä¸ªã€‘å…ƒç´ ã€‚æ¢å¥è¯è¯´ï¼Œè¿­ä»£å™¨"æŒ‡é’ˆ"åœ¨æœ€å¼€å§‹çš„æ—¶å€™æ˜¯åœ¨é¦–ä¸ªå…ƒç´ ä¹‹å‰çš„ã€‚
+			default void remove() {			//é»˜è®¤ä¸æ”¯æŒåˆ é™¤æ“ä½œ
 				throw new UnsupportedOperationException("remove");
 			}
-			default void forEachRemaining(Consumer<? super E> action) {		//½«µü´úÆ÷ÖĞÊ£ÓàµÄÔªËØ½øĞĞforeachµü´ú¡£
+			default void forEachRemaining(Consumer<? super E> action) {		//å°†è¿­ä»£å™¨ä¸­å‰©ä½™çš„å…ƒç´ è¿›è¡Œforeachè¿­ä»£ã€‚
 				Objects.requireNonNull(action);
 				while (hasNext())
 					action.accept(next());
 			}
 		}
-	3.ListIterator½Ó¿Ú
-		±ÈIterator¾ßÓĞ¸üÇ¿µÄÄÜÁ¦£¬¿ÉÒÔÏòÇ°ÒÆ¶¯£¬¿ÉÒÔÌí¼ÓºÍÉèÖÃÔªËØ£¬»¹¿ÉÒÔ»ñµÃµ±Ç°µÄË÷Òı¡£
+	3.ListIteratoræ¥å£
+		æ¯”Iteratorå…·æœ‰æ›´å¼ºçš„èƒ½åŠ›ï¼Œå¯ä»¥å‘å‰ç§»åŠ¨ï¼Œå¯ä»¥æ·»åŠ å’Œè®¾ç½®å…ƒç´ ï¼Œè¿˜å¯ä»¥è·å¾—å½“å‰çš„ç´¢å¼•ã€‚
 		public interface ListIterator<E> extends Iterator<E> {
-			/* ÖØÊö½Ó¿Ú */
+			/* é‡è¿°æ¥å£ */
 			boolean hasNext();
 			E next();
 			void remove();
 			
-			/* ÌØÓĞ½Ó¿Ú */
+			/* ç‰¹æœ‰æ¥å£ */
 			boolean hasPrevious();
 			E previous();
 			int nextIndex();
@@ -59,21 +59,21 @@
 			void add(E e);
 		}
 	
-	4.Collection½Ó¿Ú
-		¿´Ñù×Ó£¬¼¯ºÏÖ»ÄÜÌí¼ÓºÍÉ¾³ı£¬²»ÄÜÖ±½Ó»ñÈ¡ºÍÉèÖÃ¡£
-		public interface Collection<E> extends Iterable<E> {		//½Ó¿Ú¼Ì³ĞIterable£¬·ºĞÍºÍ¸¸½Ó¿ÚÊÇÏàÍ¬µÄ¡£
-			int size();						//¼¯ºÏÖĞÔªËØµÄ¸öÊı
-			boolean isEmpty();				//¼¯ºÏÊÇ·ñÎª¿Õ
-			boolean contains(Object o);		//ÅĞ¶Ï¼¯ºÏÊÇ·ñ°üº¬¶ÔÏóo
-			Iterator<E> iterator();			//·µ»ØÒ»¸öµü´úÆ÷
-			Object[] toArray();				//½«¼¯ºÏ×ª»»ÎªÒ»¸öÊı×é
+	4.Collectionæ¥å£
+		çœ‹æ ·å­ï¼Œé›†åˆåªèƒ½æ·»åŠ å’Œåˆ é™¤ï¼Œä¸èƒ½ç›´æ¥è·å–å’Œè®¾ç½®ã€‚
+		public interface Collection<E> extends Iterable<E> {		//æ¥å£ç»§æ‰¿Iterableï¼Œæ³›å‹å’Œçˆ¶æ¥å£æ˜¯ç›¸åŒçš„ã€‚
+			int size();						//é›†åˆä¸­å…ƒç´ çš„ä¸ªæ•°
+			boolean isEmpty();				//é›†åˆæ˜¯å¦ä¸ºç©º
+			boolean contains(Object o);		//åˆ¤æ–­é›†åˆæ˜¯å¦åŒ…å«å¯¹è±¡o
+			Iterator<E> iterator();			//è¿”å›ä¸€ä¸ªè¿­ä»£å™¨
+			Object[] toArray();				//å°†é›†åˆè½¬æ¢ä¸ºä¸€ä¸ªæ•°ç»„
 			<T> T[] toArray(T[] a);
-			boolean add(E e);				//Ìí¼ÓÒ»¸öÔªËØ
-			boolean remove(Object o);		//£¿£¿£¿
+			boolean add(E e);				//æ·»åŠ ä¸€ä¸ªå…ƒç´ 
+			boolean remove(Object o);		//ï¼Ÿï¼Ÿï¼Ÿ
 			boolean containsAll(Collection<?> c);
 			boolean addAll(Collection<? extends E> c);
 			boolean removeAll(Collection<?> c);	
-			default boolean removeIf(Predicate<? super E> filter) {		//ÒÆ³ı·ûºÏÌõ¼şµÄÔªËØ£¬ÈôÓĞÒÆ³ıµÄ¶¯×÷£¬Ôò·µ»Øtrue£¬Ã»ÓĞÈÎºÎÒÆ³ıÔò·µ»Øfalse
+			default boolean removeIf(Predicate<? super E> filter) {		//ç§»é™¤ç¬¦åˆæ¡ä»¶çš„å…ƒç´ ï¼Œè‹¥æœ‰ç§»é™¤çš„åŠ¨ä½œï¼Œåˆ™è¿”å›trueï¼Œæ²¡æœ‰ä»»ä½•ç§»é™¤åˆ™è¿”å›false
 				Objects.requireNonNull(filter);
 				boolean removed = false;
 				final Iterator<E> each = iterator();
@@ -86,7 +86,7 @@
 				return removed;
 			}
 			boolean retainAll(Collection<?> c);	//???
-			void clear();						//Çå¿Õ¸Ã¼¯ºÏÖĞµÄËùÓĞÔªËØ
+			void clear();						//æ¸…ç©ºè¯¥é›†åˆä¸­çš„æ‰€æœ‰å…ƒç´ 
 			boolean equals(Object o);
 			int hashCode();
 			@Override
@@ -103,8 +103,8 @@
 			}
 		}
 		
-	5.List½Ó¿Ú
-		public interface List<E> extends Collection<E> {	//listµÄ·ºĞÍºÍ¸¸ÀàµÄcollectionµÄ·ºĞÍÏàÍ¬
+	5.Listæ¥å£
+		public interface List<E> extends Collection<E> {	//listçš„æ³›å‹å’Œçˆ¶ç±»çš„collectionçš„æ³›å‹ç›¸åŒ
 			int size();
 			boolean isEmpty();
 			Iterator<E> iterator();
@@ -142,30 +142,30 @@
 				return Spliterators.spliterator(this, Spliterator.ORDERED);
 			}
 			
-			/* ÒÔÏÂÊÇlistËùÌØÓĞµÄ½Ó¿Ú */
-			E get(int index);				//¸ù¾İË÷Òı»ñµÃlistÖĞµÄÔªËØ
-			E set(int index, E element);	//ÉèÖÃÄ³¸öË÷ÒıÖĞµÄÊı¾İ
-			void add(int index, E element);	//Ìí¼ÓÔªËØ
-			E remove(int index);			//ÒÆ³ıÖ¸¶¨Ë÷ÒıµÄÔªËØ
-			int indexOf(Object o);			//²éÑ¯Ä³¸öÔªËØµÄË÷Òı£¬´ÓÍ·¿ªÊ¼¡£
-			int lastIndexOf(Object o);		//²éÑ¯Ä³¸öÔªËØµÄË÷Òı£¬´ÓÎ²°Í¿ªÊ¼¡£
-			ListIterator<E> listIterator();	//»ñµÃÁ´±íµü´úÆ÷
-			ListIterator<E> listIterator(int index);		//»ñµÃ´ÓÖ¸¶¨Ë÷Òı¿ªÊ¼µÄÁ´±íµü´úÆ÷
-			List<E> subList(int fromIndex, int toIndex);	//»ñµÃ×ÓÁ´±í
+			/* ä»¥ä¸‹æ˜¯listæ‰€ç‰¹æœ‰çš„æ¥å£ */
+			E get(int index);				//æ ¹æ®ç´¢å¼•è·å¾—listä¸­çš„å…ƒç´ 
+			E set(int index, E element);	//è®¾ç½®æŸä¸ªç´¢å¼•ä¸­çš„æ•°æ®
+			void add(int index, E element);	//æ·»åŠ å…ƒç´ 
+			E remove(int index);			//ç§»é™¤æŒ‡å®šç´¢å¼•çš„å…ƒç´ 
+			int indexOf(Object o);			//æŸ¥è¯¢æŸä¸ªå…ƒç´ çš„ç´¢å¼•ï¼Œä»å¤´å¼€å§‹ã€‚
+			int lastIndexOf(Object o);		//æŸ¥è¯¢æŸä¸ªå…ƒç´ çš„ç´¢å¼•ï¼Œä»å°¾å·´å¼€å§‹ã€‚
+			ListIterator<E> listIterator();	//è·å¾—é“¾è¡¨è¿­ä»£å™¨
+			ListIterator<E> listIterator(int index);		//è·å¾—ä»æŒ‡å®šç´¢å¼•å¼€å§‹çš„é“¾è¡¨è¿­ä»£å™¨
+			List<E> subList(int fromIndex, int toIndex);	//è·å¾—å­é“¾è¡¨
 		}
 		
-	6.Set½Ó¿Ú
-		Ò»ÖÖ²»°üº¬ÖØ¸´ÔªËØµÄ¼¯ºÏ
+	6.Setæ¥å£
+		ä¸€ç§ä¸åŒ…å«é‡å¤å…ƒç´ çš„é›†åˆ
 		public interface Set<E> extends Collection<E> {
-			int size();								//set´óĞ¡
-			boolean isEmpty();						//ÅĞ¶ÏsetÊÇ·ñÎª¿Õ
-			boolean contains(Object o);				//ÅĞ¶ÏsetÊÇ·ñ°üº¬o
-			Iterator<E> iterator();					//·µ»ØsetµÄµü´úÆ÷
-			Object[] toArray();						//·µ»ØsetÖĞµÄËùÓĞÔªËØµÄ¸±±¾
+			int size();								//setå¤§å°
+			boolean isEmpty();						//åˆ¤æ–­setæ˜¯å¦ä¸ºç©º
+			boolean contains(Object o);				//åˆ¤æ–­setæ˜¯å¦åŒ…å«o
+			Iterator<E> iterator();					//è¿”å›setçš„è¿­ä»£å™¨
+			Object[] toArray();						//è¿”å›setä¸­çš„æ‰€æœ‰å…ƒç´ çš„å‰¯æœ¬
 			<T> T[] toArray(T[] a);
-			boolean add(E e);						//Ìí¼ÓĞÂÔªËØ
-			boolean remove(Object o);				//ÒÆ³ıÖ¸¶¨ÔªËØ
-			boolean containsAll(Collection<?> c);	//ÅĞ¶ÏÊÇ·ñ°üº¬cÖĞµÄËùÓĞÔªËØ
+			boolean add(E e);						//æ·»åŠ æ–°å…ƒç´ 
+			boolean remove(Object o);				//ç§»é™¤æŒ‡å®šå…ƒç´ 
+			boolean containsAll(Collection<?> c);	//åˆ¤æ–­æ˜¯å¦åŒ…å«cä¸­çš„æ‰€æœ‰å…ƒç´ 
 			boolean addAll(Collection<? extends E> c);
 			boolean retainAll(Collection<?> c);
 			boolean removeAll(Collection<?> c);
@@ -177,134 +177,134 @@
 		}
 	7.Map
 		public interface Map<K,V> {
-			int size();								//·µ»Økv¶Ô¸öÊı
+			int size();								//è¿”å›kvå¯¹ä¸ªæ•°
 			boolean isEmpty();
-			boolean containsKey(Object key);		//ÅĞ¶ÏmapÖĞµÄkeyÊÇ·ñ°üº¬Ö¸¶¨µÄkey
-			boolean containsValue(Object value);	//ÅĞ¶ÏmapÖĞµÄvalueÊÇ·ñ°üº¬Ö¸¶¨µÄvalue
-			V get(Object key);						//¸ù¾İkey»ñµÃvalue£¬Èç¹ûÃ»ÓĞ¶ÔÓ¦µÄkey£¬·µ»Ønull
-			V remove(Object key);					//É¾µôÒ»¸ö£¬²¢ÇÒ·µ»ØÉ¾µôµÄÕâ¸ö½ÚµãµÄvalue¡£
-			V put(K key, V value);					//Ìí¼ÓÒ»¸öĞÂµÄkv¶Ô£¬ÈôkÖØ¸´¸²¸Ç¾ÉµÄ£¬²¢½«¾ÉµÄkv¶Ô·µ»Ø
-			void putAll(Map<? extends K, ? extends V> m);	//½«mÖĞµÄkv¶ÔÌí¼Óµ½±¾mapÖĞ
-			void clear();									//Çå¿Õkv¶Ô
-			Collection<V> values();							//·µ»ØÖµµÄ¼¯ºÏ
-			Set<Map.Entry<K, V>> entrySet();				//·µ»ØËùÓĞµÄkv¶Ô£¬kv¶Ô±£´æÔÚsetÖĞ
+			boolean containsKey(Object key);		//åˆ¤æ–­mapä¸­çš„keyæ˜¯å¦åŒ…å«æŒ‡å®šçš„key
+			boolean containsValue(Object value);	//åˆ¤æ–­mapä¸­çš„valueæ˜¯å¦åŒ…å«æŒ‡å®šçš„value
+			V get(Object key);						//æ ¹æ®keyè·å¾—valueï¼Œå¦‚æœæ²¡æœ‰å¯¹åº”çš„keyï¼Œè¿”å›null
+			V remove(Object key);					//åˆ æ‰ä¸€ä¸ªï¼Œå¹¶ä¸”è¿”å›åˆ æ‰çš„è¿™ä¸ªèŠ‚ç‚¹çš„valueã€‚
+			V put(K key, V value);					//æ·»åŠ ä¸€ä¸ªæ–°çš„kvå¯¹ï¼Œè‹¥ké‡å¤è¦†ç›–æ—§çš„ï¼Œå¹¶å°†æ—§çš„kvå¯¹è¿”å›
+			void putAll(Map<? extends K, ? extends V> m);	//å°†mä¸­çš„kvå¯¹æ·»åŠ åˆ°æœ¬mapä¸­
+			void clear();									//æ¸…ç©ºkvå¯¹
+			Collection<V> values();							//è¿”å›å€¼çš„é›†åˆ
+			Set<Map.Entry<K, V>> entrySet();				//è¿”å›æ‰€æœ‰çš„kvå¯¹ï¼Œkvå¯¹ä¿å­˜åœ¨setä¸­
 			boolean equals(Object o);
 			int hashCode();
 			default V getOrDefault(Object key, V defaultValue);
-			default void forEach(BiConsumer<? super K, ? super V> action);						//×öÁËÄ¬ÈÏµÄforeachÊµÏÖ
-			default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function);	//±éÀúkv¶Ô£¬Ã¿´Î¶¼½«kvÊäÈë¸øfunction£¬¸Ã²Ù×÷·µ»ØÒ»¸öĞÂµÄÖµ£¬¸ÃÖµ×öÎªµ±Ç°kv¶ÔµÄĞÂµÄvalue
-			default V putIfAbsent(K key, V value);												//µ±key²»´æÔÚµÄÊ±ºò²Åput£¬·ñÔòputÊ§°Ü¡£putÊ§°Ü½«»á·µ»Ø´æÔÚµÄÄÇ¸ökv¶ÔµÄvalue¡£
-			default boolean remove(Object key, Object value);									//´æÔÚÖ¸¶¨µÄkv¶ÔÊ±£¬½«¸Ãkv¶ÔÉ¾³ı
-			default boolean replace(K key, V oldValue, V newValue);								//½«newValueÌæ»»µôkey-oldValueµÄvalue¡£ÏÈÕÒµ½Õâ¸ökv¶Ô£¬È»ºóÔÙ¸²¸Ç¡£ÈôÃ»ÓĞÕâ¸ökv¶ÔÄÇÃ´ÊÇ²Ù×÷Ê§°Ü£¬·µ»Øfalse¡£
-			default V replace(K key, V value);													//key´æÔÚ£¬ÄÇÃ´¾ÍÓÃvalue×÷ÎªÆäĞÂÖµ¡£·µ»Ø¾ÉÖµ
-			default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);	//Èôkey²»´æÔÚ£¬Ôò½«mappingFunctionµÄÊä³ö×÷Îªvalue£¬×é½¨³ÉĞĞµÄkv¶Ô½øĞĞput¡£
-			default V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);	//Èôkey´æÔÚ£¬Ôò½«remappingFunctionµÄÊä³ö×÷Îª¸ÃkeyµÄĞÂµÄvalueÖµ¡£Èô¸ÃvaluesÖµÊÇnull£¬ÔòÉ¾³ı¸Ãkv¶Ô¡£
-			default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);			//½«remappingFunctionµÄÊä³ö×÷Îªvalue£¬½«kv¶Ô½øĞĞput¡£ÈôvalueÊÇnull£¬ÔòĞèÒªÈ·±£mapÖĞÃ»ÓĞ¸ÃkeyµÄkv¶Ô¡£
+			default void forEach(BiConsumer<? super K, ? super V> action);						//åšäº†é»˜è®¤çš„foreachå®ç°
+			default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function);	//éå†kvå¯¹ï¼Œæ¯æ¬¡éƒ½å°†kvè¾“å…¥ç»™functionï¼Œè¯¥æ“ä½œè¿”å›ä¸€ä¸ªæ–°çš„å€¼ï¼Œè¯¥å€¼åšä¸ºå½“å‰kvå¯¹çš„æ–°çš„value
+			default V putIfAbsent(K key, V value);												//å½“keyä¸å­˜åœ¨çš„æ—¶å€™æ‰putï¼Œå¦åˆ™putå¤±è´¥ã€‚putå¤±è´¥å°†ä¼šè¿”å›å­˜åœ¨çš„é‚£ä¸ªkvå¯¹çš„valueã€‚
+			default boolean remove(Object key, Object value);									//å­˜åœ¨æŒ‡å®šçš„kvå¯¹æ—¶ï¼Œå°†è¯¥kvå¯¹åˆ é™¤
+			default boolean replace(K key, V oldValue, V newValue);								//å°†newValueæ›¿æ¢æ‰key-oldValueçš„valueã€‚å…ˆæ‰¾åˆ°è¿™ä¸ªkvå¯¹ï¼Œç„¶åå†è¦†ç›–ã€‚è‹¥æ²¡æœ‰è¿™ä¸ªkvå¯¹é‚£ä¹ˆæ˜¯æ“ä½œå¤±è´¥ï¼Œè¿”å›falseã€‚
+			default V replace(K key, V value);													//keyå­˜åœ¨ï¼Œé‚£ä¹ˆå°±ç”¨valueä½œä¸ºå…¶æ–°å€¼ã€‚è¿”å›æ—§å€¼
+			default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);	//è‹¥keyä¸å­˜åœ¨ï¼Œåˆ™å°†mappingFunctionçš„è¾“å‡ºä½œä¸ºvalueï¼Œç»„å»ºæˆè¡Œçš„kvå¯¹è¿›è¡Œputã€‚
+			default V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);	//è‹¥keyå­˜åœ¨ï¼Œåˆ™å°†remappingFunctionçš„è¾“å‡ºä½œä¸ºè¯¥keyçš„æ–°çš„valueå€¼ã€‚è‹¥è¯¥valueså€¼æ˜¯nullï¼Œåˆ™åˆ é™¤è¯¥kvå¯¹ã€‚
+			default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);			//å°†remappingFunctionçš„è¾“å‡ºä½œä¸ºvalueï¼Œå°†kvå¯¹è¿›è¡Œputã€‚è‹¥valueæ˜¯nullï¼Œåˆ™éœ€è¦ç¡®ä¿mapä¸­æ²¡æœ‰è¯¥keyçš„kvå¯¹ã€‚
 			
-			//ÄÚ²¿½Ó¿ÚÀà
-			interface Entry<K,V>{					//entry¼´¼ÇÂ¼£¬´ú±íÁËkv¶Ô
-				K getKey();							//»ñµÃkey
-				V getValue();						//»ñµÃvalue
-				V setValue(V value);				//ÉèÖÃvalue
+			//å†…éƒ¨æ¥å£ç±»
+			interface Entry<K,V>{					//entryå³è®°å½•ï¼Œä»£è¡¨äº†kvå¯¹
+				K getKey();							//è·å¾—key
+				V getValue();						//è·å¾—value
+				V setValue(V value);				//è®¾ç½®value
 				public static <K extends Comparable<? super K>, V> Comparator<Map.Entry<K,V>> comparingByKey();
 				public static <K, V extends Comparable<? super V>> Comparator<Map.Entry<K,V>> comparingByValue();
 				public static <K, V> Comparator<Map.Entry<K, V>> comparingByKey(Comparator<? super K> cmp);
 				public static <K, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp);
 			}
 		}
-Èı¡¢³éÏóÀà
+ä¸‰ã€æŠ½è±¡ç±»
 	1.AbstractCollection
-		ÕâÊÇÒ»¸ö¼¯ºÏµÄ¹Ç¼ÜÊµÏÖ
-			ÒªÊµÏÖ²»¿ÉĞŞ¸ÄµÄ¼¯ºÏ£¬Ö»ĞèÒªÖØĞ´iterator()·½·¨Óësize()·½·¨¡£
-			ÒªÊµÏÖ¿ÉÒÔĞŞ¸ÄµÄ¼¯ºÏ£¬»¹ĞèÒªÖØĞ´add·½·¨(·ñÔòÅ×³ö²»Ö§³ÖÌí¼ÓÒì³£)£¬²¢ÇÒ·µ»ØµÄµü´úÆ÷±ØĞëÊµÏÖremove·½·¨¡£
+		è¿™æ˜¯ä¸€ä¸ªé›†åˆçš„éª¨æ¶å®ç°
+			è¦å®ç°ä¸å¯ä¿®æ”¹çš„é›†åˆï¼Œåªéœ€è¦é‡å†™iterator()æ–¹æ³•ä¸size()æ–¹æ³•ã€‚
+			è¦å®ç°å¯ä»¥ä¿®æ”¹çš„é›†åˆï¼Œè¿˜éœ€è¦é‡å†™addæ–¹æ³•(å¦åˆ™æŠ›å‡ºä¸æ”¯æŒæ·»åŠ å¼‚å¸¸)ï¼Œå¹¶ä¸”è¿”å›çš„è¿­ä»£å™¨å¿…é¡»å®ç°removeæ–¹æ³•ã€‚
 		public abstract class AbstractCollection<E> implements Collection<E> {
-			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;		//×î´óÈİÁ¿
+			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;		//æœ€å¤§å®¹é‡
 		
-			//¹¹Ôìº¯Êı
-			 protected AbstractCollection() {}					//¿Õ
+			//æ„é€ å‡½æ•°
+			 protected AbstractCollection() {}					//ç©º
 			 
-			//¹«¹²·½·¨
-			public abstract Iterator<E> iterator();				//·µ»Øµü´úÆ÷
-			public abstract int size();							//·µ»Ø´óĞ¡
-			public boolean isEmpty() {return size() == 0;}		//ÅĞ¶ÏÊÇ·ñÎª¿Õ£¬ÀûÓÃsize
-			public boolean contains(Object o);					//ÅĞ¶ÏÊÇ·ñ´æÔÚo£¬ÀûÓÃo.equalsºÍµü´úÆ÷¡£
-			public Object[] toArray();							//½«ËùÓĞÔªËØ¸´ÖÆµ½Êı×éÖĞ¡£ÀûÓÃµü´úÆ÷¡£
+			//å…¬å…±æ–¹æ³•
+			public abstract Iterator<E> iterator();				//è¿”å›è¿­ä»£å™¨
+			public abstract int size();							//è¿”å›å¤§å°
+			public boolean isEmpty() {return size() == 0;}		//åˆ¤æ–­æ˜¯å¦ä¸ºç©ºï¼Œåˆ©ç”¨size
+			public boolean contains(Object o);					//åˆ¤æ–­æ˜¯å¦å­˜åœ¨oï¼Œåˆ©ç”¨o.equalså’Œè¿­ä»£å™¨ã€‚
+			public Object[] toArray();							//å°†æ‰€æœ‰å…ƒç´ å¤åˆ¶åˆ°æ•°ç»„ä¸­ã€‚åˆ©ç”¨è¿­ä»£å™¨ã€‚
 			public <T> T[] toArray(T[] a);
-			public boolean add(E e) {throw new UnsupportedOperationException();}	//Ä¬ÈÏÅ×³öÒì³£
-			public boolean remove(Object o);					//ÀûÓÃµü´úÆ÷ÊµÏÖÉ¾³ı
-			public boolean containsAll(Collection<?> c);		//ÅĞ¶Ï¼¯ºÏÖĞÊÇ·ñ°üº¬c¼¯ºÏÖĞµÄÔªËØ¡£
-			public boolean addAll(Collection<? extends E> c);	//Ìí¼Ó¼¯ºÏÖĞËùÓĞµÄÔªËØ£¬ÀûÓÃadd¡£
-			public boolean removeAll(Collection<?> c);			//´Ó±¾¼¯ºÏÖĞÉ¾³ı´æÔÚÓÚcÖĞµÄÔªËØ¡£
-			public boolean retainAll(Collection<?> c);			//ÔÚ±¾¼¯ºÏÖĞ±£ÁôÔÚcÖĞ´æÔÚµÄÔªËØ¡£
-			public void clear();								//ÀûÓÃµü´úÆ÷ÊµÏÖÇå¿Õ
+			public boolean add(E e) {throw new UnsupportedOperationException();}	//é»˜è®¤æŠ›å‡ºå¼‚å¸¸
+			public boolean remove(Object o);					//åˆ©ç”¨è¿­ä»£å™¨å®ç°åˆ é™¤
+			public boolean containsAll(Collection<?> c);		//åˆ¤æ–­é›†åˆä¸­æ˜¯å¦åŒ…å«cé›†åˆä¸­çš„å…ƒç´ ã€‚
+			public boolean addAll(Collection<? extends E> c);	//æ·»åŠ é›†åˆä¸­æ‰€æœ‰çš„å…ƒç´ ï¼Œåˆ©ç”¨addã€‚
+			public boolean removeAll(Collection<?> c);			//ä»æœ¬é›†åˆä¸­åˆ é™¤å­˜åœ¨äºcä¸­çš„å…ƒç´ ã€‚
+			public boolean retainAll(Collection<?> c);			//åœ¨æœ¬é›†åˆä¸­ä¿ç•™åœ¨cä¸­å­˜åœ¨çš„å…ƒç´ ã€‚
+			public void clear();								//åˆ©ç”¨è¿­ä»£å™¨å®ç°æ¸…ç©º
 			
-			//Ë½ÓĞ·½·¨
+			//ç§æœ‰æ–¹æ³•
 			private static <T> T[] finishToArray(T[] r, Iterator<?> it);	//???
 			private static int hugeCapacity(int minCapacity);				//???
 		}
 	2.AbstractList
-		Ìá¹©ÁËlistµÄ¹Ç¼ÜÊµÏÖ
-		ÒªÊµÏÖ²»¿ÉĞŞ¸ÄµÄlist£¬Ö»ĞèÒª¸²¸Çget·½·¨ºÍsize·½·¨¡£
-		ÒªÊµÏÖ¿ÉÒÔĞŞ¸ÄµÄlist£¬ĞèÒª¸²¸Çset·½·¨(·ñÔòÅ×³ö²»Ö§³ÖÉèÖÃÒì³£)¡£
-		ÒªÊµÏÖ¿ÉÒÔÌí¼ÓµÄlist£¬ĞèÒª¸²¸Çadd·½·¨ remove·½·¨¡£
+		æä¾›äº†listçš„éª¨æ¶å®ç°
+		è¦å®ç°ä¸å¯ä¿®æ”¹çš„listï¼Œåªéœ€è¦è¦†ç›–getæ–¹æ³•å’Œsizeæ–¹æ³•ã€‚
+		è¦å®ç°å¯ä»¥ä¿®æ”¹çš„listï¼Œéœ€è¦è¦†ç›–setæ–¹æ³•(å¦åˆ™æŠ›å‡ºä¸æ”¯æŒè®¾ç½®å¼‚å¸¸)ã€‚
+		è¦å®ç°å¯ä»¥æ·»åŠ çš„listï¼Œéœ€è¦è¦†ç›–addæ–¹æ³• removeæ–¹æ³•ã€‚
 		public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
-			//¹¹Ôìº¯Êı
+			//æ„é€ å‡½æ•°
 			protected AbstractList() {}
 			
-			//¹«¹²º¯Êı
-			abstract public E get(int index);						//»ñµÃË÷ÒıindexÎ»ÖÃµÄÔªËØ
-			public boolean add(E e) {add(size(), e);return true;}	//ÔÚÄ©Î²Ìí¼ÓÔªËØ
-			public void add(int index, E element){throw new UnsupportedOperationException();}	//ÔÚÖ¸¶¨Î»ÖÃÌí¼ÓË÷Òı
-			public E set(int index, E element) {throw new UnsupportedOperationException();}		//ÉèÖÃÖ¸¶¨Ë÷Òı´¦µÄÔªËØ
-			public E remove(int index) {throw new UnsupportedOperationException();}				//ÒÆ³ıÖ¸¶¨Ë÷Òı´¦µÄÔªËØ
-			public int indexOf(Object o);														//²éÑ¯oµÄË÷Òı£¬ÀûÓÃo.equalsºÍlistµü´úÆ÷ÊµÏÖ
-			public int lastIndexOf(Object o);													//ºÍindexOf²î²»¶à£¬µ«ºóÃæ²éÑ¯¡£
-			public void clear();																//Çå¿ÕlistÖĞµÄÔªËØ
-			public boolean addAll(int index, Collection<? extends E> c);						//½«cÖĞµÄÔªËØ¸´ÖÆµ½index´¦
-			public Iterator<E> iterator() {return new Itr();}									//·µ»Øµü´úÆ÷ÊµÏÖ
-			public ListIterator<E> iterator() {return new listIterator(0);}						//·µ»Ø´ÓÍ·¿ªÊ¼µÄlistµü´úÆ÷ÊµÏÖ
-			public ListIterator<E> listIterator(final int index);								//·µ»Ø´ÓÖ¸¶¨Ë÷Òı¿ªÊ¼µÄlistµü´úÆ÷ÊµÏÖ
-			public List<E> subList(int fromIndex, int toIndex);									//·µ»ØSubList
-			public boolean equals(Object o);													//±È½ÏÁ½¸ölistÖĞµÄÔªËØÊÇ·ñÏàÍ¬¡£ÊÇÍ¨¹ıÔªËØµÄequals·½·¨À´ÅĞ¶ÏµÄ¡£
+			//å…¬å…±å‡½æ•°
+			abstract public E get(int index);						//è·å¾—ç´¢å¼•indexä½ç½®çš„å…ƒç´ 
+			public boolean add(E e) {add(size(), e);return true;}	//åœ¨æœ«å°¾æ·»åŠ å…ƒç´ 
+			public void add(int index, E element){throw new UnsupportedOperationException();}	//åœ¨æŒ‡å®šä½ç½®æ·»åŠ ç´¢å¼•
+			public E set(int index, E element) {throw new UnsupportedOperationException();}		//è®¾ç½®æŒ‡å®šç´¢å¼•å¤„çš„å…ƒç´ 
+			public E remove(int index) {throw new UnsupportedOperationException();}				//ç§»é™¤æŒ‡å®šç´¢å¼•å¤„çš„å…ƒç´ 
+			public int indexOf(Object o);														//æŸ¥è¯¢oçš„ç´¢å¼•ï¼Œåˆ©ç”¨o.equalså’Œlistè¿­ä»£å™¨å®ç°
+			public int lastIndexOf(Object o);													//å’ŒindexOfå·®ä¸å¤šï¼Œä½†åé¢æŸ¥è¯¢ã€‚
+			public void clear();																//æ¸…ç©ºlistä¸­çš„å…ƒç´ 
+			public boolean addAll(int index, Collection<? extends E> c);						//å°†cä¸­çš„å…ƒç´ å¤åˆ¶åˆ°indexå¤„
+			public Iterator<E> iterator() {return new Itr();}									//è¿”å›è¿­ä»£å™¨å®ç°
+			public ListIterator<E> iterator() {return new listIterator(0);}						//è¿”å›ä»å¤´å¼€å§‹çš„listè¿­ä»£å™¨å®ç°
+			public ListIterator<E> listIterator(final int index);								//è¿”å›ä»æŒ‡å®šç´¢å¼•å¼€å§‹çš„listè¿­ä»£å™¨å®ç°
+			public List<E> subList(int fromIndex, int toIndex);									//è¿”å›SubList
+			public boolean equals(Object o);													//æ¯”è¾ƒä¸¤ä¸ªlistä¸­çš„å…ƒç´ æ˜¯å¦ç›¸åŒã€‚æ˜¯é€šè¿‡å…ƒç´ çš„equalsæ–¹æ³•æ¥åˆ¤æ–­çš„ã€‚
 			public int hashCode();
 			
-			//Ë½ÓĞ·½·¨
-			protected void removeRange(int fromIndex, int toIndex);								//ÒÆ³ıÖ¸¶¨·¶Î§ÄÚµÄÔªËØ¡£ÀûÓÃµü´úÆ÷ÊµÏÖ¡£
+			//ç§æœ‰æ–¹æ³•
+			protected void removeRange(int fromIndex, int toIndex);								//ç§»é™¤æŒ‡å®šèŒƒå›´å†…çš„å…ƒç´ ã€‚åˆ©ç”¨è¿­ä»£å™¨å®ç°ã€‚
 			
-			//ÄÚ²¿Àà
+			//å†…éƒ¨ç±»
 			private class Itr implements Iterator<E>;
 			private class ListItr extends Itr implements ListIterator<E>;
 		}
 	3.
 	4.
 	5.AbstractMap
-		Ìá¹©ÁËMap¹Ç¼ÜÊµÏÖ¡£
-		ÒªÊµÏÖ²»¿ÉĞŞ¸ÄµÄMap£¬ĞèÒªÊµÏÖÆäentrySet()·½·¨£¬·µ»ØµÄSetĞèÒªÊµÏÖAbstractSet²¢ÇÒ²»Ó¦¸ÃÖ§³ÖÌí¼ÓÉ¾³ı£¬Æäµü´úÆ÷²»Ó¦Ö§³Öremove·½·¨¡£
-		ÒªÊµÏÖ¿ÉÒÔĞŞ¸ÄµÄMap£¬ĞèÒª¸²¸Çput()·½·¨£¬·ñÔò»áÅ×³ö²»Ö§³ÖÒì³££¬²¢ÇÒentrySet()·µ»ØµÄµü´úÆ÷Ó¦¸ÃÖ§³Öremove·½·¨¡£
+		æä¾›äº†Mapéª¨æ¶å®ç°ã€‚
+		è¦å®ç°ä¸å¯ä¿®æ”¹çš„Mapï¼Œéœ€è¦å®ç°å…¶entrySet()æ–¹æ³•ï¼Œè¿”å›çš„Setéœ€è¦å®ç°AbstractSetå¹¶ä¸”ä¸åº”è¯¥æ”¯æŒæ·»åŠ åˆ é™¤ï¼Œå…¶è¿­ä»£å™¨ä¸åº”æ”¯æŒremoveæ–¹æ³•ã€‚
+		è¦å®ç°å¯ä»¥ä¿®æ”¹çš„Mapï¼Œéœ€è¦è¦†ç›–put()æ–¹æ³•ï¼Œå¦åˆ™ä¼šæŠ›å‡ºä¸æ”¯æŒå¼‚å¸¸ï¼Œå¹¶ä¸”entrySet()è¿”å›çš„è¿­ä»£å™¨åº”è¯¥æ”¯æŒremoveæ–¹æ³•ã€‚
 		public abstract class AbstractMap<K,V> implements Map<K,V> {
 			transient volatile Set<K>        keySet;
 			transient volatile Collection<V> values;
 
-			//¹¹Ôìº¯Êı
+			//æ„é€ å‡½æ•°
 			protected AbstractMap() {}
 			
-			//¹«¹²·½·¨
-			public int size(){return entrySet().size();}		//MapµÄ´óĞ¡¾ÍÊÇentrySetµÄ´óĞ¡.
-			public boolean isEmpty() {return size() == 0;}		//ÅĞ¶ÏMapÊÇ·ñÎª¿Õ
-			public boolean containsValue(Object value);			//ÅĞ¶ÏMapÊÇ·ñ°üº¬Value£¬ÀûÓÃentrySet().iterator()ºÍvalue.equals()ÊµÏÖ¡£
-			public boolean containsKey(Object key);				//ÅĞ¶ÏMapÊÇ·ñ°üº¬key£¬ÀûÓÃentrySet().iterator()ºÍkey.equals()ÊµÏÖ¡£
-			public V get(Object key);							//·µ»Økey¶ÔÓ¦µÄvalue£¬ÀûÓÃentrySet().iterator()µÄ±éÀúÊµÏÖ¡£
+			//å…¬å…±æ–¹æ³•
+			public int size(){return entrySet().size();}		//Mapçš„å¤§å°å°±æ˜¯entrySetçš„å¤§å°.
+			public boolean isEmpty() {return size() == 0;}		//åˆ¤æ–­Mapæ˜¯å¦ä¸ºç©º
+			public boolean containsValue(Object value);			//åˆ¤æ–­Mapæ˜¯å¦åŒ…å«Valueï¼Œåˆ©ç”¨entrySet().iterator()å’Œvalue.equals()å®ç°ã€‚
+			public boolean containsKey(Object key);				//åˆ¤æ–­Mapæ˜¯å¦åŒ…å«keyï¼Œåˆ©ç”¨entrySet().iterator()å’Œkey.equals()å®ç°ã€‚
+			public V get(Object key);							//è¿”å›keyå¯¹åº”çš„valueï¼Œåˆ©ç”¨entrySet().iterator()çš„éå†å®ç°ã€‚
 			public V put(K key, V value);						//throw new UnsupportedOperationException();
-			public V remove(Object key);						//É¾³ı¶ÔÓ¦µÄkey-value£¬²¢·µ»ØÔ­value¡£ÀûÓÃentrySet().iterator()±éÀúÊµÏÖ¡£
-			public void putAll(Map<? extends K, ? extends V> m);//½«mµÄËùÓĞÄÚÈİ¸´ÖÆµ½±¾MapÖĞ¡£
+			public V remove(Object key);						//åˆ é™¤å¯¹åº”çš„key-valueï¼Œå¹¶è¿”å›åŸvalueã€‚åˆ©ç”¨entrySet().iterator()éå†å®ç°ã€‚
+			public void putAll(Map<? extends K, ? extends V> m);//å°†mçš„æ‰€æœ‰å†…å®¹å¤åˆ¶åˆ°æœ¬Mapä¸­ã€‚
 			public void clear();								//entrySet.clear()
-			public Set<K> keySet();								//·µ»ØkeySet£¬ÈôkeySetÎª¿Õ´´½¨Ò»¸öAbstractSet<K>µÄÄäÃûÀà¡£ÄäÃûÀàÖĞÀûÓÃkeySet.iterator()ÊµÏÖ¸Ã¼¯ºÏµÄiterator¡£
-			public Collection<V> values();						//·µ»Øvalues£¬ÈôvaluesÎª¿Õ´´½¨Ò»¸öAbstractCollection<V>µÄÄäÃûÀà¡£Ô­ÀíÍ¬keySet()
-			public abstract Set<Entry<K,V>> entrySet();			//Áô´ı×ÓÀàÊµÏÖ¡£
-			public boolean equals(Object o);					//ÅĞ¶ÏËùÓĞµÄentryÊÇ·ñÏàÍ¬£¬´æÔÚ²»Í¬¾ÍÈÏÎªÕâÁ½¸öMap²»Í¬¡£
-			public int hashCode();								//½«ËùÓĞµÄentry hashCodeÏà¼Ó×÷ÎªMapµÄhashCode¡£
+			public Set<K> keySet();								//è¿”å›keySetï¼Œè‹¥keySetä¸ºç©ºåˆ›å»ºä¸€ä¸ªAbstractSet<K>çš„åŒ¿åç±»ã€‚åŒ¿åç±»ä¸­åˆ©ç”¨keySet.iterator()å®ç°è¯¥é›†åˆçš„iteratorã€‚
+			public Collection<V> values();						//è¿”å›valuesï¼Œè‹¥valuesä¸ºç©ºåˆ›å»ºä¸€ä¸ªAbstractCollection<V>çš„åŒ¿åç±»ã€‚åŸç†åŒkeySet()
+			public abstract Set<Entry<K,V>> entrySet();			//ç•™å¾…å­ç±»å®ç°ã€‚
+			public boolean equals(Object o);					//åˆ¤æ–­æ‰€æœ‰çš„entryæ˜¯å¦ç›¸åŒï¼Œå­˜åœ¨ä¸åŒå°±è®¤ä¸ºè¿™ä¸¤ä¸ªMapä¸åŒã€‚
+			public int hashCode();								//å°†æ‰€æœ‰çš„entry hashCodeç›¸åŠ ä½œä¸ºMapçš„hashCodeã€‚
 			
-			//ÄÚ²¿Àà
+			//å†…éƒ¨ç±»
 			public static class SimpleEntry<K,V>
 				implements Entry<K,V>, java.io.Serializable{
 				private final K key;
@@ -318,262 +318,262 @@
 				public V setValue(V value);
 			}
 			
-			public static class SimpleImmutableEntry<K,V> implements Entry<K,V>, java.io.Serializable;	//Ïà±ÈÓëÉÏÕß£¬ÕâÊÇ¸ö²»¿É±äÀà¡£²»¾ß±¸set·½·¨¡£
+			public static class SimpleImmutableEntry<K,V> implements Entry<K,V>, java.io.Serializable;	//ç›¸æ¯”ä¸ä¸Šè€…ï¼Œè¿™æ˜¯ä¸ªä¸å¯å˜ç±»ã€‚ä¸å…·å¤‡setæ–¹æ³•ã€‚
 			
 		}
-ËÄ¡¢¾ßÌåÊµÏÖ
-	1.ArrayListÏà¹ØµÄÀà
-		ÕâÊÇÒ»¸öÊµÏÖÁËList½Ó¿ÚµÄ£¬´óĞ¡¿É±äµÄÊı×é¡£³ıÁËÊµÏÖList£¬´ËÀà»¹Ìá¹©ÁË²Ù×÷ÄÚ²¿ÓÃÓÚ´æ´¢ÁĞ±íÊı×é´óĞ¡µÄÄÚ´æµÄ·½·¨¡£
+å››ã€å…·ä½“å®ç°
+	1.ArrayListç›¸å…³çš„ç±»
+		è¿™æ˜¯ä¸€ä¸ªå®ç°äº†Listæ¥å£çš„ï¼Œå¤§å°å¯å˜çš„æ•°ç»„ã€‚é™¤äº†å®ç°Listï¼Œæ­¤ç±»è¿˜æä¾›äº†æ“ä½œå†…éƒ¨ç”¨äºå­˜å‚¨åˆ—è¡¨æ•°ç»„å¤§å°çš„å†…å­˜çš„æ–¹æ³•ã€‚
 		1).ArrayList
 		public class ArrayList<E> extends AbstractList<E>
         implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
-			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;	//Êı×éµÄ×î´óÔªËØ¸öÊı...
-			private static final int DEFAULT_CAPACITY = 10;						//³õÊ¼»¯ÈİÁ¿Îª10
+			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;	//æ•°ç»„çš„æœ€å¤§å…ƒç´ ä¸ªæ•°...
+			private static final int DEFAULT_CAPACITY = 10;						//åˆå§‹åŒ–å®¹é‡ä¸º10
 			private static final Object[] EMPTY_ELEMENTDATA = {};					//???
 			private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};	//???
-			transient Object[] elementData;		//Êµ¼Ê±£´æÔªËØµÄÊı×é
-			private int size;		//¼ÇÂ¼ÔªËØ¸öÊı
+			transient Object[] elementData;		//å®é™…ä¿å­˜å…ƒç´ çš„æ•°ç»„
+			private int size;		//è®°å½•å…ƒç´ ä¸ªæ•°
 			
-			//¹¹Ôìº¯Êı
-			public ArrayList(int initialCapacity);		//¸ù¾İ³õÊ¼»¯ÈİÁ¿£¬³õÊ¼»¯elementData
-			public ArrayList();							//¸ù¾İÄ¬ÈÏ³õÊ¼»¯ÈİÁ¿£¬³õÊ¼»¯elementData
+			//æ„é€ å‡½æ•°
+			public ArrayList(int initialCapacity);		//æ ¹æ®åˆå§‹åŒ–å®¹é‡ï¼Œåˆå§‹åŒ–elementData
+			public ArrayList();							//æ ¹æ®é»˜è®¤åˆå§‹åŒ–å®¹é‡ï¼Œåˆå§‹åŒ–elementData
 			public ArrayList(Collection<? extends E> c);//????
 			
-			//¹«¹²·½·¨
-			public void trimToSize();					//½«arraylist¶ÔÏóµÄcapacityĞŞ¼ôÎªÊµ¼Ê´óĞ¡¡£(½«Ã»ÓĞÓÃµ½µÄ¿Õ¼ä¸øÊÍ·Åµô)
-			public void ensureCapacity(int minCapacity);//Ôö¼ÓcapacityµÄÊµÀıÈİÁ¿£¬ÒÔÄÜÈİÄÉÖ¸¶¨µÄminCapacity.
-			public int size();							//¿ÉÓÃÔªËØµÄ¸öÊı£¬·Çcapacity
-			public boolean isEmpty();					//ÅĞ¶ÏsizeÊÇ·ñÎª0
-			public int indexOf(Object o);				//·µ»Ø¶ÔÏóµÄË÷Òı£¬ÅĞ¶ÏÊÇ·ñÏàµÈÓÃo.equals.Èô²»´æÔÚ¸Ã¶ÔÏó£¬·µ»Ø-1¡£´Ó¿ªÊ¼ÏòÄ©Î²±éÀú£¬ÕÒµ½¾ÍÖ±½Ó·µ»Ø£¬Òò´Ë·µ»ØµÄÊÇµÚÒ»¸ö¸Ã¶ÔÏóµÄË÷Òı¡£
-			public int lastIndexOf(Object o);			//ºÍindexOf¹¦ÄÜÏàÍ¬£¬µ«ÊÇ´ÓÄ©Î²ÏòÇ°±éÀú£¬ÕÒµ½¾Í·µ»Ø£¬Òò´Ë·µ»ØµÄÊÇ×îºóÒ»¸ö¸Ã¶ÔÏóµÄË÷Òı¡£
-			public boolean contains(Object o);			//return indexOf(o) >= 0;ÅĞ¶Ï¸Ã¶ÔÏóÊÇ·ñ´æÔÚ
-			public Object clone()£»						//¿ËÂ¡µ±Ç°¶ÔÏó¡£¶ÔÏóÖĞÔªËØºÍÔ­¶ÔÏóÖĞµÄÔªËØÊÇÏàÍ¬µÄ¡£(ÈôÔªËØÊÇ¶ÔÏó£¬ÔòÒıÓÃÖµÏàÍ¬)
-			public Object[] toArray();					//½«ArrayListµÄÊı×éÖĞµÄÔªËØ¸øcopyµ½ĞÂµÄÊı×éÖĞ£¬ĞÂµÄÊı×é¶ÔÏó´óĞ¡Îªsize¶ø·Çcapacity¡£
-			public <T> T[] toArray(T[] a);				//ÈôÊı×éa×ã¹»´ó(¿ÉÒÔÈİÄÉsize´óĞ¡µÄÔªËØ)£¬ÄÇÃ´½«¶ÔÏóÖĞµÄËùÓĞÄÚÈİ·ÅÔÚaÖĞµÄ×îÇ°Ãæ(ºóÃæµÄÔªËØ²»»á±»ĞŞ¸ÄµÄ)¡£Èôa²»¹»´ó£¬ÄÇÃ´·µ»ØÒ»¸öĞÂµÄÊı×é£¬¸ÃÊı×éµÄ´óĞ¡ºÍaÏàÍ¬£¬¿ÉÒÔ·Å¶àÉÙarraylistÖĞµÄÔªËØ¾Í·Å¶àÉÙ¡£
-			public E get(int index);					//µÈ¼ÛÓÚelementData[index]£¬»ñÈ¡Ö¸¶¨Ë÷ÒıµÄÔªËØ¡£ÓĞ·¶Î§¼ì²é¡£
-			public E set(int index, E element);			//ÉèÖÃĞÂµÄÔªËØµ½Ö¸¶¨Ë÷ÒıÖĞ£¬·µ»Ø¾ÉÔªËØ¡£ÓĞ·¶Î§¼ì²é£¬ÒªÇóindexÔÚ·¶Î§ÄÚ¡£
-			public boolean add(E e);					//Ìí¼ÓÒ»¸öĞÂÔªËØ¡£Ìí¼ÓĞÂÔªËØµÄÊ±ºòÒª½øĞĞcapacity growµÄ¼ì²é¡£·µ»ØÊ¼ÖÕÎªtrue¡£
-			public void add(int index, E element);		//ÔÚÖÆ¶¨µÄË÷Òı³öÌí¼ÓĞÂµÄÔªËØ elementData[index]½«Îªelement, index+1µ½Ä©Î²µÄÔªËØ£¬È«²¿ÏòºóÒÆ1¸ñ¡£
-			public E remove(int index);					//½«index´¦µÄÔªËØÉ¾³ı£¬ºóÃæµÄÔªËØÍùÇ°¶¥1¸ö¡£
-			public boolean remove(Object o);			//É¾³ıÖ¸¶¨µÄÔªËØ¡£Í¨¹ıo.equalsÀ´ÅĞ¶ÏÊÇ·ñÎªÖ¸¶¨¶ÀÏíµÄ¡£Ö»ÒÆ³ıµÚÒ»¸öo¡£
-			public void clear();						//½«ËùÓĞÄÚÈİ¶¼Éè¶¨Îªnull¡£
-			public boolean addAll(Collection<? extends E> c);	//½«cÖĞµÄÈ«²¿ÔªËØÌí¼Óµ½elementDataµÄºóÃæ¡£²½ÖèÊÇ¸´ÖÆ³öcÖĞµÄÔªËØ(toArray)£¬È»ºóÅĞ¶ÏÊÇ·ñÀ©Õ¹capacity£¬×îºó½«cÖĞ¸´ÖÆ³öµÄÔªËØÔÙ¸´ÖÆµ½elementDataÖĞ¡£			
-			public boolean addAll(int index, Collection<? extends E> c);	//ºÍÉÏÃæÏàÍ¬£¬²»¹ıÊÇÔÚindex´¦½øĞĞµÄÌí¼Ó¡£
-			public boolean removeAll(Collection<?> c);						//´ÓlistArrayÖĞÒÆ³ıÔÚcÖĞ´æÔÚµÄÔªËØ¡£
-			public boolean retainAll(Collection<?> c);						//ºÍremoveAllÏà·´£¬ÔÚlistArrayÖĞ±£ÁôcÖĞ´æÔÚµÄÔªËØ¡£(´ÓlistarrayÖĞÒÆ³ıcÖĞ²»´æÔÚµÄÔªËØ)
-			public ListIterator<E> listIterator(int index);					//»ñÈ¡Ò»¸ö´ÓÖ¸¶¨Ë÷Òı¿ªÊ¼µÄlistµü´úÆ÷¡£
-			public ListIterator<E> listIterator();							//»ñÈ¡Ò»¸ö´ÓÊ×ÔªËØ¿ªÊ¼µÄÁĞ±íµü´úÆ÷¡£
-			public Iterator<E> iterator();									//»ñÈ¡Ò»¸öµü´úÆ÷¡£
-			public List<E> subList(int fromIndex, int toIndex);				//·µ»Ø×Ólsit¡£
-			public void forEach(Consumer<? super E> action);				//¶ÔËùÓĞµÄÔªËØÖ´ĞĞÄ³¸ö»Øµ÷²Ù×÷¡£
+			//å…¬å…±æ–¹æ³•
+			public void trimToSize();					//å°†arraylistå¯¹è±¡çš„capacityä¿®å‰ªä¸ºå®é™…å¤§å°ã€‚(å°†æ²¡æœ‰ç”¨åˆ°çš„ç©ºé—´ç»™é‡Šæ”¾æ‰)
+			public void ensureCapacity(int minCapacity);//å¢åŠ capacityçš„å®ä¾‹å®¹é‡ï¼Œä»¥èƒ½å®¹çº³æŒ‡å®šçš„minCapacity.
+			public int size();							//å¯ç”¨å…ƒç´ çš„ä¸ªæ•°ï¼Œécapacity
+			public boolean isEmpty();					//åˆ¤æ–­sizeæ˜¯å¦ä¸º0
+			public int indexOf(Object o);				//è¿”å›å¯¹è±¡çš„ç´¢å¼•ï¼Œåˆ¤æ–­æ˜¯å¦ç›¸ç­‰ç”¨o.equals.è‹¥ä¸å­˜åœ¨è¯¥å¯¹è±¡ï¼Œè¿”å›-1ã€‚ä»å¼€å§‹å‘æœ«å°¾éå†ï¼Œæ‰¾åˆ°å°±ç›´æ¥è¿”å›ï¼Œå› æ­¤è¿”å›çš„æ˜¯ç¬¬ä¸€ä¸ªè¯¥å¯¹è±¡çš„ç´¢å¼•ã€‚
+			public int lastIndexOf(Object o);			//å’ŒindexOfåŠŸèƒ½ç›¸åŒï¼Œä½†æ˜¯ä»æœ«å°¾å‘å‰éå†ï¼Œæ‰¾åˆ°å°±è¿”å›ï¼Œå› æ­¤è¿”å›çš„æ˜¯æœ€åä¸€ä¸ªè¯¥å¯¹è±¡çš„ç´¢å¼•ã€‚
+			public boolean contains(Object o);			//return indexOf(o) >= 0;åˆ¤æ–­è¯¥å¯¹è±¡æ˜¯å¦å­˜åœ¨
+			public Object clone()ï¼›						//å…‹éš†å½“å‰å¯¹è±¡ã€‚å¯¹è±¡ä¸­å…ƒç´ å’ŒåŸå¯¹è±¡ä¸­çš„å…ƒç´ æ˜¯ç›¸åŒçš„ã€‚(è‹¥å…ƒç´ æ˜¯å¯¹è±¡ï¼Œåˆ™å¼•ç”¨å€¼ç›¸åŒ)
+			public Object[] toArray();					//å°†ArrayListçš„æ•°ç»„ä¸­çš„å…ƒç´ ç»™copyåˆ°æ–°çš„æ•°ç»„ä¸­ï¼Œæ–°çš„æ•°ç»„å¯¹è±¡å¤§å°ä¸ºsizeè€Œécapacityã€‚
+			public <T> T[] toArray(T[] a);				//è‹¥æ•°ç»„aè¶³å¤Ÿå¤§(å¯ä»¥å®¹çº³sizeå¤§å°çš„å…ƒç´ )ï¼Œé‚£ä¹ˆå°†å¯¹è±¡ä¸­çš„æ‰€æœ‰å†…å®¹æ”¾åœ¨aä¸­çš„æœ€å‰é¢(åé¢çš„å…ƒç´ ä¸ä¼šè¢«ä¿®æ”¹çš„)ã€‚è‹¥aä¸å¤Ÿå¤§ï¼Œé‚£ä¹ˆè¿”å›ä¸€ä¸ªæ–°çš„æ•°ç»„ï¼Œè¯¥æ•°ç»„çš„å¤§å°å’Œaç›¸åŒï¼Œå¯ä»¥æ”¾å¤šå°‘arraylistä¸­çš„å…ƒç´ å°±æ”¾å¤šå°‘ã€‚
+			public E get(int index);					//ç­‰ä»·äºelementData[index]ï¼Œè·å–æŒ‡å®šç´¢å¼•çš„å…ƒç´ ã€‚æœ‰èŒƒå›´æ£€æŸ¥ã€‚
+			public E set(int index, E element);			//è®¾ç½®æ–°çš„å…ƒç´ åˆ°æŒ‡å®šç´¢å¼•ä¸­ï¼Œè¿”å›æ—§å…ƒç´ ã€‚æœ‰èŒƒå›´æ£€æŸ¥ï¼Œè¦æ±‚indexåœ¨èŒƒå›´å†…ã€‚
+			public boolean add(E e);					//æ·»åŠ ä¸€ä¸ªæ–°å…ƒç´ ã€‚æ·»åŠ æ–°å…ƒç´ çš„æ—¶å€™è¦è¿›è¡Œcapacity growçš„æ£€æŸ¥ã€‚è¿”å›å§‹ç»ˆä¸ºtrueã€‚
+			public void add(int index, E element);		//åœ¨åˆ¶å®šçš„ç´¢å¼•å‡ºæ·»åŠ æ–°çš„å…ƒç´  elementData[index]å°†ä¸ºelement, index+1åˆ°æœ«å°¾çš„å…ƒç´ ï¼Œå…¨éƒ¨å‘åç§»1æ ¼ã€‚
+			public E remove(int index);					//å°†indexå¤„çš„å…ƒç´ åˆ é™¤ï¼Œåé¢çš„å…ƒç´ å¾€å‰é¡¶1ä¸ªã€‚
+			public boolean remove(Object o);			//åˆ é™¤æŒ‡å®šçš„å…ƒç´ ã€‚é€šè¿‡o.equalsæ¥åˆ¤æ–­æ˜¯å¦ä¸ºæŒ‡å®šç‹¬äº«çš„ã€‚åªç§»é™¤ç¬¬ä¸€ä¸ªoã€‚
+			public void clear();						//å°†æ‰€æœ‰å†…å®¹éƒ½è®¾å®šä¸ºnullã€‚
+			public boolean addAll(Collection<? extends E> c);	//å°†cä¸­çš„å…¨éƒ¨å…ƒç´ æ·»åŠ åˆ°elementDataçš„åé¢ã€‚æ­¥éª¤æ˜¯å¤åˆ¶å‡ºcä¸­çš„å…ƒç´ (toArray)ï¼Œç„¶ååˆ¤æ–­æ˜¯å¦æ‰©å±•capacityï¼Œæœ€åå°†cä¸­å¤åˆ¶å‡ºçš„å…ƒç´ å†å¤åˆ¶åˆ°elementDataä¸­ã€‚			
+			public boolean addAll(int index, Collection<? extends E> c);	//å’Œä¸Šé¢ç›¸åŒï¼Œä¸è¿‡æ˜¯åœ¨indexå¤„è¿›è¡Œçš„æ·»åŠ ã€‚
+			public boolean removeAll(Collection<?> c);						//ä»listArrayä¸­ç§»é™¤åœ¨cä¸­å­˜åœ¨çš„å…ƒç´ ã€‚
+			public boolean retainAll(Collection<?> c);						//å’ŒremoveAllç›¸åï¼Œåœ¨listArrayä¸­ä¿ç•™cä¸­å­˜åœ¨çš„å…ƒç´ ã€‚(ä»listarrayä¸­ç§»é™¤cä¸­ä¸å­˜åœ¨çš„å…ƒç´ )
+			public ListIterator<E> listIterator(int index);					//è·å–ä¸€ä¸ªä»æŒ‡å®šç´¢å¼•å¼€å§‹çš„listè¿­ä»£å™¨ã€‚
+			public ListIterator<E> listIterator();							//è·å–ä¸€ä¸ªä»é¦–å…ƒç´ å¼€å§‹çš„åˆ—è¡¨è¿­ä»£å™¨ã€‚
+			public Iterator<E> iterator();									//è·å–ä¸€ä¸ªè¿­ä»£å™¨ã€‚
+			public List<E> subList(int fromIndex, int toIndex);				//è¿”å›å­lsitã€‚
+			public void forEach(Consumer<? super E> action);				//å¯¹æ‰€æœ‰çš„å…ƒç´ æ‰§è¡ŒæŸä¸ªå›è°ƒæ“ä½œã€‚
 			public Spliterator<E> spliterator();							//????
-			public boolean removeIf(Predicate<? super E> filter);			//¸ù¾İfilterÖĞÖ¸¶¨µÄÌõ¼ş£¬À´¶ÔÔªËØ½øĞĞÒÆ³ı¡£???
-			public void replaceAll(UnaryOperator<E> operator);				//¶ÔËùÓĞÔªËØÖ´ĞĞÄ³¸ö»Øµ÷²Ù×÷£¬¸Ã²Ù×÷µÄ·µ»ØÖµ½«»áÖØÖÃ¸ÃË÷ÒıÉÏµÄÔªËØ¡£
-			public void sort(Comparator<? super E> c);						//¸ù¾İ´«ÈëµÄ±È½ÏÀàÀ´½øĞĞÅÅĞò
+			public boolean removeIf(Predicate<? super E> filter);			//æ ¹æ®filterä¸­æŒ‡å®šçš„æ¡ä»¶ï¼Œæ¥å¯¹å…ƒç´ è¿›è¡Œç§»é™¤ã€‚???
+			public void replaceAll(UnaryOperator<E> operator);				//å¯¹æ‰€æœ‰å…ƒç´ æ‰§è¡ŒæŸä¸ªå›è°ƒæ“ä½œï¼Œè¯¥æ“ä½œçš„è¿”å›å€¼å°†ä¼šé‡ç½®è¯¥ç´¢å¼•ä¸Šçš„å…ƒç´ ã€‚
+			public void sort(Comparator<? super E> c);						//æ ¹æ®ä¼ å…¥çš„æ¯”è¾ƒç±»æ¥è¿›è¡Œæ’åº
 			
-			//Ë½ÓĞ·½·¨
-			private void rangeCheck(int index);			//·¶Î§¼ì²é£¬´íÁËÖ±½ÓÅ×³öÒì³£¡£
-			private void rangeCheckForAdd(int index);	//¶ÔÓÚÌí¼ÓÊ±ºòµÄ·¶Î§¼ì²é¡£
-			private void grow(int minCapacity);			//Ôö¼ÓÈİÁ¿£¬ÒÔÈ·±£ÄÜ×°ÏÂÓÉ×îĞ¡ÈİÁ¿²ÎÊıÖ¸¶¨µÄÔªËØÊı¡£Ã¿´ÎÔö¼ÓÔ­ÈİÁ¿µÄ1/2£¬Èô»¹ÊÇ²»ÄÜÈİÄÉÔòÖ±½Ó½«ÈİÁ¿Éè¶¨ÎªÖ¸¶¨ÈİÁ¿¡£ÈİÁ¿Ö¸¶¨ºÃºó£¬¾ÍÓÃArrays.copyOf(elementData, newCapacity)À´´´½¨ĞÂµÄÊı×é£¬¸ÃÊı×é´óĞ¡ÎªnewCapacity£¬ÔªËØÄÚÈİºÍÖ®Ç°ÏàÍ¬£¬¶à³öÀ´µÄÊÇnull¡£
-			E elementData(int index);					//µÈ¼ÛÓÚelementData[index]£¬»ñÈ¡Ö¸¶¨Ë÷ÒıµÄÔªËØ¡£²¢Ã»ÓĞ·¶Î§¼ì²é¡£
-			private void fastRemove(int index)£»		//¿ìËÙÒÆ³ıÖ¸¶¨Ë÷Òı, ¾ÍÊÇÉÙÁËÒ»¸ö·¶Î§¼ì²é¡£
-			protected void removeRange(int fromIndex, int toIndex);	//½«Ö¸¶¨·¶Î§µÄÔªËØÉ¾³ı£¬ºóÃæµÄÔªËØÍùÇ°¶¥¡£
-			private boolean batchRemove(Collection<?> c, boolean complement);	//¸ù¾İcÅúÁ¿Òì³£¡£ÊÇremoveAllºÍretainAllµÄ»ù´¡£¬complementÓÃÓÚÑ¡ÔñÈçºÎÒÆ³ı¡£????
+			//ç§æœ‰æ–¹æ³•
+			private void rangeCheck(int index);			//èŒƒå›´æ£€æŸ¥ï¼Œé”™äº†ç›´æ¥æŠ›å‡ºå¼‚å¸¸ã€‚
+			private void rangeCheckForAdd(int index);	//å¯¹äºæ·»åŠ æ—¶å€™çš„èŒƒå›´æ£€æŸ¥ã€‚
+			private void grow(int minCapacity);			//å¢åŠ å®¹é‡ï¼Œä»¥ç¡®ä¿èƒ½è£…ä¸‹ç”±æœ€å°å®¹é‡å‚æ•°æŒ‡å®šçš„å…ƒç´ æ•°ã€‚æ¯æ¬¡å¢åŠ åŸå®¹é‡çš„1/2ï¼Œè‹¥è¿˜æ˜¯ä¸èƒ½å®¹çº³åˆ™ç›´æ¥å°†å®¹é‡è®¾å®šä¸ºæŒ‡å®šå®¹é‡ã€‚å®¹é‡æŒ‡å®šå¥½åï¼Œå°±ç”¨Arrays.copyOf(elementData, newCapacity)æ¥åˆ›å»ºæ–°çš„æ•°ç»„ï¼Œè¯¥æ•°ç»„å¤§å°ä¸ºnewCapacityï¼Œå…ƒç´ å†…å®¹å’Œä¹‹å‰ç›¸åŒï¼Œå¤šå‡ºæ¥çš„æ˜¯nullã€‚
+			E elementData(int index);					//ç­‰ä»·äºelementData[index]ï¼Œè·å–æŒ‡å®šç´¢å¼•çš„å…ƒç´ ã€‚å¹¶æ²¡æœ‰èŒƒå›´æ£€æŸ¥ã€‚
+			private void fastRemove(int index)ï¼›		//å¿«é€Ÿç§»é™¤æŒ‡å®šç´¢å¼•, å°±æ˜¯å°‘äº†ä¸€ä¸ªèŒƒå›´æ£€æŸ¥ã€‚
+			protected void removeRange(int fromIndex, int toIndex);	//å°†æŒ‡å®šèŒƒå›´çš„å…ƒç´ åˆ é™¤ï¼Œåé¢çš„å…ƒç´ å¾€å‰é¡¶ã€‚
+			private boolean batchRemove(Collection<?> c, boolean complement);	//æ ¹æ®cæ‰¹é‡å¼‚å¸¸ã€‚æ˜¯removeAllå’ŒretainAllçš„åŸºç¡€ï¼Œcomplementç”¨äºé€‰æ‹©å¦‚ä½•ç§»é™¤ã€‚????
 			
-			//ÄÚ²¿Àà
-			private class Itr implements Iterator<E>;	//ÆÕÍ¨µü´úÆ÷µÄÊµÏÖ£¬ÓÃË½ÓÃÀàÀ´ÊµÏÖ¡£
-			private class ListItr extends Itr implements ListIterator<E>;	//ÁĞ±íµü´úÆ÷µÄÊµÏÖ
+			//å†…éƒ¨ç±»
+			private class Itr implements Iterator<E>;	//æ™®é€šè¿­ä»£å™¨çš„å®ç°ï¼Œç”¨ç§ç”¨ç±»æ¥å®ç°ã€‚
+			private class ListItr extends Itr implements ListIterator<E>;	//åˆ—è¡¨è¿­ä»£å™¨çš„å®ç°
 			private class SubList extends AbstractList<E> implements RandomAccess;
 			static final class ArrayListSpliterator<E> implements Spliterator<E>;
 		}
 		
 		2).Itr
 		private class Itr implements Iterator<E> {
-			int cursor;       //Õâ¸ö¹â±êÖ¸Ê¾µÄÊÇ¡¾ÏÂÒ»¸ö¡¿·µ»ØµÄÔªËØµÄË÷Òı£¬Òò´Ë³õÊ¼»¯Îª0¡£
-			int lastRet = -1; //×î½ü´ÎÈ¡³öµÄÔªËØ¡£Òò´Ë³õÊ¼ÊÇ-1¡£
+			int cursor;       //è¿™ä¸ªå…‰æ ‡æŒ‡ç¤ºçš„æ˜¯ã€ä¸‹ä¸€ä¸ªã€‘è¿”å›çš„å…ƒç´ çš„ç´¢å¼•ï¼Œå› æ­¤åˆå§‹åŒ–ä¸º0ã€‚
+			int lastRet = -1; //æœ€è¿‘æ¬¡å–å‡ºçš„å…ƒç´ ã€‚å› æ­¤åˆå§‹æ˜¯-1ã€‚
 			int expectedModCount = modCount;
 			
-			//¹«¹²·½·¨
-			public boolean hasNext();	//¸ù¾İÏÂÒ»¸öË÷Òı(cursor)ÊÇ·ñ³¬³ösizeÀ´ÅĞ¶ÏÊÇ·ñ»¹ÓĞÔªËØ
-			public E next();			//·µ»ØÏÂÒ»¸öÔªËØ£¬²¢ÒÆ¶¯cursor(cursor+1)ÒÔ¼°ÉèÖÃlastRetÎª·µ»ØÔªËØµÄË÷Òı£¬Èô³¬³öÁË´óĞ¡£¬Å×³öÒì³£¡£
-			public void remove();		//lastRefÊÇ×î½üÈ¡³öµÄÔªËØ(µ±Ç°ÔªËØ)£¬ÈôÓĞĞ§ÔòÒÆ³ı¸ÃÔªËØ¡£Ò²Òò´Ë×î½üÒÆ³öÔªËØÒÑ¾­²»ÔÚ£¬Òò´ËlastRet»áÖØÖÃÎª-1¡£
-			public void forEachRemaining(Consumer<? super E> consumer);	//¶ÔÓàÏÂµÄÔªËØ½øĞĞforeach¡£½áÊøµÄÊ±ºòcursorºÍlastRet¶¼ÒªÖØÖÃ¡£
+			//å…¬å…±æ–¹æ³•
+			public boolean hasNext();	//æ ¹æ®ä¸‹ä¸€ä¸ªç´¢å¼•(cursor)æ˜¯å¦è¶…å‡ºsizeæ¥åˆ¤æ–­æ˜¯å¦è¿˜æœ‰å…ƒç´ 
+			public E next();			//è¿”å›ä¸‹ä¸€ä¸ªå…ƒç´ ï¼Œå¹¶ç§»åŠ¨cursor(cursor+1)ä»¥åŠè®¾ç½®lastRetä¸ºè¿”å›å…ƒç´ çš„ç´¢å¼•ï¼Œè‹¥è¶…å‡ºäº†å¤§å°ï¼ŒæŠ›å‡ºå¼‚å¸¸ã€‚
+			public void remove();		//lastRefæ˜¯æœ€è¿‘å–å‡ºçš„å…ƒç´ (å½“å‰å…ƒç´ )ï¼Œè‹¥æœ‰æ•ˆåˆ™ç§»é™¤è¯¥å…ƒç´ ã€‚ä¹Ÿå› æ­¤æœ€è¿‘ç§»å‡ºå…ƒç´ å·²ç»ä¸åœ¨ï¼Œå› æ­¤lastRetä¼šé‡ç½®ä¸º-1ã€‚
+			public void forEachRemaining(Consumer<? super E> consumer);	//å¯¹ä½™ä¸‹çš„å…ƒç´ è¿›è¡Œforeachã€‚ç»“æŸçš„æ—¶å€™cursorå’ŒlastRetéƒ½è¦é‡ç½®ã€‚
 		}
 		
 		3).ListItr
-			private class ListItr extends Itr implements ListIterator<E> {	//Ö±½Ó¼Ì³ĞItr
-				//¹¹Ôìº¯Êı
-				ListItr(int index);		//{super();cursor = index;}£¬Ö÷ÒªÊÇcursor=index£¬ÕâÑùnext½«»áÊÇindexË÷ÒıµÄÔªËØ¡£
+			private class ListItr extends Itr implements ListIterator<E> {	//ç›´æ¥ç»§æ‰¿Itr
+				//æ„é€ å‡½æ•°
+				ListItr(int index);		//{super();cursor = index;}ï¼Œä¸»è¦æ˜¯cursor=indexï¼Œè¿™æ ·nextå°†ä¼šæ˜¯indexç´¢å¼•çš„å…ƒç´ ã€‚
 				
-				//¹«¹²º¯Êı
-				public boolean hasPrevious();	//ÅĞ¶ÏcursorÊÇ·ñÎª0£¬Îª0ÄÇÃ´Ç°Ãæ¾ÍÄ¾ÓĞÁË¡£
-				public int nextIndex();			//¾ÍÊÇcursor
+				//å…¬å…±å‡½æ•°
+				public boolean hasPrevious();	//åˆ¤æ–­cursoræ˜¯å¦ä¸º0ï¼Œä¸º0é‚£ä¹ˆå‰é¢å°±æœ¨æœ‰äº†ã€‚
+				public int nextIndex();			//å°±æ˜¯cursor
 				public int previousIndex();		//return cursor-1;
-				public E previous();			//·µ»Øcursor-1µÄÔªËØ¡£lastRet½«»áÊÇ¸ÃÔªËØµÄË÷Òı¡£
-				public void set(E e);			//½«lastRetµÄË÷Òı½øĞĞÉèÖÃ£¬lastRet²¢²»»áÖØÖÃ¡£¿ÉÒÔ·´¸´ÉèÖÃÉÏÒ»´Î³öÀ´µÄË÷ÒıÎ»ÖÃµÄÔªËØ¡£
-				public void add(E e);			//ÔÚcursor´¦Ìí¼ÓÒ»¸öÔªËØ£¬cursorÏòÏÂÒÆ¶¯Ò»¸ñ¡£ÒâË¼¾ÍÊÇcursor²¢Ã»ÓĞÖ¸ÏòĞÂÌí¼ÓµÄÔªËØ£¬¶øÊÇÔ­À´µÄÄÇ¸öÔªËØ¡£¡£¡£
+				public E previous();			//è¿”å›cursor-1çš„å…ƒç´ ã€‚lastRetå°†ä¼šæ˜¯è¯¥å…ƒç´ çš„ç´¢å¼•ã€‚
+				public void set(E e);			//å°†lastRetçš„ç´¢å¼•è¿›è¡Œè®¾ç½®ï¼ŒlastRetå¹¶ä¸ä¼šé‡ç½®ã€‚å¯ä»¥åå¤è®¾ç½®ä¸Šä¸€æ¬¡å‡ºæ¥çš„ç´¢å¼•ä½ç½®çš„å…ƒç´ ã€‚
+				public void add(E e);			//åœ¨cursorå¤„æ·»åŠ ä¸€ä¸ªå…ƒç´ ï¼Œcursorå‘ä¸‹ç§»åŠ¨ä¸€æ ¼ã€‚æ„æ€å°±æ˜¯cursorå¹¶æ²¡æœ‰æŒ‡å‘æ–°æ·»åŠ çš„å…ƒç´ ï¼Œè€Œæ˜¯åŸæ¥çš„é‚£ä¸ªå…ƒç´ ã€‚ã€‚ã€‚
 			}
 	2.LinkedList
-		ÕâÊÇÒ»¸öË«ÏòÁ´±í£¬²éÑ¯²Ù×÷ÊÇ»ùÓÚ´Ó¿ªÊ¼»ò½áÎ²±éÀúµÄ¡£
+		è¿™æ˜¯ä¸€ä¸ªåŒå‘é“¾è¡¨ï¼ŒæŸ¥è¯¢æ“ä½œæ˜¯åŸºäºä»å¼€å§‹æˆ–ç»“å°¾éå†çš„ã€‚
 		public class LinkedList<E>
 			extends AbstractSequentialList<E>
 			implements List<E>, Deque<E>, Cloneable, java.io.Serializable{
 			
-			transient int size = 0;			//Ö¸¶¨´óĞ¡, transient²»²ÎÓëĞòÁĞ»¯
-			transient Node<E> first;		//µÚÒ»¸ö½Úµã
-			transient Node<E> last;			//Ä©Î²µÄ½Úµã
+			transient int size = 0;			//æŒ‡å®šå¤§å°, transientä¸å‚ä¸åºåˆ—åŒ–
+			transient Node<E> first;		//ç¬¬ä¸€ä¸ªèŠ‚ç‚¹
+			transient Node<E> last;			//æœ«å°¾çš„èŠ‚ç‚¹
 			
-			//¹¹Ôìº¯Êı
-			public LinkedList();			//¿ÕµÄ
-			public LinkedList(Collection<? extends E> c);	//½«¼¯ºÏÖĞµÄÔªËØÈ«²¿Ìí¼Óµ½Á´±íÖĞ
+			//æ„é€ å‡½æ•°
+			public LinkedList();			//ç©ºçš„
+			public LinkedList(Collection<? extends E> c);	//å°†é›†åˆä¸­çš„å…ƒç´ å…¨éƒ¨æ·»åŠ åˆ°é“¾è¡¨ä¸­
 			
-			//¹«¹²·½·¨
-			public int size();								//Ö±½Ó·µ»Øsize£¬Á´±íÔªËØ½Úµã/ÔªËØ¸öÊı
-			public E getFirst();							//»ñµÃÊ×¸öÔªËØ
-			public E getLast();								//»ñµÃÄ©Î²ÔªËØ
-			public E removeFirst();							//É¾³ıÊ×¸öÔªËØ£¬ÀûÓÃunlinkFirst()·½·¨
-			public E removeLast();							//É¾³ıÄ©Î²ÔªËØ£¬ÀûÓÃunlinkLast()·½·¨
-			public void addFirst(E e);						//ÔÚÆğÊ¼Î»ÖÃÌí¼ÓÔªËØ£¬ÀûÓÃlinkFirst()·½·¨
-			public void addLast(E e);						//ÔÚÄ©Î²Ìí¼ÓÔªËØ£¬ÀûÓÃlinkLast()·½·¨
-			public boolean add(E e);						//ºÍaddLastµÈÍ¬£¬Ê¼ÖÕ·µ»Øtrue.ÔÚÄ©Î²´¦Ìí¼ÓÔªËØ
-			public boolean remove(Object o);				//É¾³ıÔªËØ£¬Í¨¹ıo.equalsÅĞ¶Ï¶ÔÏóÊÇ·ñÏàµÈ£¬ÏàµÈ¾ÍÉ¾³ı¸Ã½Úµã(ÀûÓÃunlink)¡£É¾³ıµÄÊÇÊ×¸öÕÒµ½µÄ½Úµã¡£
-			public boolean addAll(Collection<? extends E> c);			//½«¼¯ºÏÖĞµÄËùÓĞÔªËØÌí¼Óµ½Á´±íÎ²£¬ÀûÓÃaddAll(index, c)·½·¨.
-			public boolean addAll(int index, Collection<? extends E> c)	//½«¼¯ºÏÖĞµÄËùÓĞÔªËØÌí¼Óµ½index´¦¡£
-			public void clear();										//Çå¿ÕËùÓĞ½Úµã
-			public E get(int index);									//·µ»ØÖ¸¶¨Ë÷ÒıµÄÔªËØ¡£Í¨¹ınode(index)ÕÒµ½Ö¸¶¨½Úµã£¬¸ÃÑ°ÕÒ·½·¨ÊÇ±éÀú£¬È»ºó·µ»Ø¶ÔÓ¦µÄÔªËØ¡£
-			public E set(int index, E element);							//ÉèÖÃindexÎ»ÖÃ´¦µÄÔªËØÎªelement¡£ÒªÇóindexÔÚ·¶Î§ÄÚ¡£
-			public void add(int index, E element);						//ÔÚÖ¸¶¨Ë÷Òı³öÌí¼ÓĞÂÔªËØ
-			public E remove(int index);									//É¾³ıÖ¸¶¨Ë÷ÒıµÄÔªËØ£¬²¢·µ»Ø¸ÃÔªËØ¡£
-			public int indexOf(Object o);								//·µ»ØoµÄË÷Òı£¬ÀûÓÃo.equalsÀ´ÅĞ¶ÏÊÇ·ñ´æÔÚo£¬²»´æÔÚo·µ»Ø-1¡£
-			public int lastIndexOf(Object o);							//ºÍindexOfĞ§¹ûÒ»Ñù£¬²»¹ıÊÇ´ÓºóÃæ¿ªÊ¼ÅĞ¶Ï¡£
-			public boolean contains(Object o);							//ÅĞ¶ÏoÊÇ·ñ´æÔÚ£¬ÀûÓÃindexOf(o)ÊÇ·ñĞ¡ÓÚ0£¬ÈôĞ¡ÓÚ0ÄÇÃ´²»´æÔÚ£¬·ñÔò´æÔÚ¶ÔÏó¡£
-			public E peek();											//·µ»ØÊ×ÔªËØ£¬½ÚµãfÎªnull·µ»Ønull¡£
-			public E element();											//»¹ÊÇ·µ»ØÊ×ÔªËØ£¬½ÚµãfÎªnullÅ×³öÒì³£¡£
-			public E poll();											//·µ»ØÊ×ÔªËØ£¬²¢ÇÒÉ¾³ıÊ×ÔªËØ
-			public E remove();											//É¾³ıÊ×ÔªËØ£¬²¢·µ»Ø¸ÃÔªËØ¡£
-			public boolean offer(E e);									//µÈÍ¬ÓÚadd(e);
-			public boolean offerFirst(E e);								//µÈÍ¬ÓÚaddFirst(e);
-			public boolean offerLast(E e);								//µÈÍ¬ÓÚaddLast(e);
-			public E peekFirst();										//È¡³öÊ×ÔªËØ
-			public E peekLast();										//È¡³öÄ©Î²ÔªËØ
-			public E pollFirst();										//È¡³ö²¢É¾³ıÊ×ÔªËØ
-			public E pollLast();										//È¡³ö²¢É¾³ıÎ²ÔªËØ
-			public void push(E e);										//µÈÍ¬ÓÚaddFirst
-			public E pop();												//µÈÍ¬ÓÚremoveFirst
-			public boolean removeFirstOccurrence(Object o);				//µÈÍ¬ÓÚremove(e);É¾³ıÊ×¸öo¡£
-			public boolean removeLastOccurrence(Object o);				//µÈÍ¬ÓÚremoveFirstOccurrence, µ«ÊÇ´Ó×îºó¿ªÊ¼¡£
-			public Object clone();										//°ÑÔªËØÈ«²¿¸´ÖÆ³öÀ´¡£ÏÔÈ»£¬ÔªËØ¶¼ÊÇÒıÓÃ¡£
-			public Object[] toArray();									//°ÑÔªËØ¸´ÖÆ³öÀ´£¬·ÅÔÚÊı×éÀï¡£ÔªËØ¶¼ÊÇÒıÓÃ¡£
-			public <T> T[] toArray(T[] a);								//°ÑÔªËØ¸´ÖÆµ½aÖĞ£¬ÈôaÌ«Ğ¡£¬Ôò¸ã¸öĞÂµÄaÓÃÀ´±£´æËùÓĞµÄÔªËØ£¬·µ»ØĞÂµÄa¡£Èôa´óĞ¡¹»ÓÃ£¬¾ÍÖ±½ÓÔÚaÖĞÌî³ä¡£
-			public ListIterator<E> listIterator(int index);				//·µ»Ø´ÓindexÎ»ÖÃ¿ªÊ¼µÄlistµü´úÆ÷¡£
-			public Iterator<E> descendingIterator();					//·µ»Øµİ¼õµü´úÆ÷¡£
+			//å…¬å…±æ–¹æ³•
+			public int size();								//ç›´æ¥è¿”å›sizeï¼Œé“¾è¡¨å…ƒç´ èŠ‚ç‚¹/å…ƒç´ ä¸ªæ•°
+			public E getFirst();							//è·å¾—é¦–ä¸ªå…ƒç´ 
+			public E getLast();								//è·å¾—æœ«å°¾å…ƒç´ 
+			public E removeFirst();							//åˆ é™¤é¦–ä¸ªå…ƒç´ ï¼Œåˆ©ç”¨unlinkFirst()æ–¹æ³•
+			public E removeLast();							//åˆ é™¤æœ«å°¾å…ƒç´ ï¼Œåˆ©ç”¨unlinkLast()æ–¹æ³•
+			public void addFirst(E e);						//åœ¨èµ·å§‹ä½ç½®æ·»åŠ å…ƒç´ ï¼Œåˆ©ç”¨linkFirst()æ–¹æ³•
+			public void addLast(E e);						//åœ¨æœ«å°¾æ·»åŠ å…ƒç´ ï¼Œåˆ©ç”¨linkLast()æ–¹æ³•
+			public boolean add(E e);						//å’ŒaddLastç­‰åŒï¼Œå§‹ç»ˆè¿”å›true.åœ¨æœ«å°¾å¤„æ·»åŠ å…ƒç´ 
+			public boolean remove(Object o);				//åˆ é™¤å…ƒç´ ï¼Œé€šè¿‡o.equalsåˆ¤æ–­å¯¹è±¡æ˜¯å¦ç›¸ç­‰ï¼Œç›¸ç­‰å°±åˆ é™¤è¯¥èŠ‚ç‚¹(åˆ©ç”¨unlink)ã€‚åˆ é™¤çš„æ˜¯é¦–ä¸ªæ‰¾åˆ°çš„èŠ‚ç‚¹ã€‚
+			public boolean addAll(Collection<? extends E> c);			//å°†é›†åˆä¸­çš„æ‰€æœ‰å…ƒç´ æ·»åŠ åˆ°é“¾è¡¨å°¾ï¼Œåˆ©ç”¨addAll(index, c)æ–¹æ³•.
+			public boolean addAll(int index, Collection<? extends E> c)	//å°†é›†åˆä¸­çš„æ‰€æœ‰å…ƒç´ æ·»åŠ åˆ°indexå¤„ã€‚
+			public void clear();										//æ¸…ç©ºæ‰€æœ‰èŠ‚ç‚¹
+			public E get(int index);									//è¿”å›æŒ‡å®šç´¢å¼•çš„å…ƒç´ ã€‚é€šè¿‡node(index)æ‰¾åˆ°æŒ‡å®šèŠ‚ç‚¹ï¼Œè¯¥å¯»æ‰¾æ–¹æ³•æ˜¯éå†ï¼Œç„¶åè¿”å›å¯¹åº”çš„å…ƒç´ ã€‚
+			public E set(int index, E element);							//è®¾ç½®indexä½ç½®å¤„çš„å…ƒç´ ä¸ºelementã€‚è¦æ±‚indexåœ¨èŒƒå›´å†…ã€‚
+			public void add(int index, E element);						//åœ¨æŒ‡å®šç´¢å¼•å‡ºæ·»åŠ æ–°å…ƒç´ 
+			public E remove(int index);									//åˆ é™¤æŒ‡å®šç´¢å¼•çš„å…ƒç´ ï¼Œå¹¶è¿”å›è¯¥å…ƒç´ ã€‚
+			public int indexOf(Object o);								//è¿”å›oçš„ç´¢å¼•ï¼Œåˆ©ç”¨o.equalsæ¥åˆ¤æ–­æ˜¯å¦å­˜åœ¨oï¼Œä¸å­˜åœ¨oè¿”å›-1ã€‚
+			public int lastIndexOf(Object o);							//å’ŒindexOfæ•ˆæœä¸€æ ·ï¼Œä¸è¿‡æ˜¯ä»åé¢å¼€å§‹åˆ¤æ–­ã€‚
+			public boolean contains(Object o);							//åˆ¤æ–­oæ˜¯å¦å­˜åœ¨ï¼Œåˆ©ç”¨indexOf(o)æ˜¯å¦å°äº0ï¼Œè‹¥å°äº0é‚£ä¹ˆä¸å­˜åœ¨ï¼Œå¦åˆ™å­˜åœ¨å¯¹è±¡ã€‚
+			public E peek();											//è¿”å›é¦–å…ƒç´ ï¼ŒèŠ‚ç‚¹fä¸ºnullè¿”å›nullã€‚
+			public E element();											//è¿˜æ˜¯è¿”å›é¦–å…ƒç´ ï¼ŒèŠ‚ç‚¹fä¸ºnullæŠ›å‡ºå¼‚å¸¸ã€‚
+			public E poll();											//è¿”å›é¦–å…ƒç´ ï¼Œå¹¶ä¸”åˆ é™¤é¦–å…ƒç´ 
+			public E remove();											//åˆ é™¤é¦–å…ƒç´ ï¼Œå¹¶è¿”å›è¯¥å…ƒç´ ã€‚
+			public boolean offer(E e);									//ç­‰åŒäºadd(e);
+			public boolean offerFirst(E e);								//ç­‰åŒäºaddFirst(e);
+			public boolean offerLast(E e);								//ç­‰åŒäºaddLast(e);
+			public E peekFirst();										//å–å‡ºé¦–å…ƒç´ 
+			public E peekLast();										//å–å‡ºæœ«å°¾å…ƒç´ 
+			public E pollFirst();										//å–å‡ºå¹¶åˆ é™¤é¦–å…ƒç´ 
+			public E pollLast();										//å–å‡ºå¹¶åˆ é™¤å°¾å…ƒç´ 
+			public void push(E e);										//ç­‰åŒäºaddFirst
+			public E pop();												//ç­‰åŒäºremoveFirst
+			public boolean removeFirstOccurrence(Object o);				//ç­‰åŒäºremove(e);åˆ é™¤é¦–ä¸ªoã€‚
+			public boolean removeLastOccurrence(Object o);				//ç­‰åŒäºremoveFirstOccurrence, ä½†æ˜¯ä»æœ€åå¼€å§‹ã€‚
+			public Object clone();										//æŠŠå…ƒç´ å…¨éƒ¨å¤åˆ¶å‡ºæ¥ã€‚æ˜¾ç„¶ï¼Œå…ƒç´ éƒ½æ˜¯å¼•ç”¨ã€‚
+			public Object[] toArray();									//æŠŠå…ƒç´ å¤åˆ¶å‡ºæ¥ï¼Œæ”¾åœ¨æ•°ç»„é‡Œã€‚å…ƒç´ éƒ½æ˜¯å¼•ç”¨ã€‚
+			public <T> T[] toArray(T[] a);								//æŠŠå…ƒç´ å¤åˆ¶åˆ°aä¸­ï¼Œè‹¥aå¤ªå°ï¼Œåˆ™æä¸ªæ–°çš„aç”¨æ¥ä¿å­˜æ‰€æœ‰çš„å…ƒç´ ï¼Œè¿”å›æ–°çš„aã€‚è‹¥aå¤§å°å¤Ÿç”¨ï¼Œå°±ç›´æ¥åœ¨aä¸­å¡«å……ã€‚
+			public ListIterator<E> listIterator(int index);				//è¿”å›ä»indexä½ç½®å¼€å§‹çš„listè¿­ä»£å™¨ã€‚
+			public Iterator<E> descendingIterator();					//è¿”å›é€’å‡è¿­ä»£å™¨ã€‚
 			
 			
-			//Ë½ÓĞ·½·¨
-			private void linkFirst(E e);					//´´½¨Ò»¸öÔªËØÎªeµÄĞÂµÄÊ×½Úµã(ÔÚÁ´±íÍ·Ôö¼ÓÔªËØe)
-			void linkLast(E e);								//´´½¨Ò»¸öÔªËØÎªeµÄĞÂµÄÎ²½Úµã(ÔÚÁ´±í½áÎ²Ôö¼ÓÔªËØe)
-			void linkBefore(E e, Node<E> succ);				//²åÈëÒ»¸öÔªËØÎªeµÄĞÂ½ÚµãÔÚsuccµÄÇ°Ãæ
-			private E unlinkFirst(Node<E> f);				//fÎªÊ×½Úµã£¬É¾³ıf£¬ÒÔÏÂÒ»¸ö½ÚµãÎªÊ×½Úµã£¬·µ»Ø¸Õ¸ÕÉ¾³ı½ÚµãµÄÔªËØ
-			private E unlinkLast(Node<E> l);				//lÎªÎ²½Úµã£¬É¾³ıl£¬ÒÔÉÏÒ»¸ö½ÚµãÎªÎ²½Úµã£¬·µ»Ø¸Õ¸ÕÉ¾³ı½ÚµãµÄÔªËØ
-			E unlink(Node<E> x);							//½«½Úµãx¸øÉ¾³ı(Í¨¹ı½«xµÄprevºÍnext½ÚµãÏàÁ¬£¬¶øÈÆ¿ªx)£¬·µ»Ø¸Õ¸ÕÉ¾³ı½ÚµãµÄÔªËØ
-			private boolean isElementIndex(int index);		//ÅĞ¶ÏindexÊÇ·ñÔÚ·¶Î§ÄÚ
-			private void checkElementIndex(int index);		//ÅĞ¶ÏÊÇ·ñÔÚ·¶Î§ÄÚ£¬²»ÔÚÅ×³öÒì³£
-			Node<E> node(int index);						//·µ»ØÖ¸¶¨Ë÷ÒıµÄ½Úµã£¬¸ù¾İË÷ÒıÊÇÔÚÇ°°ë²¿·Ö»òÊÇºó°ë²¿·ÖÀ´¾ö¶¨´ÓÆğÊ¼¿ªÊ¼±éÀú»¹ÊÇ´ÓÄ©Î²¿ªÊ¼±éÀú
+			//ç§æœ‰æ–¹æ³•
+			private void linkFirst(E e);					//åˆ›å»ºä¸€ä¸ªå…ƒç´ ä¸ºeçš„æ–°çš„é¦–èŠ‚ç‚¹(åœ¨é“¾è¡¨å¤´å¢åŠ å…ƒç´ e)
+			void linkLast(E e);								//åˆ›å»ºä¸€ä¸ªå…ƒç´ ä¸ºeçš„æ–°çš„å°¾èŠ‚ç‚¹(åœ¨é“¾è¡¨ç»“å°¾å¢åŠ å…ƒç´ e)
+			void linkBefore(E e, Node<E> succ);				//æ’å…¥ä¸€ä¸ªå…ƒç´ ä¸ºeçš„æ–°èŠ‚ç‚¹åœ¨succçš„å‰é¢
+			private E unlinkFirst(Node<E> f);				//fä¸ºé¦–èŠ‚ç‚¹ï¼Œåˆ é™¤fï¼Œä»¥ä¸‹ä¸€ä¸ªèŠ‚ç‚¹ä¸ºé¦–èŠ‚ç‚¹ï¼Œè¿”å›åˆšåˆšåˆ é™¤èŠ‚ç‚¹çš„å…ƒç´ 
+			private E unlinkLast(Node<E> l);				//lä¸ºå°¾èŠ‚ç‚¹ï¼Œåˆ é™¤lï¼Œä»¥ä¸Šä¸€ä¸ªèŠ‚ç‚¹ä¸ºå°¾èŠ‚ç‚¹ï¼Œè¿”å›åˆšåˆšåˆ é™¤èŠ‚ç‚¹çš„å…ƒç´ 
+			E unlink(Node<E> x);							//å°†èŠ‚ç‚¹xç»™åˆ é™¤(é€šè¿‡å°†xçš„prevå’ŒnextèŠ‚ç‚¹ç›¸è¿ï¼Œè€Œç»•å¼€x)ï¼Œè¿”å›åˆšåˆšåˆ é™¤èŠ‚ç‚¹çš„å…ƒç´ 
+			private boolean isElementIndex(int index);		//åˆ¤æ–­indexæ˜¯å¦åœ¨èŒƒå›´å†…
+			private void checkElementIndex(int index);		//åˆ¤æ–­æ˜¯å¦åœ¨èŒƒå›´å†…ï¼Œä¸åœ¨æŠ›å‡ºå¼‚å¸¸
+			Node<E> node(int index);						//è¿”å›æŒ‡å®šç´¢å¼•çš„èŠ‚ç‚¹ï¼Œæ ¹æ®ç´¢å¼•æ˜¯åœ¨å‰åŠéƒ¨åˆ†æˆ–æ˜¯ååŠéƒ¨åˆ†æ¥å†³å®šä»èµ·å§‹å¼€å§‹éå†è¿˜æ˜¯ä»æœ«å°¾å¼€å§‹éå†
 			private LinkedList<E> superClone();				//???
 			
-			//ÄÚ²¿Àà
-			private class ListItr implements ListIterator<E>;		//listµü´úÆ÷
-			private static class Node<E>;							//½ÚµãÊµÏÖ
-			private class DescendingIterator implements Iterator<E>;//µİ¼õµü´úÆ÷
+			//å†…éƒ¨ç±»
+			private class ListItr implements ListIterator<E>;		//listè¿­ä»£å™¨
+			private static class Node<E>;							//èŠ‚ç‚¹å®ç°
+			private class DescendingIterator implements Iterator<E>;//é€’å‡è¿­ä»£å™¨
 		}
 	3.HashSet
 		public class HashSet<E>
 			extends AbstractSet<E>
 			implements Set<E>, Cloneable, java.io.Serializable{
 			
-			private transient HashMap<E,Object> map;				//Êµ¼Ê±£´æÔªËØµÄÄÚ´æ¡£HashSetµÄÔªËØ£¬¶¼ÊÇ´æ·ÅÔÚHashMapµÄkeyÖĞ¡£
-			private static final Object PRESENT = new Object();		//hashMapÊÇ¸ökv¶Ô¼¯ºÏ£¬ÓÃ¸Ã¶ÔÏó´ú±ívalue¡£
+			private transient HashMap<E,Object> map;				//å®é™…ä¿å­˜å…ƒç´ çš„å†…å­˜ã€‚HashSetçš„å…ƒç´ ï¼Œéƒ½æ˜¯å­˜æ”¾åœ¨HashMapçš„keyä¸­ã€‚
+			private static final Object PRESENT = new Object();		//hashMapæ˜¯ä¸ªkvå¯¹é›†åˆï¼Œç”¨è¯¥å¯¹è±¡ä»£è¡¨valueã€‚
 			
-			//¹¹Ôìº¯Êı
-			public HashSet() {map = new HashMap<>();}				//³õÊ¼»¯Ò»¸öhashmap
-			public HashSet(Collection<? extends E> c);				//³õÊ¼»¯Ò»¸öhashmap£¬²¢½«¼¯ºÏÖĞµÄÔªËØ¸´ÖÆµ½µ±Ç°setÖĞ
-			public HashSet(int initialCapacity, float loadFactor);	//Ö¸¶¨³õÊ¼»¯ÈİÁ¿ºÍ¼ÓÔØÒò×Ó£¬ÕâÁ½¸ö²ÎÊıÓÃÀ´³õÊ¼»¯HashMap
-			public HashSet(int initialCapacity);					//Ö¸¶¨³õÊ¼»¯ÈİÁ¿£¬Õâ¸ö²ÎÊıÓÃÀ´³õÊ¼»¯HashMap
+			//æ„é€ å‡½æ•°
+			public HashSet() {map = new HashMap<>();}				//åˆå§‹åŒ–ä¸€ä¸ªhashmap
+			public HashSet(Collection<? extends E> c);				//åˆå§‹åŒ–ä¸€ä¸ªhashmapï¼Œå¹¶å°†é›†åˆä¸­çš„å…ƒç´ å¤åˆ¶åˆ°å½“å‰setä¸­
+			public HashSet(int initialCapacity, float loadFactor);	//æŒ‡å®šåˆå§‹åŒ–å®¹é‡å’ŒåŠ è½½å› å­ï¼Œè¿™ä¸¤ä¸ªå‚æ•°ç”¨æ¥åˆå§‹åŒ–HashMap
+			public HashSet(int initialCapacity);					//æŒ‡å®šåˆå§‹åŒ–å®¹é‡ï¼Œè¿™ä¸ªå‚æ•°ç”¨æ¥åˆå§‹åŒ–HashMap
 			HashSet(int initialCapacity, float loadFactor, boolean dummy);
 			
-			//¹«¹²º¯Êı
-			public Iterator<E> iterator();							//·µ»Øµü´úÆ÷£¬Êµ¼ÊÊÇmapµÄkeyÖµµÄµü´úÆ÷¡£map.keySet().iterator();
-			public int size();										//·µ»Ø´óĞ¡£¬¾ÍÊÇmapµÄ´óĞ¡, map.size()
-			public boolean isEmpty();								//·µ»Ømap.isEmpty
-			public boolean contains(Object o);						//ÅĞ¶ÏsetÖĞÊÇ·ñ´æÔÚ¶ÔÏóo£¬Êµ¼ÊÉÏÊÇmap.containsKey(o)£¬¼´ÅĞ¶ÏmapµÄkeyÊÇ·ñ´æÔÚoÔªËØ
-			public boolean add(E e);								//Ìí¼ÓÒ»¸öĞÂÔªËØ£¬Êµ¼ÊÉÏÊÇmap.put(e, PRESENT)£¬ºÜÃ÷ÏÔĞÂµÄÔªËØÌí¼Óµ½mapµÄkey´¦£¬²Ù×÷³É¹¦·µ»Øtrue£¬·ñÔòfalse¡£
-			public boolean remove(Object o);						//ÒÆ³ıÖ¸¶¨µÄÔªËØ£¬Êµ¼ÊÉÏÊÇmap.remove(o);²Ù×÷³É¹¦·µ»Øtrue£¬·ñÔòfalse
-			public void clear();									//Çå¿ÕsetµÄËùÓĞÔªËØ£¬Êµ¼ÊÉÏÊÇmap.clear();
-			public Object clone();									//¸´ÖÆsetÖĞµÄËùÓĞÔªËØ£¬·µ»ØĞÂµÄ¼¯ºÏ¡£Êµ¼ÊÉÏ¾ÍÊÇµ÷ÓÃmap.clone()¡£
+			//å…¬å…±å‡½æ•°
+			public Iterator<E> iterator();							//è¿”å›è¿­ä»£å™¨ï¼Œå®é™…æ˜¯mapçš„keyå€¼çš„è¿­ä»£å™¨ã€‚map.keySet().iterator();
+			public int size();										//è¿”å›å¤§å°ï¼Œå°±æ˜¯mapçš„å¤§å°, map.size()
+			public boolean isEmpty();								//è¿”å›map.isEmpty
+			public boolean contains(Object o);						//åˆ¤æ–­setä¸­æ˜¯å¦å­˜åœ¨å¯¹è±¡oï¼Œå®é™…ä¸Šæ˜¯map.containsKey(o)ï¼Œå³åˆ¤æ–­mapçš„keyæ˜¯å¦å­˜åœ¨oå…ƒç´ 
+			public boolean add(E e);								//æ·»åŠ ä¸€ä¸ªæ–°å…ƒç´ ï¼Œå®é™…ä¸Šæ˜¯map.put(e, PRESENT)ï¼Œå¾ˆæ˜æ˜¾æ–°çš„å…ƒç´ æ·»åŠ åˆ°mapçš„keyå¤„ï¼Œæ“ä½œæˆåŠŸè¿”å›trueï¼Œå¦åˆ™falseã€‚
+			public boolean remove(Object o);						//ç§»é™¤æŒ‡å®šçš„å…ƒç´ ï¼Œå®é™…ä¸Šæ˜¯map.remove(o);æ“ä½œæˆåŠŸè¿”å›trueï¼Œå¦åˆ™false
+			public void clear();									//æ¸…ç©ºsetçš„æ‰€æœ‰å…ƒç´ ï¼Œå®é™…ä¸Šæ˜¯map.clear();
+			public Object clone();									//å¤åˆ¶setä¸­çš„æ‰€æœ‰å…ƒç´ ï¼Œè¿”å›æ–°çš„é›†åˆã€‚å®é™…ä¸Šå°±æ˜¯è°ƒç”¨map.clone()ã€‚
 		}
 	4.HashMap
 		public class HashMap<K,V> extends AbstractMap<K,V>
 		implements Map<K,V>, Cloneable, Serializable {
 		
-			//static×Ö¶Î
-			static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;		//³õÊ¼»¯ÈİÁ¿£¬Ó¦¸ÃÊÇ2µÄn´Î·½
-			static final int MAXIMUM_CAPACITY = 1 << 30;			//×î´óÈİÁ¿
-			static final float DEFAULT_LOAD_FACTOR = 0.75f;			//Ä¬ÈÏ¼ÓÔØÒò×Ó, ÓÃÓÚ¼ÆËãthresholdµÄ.
-			static final int TREEIFY_THRESHOLD = 8;					//µ±Ò»¸öÍ°ÖĞµÄÁ´±í´ïµ½Õâ¸öÊıÖµ£¬¿¼ÂÇ²ÉÓÃTreeNodeÌæ»»¡£
+			//staticå­—æ®µ
+			static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;		//åˆå§‹åŒ–å®¹é‡ï¼Œåº”è¯¥æ˜¯2çš„næ¬¡æ–¹
+			static final int MAXIMUM_CAPACITY = 1 << 30;			//æœ€å¤§å®¹é‡
+			static final float DEFAULT_LOAD_FACTOR = 0.75f;			//é»˜è®¤åŠ è½½å› å­, ç”¨äºè®¡ç®—thresholdçš„.
+			static final int TREEIFY_THRESHOLD = 8;					//å½“ä¸€ä¸ªæ¡¶ä¸­çš„é“¾è¡¨è¾¾åˆ°è¿™ä¸ªæ•°å€¼ï¼Œè€ƒè™‘é‡‡ç”¨TreeNodeæ›¿æ¢ã€‚
 			static final int UNTREEIFY_THRESHOLD = 6;				//???
-			static final int MIN_TREEIFY_CAPACITY = 64;				//µ±Í°ÖĞµÄÁ´±í´ïµ½TREEIFY_THRESHOLD£¬²¢ÇÒÍ°¸öÊı³¬¹ı64£¬ÄÇÃ´¾ÍÓÃTreeNodeÌæ»»¡£
+			static final int MIN_TREEIFY_CAPACITY = 64;				//å½“æ¡¶ä¸­çš„é“¾è¡¨è¾¾åˆ°TREEIFY_THRESHOLDï¼Œå¹¶ä¸”æ¡¶ä¸ªæ•°è¶…è¿‡64ï¼Œé‚£ä¹ˆå°±ç”¨TreeNodeæ›¿æ¢ã€‚
 			
-			//static·½·¨
-			static final int hash(Object key);						//¼ÆËãkeyµÄhashÖµ¡£¼ÆËã¹«Ê½ÊÇ hc^(hc>>>16)¡£hcÊÇkey.hashCode()£¬ÒâÎ¶×ÅkeyµÄhash½ö½öºÍhashCode()ÓĞ¹Ø£¬Òò´ËhashÊÇ·ñÏàµÈ¿´hashCode¼´¿É¡£
-			static Class<?> comparableClassFor(Object x);			//Èç¹ûxÊµÏÖÁËComparable½Ó¿Ú£¬ÄÇÃ´·µ»Øx.getClass()£¬·ñÔò·µ»Ønull;
-			static int compareComparables(Class<?> kc, Object k, Object x);		//µ±xµÄÀàĞÍÎªkcÊ±£¬·µ»Øk.compareTo(x), ·ñÔò·µ»Ø0;
-			static final int tableSizeFor(int cap);								//¶ÔÓÚ¸ø¶¨µÄcap£¬·µ»ØÒ»¸ö2^n´óĞ¡µÄÈİÁ¿¡£ÓĞÏŞ·ù¡£
+			//staticæ–¹æ³•
+			static final int hash(Object key);						//è®¡ç®—keyçš„hashå€¼ã€‚è®¡ç®—å…¬å¼æ˜¯ hc^(hc>>>16)ã€‚hcæ˜¯key.hashCode()ï¼Œæ„å‘³ç€keyçš„hashä»…ä»…å’ŒhashCode()æœ‰å…³ï¼Œå› æ­¤hashæ˜¯å¦ç›¸ç­‰çœ‹hashCodeå³å¯ã€‚
+			static Class<?> comparableClassFor(Object x);			//å¦‚æœxå®ç°äº†Comparableæ¥å£ï¼Œé‚£ä¹ˆè¿”å›x.getClass()ï¼Œå¦åˆ™è¿”å›null;
+			static int compareComparables(Class<?> kc, Object k, Object x);		//å½“xçš„ç±»å‹ä¸ºkcæ—¶ï¼Œè¿”å›k.compareTo(x), å¦åˆ™è¿”å›0;
+			static final int tableSizeFor(int cap);								//å¯¹äºç»™å®šçš„capï¼Œè¿”å›ä¸€ä¸ª2^nå¤§å°çš„å®¹é‡ã€‚æœ‰é™å¹…ã€‚
 			
-			//ÊµÀı×Ö¶Î
-			transient Node<K,V>[] table;							//tableÓ¦¸ÃÊÇ¸öEntry-NodeÊı×é»»¾ä»°Ëµ£¬Ã¿¸öÊı×éÔªËØ¶¼ÊÇ¸öEntryÁ´±í¡£
+			//å®ä¾‹å­—æ®µ
+			transient Node<K,V>[] table;							//tableåº”è¯¥æ˜¯ä¸ªEntry-Nodeæ•°ç»„æ¢å¥è¯è¯´ï¼Œæ¯ä¸ªæ•°ç»„å…ƒç´ éƒ½æ˜¯ä¸ªEntryé“¾è¡¨ã€‚
 			transient Set<Map.Entry<K,V>> entrySet;
 			transient int size;
-			transient int modCount;									//µ±Ç°HashMap±»ĞŞ¸ÄµÄ´ÎÊı
-			int threshold;											//µ±size==thresholdÊ±£¬¾Í»áMap¾Í»áresize£¬¼´À©Õ¹´óĞ¡¡£
+			transient int modCount;									//å½“å‰HashMapè¢«ä¿®æ”¹çš„æ¬¡æ•°
+			int threshold;											//å½“size==thresholdæ—¶ï¼Œå°±ä¼šMapå°±ä¼šresizeï¼Œå³æ‰©å±•å¤§å°ã€‚
 			final float loadFactor;									//threshold = cap * factor
 			
-			//¹¹Ôìº¯Êı
-			public HashMap(int initialCapacity, float loadFactor);	//Ö¸¶¨ÁËMapµÄ³õÊ¼ÈİÁ¿ºÍ¼ÓÔØÒò×Ó¡£ÓÉÓÚÖ¸¶¨µÄ³õÊ¼ÈİÁ¿¿ÉÄÜ²¢·Ç2^n£¬ÓÃthreshold = tableSizeFor(initialCapacity)À´±£´æÒ»¸ö2^n¡£
-			public HashMap(int initialCapacity);					//Êµ¼Êµ÷ÓÃthis(initialCapacity, DEFAULT_LOAD_FACTOR);
-			public HashMap();										//·ÖÅäÒ»¸ö¿ÕµÄMap£¬¸Ã¹¹ÔìÊµ¼Ê²Ù×÷Ö»ÓĞthis.loadFactor = DEFAULT_LOAD_FACTOR¡£
+			//æ„é€ å‡½æ•°
+			public HashMap(int initialCapacity, float loadFactor);	//æŒ‡å®šäº†Mapçš„åˆå§‹å®¹é‡å’ŒåŠ è½½å› å­ã€‚ç”±äºæŒ‡å®šçš„åˆå§‹å®¹é‡å¯èƒ½å¹¶é2^nï¼Œç”¨threshold = tableSizeFor(initialCapacity)æ¥ä¿å­˜ä¸€ä¸ª2^nã€‚
+			public HashMap(int initialCapacity);					//å®é™…è°ƒç”¨this(initialCapacity, DEFAULT_LOAD_FACTOR);
+			public HashMap();										//åˆ†é…ä¸€ä¸ªç©ºçš„Mapï¼Œè¯¥æ„é€ å®é™…æ“ä½œåªæœ‰this.loadFactor = DEFAULT_LOAD_FACTORã€‚
 			public HashMap(Map<? extends K, ? extends V> m);		//???
-			public int size();										//·µ»Ø´óĞ¡
-			public boolean isEmpty();								//ÅĞ¶ÏsizeÊÇ·ñÎª0
-			public V get(Object key);								//Í¨¹ıgetNode(hash(key), key)À´µÃµ½value
-			public boolean containsKey(Object key);					//Í¨¹ıgetNode(hash(key), key)ÅĞ¶ÏÊÇ·ñÎªnull¶ÔÏóÀ´ÅĞ¶ÏÊÇ·ñ°üº¬¸Ã¹Ø¼ü´Ê
-			public V put(K key, V value);							//ÊµÖÊÉÏÊÇµ÷ÓÃputVal(hash(key), key, value, false, true);
-			public void putAll(Map<? extends K, ? extends V> m);	//½«mÖĞµÄkv·Åµ½µ±Ç°mapÖĞ¡£Êµ¼Êµ÷ÓÃputMapEntries(m, true);
-			public V remove(Object key);							//É¾³ı¹Ø¼ü´ÊÎªkeyµÄ½Úµã£¬ÀûÓÃe = removeNode(hash(key), key, null, false, true)ÊµÏÖ£¬·µ»Ø±»É¾½ÚµãµÄvalue¡£
-			public void clear();									//Çé¿ötableÖĞµÄÊı¾İ¡£´´½¨ĞÂµÄtable£¬²¢°ÑÒÔÇ°tableÖĞµÄËùÓĞÔªËØÖÃÎªnull¡£
-			public boolean containsValue(Object value);				//ÅĞ¶ÏÊÇ·ñ°üº¬value¡£·ÃÎÊtableÊı×éºÍÃ¿¸öÍ°ÖĞµÄËùÓĞ½ÚµãÔªËØ£¬ÕÒµ½Ò»¸övalue¾ÍÍË³ö¡£Í¨¹ıvalue.equals()À´ÕÒ¡£
-			public Set<K> keySet();									//·µ»ØkeySet¡£ÈôÊµÀı×Ö¶ÎÖĞµÄkeySetÎªnull£¬ÄÇÃ´´´½¨ĞÂµÄkeySet£¬²¢·µ»Ø¡£
+			public int size();										//è¿”å›å¤§å°
+			public boolean isEmpty();								//åˆ¤æ–­sizeæ˜¯å¦ä¸º0
+			public V get(Object key);								//é€šè¿‡getNode(hash(key), key)æ¥å¾—åˆ°value
+			public boolean containsKey(Object key);					//é€šè¿‡getNode(hash(key), key)åˆ¤æ–­æ˜¯å¦ä¸ºnullå¯¹è±¡æ¥åˆ¤æ–­æ˜¯å¦åŒ…å«è¯¥å…³é”®è¯
+			public V put(K key, V value);							//å®è´¨ä¸Šæ˜¯è°ƒç”¨putVal(hash(key), key, value, false, true);
+			public void putAll(Map<? extends K, ? extends V> m);	//å°†mä¸­çš„kvæ”¾åˆ°å½“å‰mapä¸­ã€‚å®é™…è°ƒç”¨putMapEntries(m, true);
+			public V remove(Object key);							//åˆ é™¤å…³é”®è¯ä¸ºkeyçš„èŠ‚ç‚¹ï¼Œåˆ©ç”¨e = removeNode(hash(key), key, null, false, true)å®ç°ï¼Œè¿”å›è¢«åˆ èŠ‚ç‚¹çš„valueã€‚
+			public void clear();									//æƒ…å†µtableä¸­çš„æ•°æ®ã€‚åˆ›å»ºæ–°çš„tableï¼Œå¹¶æŠŠä»¥å‰tableä¸­çš„æ‰€æœ‰å…ƒç´ ç½®ä¸ºnullã€‚
+			public boolean containsValue(Object value);				//åˆ¤æ–­æ˜¯å¦åŒ…å«valueã€‚è®¿é—®tableæ•°ç»„å’Œæ¯ä¸ªæ¡¶ä¸­çš„æ‰€æœ‰èŠ‚ç‚¹å…ƒç´ ï¼Œæ‰¾åˆ°ä¸€ä¸ªvalueå°±é€€å‡ºã€‚é€šè¿‡value.equals()æ¥æ‰¾ã€‚
+			public Set<K> keySet();									//è¿”å›keySetã€‚è‹¥å®ä¾‹å­—æ®µä¸­çš„keySetä¸ºnullï¼Œé‚£ä¹ˆåˆ›å»ºæ–°çš„keySetï¼Œå¹¶è¿”å›ã€‚
 			public Collection<V> values();
-			public Set<Map.Entry<K,V>> entrySet();					//·µ»ØentrySet¡£ÈôÊµÀı×Ö¶ÎÖĞµÄentrySetÎªnull£¬ÄÇÃ´´´½¨ĞÂµÄentrySet£¬²¢·µ»Ø¡£
-			public V getOrDefault(Object key, V defaultValue);		//getNode£¬ÈôÃ»È¡µ½ÔòÓÃdefaultValue·µ»Ø¡£
-			public V putIfAbsent(K key, V value);					//²»´æÔÚ²Åput£¬´æÔÚÔòÈ¡Ïûput²Ù×÷¡£
+			public Set<Map.Entry<K,V>> entrySet();					//è¿”å›entrySetã€‚è‹¥å®ä¾‹å­—æ®µä¸­çš„entrySetä¸ºnullï¼Œé‚£ä¹ˆåˆ›å»ºæ–°çš„entrySetï¼Œå¹¶è¿”å›ã€‚
+			public V getOrDefault(Object key, V defaultValue);		//getNodeï¼Œè‹¥æ²¡å–åˆ°åˆ™ç”¨defaultValueè¿”å›ã€‚
+			public V putIfAbsent(K key, V value);					//ä¸å­˜åœ¨æ‰putï¼Œå­˜åœ¨åˆ™å–æ¶ˆputæ“ä½œã€‚
 			
 			
-			//Ë½ÓĞ·½·¨
+			//ç§æœ‰æ–¹æ³•
 			final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict);		//???
-			final Node<K,V> getNode(int hash, Object key);									//Í¨¹ıhash´Ó½ÚµãÊı×é(table[(table.length-1)&hash])ÖĞ»ñÈ¡Ò»¸ö½ç¶¨°¡£¬È»ºóÍ¨¹ıkeyÖµ(key.equals)À´´Ó½ÚµãÁ´±íÖĞ»ñÈ¡Ò»¸övalue¡£½ÚµãÒ²¿ÉÄÜÊÇtreeNode£¬ÄÇ¾Íµ÷ÓÃgetTreeNode(hash, key);====>hash&(length-1)Ïàµ±ÓÚhash%length
-			final V putVal(int hash, K key, V value, boolean onlyIfAbsent,boolean evict);	//µ±tableÎª¿ÕÊ±£¬»áÍ¨¹ıresize()·½·¨³õÊ¼»¯Ò»¸ötable¡£kv¶Ô½­ºşputµ½Õâ¸ötableÖĞ¡£ÏëÍ¨¹ıkeyµÄhashÈ¡³öÊı×éÖĞµÄÁ´±í½Úµã£¬Èô¸Ã½ÚµãÎªnullÖ±½Ó³õÊ¼»¯Ò»¸öÁ´±í½Úµã·ÅÔÚ¸ÃÊı×é´¦£¬ÈôÁ´±í·Ç¿ÕÔò±éÀúÁ´±í²é¿´ÊÇ·ñÓĞÏàÍ¬µÄ£¬ÓĞÏàÍ¬µÄ¾ÍÌæ»»µô£¬Ã»ÓĞ¾Í·Åµ½Á´±í½ÚµãµÄÄ©Î²¡£·ÅÖÃÍê³Éºó£¬ÔÙ¸ù¾İsizeÊÇ·ñµÈÓÚthresholdÀ´½øĞĞresize()¡£µ±Ò»¸öÍ°ÖĞ·ÅÁË¹ı¶àµÄÔªËØµÄÊ±ºò£¬¿ÉÄÜ»á×ª»»ÎªtreeNodeµÄ·½Ê½½øĞĞ´æ´¢£¬ÕâÑù±ÜÃâÁË×ª»»Îª´¿Á´±í¡£
-			final Node<K,V>[] resize();														//À©ÈİÍêÈ«¾ÍÊÇÀ©Õ¹tableÊı×éµÄ³¤¶È¡£capacityºÍthreshold·Ö²¼À©Õ¹Ò»±¶£¬ÈôÔ­table»á½«Ô­tableÖĞµÄÊı¾İÈ«²¿·Åµ½ĞÂµÄtableÖĞ¡£ÓÉÓÚtableÊı×éµÄ³¤¶È»áÓ°Ïìkey´æ·ÅÔÚÄÄ¸öÍ°ÖĞ£¬ÕâÀïĞèÒª¼ÆÃ¿¸ökeyÔÚĞÂµÄtableÖĞµÄÍ¨Î»ÖÃ¡£
-			final void treeifyBin(Node<K,V>[] tab, int hash);								//putValÊ±£¬ÈôÍ°ÖĞÔªËØ¹ı¶à£¬»áµ÷ÓÃ¸Ãº¯Êı£¬´´½¨treeNodeÒÔ±ÜÃâ´¿Á´±í´øÀ´µÄĞ§ÂÊ½µµÍ¡£
-			final Node<K,V> removeNode(int hash, Object key, Object value, boolean matchValue, boolean movable)		//Ö§³Ö½öÆ¥ÅäkeyºÍÆ¥Åäkv¶ÔÁ½ÖÖÄ£Ê½µÄÉ¾³ı¡£
+			final Node<K,V> getNode(int hash, Object key);									//é€šè¿‡hashä»èŠ‚ç‚¹æ•°ç»„(table[(table.length-1)&hash])ä¸­è·å–ä¸€ä¸ªç•Œå®šå•Šï¼Œç„¶åé€šè¿‡keyå€¼(key.equals)æ¥ä»èŠ‚ç‚¹é“¾è¡¨ä¸­è·å–ä¸€ä¸ªvalueã€‚èŠ‚ç‚¹ä¹Ÿå¯èƒ½æ˜¯treeNodeï¼Œé‚£å°±è°ƒç”¨getTreeNode(hash, key);====>hash&(length-1)ç›¸å½“äºhash%length
+			final V putVal(int hash, K key, V value, boolean onlyIfAbsent,boolean evict);	//å½“tableä¸ºç©ºæ—¶ï¼Œä¼šé€šè¿‡resize()æ–¹æ³•åˆå§‹åŒ–ä¸€ä¸ªtableã€‚kvå¯¹æ±Ÿæ¹–putåˆ°è¿™ä¸ªtableä¸­ã€‚æƒ³é€šè¿‡keyçš„hashå–å‡ºæ•°ç»„ä¸­çš„é“¾è¡¨èŠ‚ç‚¹ï¼Œè‹¥è¯¥èŠ‚ç‚¹ä¸ºnullç›´æ¥åˆå§‹åŒ–ä¸€ä¸ªé“¾è¡¨èŠ‚ç‚¹æ”¾åœ¨è¯¥æ•°ç»„å¤„ï¼Œè‹¥é“¾è¡¨éç©ºåˆ™éå†é“¾è¡¨æŸ¥çœ‹æ˜¯å¦æœ‰ç›¸åŒçš„ï¼Œæœ‰ç›¸åŒçš„å°±æ›¿æ¢æ‰ï¼Œæ²¡æœ‰å°±æ”¾åˆ°é“¾è¡¨èŠ‚ç‚¹çš„æœ«å°¾ã€‚æ”¾ç½®å®Œæˆåï¼Œå†æ ¹æ®sizeæ˜¯å¦ç­‰äºthresholdæ¥è¿›è¡Œresize()ã€‚å½“ä¸€ä¸ªæ¡¶ä¸­æ”¾äº†è¿‡å¤šçš„å…ƒç´ çš„æ—¶å€™ï¼Œå¯èƒ½ä¼šè½¬æ¢ä¸ºtreeNodeçš„æ–¹å¼è¿›è¡Œå­˜å‚¨ï¼Œè¿™æ ·é¿å…äº†è½¬æ¢ä¸ºçº¯é“¾è¡¨ã€‚
+			final Node<K,V>[] resize();														//æ‰©å®¹å®Œå…¨å°±æ˜¯æ‰©å±•tableæ•°ç»„çš„é•¿åº¦ã€‚capacityå’Œthresholdåˆ†å¸ƒæ‰©å±•ä¸€å€ï¼Œè‹¥åŸtableä¼šå°†åŸtableä¸­çš„æ•°æ®å…¨éƒ¨æ”¾åˆ°æ–°çš„tableä¸­ã€‚ç”±äºtableæ•°ç»„çš„é•¿åº¦ä¼šå½±å“keyå­˜æ”¾åœ¨å“ªä¸ªæ¡¶ä¸­ï¼Œè¿™é‡Œéœ€è¦è®¡æ¯ä¸ªkeyåœ¨æ–°çš„tableä¸­çš„é€šä½ç½®ã€‚
+			final void treeifyBin(Node<K,V>[] tab, int hash);								//putValæ—¶ï¼Œè‹¥æ¡¶ä¸­å…ƒç´ è¿‡å¤šï¼Œä¼šè°ƒç”¨è¯¥å‡½æ•°ï¼Œåˆ›å»ºtreeNodeä»¥é¿å…çº¯é“¾è¡¨å¸¦æ¥çš„æ•ˆç‡é™ä½ã€‚
+			final Node<K,V> removeNode(int hash, Object key, Object value, boolean matchValue, boolean movable)		//æ”¯æŒä»…åŒ¹é…keyå’ŒåŒ¹é…kvå¯¹ä¸¤ç§æ¨¡å¼çš„åˆ é™¤ã€‚
 			
 			
-			//ÄÚ²¿Àà
-			static class Node<K,V> implements Map.Entry<K,V>;		//ÕâÊÇÒ»¸ö¾ß±¸EntryĞÔÖÊµÄ½Úµã¡£ÓÃÓÚ×é³ÉÁ´±í£¬Ã¿Ò»¸ö½ÚµãµÄÊı¾İ¾ÍÊÇEntryµÄÊı¾İ£¬²¢ÇÒ³ÆÊı×éµÄÔªËØÎªÍ°¡£NodeµÄÏàµÈÅĞ¶ÏÒÀÀµÓÚkeyºÍvalue£¬ºÍnextµÄ½ÚµãÎŞ¹Ø¡£
-			final class KeySet extends AbstractSet<K>;				//KeySet¡£
-			final class Values extends AbstractCollection<V>;		//values¡£
-			final class EntrySet extends AbstractSet<Map.Entry<K,V>>//entrySet¡£ÔÚÕâÈı¸öÀàÖĞ£¬²¢Ã»ÓĞÎ¬»¤Êı¾İµÄ´æ·Å£¬¶øÊÇÍ¨¹ıÊµÏÖIterator¡£Iterator¶ÔÏóÊÇÖ±½Ó´ÓHashMapµÄNodeÖĞÈ¡ÖµµÄ¡£¸ÃÀàµÄtoString¾ÍÊÇÓÉ¸¸ÀàÊµÏÖ£¬²¢Í¨¹ıiteratorÀ´»ñÈ¡Öµ¡£
+			//å†…éƒ¨ç±»
+			static class Node<K,V> implements Map.Entry<K,V>;		//è¿™æ˜¯ä¸€ä¸ªå…·å¤‡Entryæ€§è´¨çš„èŠ‚ç‚¹ã€‚ç”¨äºç»„æˆé“¾è¡¨ï¼Œæ¯ä¸€ä¸ªèŠ‚ç‚¹çš„æ•°æ®å°±æ˜¯Entryçš„æ•°æ®ï¼Œå¹¶ä¸”ç§°æ•°ç»„çš„å…ƒç´ ä¸ºæ¡¶ã€‚Nodeçš„ç›¸ç­‰åˆ¤æ–­ä¾èµ–äºkeyå’Œvalueï¼Œå’Œnextçš„èŠ‚ç‚¹æ— å…³ã€‚
+			final class KeySet extends AbstractSet<K>;				//KeySetã€‚
+			final class Values extends AbstractCollection<V>;		//valuesã€‚
+			final class EntrySet extends AbstractSet<Map.Entry<K,V>>//entrySetã€‚åœ¨è¿™ä¸‰ä¸ªç±»ä¸­ï¼Œå¹¶æ²¡æœ‰ç»´æŠ¤æ•°æ®çš„å­˜æ”¾ï¼Œè€Œæ˜¯é€šè¿‡å®ç°Iteratorã€‚Iteratorå¯¹è±¡æ˜¯ç›´æ¥ä»HashMapçš„Nodeä¸­å–å€¼çš„ã€‚è¯¥ç±»çš„toStringå°±æ˜¯ç”±çˆ¶ç±»å®ç°ï¼Œå¹¶é€šè¿‡iteratoræ¥è·å–å€¼ã€‚
 			
-			//ÄÚ²¿Ààµü´úÆ÷
+			//å†…éƒ¨ç±»è¿­ä»£å™¨
 			abstract class HashIterator;
 			final class KeyIterator extends HashIterator;
 			final class ValueIterator extends HashIterator;
