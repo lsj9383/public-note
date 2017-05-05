@@ -1,0 +1,7 @@
+一、简介
+	es其实就是对luncene进行了一个封装，es是为了分布式搜索而生。
+	还有一个搜索引擎solr，也是对luncene进行了封装，也有solar cloud。
+	es是一个机遇luncene的实时分布搜索和分析引擎。基于RESTful接口：
+		普通请求接口是 ...get?a=1
+		rest请求接口是 ...get/a/1
+	es只支持json格式

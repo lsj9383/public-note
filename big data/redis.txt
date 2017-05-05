@@ -321,6 +321,7 @@
             Lua table  --> redis 多行字符串回复，这里的lua table只能是数组，不能是字典
             Lua table带ok域  --> 状态回复
             Lua table带err域 --> 错误回复
+			Lua false  --> redis的nil
         b).客户端提交脚本
             eval "<Lua script>" keyNumber <key-1> ,... <key-keyNumber>, <arg-1>, ... <arg-n>
             <key>需要是lua脚本中将涉及的键值，<arg>是执行中需要用到的参数。这里建议一定要把所用的键值写在<key>中，因为集群模式下只能这么用。统一这样的方式可以保证兼容性。

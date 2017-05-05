@@ -75,10 +75,29 @@
     1).使用的工具不够主流(sqlserver, myeclipse)。
     2).表设计的不够合理，存在大量的冗余字段。
     3).涉及的前沿技术较少，分布式 大数据一类的技术涉及较少，而是纯的传统数据库业务操作。
-    4).数据库操作有问题，没有在service层使用事务。
-
+    4).数据库操作有问题，没有在service层使用事务。	
+	
 待优化：
     1.url统计，显示每个url的访问情况，进一步优化网站设计。可以分析访问量低于高的原因，去除多余的url，缓解高访问量的url进一步提升性能。
     2.限制ip访问，实现A时间内最多B次访问。将每个ip的访问时间放在一个队列中，队列达到B那么判断队列首元素与新访问时间差是否超出A，若超出A那么限制访问，若没有超出A则允许访问，并将首元素删除以及入队新访问。
-    3.共享session
-    4.负载均衡
+    3.共享session，采用spring session进行session共享，利用redis。
+    4.负载均衡，采用nginx+dns的二级负载均衡，数据库采用读写分离+水平拆分的负载均衡。
+	5.Service事务，声明式：
+		1).xml配置事务管理器
+			 <!--事务管理器类-->
+			<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+				<property name="dataSource" ref="dataSource"/>
+			</bean>
+			
+			<!--开启注解扫描，用于通知Service的方法开启事务-->
+			<context:component-scan base-package="com.juaner.spring.tx"/>
+
+			<!--注解方式实现事务-->
+			<tx:annotation-driven transaction-manager="txManager"/>
+		2).Service方法实现
+			@Transactional
+			 public void save(Student student){
+				...
+				this.save(student);
+			}
+	6.脚本共享，自动加载lua脚本文件到缓存，并可以同步到redis。
