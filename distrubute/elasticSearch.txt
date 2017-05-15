@@ -5,3 +5,14 @@
 		普通请求接口是 ...get?a=1
 		rest请求接口是 ...get/a/1
 	es只支持json格式
+
+二、接口使用
+	curl -XPUT 'http://hosts:9200/index-base'							建立索引库，put用更新
+	curl -XPOST/XPUT 'http://hosts:9200/index-base/type/id' -d '...'	post用于插入新的json数据
+	curl -XGET 'http://hosts:9200/index-base/type/id'					返回对应的json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/type/id?pretty'			返回对应的格式化json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/type/id?_source?pretty'	返回对应的格式化json数据，不包括版本号等其他数据
+	curl -XGET 'http://hosts:9200/index-base/type/_search?pretty'		返回type下的所有数据json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/_search?pretty'			返回索引库下的所有数据json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/_search?q=name:xx&pretty'	返回索引库下的json数据中name字段为xx的数据，包括版本号
+	curl -XPOST/XPUT http://hosts:9200/index-base/type/id/_create 		对应的数据存在，则报错。
