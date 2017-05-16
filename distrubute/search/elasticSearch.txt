@@ -45,4 +45,59 @@
 		curl -XGET 'http://hosts:9200/index-base/type/id'									//获取数据，包括数据的版本号。
 		curl -XPUT 'http://hosts:9200/index-base/type/id?version=<version>' -d '{...}'		//传过去版本号进行更新，es会获取传过去的版本号，进行对比，如果版本号相等才会执行更新。更新操作会修改版本号。
 																							//不传版本号，就会强制性使用最新版本号进行更新，当更新操作不依赖于保存的数据时就可以用这样的方式。
+三、核心概念
+	1.cluster(集群)
+		集群有多个节点，集群内部有主节点，对于外部而言访问任何节点都可以，因此对于外部而言来说es是去中心化的。
+		只需要在同一网段启动多个es节点，就可以自动组成集群。默认情况下es可以自动发现同一网段内的节点，自动组成集群。
+	2.shards(分片)
+		es可以将一个完整的索引库分成多个分片，不同的分片放在不同的节点上以实现可伸缩性。这类似于hdfs的file分成多个块，将多个块放在不同的节点上。
+		分片数量只能在创建索引库前指定。
+	3.replicas(副本)
+		为系统提供容错性和负载均衡。副本是按分片进行备份的，这也类似于hdfs的副本机制。
+		副本数只能在创建索引前指定。
+	4.recovery
+		es有节点加入或退出时会根据负载将分片重新分布。挂掉的节点恢复后，也会进行数据的恢复。
+	5.gateway
+		es的持久化方式，默认先将索引放到内存，当内存满了再持久化到硬盘。
+		当这个集群关闭再重启时，会从gateway中读取数据。es的gateway有多种方式，本地文件系统和分布式文件系统。一般就放本地。
+	6.discovery.zen
+		es的同网段自动发现机制。es是一个基于p2p的系统，它先通过广播寻找存在的节点，再通过多播协议来进行节点之间的通信，同时也支持点对点交互。
+		如果是要在不同网段之间组成集群，就需要禁止discovery.zen机制，再设置新节点启动时能够发现的主节点列表。
+	7.transport
+		es内部的节点或集群与客户端的交互方式。
+		默认内部采用tcp方式。
+
+四、编程
+	ImmutableSettings settings = ImmutableSettings.settingsBuilder().put("client.transport.sniff", true).build();	//启用自动发现机制，只需要在客户端指定一个ip，就可以获得该ip所在集群的所有节点。
+	TransportClient client = new TransportClient(settings);															//获取es transport客户端对象
+	client.addTransportAddress(new InetSocketTransportAddress("<ip>", 9300));										//指定连接的es节点ip和端口，端口默认9300，可以添加多个es的节点的ip，只要连接到任何一个节点，代码就能正常使用。如果添加了自动发现机制，那么会自动搜寻其他节点。
+	1.创建索引库数据
+		IndexResponse response = client.prepareIndex(index, type, id).setSource(jsons/hashmap).execute().actionGet();	//创建索引库中的数据。如果索引库不存在，则创建索引库。
+	2.查询数据
+		GetResponse response = client.prepareGet(index, type, id).execute().actionGet();					//获得指定索引库-类型-id的数据
+	3.更新数据
+		UpdateResponse response = client.prepareUpdate(index, type, id).setDoc(json/hashmap).actionGet();	//更新，version自增。
+	4.更新插入数据
+		有则更新，没有则插入
+		UpdateRequest request = new UpdateRequest(index, type, id);
+		request.doc(json/hashmap/XContent);
+		request.upsert(json/hashmap/XContent);
+		UpdateResponse response = client.update(request).get();
+	5.删除数据
+		DeleteRequest request = new DeleteRequest();
+		request.index(index);
+		request.type(type);
+		request.id(id);
+		DeleteResponse response = client.delete(request).get();
+	5.查询指定索引库中的总数
+		long count = client.prepareCount(index).execute().get().getCount();
+	6.批量操作
+		BulkRequestBuilder builder = client.prepareBulk();
+		IndexRequest request1 = new IndexRequest(index, type, id);
+		request.source(....);
+		DeleteRequest request2 = new DeleteRequest(index, type, id);
 		
+		builder.add(request1);
+		builder.add(request2);
+		...
+		builder.execute().actionGet();

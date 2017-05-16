@@ -42,4 +42,11 @@
 	2.对查询语句进行词法分析，语法分析及语言处理
 	3.搜索索引，得到符合语法树的文档，这时应该会有很多文档，还需要对其按输入的相关性进行排序。
 	4.根据得到文档和查询语句的相关性，对结果进行排序
-	
+		1).计算Term的权重
+			Term Frequence，即此term在文档中出现的次数，tf越大说明越重要。
+			Document Frequence，即有多少文档包含此term，df越大说明越不重要。
+		2).计算相关性
+			计算方法是向量空间模型算法。
+			将所有文档中的term权重看做一个向量 Document : (term1, term2, ..., termN) -> (weight1, weight2, ... weightN)
+			将查询语句中的term权重看做一个向量 Query    : (term1, term2, ..., termN) -> (weight1, weight2, ... weightN)
+			计算两个向量间的夹角，夹角越小则相关性越大。
