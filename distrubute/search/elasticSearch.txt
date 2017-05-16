@@ -1,0 +1,48 @@
+一、简介
+	es其实就是对luncene进行了一个封装，es是为了分布式搜索而生。
+	还有一个搜索引擎solr，也是对luncene进行了封装，也有solar cloud。
+	es是一个机遇luncene的实时分布搜索和分析引擎。基于RESTful接口：
+		普通请求接口是 ...get?a=1
+		rest请求接口是 ...get/a/1
+	es只支持json格式
+
+二、接口使用
+	curl -XPUT 'http://hosts:9200/index-base'							建立索引库，put用更新
+	curl -XPOST/XPUT 'http://hosts:9200/index-base/type/id' -d '...'	post用于插入新的json数据
+	curl -XGET 'http://hosts:9200/index-base/type/id'					返回对应的json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/type/id?pretty'			返回对应的格式化json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/type/id?_source?pretty'	返回对应的格式化json数据，不包括版本号等其他数据
+	curl -XGET 'http://hosts:9200/index-base/type/_search?pretty'		返回type下的所有数据json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/_search?pretty'			返回索引库下的所有数据json数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/_search?q=name:xx&pretty'	返回索引库下的json数据中name字段为xx的数据，包括版本号
+	curl -XGET 'http://hosts:9200/index-base/_mget?pretty' -d .....		返回多条结果
+	curl -XPOST/XPUT http://hosts:9200/index-base/type/id/_create 		对应的数据存在，则报错。
+	
+	es可以使用put或者post进行更新，如果指定id的文档已经存在，则执行更新操作。执行更新操作的时候：
+		- es首先将旧的文档删除
+		- 添加新的文档
+		- 旧的文档不会立即消失，但是也无法访问
+		- es会在继续添加添加更多数据的时候在后台清理已经标记为删除状态的文档
+	局部更新，只能使用post，可以添加新字段或者修改已有字段：curl -XPOST 'http://hosts:9200/index-base/type/id/_update' -d 'json'，版本号会随之更新
+	删除：curl -XDELETE 'http://hosts:9200/index-base/type/id',删除一个文档并不会立即生效，而是标记为已删除，在后台中由其他线程删除。
+	2.批量操作
+		角色:
+			action：index/create/update/delete
+			metadata：_index, _type, _id
+			request body：_source
+		格式:
+			{action:{metadata}}\n		//指定对metadata执行的操作
+			{request body}\n			//操作的具体数据
+			{action:{metadata}}\n
+			{request body}\n
+		curl -XPOST 'http://hosts:9200/_bulk' -d 
+		' {"index":{"_index":"index-base", _type:"emp", "_id":10"}}		//
+		  {"name":"test10", "age":10}									//request body
+		'
+		curl -XPOST 'http://hosts:9200/_bulk' --data-binary @<文件名>	//将执行文件里面的bulk操作
+	3.版本控制
+		乐观控制：不会阻塞某一数据的修改，但是如果在读取和写入之间数据发生了变化，更新就会失败，由程序决定如何解决这个冲突，一般重新读取数据再更新。
+		curl -XGET 'http://hosts:9200/index-base/type/id'									//获取数据，包括数据的版本号。
+		curl -XPUT 'http://hosts:9200/index-base/type/id?version=<version>' -d '{...}'		//传过去版本号进行更新，es会获取传过去的版本号，进行对比，如果版本号相等才会执行更新。更新操作会修改版本号。
+																							//不传版本号，就会强制性使用最新版本号进行更新，当更新操作不依赖于保存的数据时就可以用这样的方式。
+		
