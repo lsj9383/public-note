@@ -101,3 +101,19 @@
 		builder.add(request2);
 		...
 		builder.execute().actionGet();
+	7.专门的查询
+		SearchResponse response = client.prepareSearch(index)
+										.setTypes(type)
+										.setSearch(SearchType.DFS_QUERY_THEN_FETCH)			//指定查询类型
+										.setQuery(QueryBuilders.matchQuery(key, value))		//指定查询关键字
+										.addSort(key, SortOrder.ASC)						//按该关键词排序
+										//from和size是用于实现查询结果的分页，可以获取结果中某个范围额内容
+										.setFrom(from)
+										.setSize(10)
+										.execute().actionGet();
+		SearchHit[] hits = response.getHits().getHits();		//获得查询结果
+		查询类型:
+			- QUERY_THEN_FETCH
+			- QUERY_AND_FETCH
+			- DFS_QUERY_THEN_FETCH
+			- DFS_QUERY_AND_FETCH
