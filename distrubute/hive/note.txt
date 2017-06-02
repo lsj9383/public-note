@@ -1,0 +1,59 @@
+一、简介
+	目的是让精通SQL的人呢过个轻易查看和使用hdfs的数据。
+	hive的目标是一个数据仓库，而非数据库。数据仓库是一个对实时要求不高，对更新要求不高的数据存储仓库。
+	1.与传统数据库的比较
+		1).读模式与写模式
+		2).更新
+		3).事务
+		4).索引
+	2.HiveService
+		Hive Client ---> Hive Service ---> Hadoop
+		Hadoop，用来对数据进行保存，并执行hql语句的分布式平台。
+		Hive Service，用于接收用户的hql语句，并将hql语句转为mapreduce并提交给Hadoop。并且Service可以采用HA机制来部署。元数据的存储是交给Hive Service负责的。
+		Hive Client，一般是指的JDBC/ODBC用户。
+	3.示例
+		1).建表
+			create table <table-name> (<field1> <type1>, <field2> <type2>, ...)
+			row format delimited
+			fields terminated BY '\t';
+			创建表，row format指行分割符为换行符，fields terminated by指定行内的列分隔符，'\t'为制表符，也就是以制表符作为列分割。
+		2).加载数据
+			load data local inpath '<path>'
+			overwrite into table <table-name>
+			Hive把指定的本地文件夹放到hive仓库目录中，这个只是单纯的复制而已，并不会解析文件。文件不会被修改的。
+二、HiveQL
+	1.数据类型
+		1).简单类型
+			TINYINT  	DOUBLE
+			SMALLINT	BOOLEAN
+			INT			STRING
+			BIGINT		BINARY
+			FLOAT		TIMESTAMP
+		2).复杂类型
+			ARRAY	一组有序字段，字段类型必须相同
+			MAP		一组无序的kv对集合。集合中的kv类型均相同。
+			STRUCT	一个对象，或者理解为命名的字段。
+			如 create table <table-name>{
+				c1 ARRAY<INT>,
+				c2 MAP<STRING, INT>,
+				c3 STRUCT<a:STRING, b:INT, c:DOUBLE>
+			}
+			select c1[2], c2['key'], c3.c from table
+		3).强制转换
+			任何数据类型都可以隐式的转换为一个范围更广的类型，如FLOAT和DOUBLE的进行运算，会自动将FLOAT转换为DOUBLE再进行运算。
+			也可以通过cast进行强制转换：cast(val as <new-type>) 将val转换为<new-type>下的值，若不能转换就会返回null。
+	2.表
+	3.分区和桶
+	4.存储格式
+	5.表的数据导入
+	6.表的修改
+	7.查询数据
+		1).排序和聚集
+		2).MapReduce脚本
+		3).连接
+		4).子查询
+		5).视图
+	8.用户定义函数
+		1).UDF
+		2).UDAF
+		3).UDTF
