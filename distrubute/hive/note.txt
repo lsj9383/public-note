@@ -43,10 +43,67 @@
 			任何数据类型都可以隐式的转换为一个范围更广的类型，如FLOAT和DOUBLE的进行运算，会自动将FLOAT转换为DOUBLE再进行运算。
 			也可以通过cast进行强制转换：cast(val as <new-type>) 将val转换为<new-type>下的值，若不能转换就会返回null。
 	2.表
+		表由存储的<数据>和表结构的<元数据>组成。数据一般放在HDFS中，元数据一般放在关系型数据库中(如Derby和MySQL)。
+		创建表时，默认情况下Hive负责管理数据，意味着Hive会把数据复制到Hive目录下。还可以选择外部表，这会让Hive把数据复制到指定目录下。
+		create table <tbname> (...);								//创建表
+		create external table <tbname> (...) location '<new-path>'	//创建外部表，建表时不会检查<new-path>是否真的存在。
+		load data inputh '<path>' into table <tbname>;				//加载数据到Hive目录
+		drop table <tbname>;
+		删除表时，会把表的元数据和数据一起删除。
+		删除外部表时，只会删除元数据。
 	3.分区和桶
+		分区和桶，都是加快检索速度的机制。分区是将不同的值进行划分，分桶是将不同的hash值进行分"区"，因此本质上分桶和分区是一样的。
+		1.分区
+			创建分区表: 
+				create table <tbname> (...)
+				partitioned by (<partion-field1> <type1>, <partion-field2> <type2>, ...);
+			加载数据:
+				load data local inpath '<path>' into table <tbname>
+				partition (<partition-field1>='<value1>', <partition-field2>='<value2>', ...)
+			一个表可以从多个字段进行分区，分区采用的关键字为partition by。分区会在对应的表目录下面在生成子目录，以保存对应分区的数据。
+			tbpath/partition1-value1/partition2-value1/...
+			                        /partition2-value2/...
+			      /partition1-value2/partition2-value1/...
+				                    /partition2-value2/...
+			分区中的列也是属于表元素句的，但是列值的获取并不通过数据文件(数据文件中也没有)，而是通过文件目录来获取。对应目录下的数据是在加载数据的时候赋予的。
+		2.桶
+			创建带桶的表：create table <tbname> (...)
+						  clustered by (<cluster-field>) into <int> buckets;
+			将表以<cluster-field>进行创建<int>个桶。
+			不同的桶以文件的形式存在。
+			桶中的列数据是在元数据中存在的(也没办法从桶号码恢复出列数据，因为这相当于是hash恢复出原数据的难度，不可能实现)
 	4.存储格式
+		SerDe指的是serialize/deserialize，即序列化和反序列化工具。
 	5.表的数据导入
+		1).load data
+			load data inpath '<file-path>' 
+			[overwrite] into table <tbname>
+			row formated delimited
+				fields terminated by <fields-split-symbol>						//
+				collection items terminated by <collection-split-symbol>		//array struct 及 mapkv对 中的分隔符。
+				map keys interminated by <kv-split-symbol>;						//mapkv的分割符。
+			overwrite将会删除表对应目录中已有的所有文件，如果省去这一关键字，则简单地把新的文件加入目录，若有同名文件采进行覆盖。
+		2).insert
+			insert overwrite table <tbname>
+			select <field1> <field2> from <other-tbname>; overwrite指用查询结果覆盖掉<tbname>中的内容.
+			
+			insert overwrite table <tbname> partition (<partion-field>='value')
+			select <field1> <field2> from <other-tbname>; 将查询结果覆盖掉指定分区中的内容。
+		3).多表插入
+			还可以将一个表插入到多个表中，并且可以指定每个表中的数据表现形式。
+			from <tbname>
+			insert overwrite table <tbname1>
+				select ...
+			insert overwrite table <tbname2>
+				select ...
+		4).CTAS
+			即create table ... as select;用于将Hive的查询结果放入新表。
+			如create table <new-tbname> as select <field1> <field2> ... from <old-tbname>;
+			即将对<old-tbname>的查询结果放入<new-tbname>中。
 	6.表的修改
+		alter table <old-tbname> rename to <new-tbname>;		修改表名，除了修改元数据外，还会将文件目录进行重命名。
+		alter table <tbname> add columns (<new-col> <type>);	添加一个新列，通常原数据中不包含新列，因此此时新列的值为null。可以将一个定义了新列值的表覆盖掉原有的表。
+		drop table <tbname>，用于删除表和元数据，若是外部表就只删除元数据。若保留元数据，但是删除数据，则删除数据文件即可。
 	7.查询数据
 		1).排序和聚集
 		2).MapReduce脚本
