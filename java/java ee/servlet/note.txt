@@ -1,0 +1,576 @@
+servlet或者jsp获取数据
+数据来源主要有6个方面:
+1.get/post
+	String value = request.getParameter("<key>");
+2.cookie
+	1).响应cookie
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		response.addCookie(cookie);	
+	2).读取cookie数据
+		Cookie[] cookies = request.getCookies();	若浏览器没有cookie发送，则返回null
+		for(Cookie cookie : cookies){
+			String name = cookie.getName();
+			String value = cookie.getValue();
+		}
+3.session
+	1).创建session
+		HttpSession session = request.getSession(true/false);	//true，原本有session就使用，没有就创建。false，原本有session就使用，没有就返回null
+		session.setAttribue("<key>", Object o);
+	2).获取session数据
+		Object o = session.getAttribute("<key>")
+		
+4.其他servlet的转发
+	内部跳转而进行数据传递时使用
+	request.setAttribue("<key>", Object item);		在请求中暂存数据，只在一次请求中有用。常用于内部转发时的数据发送。
+	Object obj = request.getAttribute("<key>");		读取请求中暂存的数据。
+5.servlet的初始化数据
+	在servlet中可以通过getInitParameter(String para-name)来获取初始参数的值, 不同的servlet之间这些值是没有关联的。这些初始值配置在servlet中。
+	<servlet>
+		<servlet-name>...</servlet-name>
+		<servlet-class>...</servlet-class>
+		<init-param>
+			<param-name>key</para-name>
+			<param-name>value</para-name>
+		</init-param>
+		...
+	</servlet>
+	
+6.servlet上下文数据
+	在servlet中可以通过getServletContext()获得servlet上下文，servlet上下文可以在在当前webapp的所有servlet之间共享数据。
+	1).从上下文读取数据
+		ServletContext servletContext = this.getServletContext();
+		Object o = servletContext.getAttribute()<key>;
+	2).设置上下文数据
+		a).代码方式
+			ServletContext servletContext = this.getServletContext();
+			servletContext.setAttribute(<key>, Object o); 用于在上下文中设置数据
+		b).配置方式
+			这样可以用于配置初始的上下文数据
+			<context-param>
+				<param-name>key</para-name>
+				<param-name>value</para-name>
+			</context-param>
+
+零、路径写法
+	0.相对路径问题
+		浏览器向一个url发送请求获取网页信息，这个网页中还会有很多依赖的资源，比如css，js，img等等。浏览器会在网页中找到这些资源的请求路径，然后再去发送请求以请求这些资源。
+		这里需要注意的就是，若资源采用的是相对路径，相对路径的是相对于什么下面的呢？
+		结论是，相对于url中最后一个分号路径下面的。
+		例如发送一个请求http://abc.com/a/b/c/d/e，e中有个相对路径为f.js的资源，那么浏览器会发送http://abc.com/a/b/c/d/f.js去获取该资源。
+		注意无论是什么，包括直接内部servlet内部转发什么的，浏览器都不管这些，只看这个请求的url来得到相对路径前缀。
+		
+	1.要用项目名
+		1).超链接
+			<a href="/webappName/doSome"></a>
+		2).form表单的action
+			<form action="/webappName/doSome"></form>
+		3).重定向
+			response.sendRedirect("/webappName/doSome");
+		4).cookie设置path
+			cookie.setPath("/webappName/doSome");
+			
+	2.不用项目名
+		1).转发
+			request.getRequestDispatcher("/doSome").forward(request, response);
+		2).web.xml的url-pattern
+			<url-pattern>/doSome</url-pattern>
+		3).application.getRealPath
+			String realPath = application.getRealPath("/doSome");
+		4).Welcome-file-list
+			<welcome-file>xxx.html</welcome-file>
+
+	3.url-pattern
+		1).精确匹配
+			可以多个url-pattern对应同一个servlet
+			<url-pattern>/doSome1</url-pattern>
+			<url-pattern>/doSome2</url-pattern>
+		2).扩展匹配
+			<url-pattern>/doSome/*</url-pattern>
+		3).后缀匹配
+			<url-pattern>*.do</url-pattern>
+		4).全部匹配
+			<url-pattern>/*</url-pattern>
+也就三类:
+	1).以/开始，加webappName名称
+	2).以/开始，不加webbappName名称
+	欢迎界面比较特殊，不加/
+
+另：配置文件
+	CATALINA_HOME/conf/server.xml
+	Connector标签中的属性->
+		1).port			端口号
+		2).maxThread	最多支持的线程数, 默认200
+		3).URIEncoding	请求行使用的编码方式
+
+
+
+一、系统架构分类
+C/S : Client / Server
+B/S : Browser / Server. B/S是特殊的C/S，是C被限制为浏览器的C/S。
+
+二、特点
+B/S 优点：
+		不需要安装特点的客户端软件，只需要浏览器就行了。
+		升级只需要升级服务器端。
+	缺点：
+		所有数据全部集成在服务器端，数据丢失严重，相对来说不安全。
+		速度慢。
+		B/S的浏览器中界面粗糙。
+C/S 优点：
+		速度快。
+		相对安全。
+		ui漂亮。
+	缺点：
+		升级每一个客户端都需要升级。
+		需要安装特点的客户端软件，才能访问服务器。
+
+三、java web过程
+浏览器访问http://host:8080/xxxx，访问到主机的Tomcat进程。并在Tomcat的webapps去寻找xxxx资源。
+每个Tomcat都有一个webapps文件夹，该文件夹中保存了该Tomcat的所有引用。uri的后缀的/表示的根目录就是指的webapps。
+对于资源的访问，有两种：
+	静态资源：是在Tomcat中的已经有的html资源。Tomcat会直接范围该html。
+	动态资源：是在Tomcat中的java程序。服务器将会运行这段程序，程序根据服务器逻辑得到需要返回浏览器的数据。
+
+webapp和web服务器之间遵守的规范，就是servlet。因此servlet是一系列的接口，由web服务器调用，服务器通过这个接口，得到需要的数据，或者给与java程序数据。
+javaweb的开发，就是实现servlet的接口，web服务器是servlet的调用者。
+
+浏览器 ---http--> web server ---servlet---> 服务端java程序 ---jdbc---> 数据库
+
+四、tomcat
+启动：tomcat是纯java代码，因此tomcat需要运行在安装了java的机器上才能启动。启动tomcat要求已经指定了JAVA_HOME(jdk路径)
+关闭：不可以强行关闭，否则8080端口可能会关闭失败。需要执行shutdown.bat
+
+目录结构:
+	/bin/ : 相关的命令，包括服务的启动和关闭。
+	/conf/: 一些配置文件，比如端口号。使用.xml和.properties的文件。
+	/lib/ : tomcat的各种jar包，里面有servlet的jar包....。
+	/logs/: tomcat的日志信息，里面记录了错误的原因。
+	/temp/: 临时文件，不须关心。
+	/webapps/: 开发的app都是放在这个下面，是浏览器访问tomcat服务器时候的根路径。
+	/work/: 和jsp相关。
+
+五、注意
+为了更加统一，url中的ip地址，端口号可以省略。但是网络资源路径必须是绝对路径。
+servlet的开发的目录要求：
+	/WEB-INFO/classes/			放字节码class
+			 /lib/				放项目自己的jar包
+			 /web.xml			请求路径的绑定
+			 
+六、生命周期
+声明周期表示一个java对象从最初被创建到最终被销毁，经历了所有的过程。
+servlet的生命周期，由web容器(如tomcat)管理，程序员无权干涉。
+servlet对象从最初的创建开始，方法的调用，以及最后的servlet对象的销毁，整个过程是由web容器管理。
+默认情况下，servlet对象在web服务器启动阶段不会被实例化。可以通过在web.xml中的<load-on-startup>标签中，配置启动服务器时，启动。其中的自然数是优先级，越小优先级越高。
+当外部有浏览器第一次请求servlet的服务时，会初始化servlet对象，然后再调用init，最后调用service，该对象将会一直存在，知道tomcat服务器停止调用destroy方法，对象死亡。
+整个生命周期的描述=>
+	1). 用户在浏览器上输入url。
+	2). web容器截取请求路径。
+	3). web容器在容器上下文中，找请求路径对应的servlet对象。
+	4). 若没有找到servlet对象(也就是说，之前没有实例化的servlet)
+		4.1). 通过web.xml文件中的相关配置信息，得到请求路径对应的servlet完整类名。
+		4.2). 通过反射机制，调用servlet类的无参数构造方法完成servlet对象的实例化。
+		4.3). web调用servlet的init方法完成初始化操作
+	5). tomcat拿到servlet对象，调用其service方法提供访问。
+	6). web容器关闭时，或该servlet对象长时间没有用户访问时，web容器会将该servlet对象销毁。在销毁对象之前，web容器会调用servlet的destroy方法。
+总结=>
+	1.servlet类的构造方法只执行一次
+	2.servlet对象的init方法只执行一次
+	3.servlet对象的service方法，用户请求一次 执行一次。
+	4.servlet对象的destroy方法只执行一次。
+
+servlet对象的保存：
+	大多数的web容器，都是将servlet对象以及对应的url-pattern存储到Map集合中。
+	也就是说，在web容器中，有这样一个Map集合:
+	Map<String, Servlet> 集合
+	key			value
+	----------------------------------
+	/prj/login		LoginServlet对象的应用
+	....
+
+服务器在启动的时候，就会解析各个webapp的web.xml文件。这里也会保存一个Map集合：
+	Map<String, String>
+	将url-pattern和类名进行对应。
+	
+servlet接口中的所有方法解析：
+1).无参数构造方法----|	 不建议使用构造函数，因为存在风险。程序员可能会创建一个有参数构造方法，造成无法提供无参构造函数，以致无法反射。
+2).init方法--------------这两个方法执行时间几乎相同，执行次数都是一次，构造方法对象正在创建，init方法对象以及创建。
+3).service方法, 完成业务逻辑的处理。
+4).destroy方法, 用于释放资源等。
+5).getServletConfig方法，用于之类获得servletConfig，得自己编写如何返回。
+6).其他方法不用关注。
+
+七、ServletConfig
+ServletConfig，就是web.xml中的servlet标签找的配置信息....
+serverConfig方法：
+	- String getInitParameter(String name);	获取初始化参数的值。
+	- Enumeration getInitParameterNames();	获得所有初始化参数的名字。
+	- String getServletName();	获取<servlet-name>NAME</servlet-name>。
+	- ServletContext getServletContext();	获取ServletContext【Servlet上下文】。
+	注意，初始化参数的编写格式是：
+	<init-param>
+  		<param-name>NAME</param-name>
+  		<param-value>VALUE</param-value>
+  	</init-param>
+	
+八、ServletContext
+一个webapp只有一个ServletContext对象，因为一个webapp只有一个web.xml。
+=>ServletContext其实就是web.xml文件(整个web.xml)的结构化数据。
+--->ServletContext在服务器启动时候的被实例化（因为web.xml在启动时被解析），在服务器关闭的时候被销毁。
+因此ServletContext用于一个webapp中的所有servlet对象进行共享。相当于ServletContext是多线程共享的对象，因此修改时会存在安全问题。
+----常用方法:
+	Object getAttribute(String name);				从ServletContext范围中获取数据
+	void setAttribute(String name, Object object);	向ServletContext范围中添加数据
+	void remove Attribyte(String name);				移除ServletContext范围中的数据
+	
+	String getInitParameter(String name);
+	Enumeration getInitParameterNames();
+	
+	String getRealPath(String path);				用于获取项目中文件的绝对路径的。
+
+九、欢迎界面
+默认是使用WebRoot文件下的index.html。（因为在tocat的conf文件夹中的web.xml中配置了它为欢迎界面）
+若要自定义，那么在web.xml中，设置欢迎界面。
+<welcome-file-list>
+	<welcome-file>login.html</welcome-file>
+	<welcome-file>...</welcome-file>
+	...
+</welcome-file-list>
+这样在访问项目的时候，不用写完uri。
+只需要访问http://xxxx/webappName就可以访问http://xxxx/webappName/login.html
+这样访问更方便，可以提高用户体验。
+可以设置多个欢迎界面，欢迎界面在<welcome-file-list>中从上往下找，若找到了，就返回该页。
+欢迎界面可以上servlet。
+注意，路径不用'/'开始
+
+十、Http常见的错误代码(Http状态码)
+404 : Not Found、资源未找到，请求的资源写错了。
+500 : Server Inner Error、服务器内部错误, 一般是java程序异常
+<error-page>
+	<error-code>ERROR CODE</error-code>
+	<location>/error/error.html</location>
+</error-page>
+
+配置错误代码所进行的页面显示。
+
+十一、HTTP协议
+超文本传输协议，浏览器和服务器之间的一种通讯协议，由W3C负责制定。
+包括一下两种：
+	1).请求协议
+		a).请求行：
+			用来发起一个http协议的请求。
+			<请求方式> <URI> <请求方式>
+		b).消息报头
+		c).空白行
+			用来分离消息报头和请求体的。
+		d).请求体
+			post传输时数据的位置
+	2).响应协议
+		a).状态行
+			<协议版本号> <状态号> <状态描述信息>
+		b).响应报头
+			其中的Content-Type: text/html;charset-UTF8是告诉浏览器以UTF8显示，否则浏览器会用默认的编解码方式，可能造成乱码。
+		c).空白行
+			分离了响应报头与响应体。
+		d).响应体
+			也就是html内容。
+GET和POST的区别:
+	只有在form中，action使用post时，浏览器才会发送get请求。
+	GET请求：
+		在请求行提交数据，格式uri?name=value&...
+		这种提交方式最终提交的数据会显示在浏览器的地址栏上。
+		提交长度有限制。
+		GET请求只能提交字符串，文件上传等等不可用GET。
+		GET请求最终的结果，会被浏览器缓存收纳。下次访问，大量的数据不会加载。因为有大量的图片等等，不需要重新加载。
+		GET常用在向服务器拿东西。也因此可以缓存。
+		浏览器将资源缓存之后，是和某个特定的路径绑定在一起。只要浏览器发送相同的请求路径，会去缓存中获取资源，以这种方式降低服务器压力。但有时不需要用缓存，而是用服务器。在请求路径后面添加一个时间戳即可，这样GET请求也会得到新网页的。
+	POST请求：
+		提交格式name=value&...，在请求的请求体中，也就是跟在空白行后面。
+		这个请求不会显示地址栏上。相对安全（其实也不是很安全）。
+		提交长度无限制。
+		提交内容无限制。
+		POST请求响应后的结果不会被缓存。下次访问，会重新加载。
+		POST常用在向服务器发送，或者修改东西。也因此，最好重新加载。
+		post时，cache-control通常为no-cache或者是max-age=0，其实都是指的不用缓存。
+		
+十二、request以及模板设计方法
+前端发送的请求方式，应该和后台需要的请求方式一致。若前端发送的请求不一致，服务器应该提示错误信息。
+在javaweb后台中，可以通过request变量，获得请求方式，再进行具体的判断。
+获得请求方式:
+	HTTP的请求协议，全部信息被自动封装到javax.servlet.http.HttpServletRequest对象中。
+	HttpServletRequest 是 ServletRequest 的子类。
+	
+	HttpServletRequest request = (HttpServletRequest)req;
+	request.getMethod(); 获得请求方法，是字符串形式的。
+	
+模板方法：
+	由于每个service，都要重新写一次请求方法的判断，非常麻烦，只需要在父类中进行解耦就行了。
+	在父类的service中
+		String method = request.getMethod();
+		if("POST".equals(method)){
+			PostService(request, response);
+		}else if("GET".equals(method)){
+			GetService(request, response);
+		}
+		else{
+			
+		}
+	在子类中重写PostService 和 GetService即可。对于子类没有重写的方法， 在父类中的默认处理是报错。这样子类只需要重写需要的方法即可。
+	
+十三、HttpServletRequest:
+	是一个接口，servlet规范重要接口之一。
+	封装了http请求协议的全部内容：
+		-请求方式
+		-uri
+		-协议版本号
+		-表单提交的数据
+	一次请求，就有一个request对象。因此其生命周期是短暂的。
+	数据的保存方式:
+		Map<String, String[]>, 大多数情况下的Value都只有一个元素。当key重复一样的时候，其实就是将重复的key对应的value保存到String[]中。
+	常用方法：
+		1).获取表单数据
+			String getParameter(String name), 通过key获取value一位数组的首元素, POST或者GET中的数据
+			Map getParameterMap(),	获取整个Map
+			Enumeration getParameterNames(),	获取Map的所有key
+			String[] getParameterValues(String name),	通过获得value这一数组, 适合取复选框的数据，因为复选框的数据的key全都一样的。
+		2).request短暂保存数据的，可以在跨servlet调用时使用
+			Object getAttribute(String name);
+			void setAttribue(String name);
+			void removeAttribute(String name);
+	
+		
+		3).其他
+			String getContextPath();	获得根路径地址（就是webapp在webapps中的路径）
+			String getRemoteAddr();		获取客户端ip
+			String getMethod();			获取请求方法			
+			String getRequestURI();		uri
+			String getRequestURL();		url
+			String getServletPath();	url-pattern
+			void setCharacterEncoding();
+		
+		4).cookie seesion
+			Cookie[] getCookies();		//cookie内容
+			HttpSession getSession();	//session内容
+	ServletContext和ServletRequest范围：
+		ServletContext 应用范围，可以跨用户传递数据
+		ServletRequest 请求范围，只能在同一个请求中传递数据。
+		
+	跳转：
+		执行完AServlet之后，跳转到BServlet，将一次请求，执行两个servlet。
+		必须使用转发技术。
+		第一步, 获取请求转发器对象：dispatcher = request.getRequestDispatcher("");
+		第二部，调用请求转发器的forward方法: dispatcher.forward(request);
+
+十四、乱码解决
+乱码位置：
+	- 数据保存过程中的乱码
+		最终保存到数据库表中的时候，数据出现乱码
+		导致数据保存过程中的乱码包括以下两个情况：
+			1).在保存之前，数据本身就是乱码。
+			2).保存前，数据不是乱码，但是由于数据库不支持简体中文，保存之后出现乱码。
+	- 数据展示过程中的乱码
+		最终显示到网页数据出现中文乱码。
+		解决:
+			1).设置响应的内容类型，以及对应的字符编码方式：
+				response.setContentType("text/html;charset=UTF-8");
+			2).ide的字符编码方式，和浏览器的解码方式不同，造成显示乱码。
+				可以改ide的编码方式，但是不是很好。
+				可以在<head></head>中使用<meta charset="UTF-8">，用以表示当前网页采用UTF-8。
+				或是使用<meta content="text/html;charset=UTF-8">
+	- 数据传递过程中的乱码
+		数据从浏览器发送给服务器的时候，服务器接收到的是乱码。
+		不管是哪个国家的语言，在浏览器发送给服务器的时候，都会用ISO-8859-1的方式发送，改变吗兼容asiic，因此对英文和数字是不会乱码的。
+		发送给web服务器后，web服务器不知道这些数据是什么类型的文字。所以web服务器接收到的中文数据，将会乱码。
+		浏览器二进制码-->ISO编码---->发送---->服务器接收
+		解决数据传递过程中的乱码：
+			1).万能方式，post和get的乱码，都能解决。
+				先将服务器中接收到的数据，采用ISO-8859-1的方式解码，回归原始状态。
+				在给定一种支持简体中文的编码方式重新编码组装。这时候重新编码的方式，需要和浏览器的编码方式相同。
+				String dname = request.getParameter("dname");
+				byte[] bytes = dname.getBytes("ISO-8859-1");	//回到二进制码
+				String nname = new String(bytes, "UTF-8");		//编码，这里的编码方式，需要和浏览器的编码方式一致。
+			2).支持post请求，因为这种方式只对请求体编码。
+				request.setCharacterEncoding("UTF-8");
+				String dname = request.getParameter("dname");
+
+十五、线程安全问题
+Servlet是单实例多线程环境下运行的。
+线程安全问题：
+	多线程并发。
+	有共享的数据。
+	共享数据有修改操作。
+线程安全不止是在jvm中，也可能在数据库中。例如多个线程共享一张表。
+1.解决数据库线程安全的两种方案：
+	1).在java程序中使用synchronized关键字，线程排队执行，自然不会在数据库中并发
+	2).行级锁
+	3).事务隔离级别，如串行化
+	4).乐观锁
+2.解决servlet中线程安全的问题
+	1).尽量使用局部变量。
+	2).若必须使用使用实例变量，那么刻意考虑将该对象变成多例对象。（一个线程用一个对象）
+	3).若必须使用单例，那就只能用synchronized线程同步机制，线程一旦排队执行，则吞吐量降低，降低用户体验。
+
+十六、转发与重定向
+跳转用两种方式：
+	1).转发	forward
+	2).重定向 
+		重定向，浏览器其实会发送多次请求。
+		当后台执行重定向时，会向浏览器发送新的请求连接，然后浏览器会发送请求到新连接。
+		对于浏览器接收到的第一次回应，是一个重定向回应，状态码是302，即重定向。
+相同点与不同点：
+	相同点：都可以完成资源跳转。
+	不同点：
+		转发是request对象触发的。重定向是response对象触发的。
+		转发是一次请求，浏览器地址不会变化。重定向是多次请求，浏览器地址栏上是会变化的。
+		转发不用加webapp，转发只能在项目内部完成资源调整。重定向的路径需要加webapp根路径，可以完成跨app跳转资源。
+
+跳转的下一个资源可以是什么
+	可以是web服务器中的任何资源。
+	
+什么时候使用转发，什么时候使用重定向(大部分情况使用重定向)
+	- 完成跨app调整，必须使用重定向。
+	- 若在上一个资源中向reqeust范围中存储了数据，希望在下一个资源中从request范围中将数据取出，必须使用转发。
+	- 重定向可以解决浏览器的刷新问题。
+		刷新问题，是由于向某个地址发送数据后，反复刷新页面，会数次发送数据。
+		但若用重定向则不会，因为最终页面并不是表单提交页面。浏览器中间的地址发送过程，不会在地址栏中保存，因此提交请求的地址，根本就不会保存下来。
+重定向原理
+	response.sendRedirect("/jd/login");
+	程序执行到以上代码，将请求路径反馈给浏览器，浏览器自动又向web服务器发送了一次全新的请求:/jd/login
+	浏览器地址栏上最终显示的地址是/jd/login
+	
+十八、cookie
+由http协议规定的，cookie可以保存会话的状态。（一次会话是指的浏览器打开到关闭的所有操作）
+cookie数据可以保存
+	1).浏览器缓存中，浏览器关闭cookie消失。
+	2).客户端的硬盘中，浏览器关闭cookie还在。
+java中cookie当做类处理，使用new来创建cookie。cookie由两部分组成，key和value
+
+1.servlet发送cookie：
+	1).默认情况下，服务器发送的cookie，浏览器将cookie保存到浏览器缓存中，浏览器一关闭，缓存中的cookie被清除。
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		response.addCookie(cookie);	
+	2).通过设置cookie的有效时常(>0)，以保证cookie保存到硬盘文件中。
+		cookie1.setMaxAge(expire);
+		expire > 0 存储到硬盘上。
+		expire = 0 cookie直接删除。
+		expire < 0 无操作，不存储。
+2.浏览器发送cookie：
+	不同的请求路径，会发送不同的cookie。
+	默认情况下，/prj/test/cookie创建了cookie，以后浏览器向/prj/test/...都会带cookie。
+		/prj/test 		不带cookie
+		/prj/test/ 		要带cookie
+		/prj/test/...	要带cookie
+	可以通过java设置cookie的关联路径。关联后和原默认路径就无任何关系了。
+		cookie1.setPath(request.getContextPath() + "/king");
+
+3.servlet接收cookie
+	Cookie[] cookies = request.getCookies();	若浏览器没有cookie发送，则返回null
+	for(Cookie cookie : cookies){
+		String name = cookie.getName();
+		String value = cookie.getValue();
+	}
+4.浏览器接收cookie可以禁用
+	即 服务器仍然会发送cookie，但是本地不会对cookie作保存。
+
+十九、Session
+	Session将会话状态保存到服务器端。Session对象是一个会话级别的对象，一次会话对应一个HttpSession。
+	会话 是指 用户打开浏览器 直到关闭，这期间就是会话时间。可以看出，一次会话包括了多次请求。
+	在会话进行过程中，web服务器一直为当前这个用户维护着一个会话对象/HttpSession。
+	在web容器中，web容器维护了大量的HttpSession对象。
+	
+	1.session原理：
+		- 浏览器发送请求
+		- 服务器会创建HttpSession对象，检查浏览器的是否有JESSIONID的cookie对象存在。
+		- 若没有该cookie，产生HttpSession对象，以及一个对应name是JSESSIONID，value是128bit字符串的cookie对象。
+		- 服务器将Cookie的Value和HttpSession对象，绑定到session对象中。
+		- 服务器将cookie完整发送给浏览器客户端。
+		- 浏览器将cookie保存到缓存中，浏览器不关闭，cookie不会消失。
+		- 当浏览器再次发送请求时候，会发送cookie。
+		- 服务器在创建HttpSession对象时，若发现客户端有JESSIONID的cookie对象，则将对应的Value从Session列表中找到相应的session对象。
+	=> 禁用cookie后，服务器拿不到jsessionid，因此禁用cookie，每次都是新的HttpSession对象。
+	
+	浏览器关闭后，服务器不会销毁session对象。而是在session超时的时候销毁。
+	也就是，当很长一段时间（可以配置）没有用户在访问该session对象，次数session对象超时，web服务器自动回收session对象。
+	在web.xml中，可以配置该项目的session的超时时间。
+	<session-config>
+		<session-timeout>分钟</session-timeout> <!-- 默认是30分钟 -->
+	</session-config>
+	
+	2.HttpSession常用方法
+		HttpSession = getSession(boolean create);
+			create == true , 若没有session对象(该对象过期，或是jsessionid不存在)，则新建session对象
+			create == false, 若没有session对象，则返回null
+			默认create=true
+		void setAttribue(String name, Object value);	向会话范围存入时间
+		Object getAttribute(String name);				
+		void remoteAttribyte(String name);
+		void invalidate();
+二十、Filter
+	Filter不用于处理客户端请求，而是在请求达到servlet进行正式的业务处理前进行一些操作，且Filter是链式的:
+	 ________      _________      _________      _________
+    |        | -> |         | -> |         | -> |         |
+	| client |    | Filter1 |    | Filter2 |    | Servlet |
+	|________| <- |_________| <- |_________| <- |_________|
+	
+	1.Filter接口
+		public interface Filter{
+			public void init(FilterConfig config) throws ServletException;	//web程序启动是调用此方法，用于初始化Filter
+			public void destroy();											//web程序关闭时调用此方法，用于销毁一些资源
+			public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException;
+		}
+	2.使用Filter
+		public class MyFilter implements Filter {
+			@Override
+			public void init(FilterConfig arg0) throws ServletException {}
+			@Override
+			public void destroy() {}
+			@Override
+			public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
+					throws IOException, ServletException {
+				System.out.println("befor request have processed");
+				filterChain.doFilter(request, response);				//执行链条的下一个节点
+				System.out.println("after request have processed");
+			}
+		}
+	3.配置Filter
+		<filter>
+			<filter-name>MyFilter</filter-name>
+			<filter-class>com.lsj.filter.MyFilter</filter-class>
+		</filter>
+
+		<filter-mapping>
+			<filter-name>MyFilter</filter-name>
+			<url-pattern>*.do</url-pattern>
+			<dispatcher>REQUEST</dispatcher>
+			<dispatcher>FORWARD</dispatcher>
+		</filter-mapping>
+		
+		<url-pattern>标签所包含的servlet，都会经过该过滤器。
+		<dispatcher>标签表示了filter生效的方式：
+			REQUEST : 默认就有的，仅当直接请求servlet时才生效。
+			FORWARD : 另一个servlet通过FORWARD到该servlet时才生效。
+			INCLUDE : jsp中通过<jsp:include />请求某servlet时才生效。
+			ERROR : jsp中通过<%@ page errorPage="error.jsp" %>指定错误处理页面，仅在这种情况下才有效。
+		=> <url-pattern>和<dispatcher>是【且】的关系，也就是说两者都满足，该filter才会生效被调用。
+	4.Filter顺序
+		对一个请求经过filter的顺序是：
+			通过配置文件，可以获悉符合该请求的filter配置。
+			
+二十一、上传文件
+	客户端:
+	<form action="/mdblog/upload" method="post" enctype="multipart/form-data">
+		<input type="text" name="postname"><br>
+		<input type="file" name="file"><br>
+		<input type="submit" name="submit" value="submit">
+	</form>
+	
+	服务器端:
+	需要使用appach common提供的库:commons-fileupload.jar.
+	DiskFileUpload diskFileUpload = new DiskFileUpload();
+	try {
+		List<FileItem> fileList = diskFileUpload.parseRequest(request);
+		for(FileItem fileItem : fileList){	//遍历所有上传来的文件
+			if(!fileItem.isFormField()){	//是文件
+				out.println(fileItem.getName());
+			}
+		}
+	} catch (FileUploadException e) {e.printStackTrace();}

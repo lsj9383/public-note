@@ -1,0 +1,424 @@
+一、框架
+	原来叫ibatis，后来改名叫做mybatis，是一个基于java的持久层框架，和hibernate类似。
+	Hibernate面向对象的orm框架，即对象关系映射框架，将面向对象的java语言和关系型数据库做映射，操作对象就等同于操作与数据库记录，但hibernate的效率非常低 而且 占用内存。
+	MyBits面向SQL的框架，也称为sql映射器。
+	配置:
+		1).引入框架jar包
+			MYBATIS/mybatis-x.y.z.jar
+			MYBATIS/lib/*.jar
+			数据库驱动jar
+		2).增加配置文件，放置在src的文件夹中
+			Hibernate的配置文件
+				a).主配置文件
+					数据库的连接信息(账号密码、数据库位置之类的)
+					方言（不同的数据库来生成不同的sql）
+					映射文件路径(就是实体类映射文件)
+				b).实体类映射文件
+					对象和数据库的映射
+			MyBatis
+				a).主配置文件
+					数据库连接信息
+					映射文件路径
+					<?xml version="1.0" encoding="UTF-8" ?>
+					<!DOCTYPE configuration
+					PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+					"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+					<configuration>
+						<properties resource="db-config.properties"></properties>
+						
+						<!-- 所有的环境匹配, 环境可以不止一个,default是默认使用的环境的标识 -->
+						<environments default="development">
+							<!-- 配置单个环境,标识为developement -->
+							<environment id="development">
+								<!-- 事务处理管理器，采用jdbc -->
+								<transactionManager type="JDBC"/>
+								<!-- 数据源, 
+									POOLED表示使用连接池, 不使用资源后并不会释放，而是等待重复利用
+									UNPOOLED表示不使用连接池，每次都创建新的，不重复利用 -->
+								<dataSource type="POOLED">
+									<!-- 下面的数据可以直接写， 也可以从properties中获取 -->
+									<property name="driver" value="${jdbc.driverClass}"/>
+									<property name="url" value="${jdbc.url}"/>
+									<property name="username" value="${jdbc.username}"/>
+									<property name="password" value="${jdbc.password}"/>
+								</dataSource>
+							</environment>
+						</environments>
+						
+						<mappers>
+							<!-- 在src下找 -->
+							<mapper resource="mybatis-user-mapping.xml"/>
+						</mappers>
+					</configuration>
+				b).SQL映射文件
+					将执行的sql进行关联映射
+					主要是将sql语句 与 保存查询结果的类 和 sql语句标识进行关联。在编程的时候，只需要提供sql语句标识与需要的参数，就能将结果保存到一个自定义的类中。如
+					<mapper namespace="test">
+						<!-- 将id和sql语句绑定在一起，访问id时，等同于访问sql -->
+						<!-- resultType表示查询结果所转换的类型 -->
+						<select id="selectUsers" resultType="com.lsj.mybatis.bean.User">
+							select * from t_user
+						</select>
+					</mapper>
+				c).编程使用
+				InputStream is = Resources.getResourceAsStream(resource);
+				SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(is);	//sql工厂，用于生产session的。
+				SqlSession session = sqlSessionFactory.openSession();	//生产一个session
+				
+				List<User> list = session.selectList("selectUsers");				//一个session可以执行sql映射文件中的映射语句, 以此获得查询结果。查询结果都是放在list中的。
+				User user = session.selectOne("selectOne");							//返回单一结果，若执行后返回多个结果会运行时报错。
+				Map<String, Object> session.selectMap("selectUser", "usercode");	//将指定的字段作为key，将查询结果作为value，形成kv对，放在map里。
+				session.close();
+				
+二、mybatis的命名空间
+	1.目的
+		主要用于避免sql映射id重名的情况。
+		同一个映射文件中，无法使用命名空间区分相同名称的映射id。换句话说一个映射文件就只有一个映射空间。
+	2.使用方式: 
+		命名空间.sql映射id
+		若不同的命名空间中有重名id时，在使用id的时候，需要使用全名。
+		映射id不冲突时，是可以不用加命名空间的。
+	3.接口绑定
+		将命名空间和接口进行绑定，然后将接口中的方法和映射id进行绑定。
+		当调用接口中的方法时，等同于调用命名空间中的sql映射id。
+		<mapper namespace="com.lsj.UserDao">
+			<!-- id应该和接口中的方法同名 -->
+			<select id="selectUsers" resultType="com.lsj.mybatis.bean.User">
+				select * from t_user
+			</select>
+		</mapper>
+		
+		编程使用
+		UserDao dao = session.getMapper(UserDao.class);	//获得接口的实例
+		dao.selectUsers();	//dao其实是jdk动态代理的对象
+	4.打印log信息
+		可以显示框架具体执行了什么sql语句。甚至sql执行的详细log。
+		配置
+			log4j.logger.命名空间名称=TRACE
+			放在log4j.properties文件的最后。这样命名空间里的sql都会有详细的log。
+
+三、mybatis输入参数
+	1.jdbc的传参
+		1).拼串
+			String id = "1";
+			String sql = "select * from t_user where id " + id;
+		2).占位符
+			int id = 1;
+			String sql = "select * from t_user where id = ?";
+			pstat.setInt(1, id);
+			减少编译次数提高效率，且防sql注入。
+	2.Mybatis
+		1).占位符
+			由于框架将sql语句和程序代码分离开，所以无法直接确认参数的含义。
+			所以框架用特殊的符号来代替?
+			a).配置
+				<select id="selectUser" resultType="com.lsj.User">
+					select * from t_user where usercode = #{usercode} and userpswd = #{userpswd}
+				</select>
+			b).使用
+				User user = session.selectOne("selectUser", <parameter>);
+				<parameter>的类型是Object
+				i).简单的类型(如String int等等)
+					则所有的参数全部是一样的String。
+					应用场景：sql只有一个参数时，使用简单类型。通常主键查询。
+				ii).自定义类型
+					sql的参数会从属性中获取，不过要保证sql中的参数名称和自定义类型中的属性同名，这样才能从自定义类型中获取参数。
+					可以用如下匿名类。其实也是用的getter和setter方法。
+					<parameter> = new Object(){
+						String usercode = "123";
+						String userpswd = "123";
+						...
+						setter;
+						getter;
+					};
+					应用场景：sql中多个参数具有关系时，比如都是一个东西的属性，使用自定义类型。
+				iii).集合类型
+					不能用list类型，因为list没法指定参数对应的参数名。因此要用map的kv对。
+					<parameter> = new HashMap<String, Object>();
+					<parameter>.put("usercode", "123");
+					<parameter>.put("userpswd", "123");
+					应用场景：sql中多个参数之间没啥关系时。
+			c)限制
+				i).表明不能使用占位符，换句话说，不能使用这样的方法查询多种表。(select * from #{tablename}, 这样不对)
+				ii).列名不能使用占位符。(select #{col_name} from t_user, 这样不对)
+				iii).列名不能使用占位符。(select #{col_name} from t_user, 这样不对)
+				iv).排序的方式不能使用占位符。(select * from t_user order by regdata #{orderType}, 这样不对）
+		2).拼串
+			占位符传递参数 一般是在条件语句中使用。其他场合一般使用拼串。
+			框架采用特殊的符号进行拼串。
+			a).配置
+				和占位符基本一样，但是采用$符号。即:
+				${参数名称}
+			b).使用
+				和占位符的使用，完全一模一样。
+			c).效果
+				虽然感觉和占位符差不多，但是其实这些参数会作为sql文的一部分，而不会作为占位符输入。因此拼串会出现sql注入问题。
+				=>条件中使用参数，使用占位符
+				=>其他情况:
+					--->参数是由用户输入的，不能用拼串，因为可能会sql注入。想法设法用别的方式。
+					--->如果参数是系统生成的，那么可以拼串。
+		3).模糊查询
+			a).原始方式
+				select * from t_user where username like #{username}
+				把通配符放在参数里面传。但是这个通配符是sql的语法，放在参数里面有很强的耦合性。
+			
+			b).常用方式
+				select * from t_user where username like 拼接('%', #{username}, '%');
+				不同的sql采用不同的拼接方式，mysql中使用concat(s1, s2, ...)进行拼接。
+四、mybatis的输出
+	1.所谓的输出，就是sql操作的结果
+		1).增 删 改
+			返回受操作影响的数据条数.
+			jdbc中
+				String sql = "";
+				int count = pstat.executeUpdate(sql);
+		2).查
+			较为复杂
+	2.mybatis的输出，主要是真的查询的
+		<select id = "" resultType="<class-name>">
+		</select>
+		resultType将查询解决过转换为resultType类型的对象。
+		mybatis框架面向sql，所以对象和sql没啥关系，只是保存个结果数据而已。
+		1).结果转换规则：
+			将查询结果转换为指定类型的对象时，需要遵循转换的规则。
+			将查询结果的字段名称和指定类型的属性名称进行匹配
+				1).如果匹配成功，那么反射调用。
+				2).如果匹配部分成功，也会反射创建，并且设置匹配成功部分的属性。
+				3).如果匹配全部失败，则不会创建，即为null。
+			查询结果的字段名称是可以通过别名来设置的。
+			也可以设定查询结果的转换规则:
+				<select id = "" resultMap="<map-name>">
+				</select>
+				
+				<resultMap type="<class-name>" id="<map-name>"> <!-- 标识将结果保存到什么类里面，以及结果转换到该类时类名的映射关系 -->
+					<id column="<col-name>" property="<new-properties-name>" />		<!-- 主键的列名映射 -->
+					<result column="<col-name>" property="<new-properties-name>" />	<!-- 普通字段你的列名映射 -->
+				</resultMap>
+		2).查询结果转换的类型
+			a).自定义类型
+				前面都是转换为自定义类型。
+			b).Map集合类型
+				将查询结果转换为map集合类型
+				<select id = "" resultType="java.util.HashMap">
+				</select>
+				Map map = seesion.selectOne(....);
+				会将查询结果转换为kv对，查询字段作为key，查询结果作为val。
+			c).简单类型
+				<select id = "" resultType="java.lang.String">
+				</select>
+				
+				String s = seesion.selectOne(....);
+				返回的是查询结果的首个字段的数据。(只返回字段的数据，不会返回字段。而且还是首个字段的数据)
+				
+	五、分页查询
+		1.分页查询
+			由于实现的方式不一样，可以分为两种
+			1).逻辑分页
+				一次性将数据库的所有数据查询出来，放置在缓存中。
+				通过逻辑算法获取指定页码的数据。
+				查询效率快。
+				使用:
+					RowBounds rb = new RowBounds(startIndex, pageSize);
+					session.selectList("", null, rb);	//从结果中选取结果范围进行返回
+			2).物理分页(推荐)
+				采用数据库本身的分页机制实现分页查询操作。
+				查询效率低。
+				mysql :
+					limit startIndex, pagesize
+					limit pageSize == limit 0, pageSize
+				oracle :
+					三层查询嵌套 + rownum
+				<select id = "" resultType="">
+					select  * from t_user limit #{startIndex}, #{pageSize}
+				</select>
+	
+	六、动态参数查询
+		表示查询条件不是固定不变的，而是由用户决定是否使用参数。
+		<select id = "" resultType="">
+			select  * from t_user where
+			<!-- 里面所有的条件都成立，框架会自动加where -->
+			<where>
+				<!-- 输入参数为null就添加这个条件 -->
+				<if test="usercode != null">
+					and usercode=#{usercode} 	<!-- 若这个是第一个成立的条件，会自动省略and -->
+				</if>
+				
+				<if test="userpswd != null">
+					and userpswd=#{userpswd}
+				</if>
+			</where>
+		</select>
+		框架采用特殊的标签进行参数条件判断
+			1) <if>: 判断参数条件是否成立，如果成立，将标签体中的sql和外部的sql拼接在一起。
+			2) <where>: 根据条件自动判断是否添加where关键词。如果第一个条件成立时，以and开头，那么会省略掉这个and。
+			3) if-else
+				<choose>
+					<when test=""></when>
+					<otherwise></otherwise>
+				</choose>
+				等同于if-else
+			4).foreach
+				<foreach collection="items" item="item" separator=",">
+					#{item}
+				</foreach>
+				"items"是map中的key的名称，其value应该是个集合。item是集合中遍历得到的值，以","进行分隔。
+七、CUD（增删改）
+	框架提供了增加，修改，删除的接口，开发人员调用就可以了。
+	框架默认的dml使用事务，	因此操作完成后应该提交事务。
+	1.insert
+		1).配置
+			<insert id="insertUser">
+				insert into t_user(
+					usercode,username,userpswd
+				) values (
+					#{usercode}, #{username}, #{userpswd}
+				)
+			</insert>
+		2.)使用
+			session.insert("insertUSer", <parameter>);
+			session.commit();
+			<parameter>和之前查询的使用方式完全相同。
+	2.update
+		1).配置
+			<update id="updateUser">
+				update tbl_user 
+				set
+					usercode = #{usercode},
+					username = #{username},
+					userpswd = #{userpswd}
+			</update>
+		2.)使用
+			session.update("updateUser", <parameter>);
+			session.commit();
+			<parameter>和之前查询的使用方式完全相同。
+	3.delete
+		1).配置
+			<delete id="deleteUser">
+				delete from tbl_user where id = #{id}
+			</delete>
+		2.)使用
+			session.delete("delteUser", <parameter>);
+			session.commit();
+			<parameter>和之前查询的使用方式完全相同。
+	4.获取自增长主键
+		为了方便对插入的数据作进一步的操作，需要获得其自增长的主键。
+		<insert id="insertUser">
+			<insert sql语句>
+			<selectKey KeyProperties="<保存主键的key或者是属性>" resultType="java.lang.Integer">
+				select @@identity as id	<!-- mysql中这么写 -->
+			</selectKy>
+		</insert>
+八、事务处理
+	1.基本概念
+		0).事务的边界
+			事务的开始与结束，一般由service层管理。
+		1).传播行为
+			多个数据库操作在嵌套使用时引用事务的方式。
+		2).隔离级别
+			多个事务操作数据库时的交互级别。
+	2.框架的事务处理
+		try{
+			...
+			session.commit();
+		}catch(){
+			session.rollback();
+		}finally{
+			session.close();	==>>close会根据当前的提交情况来判断是否回滚。老实说，只要没有提交，不管有没有发生异常，close都会自动进行回滚。
+		}
+		====》因此简化为
+		try{
+			...
+			session.commit();
+		}finally{
+			session.close();
+		}
+		另外:
+			1.finally和return
+				函数中的所有return都共享同一个临时变量，return实质上是返回的一个临时变量_retValue.
+				int i = 10;
+				try{
+					return i;
+				}finally{
+					i += 1;
+				}
+				这里返回的是10 而非11.执行return i时，会_retValue = i;然后判断是否存在finally语句，若存在finally则执行finally中的代码。执行完以后再执行return _retValue;而非return i;
+			2).protected
+				满足同类或同包或之类，才可以访问的方法。
+				
+九、缓存
+	1.一级缓存
+		sqlSession，默认使用。
+		框架处理缓存是依赖于sql映射id，只要id不同，就算sql语句一样，也要从数据库中读取数据。若id相同，会先尝试从内存中读取。
+		一级缓存无法跨越session，一旦session发生变化，一级缓存失效。
+	2.二级缓存
+		sqlSessionFactory，默认不使用。
+		配置
+			1).在映射文件中添加标签:
+			<mapper namespace="">
+				<select id=...></select>
+				<cache evction="" flushInterval="" readOnly=""></cache>
+				<!--
+					evction : 移除策略。主要是防止缓存满了。
+						LRU - 最近最少使用的对象会被移除。
+						FIFO - 先放进去的先移除
+					flushInterval : 缓存刷新时间，单位ms。多长时间将缓存清空。
+					readOnly : 是否只读。默认只读。
+					size : 缓存容量。默认1024(个)
+				-->
+			</mapper>
+			只要使用配置了二级缓存的mapper标签中的sql，都会使用二级缓存。
+			2).序列化
+				将缓存结果的类实现序列化接口。
+十、多表关联
+	1.多对一
+		1).设计
+			表设计：在多的一方增加一的一方的外键。
+			类设计：在多的一方增加一的一方的引用。
+		2).使用
+			mybatis本身并非orm(对象关系映射)，对象的管理并不会有框架完成，需要由用户编程或者配置，因此多表查询时，不会自动将关联的表添加到对象的应用中去，需要人为配置。
+			可以写两个sql，先将多的一方查出来全部，再对应的少的一方查出来，将结果保存到多的一方对象引用中。
+			也可以结合两者
+			<resultMap id="map" type="<保存结果的类，其实就是多的一方的那个类>">
+				<id column="sid" property="sid" />
+				<result column="sname" property="sname" />
+				<association property="<多的一方引用的对象>" javaType="<多的一方引用的类>">
+					<id column="cid" property="cid" />
+					<result column="cname" property="cname" />
+				</association>
+			</resultMap>
+			
+			<select id="selectStudent" resultMap="map">
+				select
+					s.*,
+					c.cname
+				from p_student s
+				join p_classes c on c.cid = s.cid	<!-- 班级id相同的 -->
+				where sid = #{sid}	<!-- 查对应的学生 -->
+			</select>
+	2.一对多
+		1).表设计
+			多的一方增加一的一方的外键。
+			在一的一方增加多的一方的数据集合。
+		2).使用
+			<select id="selectStudentByClasses" resultType="">
+				select * from p_student where cid=#{cid}
+			</select>
+			
+			<resultMap id="" type="">
+				<id column="cid" property="cid" />
+				<result column="cname" property="cname" />
+				<collection property="<集合应用对象的属性>" 
+							ofType="<集合中的对象类型	>" 
+							column="<查询结合中对象所用到的参数>"
+							select="selectStudentByClasses">
+				</collection>
+			</resultMap>
+			
+			<select id="" resultMap="">
+				select *
+				from p_clsses
+				where cid = #{cid}
+			</select>
+	3.一对一
+	4.多对多

@@ -1,0 +1,17 @@
+参考书籍：
+CUDA C Programming Guide, CUDA官方手册.
+CUDA Best Pracice Guide, 优化经验、方法和手段.
+Programing Massively Parallel Processors.
+
+一、CPU体系架构概述
+二、并行程序设计概述
+三、CUDA开发环境搭建和工具配置
+四、GPU体系结构概述
+五、GPU编程模型
+六、CUDA编程 1
+七、CUDA编程 2
+八、CUDA编程 3
+九、CUDA程序分析和调试工具
+十、CUDA基本优化
+十一、CUDA程序深入优化
+十二、最新NVIDIA GUP和CPU特性

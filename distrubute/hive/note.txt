@@ -106,11 +106,46 @@
 		drop table <tbname>，用于删除表和元数据，若是外部表就只删除元数据。若保留元数据，但是删除数据，则删除数据文件即可。
 	7.查询数据
 		1).排序和聚集
-		2).MapReduce脚本
-		3).连接
-		4).子查询
-		5).视图
+			order by 通过一个reduce来排序。对于大规模数据而言，仅用一个reduce就会让效率很低下。
+			sorted by 为每个reducer产生一个排序文件。
+		2).连接
+			a).内连接
+				通过join on实现，on是连接的条件，hive中只支持等值连接。
+				在查询中可以使用多个join on来连接多个表，hive会以最少的mapreduce作业数来执行连接。
+				如果多个的连接的连接条件使用的列相同，那么可以减少mapreduce作业数。
+				如：select a.*, b.* from a join b on a.id = b.id;
+				在查询语句前面加explain可以查询执行计划的详细信息。
+			b).外连接
+				外连接分了左外连接 和 右外连接。
+				left  outer join 左外连接
+				right outer join 右外连接
+				full  outer join 全外连接
+			c).半连接
+				使用LEFT SEMI JOIN来使用。
+				主要是为了支持in子查询。
+				传统方式：select * from things where things.id in (select id from sales);
+				hive方式：select * from things left semi join sales on things.id = sals.id;
+			d).map连接
+				如果连接的两个表中，有一个表特别小，就可以用map连接。map连接个将特表小的表放入每个mapper的内存，并省略掉reduce的步骤。
+				因为若要执行右连接或是全连接时，right表中的某一行和其中一个mapper无法匹配并不代表该行和左表无法匹配，在一个mapper中若右/全连接无法匹配将会把左表的该行输出为null，但其实在其他mapper中可能是匹配的。
+				换句话本质就是right表无法得知left表的所有情况，一个mapper中无法确定当前右/全连接当前行没法匹配时左表在该行的输出情况，因此无法进行右连接和全连接。
+				select /*+ MAPJOIN(<right-tbname>) */ <left-tbname>.*, <right-tbname>.* from <left-tbname> join <right-tbname> on <left-tbname>.id = <right-tbname>.id;
+		3).子查询
+			hive的子查询只允许子查询语句出现在select的from子句中。
+		4).视图
+			视图是一种用select语句定义的虚表。
+			视图可以将表进行简化和聚集便于后期处理，也可以用来限制用户访问其权限所能访问的。
+			视图只是一条查询语句，并且在创建视图时并不会执行该语句。该语句用来作为子查询。
+			create view <view-name> as
+			select * from <tbname>;
+			
+			select * from <view-name>;
+			hive中的视图是只读的。
 	8.用户定义函数
+		hive内置函数不能满足需求时，可以使用用户定义函数。
 		1).UDF
+			用于单行数据，且产生一个数据作为输出。
 		2).UDAF
+			用于多行数据，且产生一个数据作为输出。例如count
 		3).UDTF
+			用于单行数据，且产生多行数据(表)作为输出。

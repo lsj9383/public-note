@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;reflect/dbinfo&apos; to &apos;classInfo.properties&apos;" description="Rename resource &apos;dbinfo&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="dbinfo" name="classInfo.properties" stamp="1477817177106" updateReferences="true"/>
-</session>

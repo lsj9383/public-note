@@ -1,0 +1,581 @@
+集合详解：
+一、继承关系：
+	Iterable <|-- Collection <|-- List <|-- ArrayList
+							  |         |__<|-- LinkedList
+							  |         |__<|-- Vector
+							  |
+							  |__<|-- Set <|-- HashSet
+									   |__<|-- SortedSet <|-- TreeSet
+	Map <|-- HashMap
+	 |__<|-- HashTable <|-- Properties
+	 |__<|-- SortedMap <|-- TreeMap
+ 
+二、集合接口
+	记录这些接口所拥有的方法 及其作用。
+	1.Iterable接口
+		public interface Iterable<T>{
+			Iterator<T> iterator();		//返回迭代器
+			
+			default void forEach(Consumer<? super T> action) {		//foreach方法，传入每个元素的操作方法, default方法可以让接口进行一些默认方法的实现，有点反传统。
+				Objects.requireNonNull(action);
+				for (T t : this) {
+					action.accept(t);
+				}
+			}
+			
+			default Spliterator<T> spliterator() {		//还不清楚
+				return Spliterators.spliteratorUnknownSize(iterator(), 0);
+			}
+		}
+		
+	2.Iterator接口
+		看样子提供了向后移动和删除的接口。
+		public interface Iterator<E>{
+			boolean hasNext();				//如果迭代器还有更多的元素，则返回true。
+			E next();						//返回迭代器的【下一个】元素。换句话说，迭代器"指针"在最开始的时候是在首个元素之前的。
+			default void remove() {			//默认不支持删除操作
+				throw new UnsupportedOperationException("remove");
+			}
+			default void forEachRemaining(Consumer<? super E> action) {		//将迭代器中剩余的元素进行foreach迭代。
+				Objects.requireNonNull(action);
+				while (hasNext())
+					action.accept(next());
+			}
+		}
+	3.ListIterator接口
+		比Iterator具有更强的能力，可以向前移动，可以添加和设置元素，还可以获得当前的索引。
+		public interface ListIterator<E> extends Iterator<E> {
+			/* 重述接口 */
+			boolean hasNext();
+			E next();
+			void remove();
+			
+			/* 特有接口 */
+			boolean hasPrevious();
+			E previous();
+			int nextIndex();
+			int previousIndex();
+			void set(E e);
+			void add(E e);
+		}
+	
+	4.Collection接口
+		看样子，集合只能添加和删除，不能直接获取和设置。
+		public interface Collection<E> extends Iterable<E> {		//接口继承Iterable，泛型和父接口是相同的。
+			int size();						//集合中元素的个数
+			boolean isEmpty();				//集合是否为空
+			boolean contains(Object o);		//判断集合是否包含对象o
+			Iterator<E> iterator();			//返回一个迭代器
+			Object[] toArray();				//将集合转换为一个数组
+			<T> T[] toArray(T[] a);
+			boolean add(E e);				//添加一个元素
+			boolean remove(Object o);		//？？？
+			boolean containsAll(Collection<?> c);
+			boolean addAll(Collection<? extends E> c);
+			boolean removeAll(Collection<?> c);	
+			default boolean removeIf(Predicate<? super E> filter) {		//移除符合条件的元素，若有移除的动作，则返回true，没有任何移除则返回false
+				Objects.requireNonNull(filter);
+				boolean removed = false;
+				final Iterator<E> each = iterator();
+				while (each.hasNext()) {
+					if (filter.test(each.next())) {
+						each.remove();
+						removed = true;
+					}
+				}
+				return removed;
+			}
+			boolean retainAll(Collection<?> c);	//???
+			void clear();						//清空该集合中的所有元素
+			boolean equals(Object o);
+			int hashCode();
+			@Override
+			default Spliterator<E> spliterator() {		//???
+				return Spliterators.spliterator(this, 0);
+			}
+			
+			default Stream<E> stream() {				//???
+				return StreamSupport.stream(spliterator(), false);
+			}
+			
+			default Stream<E> parallelStream() {		//???
+				return StreamSupport.stream(spliterator(), true);
+			}
+		}
+		
+	5.List接口
+		public interface List<E> extends Collection<E> {	//list的泛型和父类的collection的泛型相同
+			int size();
+			boolean isEmpty();
+			Iterator<E> iterator();
+			Object[] toArray();
+			<T> T[] toArray(T[] a);
+			boolean add(E e);
+			boolean remove(Object o);
+			boolean containsAll(Collection<?> c);
+			boolean addAll(Collection<? extends E> c);
+			boolean removeAll(Collection<?> c);
+			boolean retainAll(Collection<?> c);
+			
+			default void replaceAll(UnaryOperator<E> operator) {		//???
+				Objects.requireNonNull(operator);
+				final ListIterator<E> li = this.listIterator();
+				while (li.hasNext()) {
+					li.set(operator.apply(li.next()));
+				}
+			}
+			
+			@SuppressWarnings({"unchecked", "rawtypes"})
+			default void sort(Comparator<? super E> c) {
+				Object[] a = this.toArray();
+				Arrays.sort(a, (Comparator) c);
+				ListIterator<E> i = this.listIterator();
+				for (Object e : a) {
+					i.next();
+					i.set((E) e);
+				}
+			}
+			void clear();
+			boolean equals(Object o);
+			@Override
+			default Spliterator<E> spliterator() {			//???
+				return Spliterators.spliterator(this, Spliterator.ORDERED);
+			}
+			
+			/* 以下是list所特有的接口 */
+			E get(int index);				//根据索引获得list中的元素
+			E set(int index, E element);	//设置某个索引中的数据
+			void add(int index, E element);	//添加元素
+			E remove(int index);			//移除指定索引的元素
+			int indexOf(Object o);			//查询某个元素的索引，从头开始。
+			int lastIndexOf(Object o);		//查询某个元素的索引，从尾巴开始。
+			ListIterator<E> listIterator();	//获得链表迭代器
+			ListIterator<E> listIterator(int index);		//获得从指定索引开始的链表迭代器
+			List<E> subList(int fromIndex, int toIndex);	//获得子链表
+		}
+		
+	6.Set接口
+		一种不包含重复元素的集合
+		public interface Set<E> extends Collection<E> {
+			int size();								//set大小
+			boolean isEmpty();						//判断set是否为空
+			boolean contains(Object o);				//判断set是否包含o
+			Iterator<E> iterator();					//返回set的迭代器
+			Object[] toArray();						//返回set中的所有元素的副本
+			<T> T[] toArray(T[] a);
+			boolean add(E e);						//添加新元素
+			boolean remove(Object o);				//移除指定元素
+			boolean containsAll(Collection<?> c);	//判断是否包含c中的所有元素
+			boolean addAll(Collection<? extends E> c);
+			boolean retainAll(Collection<?> c);
+			boolean removeAll(Collection<?> c);
+			void clear();
+			@Override								//???
+			default Spliterator<E> spliterator() {
+				return Spliterators.spliterator(this, Spliterator.DISTINCT);
+			}
+		}
+	7.Map
+		public interface Map<K,V> {
+			int size();								//返回kv对个数
+			boolean isEmpty();
+			boolean containsKey(Object key);		//判断map中的key是否包含指定的key
+			boolean containsValue(Object value);	//判断map中的value是否包含指定的value
+			V get(Object key);						//根据key获得value，如果没有对应的key，返回null
+			V remove(Object key);					//删掉一个，并且返回删掉的这个节点的value。
+			V put(K key, V value);					//添加一个新的kv对，若k重复覆盖旧的，并将旧的kv对返回
+			void putAll(Map<? extends K, ? extends V> m);	//将m中的kv对添加到本map中
+			void clear();									//清空kv对
+			Collection<V> values();							//返回值的集合
+			Set<Map.Entry<K, V>> entrySet();				//返回所有的kv对，kv对保存在set中
+			boolean equals(Object o);
+			int hashCode();
+			default V getOrDefault(Object key, V defaultValue);
+			default void forEach(BiConsumer<? super K, ? super V> action);						//做了默认的foreach实现
+			default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function);	//遍历kv对，每次都将kv输入给function，该操作返回一个新的值，该值做为当前kv对的新的value
+			default V putIfAbsent(K key, V value);												//当key不存在的时候才put，否则put失败。put失败将会返回存在的那个kv对的value。
+			default boolean remove(Object key, Object value);									//存在指定的kv对时，将该kv对删除
+			default boolean replace(K key, V oldValue, V newValue);								//将newValue替换掉key-oldValue的value。先找到这个kv对，然后再覆盖。若没有这个kv对那么是操作失败，返回false。
+			default V replace(K key, V value);													//key存在，那么就用value作为其新值。返回旧值
+			default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction);	//若key不存在，则将mappingFunction的输出作为value，组建成行的kv对进行put。
+			default V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);	//若key存在，则将remappingFunction的输出作为该key的新的value值。若该values值是null，则删除该kv对。
+			default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);			//将remappingFunction的输出作为value，将kv对进行put。若value是null，则需要确保map中没有该key的kv对。
+			
+			//内部接口类
+			interface Entry<K,V>{					//entry即记录，代表了kv对
+				K getKey();							//获得key
+				V getValue();						//获得value
+				V setValue(V value);				//设置value
+				public static <K extends Comparable<? super K>, V> Comparator<Map.Entry<K,V>> comparingByKey();
+				public static <K, V extends Comparable<? super V>> Comparator<Map.Entry<K,V>> comparingByValue();
+				public static <K, V> Comparator<Map.Entry<K, V>> comparingByKey(Comparator<? super K> cmp);
+				public static <K, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp);
+			}
+		}
+三、抽象类
+	1.AbstractCollection
+		这是一个集合的骨架实现
+			要实现不可修改的集合，只需要重写iterator()方法与size()方法。
+			要实现可以修改的集合，还需要重写add方法(否则抛出不支持添加异常)，并且返回的迭代器必须实现remove方法。
+		public abstract class AbstractCollection<E> implements Collection<E> {
+			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;		//最大容量
+		
+			//构造函数
+			 protected AbstractCollection() {}					//空
+			 
+			//公共方法
+			public abstract Iterator<E> iterator();				//返回迭代器
+			public abstract int size();							//返回大小
+			public boolean isEmpty() {return size() == 0;}		//判断是否为空，利用size
+			public boolean contains(Object o);					//判断是否存在o，利用o.equals和迭代器。
+			public Object[] toArray();							//将所有元素复制到数组中。利用迭代器。
+			public <T> T[] toArray(T[] a);
+			public boolean add(E e) {throw new UnsupportedOperationException();}	//默认抛出异常
+			public boolean remove(Object o);					//利用迭代器实现删除
+			public boolean containsAll(Collection<?> c);		//判断集合中是否包含c集合中的元素。
+			public boolean addAll(Collection<? extends E> c);	//添加集合中所有的元素，利用add。
+			public boolean removeAll(Collection<?> c);			//从本集合中删除存在于c中的元素。
+			public boolean retainAll(Collection<?> c);			//在本集合中保留在c中存在的元素。
+			public void clear();								//利用迭代器实现清空
+			
+			//私有方法
+			private static <T> T[] finishToArray(T[] r, Iterator<?> it);	//???
+			private static int hugeCapacity(int minCapacity);				//???
+		}
+	2.AbstractList
+		提供了list的骨架实现
+		要实现不可修改的list，只需要覆盖get方法和size方法。
+		要实现可以修改的list，需要覆盖set方法(否则抛出不支持设置异常)。
+		要实现可以添加的list，需要覆盖add方法 remove方法。
+		public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
+			//构造函数
+			protected AbstractList() {}
+			
+			//公共函数
+			abstract public E get(int index);						//获得索引index位置的元素
+			public boolean add(E e) {add(size(), e);return true;}	//在末尾添加元素
+			public void add(int index, E element){throw new UnsupportedOperationException();}	//在指定位置添加索引
+			public E set(int index, E element) {throw new UnsupportedOperationException();}		//设置指定索引处的元素
+			public E remove(int index) {throw new UnsupportedOperationException();}				//移除指定索引处的元素
+			public int indexOf(Object o);														//查询o的索引，利用o.equals和list迭代器实现
+			public int lastIndexOf(Object o);													//和indexOf差不多，但后面查询。
+			public void clear();																//清空list中的元素
+			public boolean addAll(int index, Collection<? extends E> c);						//将c中的元素复制到index处
+			public Iterator<E> iterator() {return new Itr();}									//返回迭代器实现
+			public ListIterator<E> iterator() {return new listIterator(0);}						//返回从头开始的list迭代器实现
+			public ListIterator<E> listIterator(final int index);								//返回从指定索引开始的list迭代器实现
+			public List<E> subList(int fromIndex, int toIndex);									//返回SubList
+			public boolean equals(Object o);													//比较两个list中的元素是否相同。是通过元素的equals方法来判断的。
+			public int hashCode();
+			
+			//私有方法
+			protected void removeRange(int fromIndex, int toIndex);								//移除指定范围内的元素。利用迭代器实现。
+			
+			//内部类
+			private class Itr implements Iterator<E>;
+			private class ListItr extends Itr implements ListIterator<E>;
+		}
+	3.
+	4.
+	5.AbstractMap
+		提供了Map骨架实现。
+		要实现不可修改的Map，需要实现其entrySet()方法，返回的Set需要实现AbstractSet并且不应该支持添加删除，其迭代器不应支持remove方法。
+		要实现可以修改的Map，需要覆盖put()方法，否则会抛出不支持异常，并且entrySet()返回的迭代器应该支持remove方法。
+		public abstract class AbstractMap<K,V> implements Map<K,V> {
+			transient volatile Set<K>        keySet;
+			transient volatile Collection<V> values;
+
+			//构造函数
+			protected AbstractMap() {}
+			
+			//公共方法
+			public int size(){return entrySet().size();}		//Map的大小就是entrySet的大小.
+			public boolean isEmpty() {return size() == 0;}		//判断Map是否为空
+			public boolean containsValue(Object value);			//判断Map是否包含Value，利用entrySet().iterator()和value.equals()实现。
+			public boolean containsKey(Object key);				//判断Map是否包含key，利用entrySet().iterator()和key.equals()实现。
+			public V get(Object key);							//返回key对应的value，利用entrySet().iterator()的遍历实现。
+			public V put(K key, V value);						//throw new UnsupportedOperationException();
+			public V remove(Object key);						//删除对应的key-value，并返回原value。利用entrySet().iterator()遍历实现。
+			public void putAll(Map<? extends K, ? extends V> m);//将m的所有内容复制到本Map中。
+			public void clear();								//entrySet.clear()
+			public Set<K> keySet();								//返回keySet，若keySet为空创建一个AbstractSet<K>的匿名类。匿名类中利用keySet.iterator()实现该集合的iterator。
+			public Collection<V> values();						//返回values，若values为空创建一个AbstractCollection<V>的匿名类。原理同keySet()
+			public abstract Set<Entry<K,V>> entrySet();			//留待子类实现。
+			public boolean equals(Object o);					//判断所有的entry是否相同，存在不同就认为这两个Map不同。
+			public int hashCode();								//将所有的entry hashCode相加作为Map的hashCode。
+			
+			//内部类
+			public static class SimpleEntry<K,V>
+				implements Entry<K,V>, java.io.Serializable{
+				private final K key;
+				private V value;
+				
+				public SimpleEntry(K key, V value);
+				public SimpleEntry(Entry<? extends K, ? extends V> entry);
+				
+				public K getKey();
+				public V getValue();
+				public V setValue(V value);
+			}
+			
+			public static class SimpleImmutableEntry<K,V> implements Entry<K,V>, java.io.Serializable;	//相比与上者，这是个不可变类。不具备set方法。
+			
+		}
+四、具体实现
+	1.ArrayList相关的类
+		这是一个实现了List接口的，大小可变的数组。除了实现List，此类还提供了操作内部用于存储列表数组大小的内存的方法。
+		1).ArrayList
+		public class ArrayList<E> extends AbstractList<E>
+        implements List<E>, RandomAccess, Cloneable, java.io.Serializable{
+			private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 8;	//数组的最大元素个数...
+			private static final int DEFAULT_CAPACITY = 10;						//初始化容量为10
+			private static final Object[] EMPTY_ELEMENTDATA = {};					//???
+			private static final Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA = {};	//???
+			transient Object[] elementData;		//实际保存元素的数组
+			private int size;		//记录元素个数
+			
+			//构造函数
+			public ArrayList(int initialCapacity);		//根据初始化容量，初始化elementData
+			public ArrayList();							//根据默认初始化容量，初始化elementData
+			public ArrayList(Collection<? extends E> c);//????
+			
+			//公共方法
+			public void trimToSize();					//将arraylist对象的capacity修剪为实际大小。(将没有用到的空间给释放掉)
+			public void ensureCapacity(int minCapacity);//增加capacity的实例容量，以能容纳指定的minCapacity.
+			public int size();							//可用元素的个数，非capacity
+			public boolean isEmpty();					//判断size是否为0
+			public int indexOf(Object o);				//返回对象的索引，判断是否相等用o.equals.若不存在该对象，返回-1。从开始向末尾遍历，找到就直接返回，因此返回的是第一个该对象的索引。
+			public int lastIndexOf(Object o);			//和indexOf功能相同，但是从末尾向前遍历，找到就返回，因此返回的是最后一个该对象的索引。
+			public boolean contains(Object o);			//return indexOf(o) >= 0;判断该对象是否存在
+			public Object clone()；						//克隆当前对象。对象中元素和原对象中的元素是相同的。(若元素是对象，则引用值相同)
+			public Object[] toArray();					//将ArrayList的数组中的元素给copy到新的数组中，新的数组对象大小为size而非capacity。
+			public <T> T[] toArray(T[] a);				//若数组a足够大(可以容纳size大小的元素)，那么将对象中的所有内容放在a中的最前面(后面的元素不会被修改的)。若a不够大，那么返回一个新的数组，该数组的大小和a相同，可以放多少arraylist中的元素就放多少。
+			public E get(int index);					//等价于elementData[index]，获取指定索引的元素。有范围检查。
+			public E set(int index, E element);			//设置新的元素到指定索引中，返回旧元素。有范围检查，要求index在范围内。
+			public boolean add(E e);					//添加一个新元素。添加新元素的时候要进行capacity grow的检查。返回始终为true。
+			public void add(int index, E element);		//在制定的索引出添加新的元素 elementData[index]将为element, index+1到末尾的元素，全部向后移1格。
+			public E remove(int index);					//将index处的元素删除，后面的元素往前顶1个。
+			public boolean remove(Object o);			//删除指定的元素。通过o.equals来判断是否为指定独享的。只移除第一个o。
+			public void clear();						//将所有内容都设定为null。
+			public boolean addAll(Collection<? extends E> c);	//将c中的全部元素添加到elementData的后面。步骤是复制出c中的元素(toArray)，然后判断是否扩展capacity，最后将c中复制出的元素再复制到elementData中。			
+			public boolean addAll(int index, Collection<? extends E> c);	//和上面相同，不过是在index处进行的添加。
+			public boolean removeAll(Collection<?> c);						//从listArray中移除在c中存在的元素。
+			public boolean retainAll(Collection<?> c);						//和removeAll相反，在listArray中保留c中存在的元素。(从listarray中移除c中不存在的元素)
+			public ListIterator<E> listIterator(int index);					//获取一个从指定索引开始的list迭代器。
+			public ListIterator<E> listIterator();							//获取一个从首元素开始的列表迭代器。
+			public Iterator<E> iterator();									//获取一个迭代器。
+			public List<E> subList(int fromIndex, int toIndex);				//返回子lsit。
+			public void forEach(Consumer<? super E> action);				//对所有的元素执行某个回调操作。
+			public Spliterator<E> spliterator();							//????
+			public boolean removeIf(Predicate<? super E> filter);			//根据filter中指定的条件，来对元素进行移除。???
+			public void replaceAll(UnaryOperator<E> operator);				//对所有元素执行某个回调操作，该操作的返回值将会重置该索引上的元素。
+			public void sort(Comparator<? super E> c);						//根据传入的比较类来进行排序
+			
+			//私有方法
+			private void rangeCheck(int index);			//范围检查，错了直接抛出异常。
+			private void rangeCheckForAdd(int index);	//对于添加时候的范围检查。
+			private void grow(int minCapacity);			//增加容量，以确保能装下由最小容量参数指定的元素数。每次增加原容量的1/2，若还是不能容纳则直接将容量设定为指定容量。容量指定好后，就用Arrays.copyOf(elementData, newCapacity)来创建新的数组，该数组大小为newCapacity，元素内容和之前相同，多出来的是null。
+			E elementData(int index);					//等价于elementData[index]，获取指定索引的元素。并没有范围检查。
+			private void fastRemove(int index)；		//快速移除指定索引, 就是少了一个范围检查。
+			protected void removeRange(int fromIndex, int toIndex);	//将指定范围的元素删除，后面的元素往前顶。
+			private boolean batchRemove(Collection<?> c, boolean complement);	//根据c批量异常。是removeAll和retainAll的基础，complement用于选择如何移除。????
+			
+			//内部类
+			private class Itr implements Iterator<E>;	//普通迭代器的实现，用私用类来实现。
+			private class ListItr extends Itr implements ListIterator<E>;	//列表迭代器的实现
+			private class SubList extends AbstractList<E> implements RandomAccess;
+			static final class ArrayListSpliterator<E> implements Spliterator<E>;
+		}
+		
+		2).Itr
+		private class Itr implements Iterator<E> {
+			int cursor;       //这个光标指示的是【下一个】返回的元素的索引，因此初始化为0。
+			int lastRet = -1; //最近次取出的元素。因此初始是-1。
+			int expectedModCount = modCount;
+			
+			//公共方法
+			public boolean hasNext();	//根据下一个索引(cursor)是否超出size来判断是否还有元素
+			public E next();			//返回下一个元素，并移动cursor(cursor+1)以及设置lastRet为返回元素的索引，若超出了大小，抛出异常。
+			public void remove();		//lastRef是最近取出的元素(当前元素)，若有效则移除该元素。也因此最近移出元素已经不在，因此lastRet会重置为-1。
+			public void forEachRemaining(Consumer<? super E> consumer);	//对余下的元素进行foreach。结束的时候cursor和lastRet都要重置。
+		}
+		
+		3).ListItr
+			private class ListItr extends Itr implements ListIterator<E> {	//直接继承Itr
+				//构造函数
+				ListItr(int index);		//{super();cursor = index;}，主要是cursor=index，这样next将会是index索引的元素。
+				
+				//公共函数
+				public boolean hasPrevious();	//判断cursor是否为0，为0那么前面就木有了。
+				public int nextIndex();			//就是cursor
+				public int previousIndex();		//return cursor-1;
+				public E previous();			//返回cursor-1的元素。lastRet将会是该元素的索引。
+				public void set(E e);			//将lastRet的索引进行设置，lastRet并不会重置。可以反复设置上一次出来的索引位置的元素。
+				public void add(E e);			//在cursor处添加一个元素，cursor向下移动一格。意思就是cursor并没有指向新添加的元素，而是原来的那个元素。。。
+			}
+	2.LinkedList
+		这是一个双向链表，查询操作是基于从开始或结尾遍历的。
+		public class LinkedList<E>
+			extends AbstractSequentialList<E>
+			implements List<E>, Deque<E>, Cloneable, java.io.Serializable{
+			
+			transient int size = 0;			//指定大小, transient不参与序列化
+			transient Node<E> first;		//第一个节点
+			transient Node<E> last;			//末尾的节点
+			
+			//构造函数
+			public LinkedList();			//空的
+			public LinkedList(Collection<? extends E> c);	//将集合中的元素全部添加到链表中
+			
+			//公共方法
+			public int size();								//直接返回size，链表元素节点/元素个数
+			public E getFirst();							//获得首个元素
+			public E getLast();								//获得末尾元素
+			public E removeFirst();							//删除首个元素，利用unlinkFirst()方法
+			public E removeLast();							//删除末尾元素，利用unlinkLast()方法
+			public void addFirst(E e);						//在起始位置添加元素，利用linkFirst()方法
+			public void addLast(E e);						//在末尾添加元素，利用linkLast()方法
+			public boolean add(E e);						//和addLast等同，始终返回true.在末尾处添加元素
+			public boolean remove(Object o);				//删除元素，通过o.equals判断对象是否相等，相等就删除该节点(利用unlink)。删除的是首个找到的节点。
+			public boolean addAll(Collection<? extends E> c);			//将集合中的所有元素添加到链表尾，利用addAll(index, c)方法.
+			public boolean addAll(int index, Collection<? extends E> c)	//将集合中的所有元素添加到index处。
+			public void clear();										//清空所有节点
+			public E get(int index);									//返回指定索引的元素。通过node(index)找到指定节点，该寻找方法是遍历，然后返回对应的元素。
+			public E set(int index, E element);							//设置index位置处的元素为element。要求index在范围内。
+			public void add(int index, E element);						//在指定索引出添加新元素
+			public E remove(int index);									//删除指定索引的元素，并返回该元素。
+			public int indexOf(Object o);								//返回o的索引，利用o.equals来判断是否存在o，不存在o返回-1。
+			public int lastIndexOf(Object o);							//和indexOf效果一样，不过是从后面开始判断。
+			public boolean contains(Object o);							//判断o是否存在，利用indexOf(o)是否小于0，若小于0那么不存在，否则存在对象。
+			public E peek();											//返回首元素，节点f为null返回null。
+			public E element();											//还是返回首元素，节点f为null抛出异常。
+			public E poll();											//返回首元素，并且删除首元素
+			public E remove();											//删除首元素，并返回该元素。
+			public boolean offer(E e);									//等同于add(e);
+			public boolean offerFirst(E e);								//等同于addFirst(e);
+			public boolean offerLast(E e);								//等同于addLast(e);
+			public E peekFirst();										//取出首元素
+			public E peekLast();										//取出末尾元素
+			public E pollFirst();										//取出并删除首元素
+			public E pollLast();										//取出并删除尾元素
+			public void push(E e);										//等同于addFirst
+			public E pop();												//等同于removeFirst
+			public boolean removeFirstOccurrence(Object o);				//等同于remove(e);删除首个o。
+			public boolean removeLastOccurrence(Object o);				//等同于removeFirstOccurrence, 但是从最后开始。
+			public Object clone();										//把元素全部复制出来。显然，元素都是引用。
+			public Object[] toArray();									//把元素复制出来，放在数组里。元素都是引用。
+			public <T> T[] toArray(T[] a);								//把元素复制到a中，若a太小，则搞个新的a用来保存所有的元素，返回新的a。若a大小够用，就直接在a中填充。
+			public ListIterator<E> listIterator(int index);				//返回从index位置开始的list迭代器。
+			public Iterator<E> descendingIterator();					//返回递减迭代器。
+			
+			
+			//私有方法
+			private void linkFirst(E e);					//创建一个元素为e的新的首节点(在链表头增加元素e)
+			void linkLast(E e);								//创建一个元素为e的新的尾节点(在链表结尾增加元素e)
+			void linkBefore(E e, Node<E> succ);				//插入一个元素为e的新节点在succ的前面
+			private E unlinkFirst(Node<E> f);				//f为首节点，删除f，以下一个节点为首节点，返回刚刚删除节点的元素
+			private E unlinkLast(Node<E> l);				//l为尾节点，删除l，以上一个节点为尾节点，返回刚刚删除节点的元素
+			E unlink(Node<E> x);							//将节点x给删除(通过将x的prev和next节点相连，而绕开x)，返回刚刚删除节点的元素
+			private boolean isElementIndex(int index);		//判断index是否在范围内
+			private void checkElementIndex(int index);		//判断是否在范围内，不在抛出异常
+			Node<E> node(int index);						//返回指定索引的节点，根据索引是在前半部分或是后半部分来决定从起始开始遍历还是从末尾开始遍历
+			private LinkedList<E> superClone();				//???
+			
+			//内部类
+			private class ListItr implements ListIterator<E>;		//list迭代器
+			private static class Node<E>;							//节点实现
+			private class DescendingIterator implements Iterator<E>;//递减迭代器
+		}
+	3.HashSet
+		public class HashSet<E>
+			extends AbstractSet<E>
+			implements Set<E>, Cloneable, java.io.Serializable{
+			
+			private transient HashMap<E,Object> map;				//实际保存元素的内存。HashSet的元素，都是存放在HashMap的key中。
+			private static final Object PRESENT = new Object();		//hashMap是个kv对集合，用该对象代表value。
+			
+			//构造函数
+			public HashSet() {map = new HashMap<>();}				//初始化一个hashmap
+			public HashSet(Collection<? extends E> c);				//初始化一个hashmap，并将集合中的元素复制到当前set中
+			public HashSet(int initialCapacity, float loadFactor);	//指定初始化容量和加载因子，这两个参数用来初始化HashMap
+			public HashSet(int initialCapacity);					//指定初始化容量，这个参数用来初始化HashMap
+			HashSet(int initialCapacity, float loadFactor, boolean dummy);
+			
+			//公共函数
+			public Iterator<E> iterator();							//返回迭代器，实际是map的key值的迭代器。map.keySet().iterator();
+			public int size();										//返回大小，就是map的大小, map.size()
+			public boolean isEmpty();								//返回map.isEmpty
+			public boolean contains(Object o);						//判断set中是否存在对象o，实际上是map.containsKey(o)，即判断map的key是否存在o元素
+			public boolean add(E e);								//添加一个新元素，实际上是map.put(e, PRESENT)，很明显新的元素添加到map的key处，操作成功返回true，否则false。
+			public boolean remove(Object o);						//移除指定的元素，实际上是map.remove(o);操作成功返回true，否则false
+			public void clear();									//清空set的所有元素，实际上是map.clear();
+			public Object clone();									//复制set中的所有元素，返回新的集合。实际上就是调用map.clone()。
+		}
+	4.HashMap
+		public class HashMap<K,V> extends AbstractMap<K,V>
+		implements Map<K,V>, Cloneable, Serializable {
+		
+			//static字段
+			static final int DEFAULT_INITIAL_CAPACITY = 1 << 4;		//初始化容量，应该是2的n次方
+			static final int MAXIMUM_CAPACITY = 1 << 30;			//最大容量
+			static final float DEFAULT_LOAD_FACTOR = 0.75f;			//默认加载因子, 用于计算threshold的.
+			static final int TREEIFY_THRESHOLD = 8;					//当一个桶中的链表达到这个数值，考虑采用TreeNode替换。
+			static final int UNTREEIFY_THRESHOLD = 6;				//???
+			static final int MIN_TREEIFY_CAPACITY = 64;				//当桶中的链表达到TREEIFY_THRESHOLD，并且桶个数超过64，那么就用TreeNode替换。
+			
+			//static方法
+			static final int hash(Object key);						//计算key的hash值。计算公式是 hc^(hc>>>16)。hc是key.hashCode()，意味着key的hash仅仅和hashCode()有关，因此hash是否相等看hashCode即可。
+			static Class<?> comparableClassFor(Object x);			//如果x实现了Comparable接口，那么返回x.getClass()，否则返回null;
+			static int compareComparables(Class<?> kc, Object k, Object x);		//当x的类型为kc时，返回k.compareTo(x), 否则返回0;
+			static final int tableSizeFor(int cap);								//对于给定的cap，返回一个2^n大小的容量。有限幅。
+			
+			//实例字段
+			transient Node<K,V>[] table;							//table应该是个Entry-Node数组换句话说，每个数组元素都是个Entry链表。
+			transient Set<Map.Entry<K,V>> entrySet;
+			transient int size;
+			transient int modCount;									//当前HashMap被修改的次数
+			int threshold;											//当size==threshold时，就会Map就会resize，即扩展大小。
+			final float loadFactor;									//threshold = cap * factor
+			
+			//构造函数
+			public HashMap(int initialCapacity, float loadFactor);	//指定了Map的初始容量和加载因子。由于指定的初始容量可能并非2^n，用threshold = tableSizeFor(initialCapacity)来保存一个2^n。
+			public HashMap(int initialCapacity);					//实际调用this(initialCapacity, DEFAULT_LOAD_FACTOR);
+			public HashMap();										//分配一个空的Map，该构造实际操作只有this.loadFactor = DEFAULT_LOAD_FACTOR。
+			public HashMap(Map<? extends K, ? extends V> m);		//???
+			public int size();										//返回大小
+			public boolean isEmpty();								//判断size是否为0
+			public V get(Object key);								//通过getNode(hash(key), key)来得到value
+			public boolean containsKey(Object key);					//通过getNode(hash(key), key)判断是否为null对象来判断是否包含该关键词
+			public V put(K key, V value);							//实质上是调用putVal(hash(key), key, value, false, true);
+			public void putAll(Map<? extends K, ? extends V> m);	//将m中的kv放到当前map中。实际调用putMapEntries(m, true);
+			public V remove(Object key);							//删除关键词为key的节点，利用e = removeNode(hash(key), key, null, false, true)实现，返回被删节点的value。
+			public void clear();									//情况table中的数据。创建新的table，并把以前table中的所有元素置为null。
+			public boolean containsValue(Object value);				//判断是否包含value。访问table数组和每个桶中的所有节点元素，找到一个value就退出。通过value.equals()来找。
+			public Set<K> keySet();									//返回keySet。若实例字段中的keySet为null，那么创建新的keySet，并返回。
+			public Collection<V> values();
+			public Set<Map.Entry<K,V>> entrySet();					//返回entrySet。若实例字段中的entrySet为null，那么创建新的entrySet，并返回。
+			public V getOrDefault(Object key, V defaultValue);		//getNode，若没取到则用defaultValue返回。
+			public V putIfAbsent(K key, V value);					//不存在才put，存在则取消put操作。
+			
+			
+			//私有方法
+			final void putMapEntries(Map<? extends K, ? extends V> m, boolean evict);		//???
+			final Node<K,V> getNode(int hash, Object key);									//通过hash从节点数组(table[(table.length-1)&hash])中获取一个界定啊，然后通过key值(key.equals)来从节点链表中获取一个value。节点也可能是treeNode，那就调用getTreeNode(hash, key);====>hash&(length-1)相当于hash%length
+			final V putVal(int hash, K key, V value, boolean onlyIfAbsent,boolean evict);	//当table为空时，会通过resize()方法初始化一个table。kv对江湖put到这个table中。想通过key的hash取出数组中的链表节点，若该节点为null直接初始化一个链表节点放在该数组处，若链表非空则遍历链表查看是否有相同的，有相同的就替换掉，没有就放到链表节点的末尾。放置完成后，再根据size是否等于threshold来进行resize()。当一个桶中放了过多的元素的时候，可能会转换为treeNode的方式进行存储，这样避免了转换为纯链表。
+			final Node<K,V>[] resize();														//扩容完全就是扩展table数组的长度。capacity和threshold分布扩展一倍，若原table会将原table中的数据全部放到新的table中。由于table数组的长度会影响key存放在哪个桶中，这里需要计每个key在新的table中的通位置。
+			final void treeifyBin(Node<K,V>[] tab, int hash);								//putVal时，若桶中元素过多，会调用该函数，创建treeNode以避免纯链表带来的效率降低。
+			final Node<K,V> removeNode(int hash, Object key, Object value, boolean matchValue, boolean movable)		//支持仅匹配key和匹配kv对两种模式的删除。
+			
+			
+			//内部类
+			static class Node<K,V> implements Map.Entry<K,V>;		//这是一个具备Entry性质的节点。用于组成链表，每一个节点的数据就是Entry的数据，并且称数组的元素为桶。Node的相等判断依赖于key和value，和next的节点无关。
+			final class KeySet extends AbstractSet<K>;				//KeySet。
+			final class Values extends AbstractCollection<V>;		//values。
+			final class EntrySet extends AbstractSet<Map.Entry<K,V>>//entrySet。在这三个类中，并没有维护数据的存放，而是通过实现Iterator。Iterator对象是直接从HashMap的Node中取值的。该类的toString就是由父类实现，并通过iterator来获取值。
+			
+			//内部类迭代器
+			abstract class HashIterator;
+			final class KeyIterator extends HashIterator;
+			final class ValueIterator extends HashIterator;
+			final class EntryIterator extends HashIterator;
+		}

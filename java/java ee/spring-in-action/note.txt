@@ -1,0 +1,535 @@
+一、概述
+	1.简化java开发
+		1).POJO
+			spring使用组件是非侵入性的，不用继承任何类。
+		2).依赖注入
+			为了降低组件和组件之间的依赖，避免一个组件中指定一个具体的实现类（因为若指定了具体实现类，那么依赖性很强）采用依赖注入。
+			依赖注入可以通过组件的构造函数和setter-getter方法实现。
+		3).应用切面
+			AOP，面向切面编程。系统有许多不同组件构成，组件只需要关注自己需要关心的就好，不应该承担其他任务。
+			与组件核心功能无关的职责，主要是日志、事务管理、安全检查等等，这些系统服务通常称为横切关注点。若没有aop编程：
+				a).实现系统关注点功能的代码将会重复出现在多个组件中。
+				b).组件会因为那些与自身核心业务无关的关注点代码而混乱。
+		4).消除样板代码
+			例如jdbc中和核心业务相关的异常处理、打开数据库连接等等。这些在spring都采用模板编程来消除了。
+	2.bean与容器
+		在Spring应用中，组件对象必须由Spring容器它才具备多种功能，例如di和aop。
+		默认情况下，在xml配置文件中一个<bean />就是一个对象。
+		1).spring容器
+			spring容器有多种，但可以归为两种：
+				i).bean工厂
+					由org.springframework.beans.factory.beanFactory接口定义，是最简单的容器。提供基本的DI支持。
+				ii).上下文
+					由org.springframework.context.ApplicationContext接口定义，并且是基于BeanFactory构建的。提供了框架级别的服务。
+					bean工厂太过底层，因此大多数情况都是使用的上下文容器。以下几种上下文是最常用的。
+					a).AnnotationConfigApplicationContext
+						从一个或多个基于Java的配置类中加载spring应用上下文。
+					b).AnnotationConfigWebApplicationContext
+						从一个或多个基于java的配置类中加载spring web应用上下文。
+					c).ClassPathXmlApplicationContext
+						从【类路径】下的一个或多个xml配置文件中加载上下文定义
+					d).XmlWebApplicationContext
+						从Web应用下的一个或多个xml配置文件中加载上下文定义。
+					e).FileSystemXmlApplicationContext
+						从【文件系统】下的一个或多个xml配置文件中加载上下文定义。
+					使用ApplicationContext context = new ClassPathXmlApplicationContext("xxx.xml");就可以将该xml中的上下文加载到spring中。
+		2).bean的声明周期
+			加载xml文件，便开始构建bean对象:
+			a).spring对bean进行实例化。
+			b).spring将值和bean的引用注入到bean对应的属性中。
+			c).若bean实现了BeanNameAware接口，spring将bean的id传递给setBeanName()方法。
+			d).若bean实现了BeanFactoryAware接口，spring将bean的BeanFactory实例传递给setBeanFactory()方法。
+			e).若bean实现了ApplicationContextAware接口，spring将bean的上下文引用传递给setApplicationContext()方法。
+			f).若bean实现了BeanPostProcessor接口，spring将调用postProcessBeforeInitialization()方法。
+			g).若bean实现了InitializingBean接口，spring它的afterPropertiesSet()方法。当然，若使用init-method声明了初始化方法，声明的该方法也会被调用。
+			h).若bean实现了BeanPostProcessor接口，spring将调用postProcessAfterInitialization()方法。
+			i).此时bean已经就绪，可以被引用程序使用了，并且一直驻留在应用上下文中。
+			j).上下文被销毁。
+			k).若bean实现了DisposableBean接口，spring将调用destory()接口方法。若使用destroy-method声明了销毁方法，该方法也会被调用。
+
+二、装配bean
+	1.在xml中进行显示的配置
+		1).配置规范
+			<?xml version="1.0" encoding="UTF-8"?>
+			<beans xmlns="http://www.springframework.org/schema/beans"
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xmlns:context="http://www.springframework.org/schema/context"
+				xmlns:mvc="http://www.springframework.org/schema/mvc"
+				xsi:schemaLocation="
+				http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+				http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+			
+			</beans>
+			在<beans>中可以配置多个<bean>
+		2).bean配置
+			<bean class="<class-name>" />
+			在没有给出id的时候，会根据全限定类名来进行生成id = <class-name>#0, 最后1个数字是索引，标记这是第几个该类的对象。
+			为了方便引用该bean，通常会给bean一个id:<bean id="<id>" class="class-name" />
+			a).构造器注入
+				通过构造器注入，是spring实例化该bean时，将需要注入的引用和值通过构造器注入到bean中。
+				i).<constructor-arg>
+					<bean>
+						<constructor-arg ref="<>" />
+						<constructor-arg value="<>" />
+					</bean>
+					可以配置多个<constructor-arg />这个标签是有顺序的，顺序应该和构造器参数顺序一致。个别情况spring可以判断顺序，但是尽量就和构造器参数顺序一致。
+				ii).c-命名空间
+					这个方式需要修改xml头部，这里暂不叙述。
+			b).属性注入
+				可以通过setter方法进行注入(只有setter即可)
+				i).<property>
+					<bean>
+						<property name="<property-name-in-class>" ref="<id-in-spring>" />
+						<property name="<property-name-in-class>" value="<new-value>" />
+					</bean>
+				ii).p-命名空间
+			c).可以注入的标签和属性（这里称为注入标签）
+				i).ref/<ref>
+					这个是设置当前bean某个属性引用，这个引用的对象应该也是有spring管理的一个bean。需要指明引用对象的id。可用标签，也可以用标签上的属性。
+				ii).value/<value>
+					这个是设置当前bean某个属性的值，支持String int boolean，可以自动将String转换为对应属性的值。可用标签，也可以用标签上的属性。
+				iii).<bean>
+					这个可以直接定义一个对象。
+				iv).<list>
+					List对象可以使用的标签，这个标签里面可以签其他注入标签。
+				v).<set>
+					Set对象可以使用的标签。
+				vi).<map>
+					Map对象可以使用的标签。
+	2.在java中进行显示的配置
+		和xml配置相同，需要添加一个配置文件，在配置文件中添加bean。但不同于xml语法，这里使用java语法来进行配置。
+		1).添加配置文件
+			配置文件是一个类.类名什么的随意。
+			import org.springframework.context.annotation.Configuration;
+
+			@Configuration
+			public class CDPlayerConfig {
+
+			}
+			@Configuration这个注解说明这是个spring配置类。
+		2).声明bean
+			bean是配置在配置类中的
+			@Bean
+			public <class-name> <method-name/id>(){
+				return new <class-name>(...);
+			}
+			@Bean注解就是声明这是配置类。并且这个bean的id就是这个方法名。
+			也可以通过@Bean(name="<id>")来设置一个id。这些个方法里面都可以添加逻辑代码。
+		3).注入
+			a).构造函数注入
+				@Bean
+				public <class-name> <method-name/id>(){
+					return new <class-name>(<method-name-in-javaconfig>());
+				}
+				虽然可以看到每个<method-name-in-javaconfig>()方法中都是返回一个new的对象，因此会认为这里注入的引用会是新对象。其实不是的。
+				对于有@Bean注解的方法，spring会拦截对它的调用，并直接返回该方法之前创建过的对象。因为这是个单例模式的。
+			b).setter注入
+				其实也和构造函数注入差不多。只是在该方法中获得这个对象，然后用对象的setter方法来设置。
+			c).本质
+				加载java配置文件时，会扫描每个@Bean，并且每个@Bean方法都会返回一个新对象，这个对象会缓存在spring中，并且这个对象就是spring管理的bean。
+				其注入方式就和普通的java代码几乎一模一样。只有一点不同，直接使用@Bean的方法来获得对象时，获得是单例模式的对象。
+	3.隐式的bean发现机制和自动装配
+		自动化装配依赖于两个技术:组件扫描和自动装配。
+		1).创建可被扫描的bean
+			带有@Component注解的实现类，都是可以被扫描的。被扫描的意思是会创建一个该类的对象并由spring管理。
+			并且需要了解的是，若没有显示指定@Component的id，那么id就是首写字母小写的类名。
+			可以通过@Component("<id>");来指定该component的id。
+		2).启用扫描
+			为了启用扫描，还是得需要一个启动扫描的配置文件，xml和javaconfig都可以实现。
+			a).xml
+				<context:component-scan base-package="<package-name>" />
+				将扫描指定包中的所有类，被@Component的类将被添加到spring中。
+			b).javaconfig
+				@Configuration
+				@ComponentScan
+				public class <config-class-name>{}
+				这里的配置类可以为空，因为是扫描的方式来添加的bean。这个扫描的位置默认是当前这个配置类所在的包中。
+				可以通过@ComponentScan(basePackages="<package-name>");来指定搜索的包
+				@ComponentScan(basePackages={"<package-name>","<package-name>"});可以指定多个包。
+		3).自动装配(注入)
+			对于value的属性，可以通过设置类初值的方式注入。而对于引用类型的属性，则需要使用自动装配注解来注入。
+			a).构造函数注入
+				在构造器的位置添加@Autowired注解
+				@Autowired
+				public ctor(<class-name> object){
+					this.object = object;
+				}
+				这样扫描到当前bean时，发现构造器需要自动装配，那么就在spring容器中寻找到一个与<class-name>相同的bean来注入。
+			b).setter方法注入
+				@Autowired
+				public setter(<class-name> object){
+					this.object = object;
+				}
+			c).属性注入
+				@Autowired
+				private <class-name> object;
+				就算这样也可以注入进去
+				
+				这样扫描到当前bean且在bean实例化后，就在spring容器中寻找到一个与<class-name>相同的bean来注入。
+			需要注意的是，@Autowired是利用<class-name>来选择bean的，若有两个不同的bean但具有相同的类，或者是相同的父类，那么这时是会发生冲突异常的，因为spring不知道选择哪个注入。
+			若没有在spring容器中找到对应<class-name>的bean，也会抛出异常。使用@Autowired(required=false)，当没找到对应的bean时不会抛出异常，而是注入null。
+			
+		4).消除自动装配歧义
+			因为默认Bean的id是类名，类名是基本不会重的。但是在自动装配是可以使用父类的，这样的话所有子类都会冲突，这样就需要消除歧义。
+			消除歧义主要是通过限定符注解@Qualifier("...")
+			@Autowired
+			@Qualifier("<限定符/id>")
+			public ctor(<class-name> object){...}
+			需要注意的是，每个bean都有自己的限定符，并且限定符不等同于id，只是默认情况下一个bean的限定符和id是相同的。
+	4.bean的作用域
+		1).作用域类型
+			a).Singleton
+				单例，在整个应用中只创建bean的一个实例。默认的。			
+			b).Prototype
+				原型，每次注入或者通过ApplicationContext获取的时候，都会创建一个新的bean。
+			c).Session
+				在web应用中，为每个会话创建一个bean实例。在单个session中时，申请的bean是单例的。
+			d).Request
+				在web应用中，为每个请求创建一个bean实例。在单个请求中时，申请的bean是单例的。
+		2).作用域配置
+			a).自动扫描
+				@Component
+				@Scope("<scope-type>")
+				class <class-name>{
+					...
+				}
+			b).JavaConfig
+				@Configuration
+				class JavaConfig{
+					@Bean
+					@Scope("<scope-type>")
+					public <class-name> <method-name/id>(){
+						return new <class-name>();
+					}
+				}
+			c).xml
+				<bean id="" class="" scope="<scope-type>">
+三、AOP
+	面向切面编程。
+	1.AOP术语
+		1).连接点(JointPoint)
+			连接点，就是可以成为切点的点。切面可以在这些连接点的位置形成切点，来插入逻辑。一般就是对象的方法，这些方法都是连接点，可以配置成切点。
+		2).通知(Advice)
+			通知包含了两个含义，切面要完成的工作逻辑(代码)，该工作合适执行(在切点的之前还是之后)
+		3).切点(Pointcut)
+			切点指定了切面具体应用到哪个连接点上。通常是通过execution("<expression>")来指定匹配的连接点为切点。
+		4).切面(Aspect)
+			切面就是多个<通知和切点>的集合，而且这些集合是为了支持一个模块的。切面通常是一个类，里面的每个方法就是通知的工作逻辑。
+		5).引入(Introduction)
+			引入允许想类中添加新的方法或属性。
+		6).织入(Weaving)
+			把切面应用到目标对象并创建新的代理对象的过程。
+	2.spring的aop支持
+		spring支持4种aop形式
+		1).基于代理的经典SpringAOP
+			过于笨重，现在很少使用了。
+		2).纯POJO切面
+			和xml配合使用
+		3).@AspectJ注解驱动的切面
+		4).注入式AspectJ切面
+		spring的通知都是通过java代码编写的，定义通知的切点可以使用注解或xml。
+		spring支持方法级别的连接点。
+	3.选择连接点
+		在Spring AOP，要使用AspectJ的切点表达式语言来定义切点。
+		主要使用exection()来匹配连接点的执行方法，其他的一些语法是进行限制。
+		exection(* <class-name>.<method-name>(..));
+		        /|\                          /|\
+				 |---指的返回任意类型         |---任意参数
+	4.使用注解创建切面
+		1).使用AspectJ注解定义切面:
+		@Aspect
+		public class <aspect-class-name>{
+			@<advice-time>("execution(<expression>)")
+			public void <advice-method-name>(){
+				...
+			}
+		}
+		这里一个方法就会配置好通知和切点。(通知就是方法里面的工作逻辑和<advice-time>, 切点就是execution匹配的连接点)
+		这里的@<advice-time>可以的取值是:
+		@After
+		@AfterReturning
+		@AfterThrowing
+		@Around
+		@Before
+		对于不同方法，相同的切点以及advice-time时，会按照method的编写顺序来执行。
+		对于不同的切面，完全相同的advice-time和切点，执行顺序会按照他们在bean在配置文件中的顺序。
+		2).设置配置文件
+			a).xml
+				<aop:aspectj-autoproxy /> 切面代理启动，这个必须要有哦。
+				<bean class="<aspect-class-name>" />切面bean是需要纳入spring管理的。
+			b).javaconfig
+				@Configuration
+				@EnableAspectJAutoProxy
+				public class Config{
+					@Bean
+					public <aspect-class-name> <aspect-name>(){
+						return ...
+					}
+				}
+	5.使用xml声明切面
+		1).顶层aop标签
+			<aop:config>
+				....
+			</aop:config>
+			所有的aop的声明都在这个标签里面.其中可以声明多个aop切面、通知器或切点。
+		2).aop切面
+			<aop:aspect ref="<aspec-bean-id>">
+				...
+			</aop:aspect>
+			在aop切面中可以声明多个aop【通知器和切点】。
+		3).通知器和切点
+			<aop:<advice-time>	pointcut="exection(...)"
+								method="<bean-method-name>" />
+			指定了切面的哪个方法，在哪个时候，在哪个切点调用。
+		4).切点定义
+			<aop:pointcut id="<pointcut-id>" expression="exection(...)">
+			有些时候很多切点的execution是相同的，为了增加可读性可以将这些抽出来，赋予一个id，这样在指定aop切点的时候可以直接使用该id:
+			<aop:<advice-time>	pointcut-ref="<pointcut-id>"
+								method="<bean-method-name>" />
+								
+四、springmvc
+	1.搭建springMVC
+		在传统的servlet工程中，需要使用web.xml来搭建工程，新的servlet支持使用java类来配置。
+		1.AbstractAnnotationConfigDispatcherServletInitializer
+			这个是spring框架中的一个类，配置这个类就是配置DispatcherServlet的映射和spring应用上下文。
+			在servlet3.0中，会查找实现了ServletContainerInitializer接口的类，如果发现了，就采用该类来配置servlet。spring有个类实现了该接口:SpringServletContainerInitializer，这个类会查找实现了WebApplicationInitializer接口的类，并将配置认为交给该类完成。
+			AbstractAnnotationConfigDispatcherServletInitializer就是这个类的基础实现，因此会用该类的实现类来配置servlet。该类需要重写3个方法。
+			1).getServletMappings()
+				这个会将一个或多个路径映射到DispatcherSer。
+				@Override
+				protected String[] getServletMappings() {		//将DispatcherServlet映射到"/"
+					return new String[]{"/"};
+				}
+			2).getServletConfigClasses()
+				返回带有@Configuration注解的类，将会用来配置DispatcherServlet创建的应用上下文中的bean。
+				@Override
+				protected Class<?>[] getServletConfigClasses() {
+					return null;
+				}
+			3).getRootConfigClasses()
+				返回带有@Configuration注解的类，将会用来配置ContextLoaderListener创建的应用上下文中的bean。
+				@Override
+				protected Class<?>[] getRootConfigClasses() {
+					return null;
+				}
+			需要注意，这里会涉及到返回两个上下文配置类。
+			当DispatcherServlet启动的时候，会创建spring应用上下文，并加载配置文件或配置类中的bean。该配置类由getServletConfigClasses指定，这个通常包含web组件的bean。
+			当DispatcherServlet启动的时候，还会启动ContextLoaderListener，也会创建上下文，加载配置文件或配置类中的bean。该配置类由getRootConfigClasses指定，这个通常包含驱动应用后端的中间层和数据层的bean。
+			后面还会介绍使用纯web.xml如何加载。
+		2.配置SpringMVC的组件
+			由getServletConfigClasses()这个方法指定。
+			主要是配置:
+				1).视图解析器。
+				2).启用组件扫描，这样才方便使用注解来配置控制器。
+				3).静态资源, 静态资源也会走DispatcherServlet，这样是无法访问静态资源的。
+			@Configuration
+			@EnableWebMvc
+			@ComponentScan("<package-name>")
+			public class WebConfig {
+				@Bean
+				public ViewResolver viewResolver(){		//配置视图解析器
+					InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+					resolver.setPrefix("/WEB-INF/views/");
+					resolver.setSuffix(".jsp");
+					return resolver;
+				}
+				@Override
+				public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer){	//配置静态资源
+					configurer.enable();
+				}
+			}
+		3.配置RootConfig的组件
+			这个是由ContextLoaderListener来加载的。
+		4.配置控制器
+			1).Controller注解
+				@Controller
+				public class <controller-name>{
+					...
+				}
+				这个@Controller是用来声明控制器的，但实际上这个本质上就是Bean注解，只是更能表征它的作用而已。
+			2).RequestMapping注解
+				@RequestMapping(...)
+				public String <method-name>( ... ){
+					return ...;
+				}
+				这个注解的方法返回的是视图的逻辑名称。@RequestMapping有两个常用的参数:value="<url>", method=<GET/POST>，用来将url映射到该方法上，并且需要满足get或post请求类型。
+		5.请求处理
+			1).@RequestMapping("<url>")
+				等价于@RequestMapping(value="<url>").
+			2).返回值
+				用于寻找视图。
+			3).传递模型到视图
+				@RequestMapping(...)
+				public String <method-name>( Model model ){
+					model.addAttribute(Object);
+					model.addAttribute("<key>", Object);
+					return ...;
+				}
+				这里model添加对象的时候，没有带"<key>"，会根据对象类型来指定key(类首写小写作为key)。
+				数据其实是添加到request中的，可以通过el表达式取出。${"<key>"}
+			4).输入参数
+				a).查询/表单参数
+					i).传统
+						查询参数是指的GET请求后面跟的参数,表单参数就是post请求后面跟的参数。
+						public String spittles(	@RequestParam("<var-name-in-query>") <class> <new-var-name>,
+												...
+												Model model )
+							return ...;
+						}
+						<var-name-in-query>是变量在url中的变量名。
+						这个要求url中包含所有的参数，如果有参数不存在则会报错。
+					ii).传统默认值
+						如果要使用默认参数用:@RequestParam(value="<var-name-in-query>" defaultValue=<初始值>) <class> <new-var-name>,
+					iii).传统简写
+						如果<var-name-in-query>和<new-var-name>相同，那么可以省掉@RequestMapping。在这种情况下若查询不包含该参数的，会传以null。
+					iv).对象
+						public String spittles(	<new-class> new-object )
+							会自动根据传入的参数填充new-object中的属性
+							return ...;
+						}
+					v).request response的获取
+						@RequestMapping("...")
+						public String insert(HttpServletRequest request, HttpServletResponse response){
+							...
+						}
+					vi).传文件
+						
+				b).路径参数
+					@RequestMapping("<pre-uri>/{param1}/{param2}/...")
+					public String showSpittle(@PathVariable("param1") Long param1){
+						return "spittle";
+					}
+					路径中必须包含次参数，否则服务器抛出异常。
+五、springmvc高级技术
+	1.JavaConfig springmvc 进一步配置
+		AbstractAnnotationConfigDispatcherServletInitializer实现类之前重载了3个方法，分布指定了DispatcherServlet以及两个spring上下文加载的类，除此之外还有一别的方法可以重载。
+		1).customizeRegistration
+			在DispatcherServlet注册到servlet容器中之后，就会调用该方法。并且该方法还有个Dynamic的参数传进来，可以用于进一步配置
+			@Override
+			protected void customizeRegistration(Dynamic registration){
+				...
+			}
+			可以设置load-on-startup优先级、通过setInitParameter初始化参数、通过setMultipartConfig配置Servlet3.0对multipart的支持。
+		2).getServletFilters
+			若只想DispatcherServlet添加filter，可以重载该方法。
+			@Override
+			protected Filter[] getServletFilters() {
+				return new Filter[]{new Filter(), new ..};
+			}
+			filter顺序和该数组中的顺序一致。
+		3).添加其他的Servlet和Filter
+			采用Java的初始化器，可以定义任意数量的初始化器，如果想往Web容器中注册组件，只需要创建一个新的初始化器就可以了。
+			初始化器和AbstractAnnotationConfigDispatcherServletInitializer实现类相同会自动调用的里面的方法。
+			public class <servlet-initializer-class-name> implements WebApplicationInitializer {
+				@Override
+				public void onStartup(ServletContext servletContext) throws ServletException {
+						Dynamic myServlet = servletContext.addServlet("<servlet-name>", <servlet-class-name>.class);		//注册servlet
+						myServlet.addMapping("<uri>");		//添加uri映射
+				}
+			}
+			filter和listener都可以通过类似的方式来加载。主要是调用servletContext.add<filter/listener/servlet>来指定。
+	2.xml springmvc 配置
+		当有web.xml配置文件的时候，还是会使用java初始化器。这种情况可能存在两个DispatcherServlet。
+		1).配置web.xml
+			<context-param>
+				<param-name>contextConfigLocation</param-name>
+				<param-value>【xml路径】/【java类】</param-value>	<!-- 指定ContextLoader会加载的配置文件，可以是xml也可以是java类 -->
+			</context-param>
+			
+			<!-- 指定由springmvc提供的一个ContextLoader监听器，该监听器将会加载contextConfigLocation指定路径下的配置文件 -->
+			<listener>
+				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+			</listener>
+			
+			<!-- DispatcherServlet的配置 -->
+			<servlet>
+				<servlet-name>appServlet</servlet-name>
+				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+			</servlet>
+			
+			<servlet-mapping>
+				<servlet-name>appServlet</servlet-name>
+				<url-pattern>/</url-pattern>
+			</servlet-mapping>
+		2).配置spring mvc
+			springmvc的xml配置文件，默认是<servlet-name>-servlet.xml，如果该文件另有路径或者要采用java类，可以通过以下方式来选择
+			<servlet>
+				<servlet-name>appServlet</servlet-name>
+				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+				<init-param>
+					<param-name>contextConfigLocation</param-name>
+					<param-value>【xml路径】/【java类】</param-value>
+				</init-param>
+			</servlet>
+		3).使用java类来作为上下文配置
+			在<param-value>中需要指明java类，除此之外还需要通知ContextLoader监听器以及DispatcherServlet采用java类来加载：
+			<param-name>contextClass</param-name>
+			<param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+	3.处理multipart形式数据
+		post请求可以上传multipart数据，比如图片，硬盘等文件。multipart格式的数据会将一个表单拆分为多个部分(part，因此叫multi-part 多部分)，每个部分对应一个输入域。上传的文件的输入域将会是二进制数据。
+		1).配置multipart解析器
+			DispatcherServlet没有实现任何解析multipart请求数据的功能。它将该任务委托给了MultipartResolver接口来实现，通过这个来解析multipart请求中的内容。
+			Spring内置了两个MultipartResolver的实现:
+			a).standardServletMultipartResolver
+				依赖于servlet3.0对multipart请求的支持。常用该方式，因为它是servlet3.0支持的，不需要依赖于其他的。
+				在spring应用上下文中配置bean
+				public class RootConfig {
+					@Bean
+					public MultipartResolver multipartResolver(){
+						return new StandardServletMultipartResolver();
+					}
+				}
+				上面只是multipart的解析器，但是对multipart参数的配置需要在AbstractAnnotationConfigDispatcherServletInitializer的配置中或web.xml的配置中来实现。
+				需要注意的是standardServletMultipartResolver必须要临时文件存放路径的配置，否则接收到的文件是null对象。
+				i).AbstractAnnotationConfigDispatcherServletInitializer
+					@Override
+					protected void customizeRegistration(Dynamic registration){
+						registration.setMultipartConfig(new MultipartConfigElement("<临时文件的存放路径>", 		//必须有
+																					<上传文件的最大容量, 字节为单位, 默认是没有限制>,
+																					<整个multipart请求的最大容量，字节为单位，默认是没有限制>,
+																					<上传过程中，如果文件大小达到了指定的最大容量，将会写入到临时文件路径中，默认值为0，即会写入到临时文件>));
+					}
+				ii).xml配置
+					省
+			b).CommonsMultipartResolver
+				使用Jakarta Commons FileUpload解析multipart请求。这个需要commons-fileupload的jar包支持
+				i).javaConfig配置
+					@Bean
+					public MultipartResolver multipartResolver(){
+						return new CommonsMultipartResolver();
+					}
+					这个的默认临时文件存放路径是自己就存在的，不用额外设定。要让这个工作起来不用作任何其余的设定。
+					若要进行配置:
+					public MultipartResolver multipartResolver(){
+						CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+						resolver.setUploadTempDir(new FileSystemResource("..."));
+						resolver.setMaxUploadSize(....);
+						return resolver;
+					}
+				也可以在springmvc的xml文件中配置:
+					<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+						<property name="defaultEncoding" value="utf-8"></property>   
+						<property name="maxUploadSize" value="10485760000"></property>
+				   </bean>
+				
+		2).处理multipart请求
+			前端的form: <form method="" enctype="multipart/form-data"></form>
+			服务器通常使用MultipartFile接口来接收对象，该接口提供了多种方法。其中包括可以直接将接收到的文件进行保存的方法。
+			public String register(MultipartFile uploadFile) throws IllegalStateException, IOException{
+				uploadFile.transferTo(new File("..."));	//保存
+				return ...;
+			}
+	4.跨重定向请求传递数据
+		1).重定向
+			在方法中处理完后通过 return "redirect:<uri>";来进行重定向。等价于response.sendRedirect("/<app>/<uri>");
+		2).flash
+			重定向传递参数可以通过拼接uri，在后面使用?a=1&b=2的方式，但是这样的方式只能传递简单的字符串，不便于传递对象。
+			spring提供了flashAttribute来进行重定向请求传递数据，这样的方式类似于将数据存放在session中。spring通过RedirectAttributes类型的对象来实现flash属性，这个是Model的一个子接口，也提供Model的功能。
+			@RequestMapping("<url>")
+			public String <method-name>(RedirectAttributes model) throws IllegalStateException, IOException{
+				model.addFlashAttribute("<key>", <value-object>);
+				return "redirect:...";
+			}
+			在重定向之前，所有的flash属性都会复制到session中，而在重定向完成后session会取出其中的flash属性，并且清除掉session中的这些数据。
+			这样重定向之后，数据就在Model中了，在jsp中就和使用其他的model数据相同。

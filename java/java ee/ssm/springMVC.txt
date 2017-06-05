@@ -1,0 +1,313 @@
+一、开始
+	Spring Web MVC是一种基于java的，实现了Web MVC设计模式的，请求驱动类型的，轻量级web框架。是Spring框架的重要组成部分。
+	基于请求驱动指导指的就是使用请求-响应模型。
+	MVC架构模式中要求一定存在前端控制器，而且一定要是servlet实现。
+	springMVC的优势:
+		1).与spring框架天然集成.
+		2).简单的web层测试单元
+		3).支持灵活的url到页面控制器的映射
+			servlet规范对路径匹配规则是有要求的
+				a).如果一个路径是斜杠开头，以斜杠星结尾，称为路径的前缀匹配，如 /servlet/*
+				b).如果一个路径以星点开头，那么这个路径称为扩展匹配，如:*.do
+				c).其他所有路径都是精确匹配。
+		4).非常容易与其他视图技术集成
+	springmvc配置
+		1).引入jar包
+			SPRING-HOME/lib/*.jar
+			commons-logging.jar
+			jstl.jar
+			standard.jsr
+		2).配置servlet前端控制器
+			<servlet>
+				<servlet-name>springmvc</servlet-name>
+				<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+				<load-on-startup>1</load-on-startup>	<!-- 启动时加载 -->
+			</servlet>
+			
+			<servlet-mapping>
+				<servlet-name>springmvc</servlet-name>
+				<url-pattern>/</url-pattern>
+			</servlet-mapping>
+		3).springmvc-servlet.xml配置
+			前端控制器，会加载WEB-INFO下的 <前端控制器的servlet名字>-servlet.xml配置文件. 这里就是springmvc-servlet.xml
+			<?xml version="1.0" encoding="UTF-8"?>  
+			<!-- Bean头部 -->  
+			<beans xmlns="http://www.springframework.org/schema/beans"  
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+				xmlns:p="http://www.springframework.org/schema/p"  
+				xmlns:mvc="http://www.springframework.org/schema/mvc"  
+				xmlns:context="http://www.springframework.org/schema/context"  
+				xmlns:util="http://www.springframework.org/schema/util"  
+				xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd  
+						http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd  
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+						
+				<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />	<!-- 配置springmvc的映射类的具体类，在前端控制器会使用的 -->
+				<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />	<!-- 配置springmvc的控制适配器的具体类，在前端控制器会使用的 -->
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >	<!-- 配置springmvc的视图解析器 里面暗示了视图的来源-->
+					<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+					<!-- view的前缀和后缀 -->
+					<property name="prefix" value="/WEB-INF/jsp/" />
+					<property name="suffix" value=".jsp" />
+				</bean>
+						
+				<!-- 配置处理的控制器 -->
+				<bean name="<url expect root : /hello>" class="<controller-class-name>"></bean>
+						
+			</beans>
+			
+二、HandlerMapping 映射控制器
+	将请求路径和控制器进行关联映射，当用户发出相应的请求，会找到对应的控制器。
+	1.BeanNameUrlHandlerMappping
+		将<bean>标签的name属性作为映射url进行关联。
+		<bean name="/hello" class="<controller-class-name>" />	这样的缺点是bean-name和url强相关不够独立。
+	2.SimpleUrlHandler
+		<bean id="helloWorldController" class="<controller-class-name" />
+		
+		url和bean进行关联:
+		<bean class="org.springframework.web.servlet.handler.SimpleUrlHandler">
+			<property name="urlMap">
+				<map>
+					<entry key="/hello" value="<controller-id such as : helloWorldController>"></entry>
+				</map>
+			</property>
+		</bean>
+		
+		url可以使用的通配符:
+			*, 任意可能的字串，包括空字串。
+			?, 1个任意字符，必须有1个。
+		
+	3.路径
+		1).绝对路径	固定不变的，无法改变的路径
+			本地路径：增加盘符的路径(D:/test/abc)
+			网络路径：增加协议和服务器及端口号的路径(http://www.baidu.com:80/test/abc)
+			http://www.baidu.com:80总是固定关联到主机的一个绝对本地路径。因此网络路径也是绝对路径。
+		2).相对路径，存在一个基准路径，从基准路径查找资源
+			a).需要注意的是 基准路径 是当前只有的【访问路径】。
+				所在路径：文件实际存在的路径
+				访问路径：通过某个路径来访问该文件，最后一个斜杠前面的路径。
+			b).如果一个相对路径斜杠开头，那么是特殊的相对路径，改变了默认的基准路径的位置
+				i).前台路径
+					由浏览器解析执行的代码，称为前台代码，代码中的路径，就称为前台路径。
+					以斜杠开头时，web服务器的根路径为基准路径。
+					url = http://localhost:8080/mvc/test/testServlet
+					基准路径 = http://localhost:8080/
+				ii).后台路径
+					由服务器解析执行的代码，称为后台代码，代码中的路径，就称为后台路径。
+					以斜杠开头时，web服务器的应用根路径为基准路径。
+					url = http://localhost:8080/mvc/test/testServlet
+					基准路径 = http://localhost:8080/mvc
+					
+三、拦截器
+	作用就是对业务功能的补充，队请求和响应进行拦截，拦截后进行业务操作。拦截器就是仿照过滤器来设计的。拦截器就是一种aop的体现。
+	1.拦截器和过滤器的区别
+		过滤器是加在servlet上的，拦截器是加在controller上的。
+	2.自定义拦截器
+		1).创建类，继承org.springframework.web.servlet.handler.HandlerInterceptorAdapter
+		2).重写方法
+			class LogInterceptor{
+				//拦截器执行完毕后执行的
+				@Override
+				public void afterCompletion(HttpRequest request, HttpResponse response){
+				
+				}
+				
+				//在执行控制器之后，对响应的验证，比如字符串编码等等
+				@Override
+				public void postHandler(HttpRequest request, HttpResponse response){
+				
+				}
+				
+				//在执行控制器之前进行验证
+				@Override
+				public boolean preHandler(HttpRequest request, HttpResponse response){
+					return true;	//验证成功往下走，否则直接返回。
+				}
+			}
+		3).配置拦截器
+			<!-- 将拦截器交给spring管理 -->
+			<bean id="log" class="<interceptor-class-name>"></bean>
+			
+			<!-- 给控制器增加拦截器 -->
+			<bean ... >
+				...<!-- url映射 -->
+				<!-- 配置拦截器 -->
+				<property>
+					<!-- list中的顺序，就是拦截器的排列顺序 -->
+					<list>
+						<ref bean="<interceptor-id such as : log>" />
+					</list>
+				</property>
+			</bean>
+四、springmvc控制器
+	由适配器调用，控制器可以实现的:
+	1).Controller (interface)，适配器中只能调用实现了Controller接口的对象。
+	2).AbstractController (class) 这个类实现了Controller接口了的。
+		这个类可以设置被支持请求方法:
+			<bean id="<controller-id>" class="<controller-class-name>">
+				<!-- 设置控制器可以接受的请求方法 -->
+				<property name="supportedMethods">
+					<set>
+						<value>POST</value>
+					</set>
+				</property>
+			</bean>
+	3).MultiactActionController (class) 继承了AbstractController
+		这个类里面，不同的请求走不同的方法。
+		<bean id="<controller-id>" class="<controller-class-name>">
+			<property name="methodNameResolver">
+				<bean class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodName">
+					<property name="mappings">
+						<props>
+							<prop key="<url>"> <method-name> </prop>
+							<prop key="<url>"> <method-name> </prop>
+						</props>
+					</property>
+				</bean>
+			</property>
+		</bean>
+		
+		这个东西的原理是所有的相关url请求都会跳转到这个控制器类中，再分发到不同的方法。
+		因此还需要配置这个控制器的url，将其使用通配符以满足props中的url都可以进入该控制器。
+		下面是另一种url解析方法，比上面的更方便。
+		<bean id="<controller-id>" class="<controller-class-name>">
+			<property name="methodNameResolver">
+				<bean class="org.springframework.web.servlet.mvc.multiaction.ParameterMethodName"> 
+					<!-- 方法参数, 默认为action -->
+					<property name="paramName" value="m"></property>
+				</bean>
+			</property>
+		</bean>
+		这个是靠get传入的参数来选择方法的.默认为action参数。
+		url = http://localhost/mvc/test?action=insert
+		这就会调用里面的insert方法。
+		
+五、ModelAndView
+	1.模型
+		主要指的数据数据模型
+			ModelAndView mv = new ModelAndView();
+			mv.addObject(String key, Object value); 就是在设置模型的数据，以方便在View中获取。往map中放重复key的数据时，会替换掉旧的value
+	2.视图
+		View，仅仅用于声明展示数据的相关配置，用于关联具体的视图。
+		mv.setViewName("<view-name>");
+
+六、viewresolver
+	视图解析。在控制器返回后，仅仅是视图对象，并没有指向任何页面，所以需要解析。
+	1.InternalResourceViewResolver: 内部资源解析器。
+		用于在当前web应用的内部查找只有
+		查找资源遵循查找规则：
+		视图的前缀　+ 视图的名称 + 视图的后缀
+		跳转的方式是转发（内部调整，url不变）
+	2.BeanNameViewResolver: 对象名称解析器
+		将视图名称作为spring bean对象的名称进行解析。
+		<bean class="org.springframework.web.servlet.view.BeanNameViewResolver"></bean>
+		
+		<!-- view和bean的id相对应，会找到这里面的视图文件 -->
+		<bean id="<view-id>" class="org.springframework.web.servlet.view.JstlView">
+			<property name="url" value="/WEB-INF/jsp/test.jsp"></property>
+		</bean>
+		
+七、注解
+	所谓的注解，就是加标记。框架的配置文件的内容太多，比较复杂，不利于维护和管理。
+	使用注解可以简化配置文件，提高开发效率。
+	使用注解进行简化，只保留视图解析器。
+	1.配置
+		<!-- 启用注解功能 -->
+		<context:annotation-config />
+		
+		<!-- 扫描注解类, 查询这个包下的所有注解类 -->
+		<context:component-scan base-package="com.lsj.springmvc.*" />
+		
+		<!-- 视图解析器 -->
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" >
+			<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+			<property name="prefix" value="/WEB-INF/jsp/" />
+			<property name="suffix" value=".jsp" />
+		</bean>
+	2.使用
+		创建注解类，用于扫描，加载到spring中。类不需要实现任何接口，继承任何的类。
+		@Controller
+		public class UserController{
+			@RequestMapping("/user/insert")
+			public String insert(){
+				return "success";
+			}
+		}
+		方法的返回值表示视图的名称。
+	3.注解
+		1).@Controller，类前声明，声明该类为控制器类。
+		2).@RequestMapping(...)，方法前声明，配置控制器对请求的执行逻辑。
+			@RequestMapping(value = "<url>", 				//请求与方法进行映射,url支持通配符。
+							method={RequestMethod.POST/GET}	//GET和POST方法的限定。
+							params={"<param-name>"}			//请求对象中必须包含指定的参数，这个参数可以是get也可以是post。若是【!<param-name>】指若存在这个参数，不允许访问。【<param-name>=<must-valu>】参数必须为这个值才能访问。
+							)
+		3).@RequestMapping("<namespace>")，类前声明，以为这命名空间。相当于给下面方法的url增加了前缀，而且这个前缀必须使用！
+	4.函数的参数
+		1).普通类型
+			函数的参数名和请求中的参数同名，就可以取出参数。这个支持多个参数。
+			若函数参数名和请求中的参数不同命，需要增加注解进行映射。
+			@RequestMapping("/user/insert")
+			public String insert(String <param-name>){
+				return "success";
+			}
+			这个方法对于参数特别多时，不适用。
+		2).将表单数据封装到数据模型
+			@RequestMapping("/user/insert")
+			public String insert(<class-object>){
+				return "success";
+			}
+			这个方式，参数将会赋给对象中属性名和参数名相同的那些属性。
+		3).获取request
+			需要什么就给方法声明
+			@RequestMapping("/user/insert")
+			public String insert(HttpServletRequest request, HttpServletResponse response){
+				...
+			}
+			
+			public String insert(HttpSession session){
+				...
+			}
+		4).路径传参
+			@RequestMapping("<url>/{<param-name1>}/{<param-name2>}/...")
+			public String insert(@PathVariable("<param-name1>")String <param1>, @PathVariable("<param-name2>")String <param2>, ...){
+				...
+			}
+			@PathVariable("<param-name-in-path>") String <param> 将path中的参数和函数参数绑定
+	5.函数的返回值
+		1).String
+			public String insert(HttpServletRequest request, HttpServletResponse response){
+				return "";
+			}
+		2).void
+			方法可以没有返回值，因此方法可以是void，这是因为可以自己利用response进行
+			public void insert(HttpServletRequest request, HttpServletResponse response){
+				
+			}
+		3).View
+			public View insert(HttpServletRequest request, HttpServletResponse response){
+				RedirectView view = new RedirectView();		//重定向的view
+				view.setUrl("<url>");
+				return view;
+			}
+		4).Json
+			a).必须添加特殊的注解
+				@ResponseBody
+				public Object fun(){
+					return item;
+				}
+			b).引入jackson的jar包
+			c).修改配置文件，让响应体的内容变为json字符串
+				<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+					<property name="messageConverters">
+						<list>
+							<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+								<property name="supportedMediaTypes">
+									<list>
+										<value>application/json;charset=UTF-8</value>
+									</list>
+								</property>
+							</bean>
+						</list>
+					</property>
+				</bean>

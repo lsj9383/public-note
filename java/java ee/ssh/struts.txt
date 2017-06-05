@@ -1,0 +1,321 @@
+一、struts
+	MVC:
+		1).事件驱动MVC框架，移动端、桌面端常用。
+		2).请求驱动MVC框架，
+	普通servlet的开发不够灵活。struts就是在servlet基础上进行了封装。
+	不灵活主要体现在：
+		1).对于不同的输入做不同的响应时，需要大量的if-else语句。也无法灵活修改针对新参数而新增条件分支，只能修改代码。
+		2).对于不同的处理结果转到的网页是固定的，无法灵活配置。(若需要修改网页的名字，则必须得改代码)
+		3).类型的转换不够灵活。比如String到int的转换需要程序控制，但其实可以自动完成。
+	解决:
+		使用配置文件，指定操作对应的逻辑类，并且对操作的成功与失败指定转到的网页。
+		中央控制器(ActionServlet)核心逻辑代码:
+		protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+			String uri = request.getRequestURI();			//获取请求的uri
+			String path = uri.substring(uri.indexOf('/', 1), uri.indexOf('.', 1));	//截取uri的具体请求路径
+			ActionMapping = actionMapping = (ActionMapping)map.get(path);		//获得该请求路径的相信参数，map是配置信息。
+			String type = actionMapping.getType();								//获得完整类路径
+			Action action = (Action)class.forName(type).newInstance();
+			
+			String forward = action.execute(request, response);					//执行对应的action请求。
+			request.getRequestDispatcher(forward).forward(request, response);	//根据action返回值来转到对应的网页。
+		}
+		
+		也就是说，以后只需要写好配置文件就将控制器做好了。也就是将控制器给灵活化了。
+		中央控制器的职责是：
+			1).根据相应的规则截取URL
+			2).根据URL分发到相应的Action
+		action是后期控制器，执行具体的业务逻辑以及确定返回值。
+	struts的实现:
+		web client -request-> ActionServlet <-dispatch-> Action <-wr-> Model
+								    |	|
+									|	|----forward-> jsp/html/...
+									|
+								   \|/
+						   读struts-config.xml
+二、struts开始
+	1.配置struts
+		1).拷贝strtus相关的jar到WEB-INF的lib文件夹下。
+		2).在web.xml中配置ActionServlet
+		3).配置struts-config.xml在WEB-INF文件夹下。
+	2.编写ActionForm类
+		这个是对于post请求才有用的，可以将表单数据进一步封装。
+		表单数据都是字符串，可以通过该类使用更结构化的数据。要求的是该类中的成语变量需要和表单中的name同名。
+	3.编写Action类
+		返回是ActionForward对象。
+		mapping..findForward("<forward-name>");	返回在struts-config.xml中配置的forward信息，由ActionServlet进行转换。
+	4.配置struts-config.xml
+		1).注册struts的ActionForm用于保存保单
+			<form-beans>
+				<form-bean name="<form-name>" type="<类全名>" />
+			</form-beans>
+		2).注册struts的Action
+			<action-mappings>
+				<action path="/login" 							<!-- 指定action的路径，这里的uri应该写/app/login.do -->
+						type="com.lsj.struts.LoginAction"		<!-- Action类全名 -->
+						name="<form-name>"						<!-- 传入尽量的表单类名，该类名是在xml中配置的名字 -->
+						scope="request"							<!-- 表单保存的方式， 有request和session两种，也就是说保存在request中或是session中。因为一般表达都是单词有效，因此常用request。若不配，则默认传到session中 -->
+						>
+					<!-- 配置跳转的目标 -->
+					<forward name="success" path="/login_success.jsp" />
+					<forward name="error" path="/login_success.jsp" />
+				</action>
+			</action-mappings>
+	5.ActionServlet完整逻辑
+		1).processPath.截取URL.
+		2).processPopulate.根据截取的URL获得ActionMapping.
+		3).processActionForm.根据ActionMapping中的name名称查找ActionForm，若配置了ActionForm那么就到request或session中查找。如果在request或session中存在已久创建的ActionForm，那么将返回。如果不存在那么会根据ActionForm的完整路径采用反射进行创建，再将创建好的ActionForm放到request或session中.
+		4).processPopulate.根据ActionForm中的reset方法进行充值，然后得到表单中所有输入域的name名称，再得到对应的值。最后将表单中的kv对保存到一个map中。接下来用第三方组件BeanUtils，将map中的值根据ActionForm中的类型先转换好，再通过ActionForm中的setter配置ActionForm。
+		5).processActionCreate.根据Action的完整类名称到Map中查找，如果存在就返回Action对象，否则根据Action类的完整名称采用反射区创建，再将创建好的Action放到map中.所以struts中的action是单实例的，存在线程安全问题。
+		6).processActionPerform.执行用户自定义的action中的execute方法.
+		7).processForwardConfig.根据返回的ActionForward完成跳转(重定向或转发).
+	6.action属性
+		path="<uri>"
+		type="<actioin类全名>"
+		name="<form-name>"				传入的ActionForm对象。
+		scope="request/session"			ActionForm对象保存在request或是session里。默认为session
+		validate="false/true"			验证
+		attribute="<other form-name>"	在session或是request保存的表单的key值，默认为name
+	7.牢记原则。
+		Action的职责是拿到表单数据，并调用Model。业务逻辑应交给专门的Model层去做。
+		对于异常，在Action中抓到Model中的异常，然后进行跳转。
+
+三、标签
+	1.配置
+		1).配置国际化，在struts-config.xml文件中加入如下配置：
+			<message-resources parameter="MessageResources" />
+			加在<struts-config>标签的最下面。
+		2).最好提供国际化资源文件，将该文件放在src下
+		3).在要使用tag的jsp上面，添加
+			<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+			<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic" %>
+	2.Bean Tags
+		用于输出的。
+		<bean:write name="<key>">  将request的<key>对应的value输出.(value的toString()方法)
+		<bean:write name="<key>" filter="true/false">	filter默认为true，为true时将value原封不动输出。若为false会进行html解析。
+		<bean:write name="<key>" format="<format>">	格式化输出
+		<bean:write name="<key>" property="<field>"> 这里value是个对象，访问其成员。
+	3.Logic Tags
+		用于逻辑流控制的。
+		<logic:empty name="<key>">
+			<key>为空将会执行这里面		value==null或是""空船
+		</logic:empty>
+		
+		<logic:notEmpty name="<key>">
+			<key>不为空将会执行这里面
+		</logic:empty>
+		
+		<logic:present name="<key>">
+			<key>存在
+		</logic:empty>
+		
+		<logic:notPresent name="<key>">
+			<key>不存在。			value==null也属于不存在
+		</logic:empty>
+		
+		<logic:iterate id="<item>" name="<key>">	<!-- 若value具备迭代能力，则可以用迭代器 -->
+			<item>是当前迭代到的元素
+			<bean:write name="<item>" property="<field>" />
+		</logic:iterate>
+四、ActionForm
+	1.动态ActionForm
+		可以不用定义ActionForm子类，可以减少静态ActionForm的数量，使用动态ActionForm有所有静态ActionForm的功能。
+		其实本质上是将ActionForm的实现，放到了配置文件中指定字段和字段类型。
+		1).配置:
+			<form-beans>
+				<form-bean name="<form-name>" type="org.apache.struts.action.DynaActionForm">
+					<form-property name="username" type="java.lang.String" />
+					...
+				</form-bean>
+			</form-bean>
+		动态ActionForm类里面用一个HashMap来记录变量名和变量类型。
+		对于其验证通常使用动态验证框架。
+		2).使用:
+			DynaActionForm daf = (DynaActionForm)form;
+			String username = (String)daf.get("username");
+			在daf中取值的过程，内部是通过hashmap取值来实现的。
+	2.上传文件
+		1).对于可以上传文件的表单：
+		<form action="<uri>" enctype="multipart/form-data" method="">
+			file :<input type="file" name="myFile"><br>
+			<input type="submit" value="submit">
+		</form>
+		
+		2).上传的文件在ActionForm中必须用FormFile类型来表示:
+		public class UploadActionForm extends ActionForm {
+			private String title;
+			private FormFile myfile;
+		}
+		
+		3).上传文件大小设置
+			<controller maxFileSize="10M"></controller>
+	3.ActionForm类型转换器
+		采用第三方的beanutils. (utils 工具)
+		转换器中维护了一个map，这个map里面保存了一个key为Class value为对应转换器的结构。
+		自定义转换器:
+			默认的转换器不具备将字符串转换为任意类型的功能。面对这种时候，需要自定义转换器；
+			1).自定义转换器
+				MyConvert implements Converter{
+					@Override
+					public Object convert(class type, Object value){
+						...
+						return ...;
+					}
+				}
+			2).注册转换器
+				写个新的servlet，在新的servlet启动时注册。
+				public void init() throws ServletException{
+					ConvertUtils.register(new MyConvert(), MyType.class);
+				}
+				需要配置servlet在tomcat启动时就进行servlet初始化，这样的话才能让对转换器的配置成功。
+五.ActionForward
+	ActionForward是Action的execute()方法的返回类型。
+	1.重定向与
+		<action ...>
+			<forward name="" paht="<>" redirect="false" />  使用转发。默认redirect为false。
+			<forward name="" paht="<>" redirect="true" />	使用重定向。
+		</action>
+	2.全局和局部forward
+		全局的forward可重用
+		1).局部forawrd
+			<action ...>
+				局部
+			</action>
+		2).全局forward
+			<global-forwards>
+				<forward ...>
+			</global-forwards>
+		3).若全局和局部forward的forward的name重复，则使用局部的。只有局部没有，才找全局的。
+		struts-config.xml文件的行为不能再运行期修改。
+	3.手动转向
+		返回ActionForward为null，就可以自己用response进行跳转。
+	4.动态ActionForward
+		ActionForward af = new ActionForward(String path, boolean redirect);
+		af.setPath("<uri>");		//转发的位置
+		af.setRedirect(boolean);	//设置重定向
+		return af;
+六、ActionMapping
+	保存了配置信息
+	ActionMapping一个实例对应了struts-config.xml中的一个action标签。
+	属性：
+		1).path
+			对应了action中的path
+		2).forward
+			不用建action，向该action的请求是直接跳转。
+			<action ...
+					forward="<uri>"
+			></action>
+			相当于建立个action，该action的execute只有一句跳转的语句。
+		3).type
+			action对应的
+		4).name
+			指定ActionForm的name
+		5).scope
+			默认为session
+		6).validate
+			默认为true，是否调用ActionForm
+		7).input
+			验证出错转到的页面。
+		8).parameter
+		9).unknown
+			输入的.do不存在，转移到指定的页面。
+			<action path="<随便>"
+					forward="<unknown-page>"
+					unknown="true"
+			>
+			</action>
+			当请求的.do不存在的时候，就会到forward对应的页面中去。
+			也就是说，ActionServlet中，取出ActionMapping，由于该action不存在，因此取出的是null。再检查所有的action中是否有unknown为true，有的话就forward到指定的page中。
+七、国际化
+	I18N就是指的国际化。
+	Locale.getDefault();		//获得当前JVM所处环境的语言和国家。(计算机中设置的)
+	Locale.getDefault().getCountry();	//获得当前系统的国家
+	Locale.getDefault().getLanguage();	//获得当前系统的语言
+	
+	1.国际化资源文件
+		配置多个国家多个语言的文件,其实就是一些键值对。
+		baseName.properties			缺省国际化资源文件，以面对无法找到资源文件的情景，会自动使用该资源文件。
+		baseName_zh_CN.properties
+		baseName_en_US.properties
+		...
+	2.使用
+		ResourceBundle rb = ResourceBundle.getBundle("<baseName>", <Locale-Object>);
+		rb.getString("<key>");
+		需要注意，这里Locale对象若不存在，则使用系统默认的。即Locale.getDefault();当然，需要配置了对应的资源文件，否则资源文件无法找到，也会报错。
+	3.动态使用
+		在properties中使用k=<string>{0}<string>{1}		用占位符填充，可以简单的插入数据
+		或者是使用%s %d等等。然后使用Format或者String.format方法
+		
+		1).对于{i}的占位符，使用
+			String str = new MessageFormat(<string>).format(new Object[]{...});
+		2).对于%s的占位符，使用
+			String str = String.format(<string>, new Object[]{...});
+		
+		其实就是使用格式化输出。
+	其实本质上就是对键值对上加了层封装
+	4.struts的国际化 
+		1).配置
+			在struts-config.xml中配置国际化.
+				<message-resources parameter="<packageName>.<baseName>" />
+			提供具体的国际化资源文件放在能找到的路径下即可.
+				<baseName>.properties
+				<baseName>_zh_CN.properties
+				<baseName>_en_US.properties
+			在是用的jsp中配置
+			<%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean" %>
+		2).使用
+			jsp管理视图，因此常在jsp中读出资源文件的数据。并且有专门的标签负责读该类资源文件。
+			<bean:message key="<key in message-resources>">
+			不同的web语言首选项，会发送不同的Locale到server，以读不同的资源文件。
+			web发送accept-language的消息报头给server以指定显示的。若服务器不存在accept-language指定的资源文件，则使用服务器系统的language对应的资源文件，若服务器系统language的资源文件也不存在，那么就使用<baseName>.properties中的配置。
+		当然struts的国际化资源文件，也是在servlet初始化时就加载内存里了，若修改了国际化资源文件，就需要重新启动tomcat。(因为一般都配置servlet在tomcat开启时全部加载)
+		3).手动切换语言设置
+			该用户的语言环境是配置在该用户的session中的。用户第一次登陆，就已经将语言环境配置到session中了，以后该用户的连接就直接用session中的语言设置。
+			因此，在Action中进行session配置locale即可:
+				Locale locale = new Locale("zh", "CN");
+				request.getSession().setAttribute(Globals.LOCALE_KEY locale);
+		4).ActionMessage
+			一个ActionMessage对应了一个国际化资源文件中的一条kv中的value
+			ActionMessage message = new ActionMessage("<key>", Object[]);	从当前对应的locale中的key中读取。后面是添加占位符。
+八、动态异常处理
+	1.配置
+		<action ...>
+			<exception key="<国际资源文件中的key>" type="<Exception Class>" path="<forward-path>"/>	出现了指定的异常类后，在<forward-path>中，打印国际化消息。
+		</action>
+		捕捉的是由action.execute();抛出的异常
+		也可以将异常处理配置为全局的。
+		<global-exceptions>
+			<exception ....>
+		</global-exceptions>
+
+九、DispatchAction
+	这是Action子类，可以将多个Action的逻辑集合到DispatchAction类里的不同方法中去。
+	而不同方法的调用，通过uri中的command参数进行制定。
+	即....dispatch.do?command=<method>
+	1.配置
+		<action ... parameter="command">
+			<forward ... >
+			<forward ... >
+			<forward ... >
+			...
+		</action>
+	2.代码
+		public class Manager extends DispatchAction{
+			method1(){
+			}
+			
+			method2(){
+			}
+			
+			...
+		}
+	3.访问
+		http://.../dispatch.do?commad=method1
+		这里的command跟的参数必须和方法名完全一致。
+	DispatchAction的execute方法有具体的调用逻辑，因此不能覆盖。
+	DispatchAction有一个unspecified的方法，这个方法可以覆盖。用于若没有指定parameter时，就调用该方法。
+	parameter参数值不能是execute和perform方法。
+	
+十、其他
+	BeanUtils.copyProperties(target, origin); 将源对象中的所有getter的属性，赋值到targget的getter属性中去，要求这些属性同名。
