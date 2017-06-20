@@ -1,0 +1,35 @@
+一、开始与基础概念
+	在classpath路径下创建mybatis的根配置文件：mybatis-config.xml，该配置文件主要是指定数据库及其连接以及需要映射的sql语句的mapper配置文件。
+	通用配置如下：
+	<?xml version="1.0" encoding="UTF-8" ?>
+	<!DOCTYPE configuration
+	  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+	<configuration>
+	  <environments default="development">
+		<environment id="development">
+		  <transactionManager type="JDBC"/>
+		  <dataSource type="POOLED">
+			<property name="driver" value="${driver}"/>
+			<property name="url" value="${url}"/>
+			<property name="username" value="${username}"/>
+			<property name="password" value="${password}"/>
+		  </dataSource>
+		</environment>
+	  </environments>
+	  <mappers>
+		<mapper resource="<mapper-xml-path-in-classpath>"/>
+	  </mappers>
+	</configuration>
+	对于mapper配置文件 格式为：
+	<?xml version="1.0" encoding="UTF-8" ?>
+	<!DOCTYPE mapper
+	  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="<namespace>">
+	  <select id="selectById" resultType="<result-type>">
+		select * from user where id = #{id}
+	  </select>
+	</mapper>
+	会将得到的属性赋值到对应的result-type中去。
+	
