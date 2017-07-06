@@ -23,9 +23,25 @@
             ^B 用于分割ARRAY和STRUCT中的元素，以及Map的KV对。
             ^C 用于Map的KV的分割。
         也可以在建表的时候指定分隔符：
-            
+			row format delimited
+			lines terminated by '<记录分隔符>'
+			fields terminated by '<字段分隔符>'
+			collection items terminated by '<集合元素间的分隔符>'
+			map keys terminated by '<kv之间的分隔符>'
+	3.读时模式
+		传统数据库采用写时模式，即在写入数据库时进行检查，
+		hive采用读时模式，即在查询时才会进行检验，在加载数据到表中的时候，是不会进行检查的。
 三、DDL
-
+	1.数据库
+		hive中的数据库，就是在hdfs中的一个目录或命名空间。如果没有显示指定数据，则会使用默认数据库default。
+		show databases;						显示存在的数据库。
+		use <base-name>;					选择一个数据库来使用。
+		create database <base-name>;		创建一个指定的数据库。
+		drop database <base-name>;			删除一个数据库，但是要确保数据库中没有其他表存在。可以在后面添加cascade关键词自动删除表和数据库。
+	2.表
+		show tables;											显示当前数据库下的所有表
+		create table <tb-name> like <other-tb-name> 			创建一个表的格式和<other-tb-name>相同的表
+		create external table <tb-name> ... location '<path>'	创建外部表，location指定数据文件的位置，删除表的时候，表数据是不会被删除的，只会被删除表的元数据。
 四、DML
     1.导入数据
     2.查询
