@@ -1,0 +1,146 @@
+JDW(Jingdong Data Warehouse) 京东数据仓库
+BDP(Big Data Platform) 大数据平台
+
+业务篇：
+    FDM 基础数据层
+        * 增量表：
+            分区：dt
+            可以查询某日的增量数据。
+        * 拉链表：
+            分区：dp dt end_date
+            使用start_date和end_date进行日期范围控制。
+            获取date当天全量数据快照：start_date <= <date> and <date> < end_date
+            拉链表的每个商品的记录基本上是不会变化的，若需要变化，则新建一个商品的记录，并将原记录置为expired。
+            也就是说，拉链表的每个记录只有end_date和dp需要变更，其他字段变更则是通过新建记录的方式实现。
+            因此，拉链表中保存了全部的数据快照，每个商品都能找到其在某个时间点的情况。
+    BDM 通用数据层
+    ADM 聚合数据层
+
+HIVE:
+    1.数据类型
+        TINYINT
+        SMALLINT
+        INT
+        BIGINT
+        FLOAT
+        DOUBLE
+        BOOLEAN
+        STRING
+        DECIMAL
+        为了更为灵活的使用，可以使用类型转换：
+            select cast(<field>/<value> as double) from <table>; 将字段的数据强制转化为double
+    2.建表
+        1).元数据
+            维护表定义的信息，和真实数据无关。比如表名，字段名，类型等等。
+            保存在MySQL，可以是远程也可以是本地(这个本地指的是提供Hive Service的机器)。
+        2).真实数据
+            实际由用户管理的数据，比如学生表中的学生数据。
+            保存在HDFS上，因此可以保存海量真实数据。
+        3).压缩表/非压缩表
+        4).内部表/外部表
+            创建表时，指定EXTERNAL就是外部表，否则是内部表。
+            内部表会在drop时从MySQL删除元数据从HDFS上删除数据。
+            外部表不会再drop时删除数据。
+            内部表：
+                create table <tbname> ( ... ) [partitioned by (<field> <type>)] row format delimited fields terminated by '<char>' stored as TEXTFILE;
+            外部表：
+                create external table <tbname> ( ... ) ... location '<hdfs-path>';
+    3.DML
+        1).join
+        2).过滤
+        3).order by/sort by/distribute by/cluster by
+        4).hive函数
+            sysdate()、date_format()、concat、substr、like、split。
+            sysdate()是hive特有的，用于指定相对于今天的日期。
+        5).数据倾斜
+        6).Hive分区表的高效查询
+        7).多表插入
+        8).hive null关联
+        9).动态分区
+            SET hive.exec.dynamic.partition=true;
+            SET hive.exec.dynamic.partition.mode=nonstrict;
+            可以启动动态分区。
+            insert overwrite table <table> partition (dt)
+                select * from <origin-table>
+            当查询的结果里面有dt时，会动态的将对应的记录放在对应的分区中。
+            静态分区时必须指定dt的值。
+        10).数据采样
+
+特别注意：
+    一、union和union all
+        union可以将两个查询结果合并成到一个结果中：
+            SELECT column_name(s) FROM table_name1
+            UNION
+            SELECT column_name(s) FROM table_name2
+        union操作符将会筛选掉重复的记录。如果允许重复的值，使用union all。
+        JDH不支持union，仅仅支持union all。
+        如果希望实现union的效果，需要使用子查询：
+            select distinct * from ( ... union all ... ) tb;
+    二、排序函数
+        1.order by
+            全局排序，因此只能有一个reduce，数据量较大时将会影响性能。
+        2.sort by
+            局部排序，多个reduce存在时，可以保证每个reduce输出的有序。
+            常和distribute by联合使用。
+        3.distribute by
+            将指定的字段相同值交给同一个reduce。但是这并不代表该字段相同值的记录就完全占有一个reduce，而是确保这些相同的值在同一个reduce中。
+            distribute by level 这样会将不同的level值交给不同的reduce。
+            distribute by level sort by score asc。这样将会对相同的level记录的score值进行排序，因为这些相同的level记录都在同一个reduce中。
+            level-1 1
+            level-1 2
+            level-1 3
+            level-2 1
+            level-2 3
+            level-3 4
+            level-3 5
+        4.cluster by
+            cluster by 是distribute by和sort by的结合，只能asc。
+            cluster by level 等价于 distribute level sort by level。
+            其分组的字段和排序的字段是一样的，因此cluster by比较受限。
+            （用了distribute by不代表一种类型的记录就占用一个reduce，在reduce少，而字段值类型多时，通过hash值和reduce求余进行分配，一个reduce里面应该会有好几种记录。因此需要这样的排序。）
+    三、查询和Join优化
+        0.根本思想
+            尽早过滤数据，减少每个阶段的数据量(可以节约大量的网络传输和节点处理)
+            减少Job数。复杂的hive任务会生成很多Job，而每个Job之间都是有依赖的，依赖的桥梁是每个Job在hdfs上生成的文件，因此过多的Job会耗费大量的IO。
+            解决数据倾斜任务
+        1.普通优化
+            1).列裁剪
+                将需要用到的列查询出来，不用的列就别查。
+            2).分区裁剪
+                也就是充分利用分区，如果有所属区的先验知识，则指定分区进行扫描。
+                Explain dependency可以查看查询语句扫描的分区。
+            3).多表插入优化
+                insert overwrite table tmp1
+                    select .... from tb where <cond1>
+                insert overwrite table tmp2
+                    select .... from tb where <cond2>
+                将tb表中满足不同条件的数据输出到不同的表中，这样的方式会对tb表扫描多次。可以通过
+                from tb
+                    insert overwrite table tmp1
+                        select ... where <cond1>
+                    insert overwrite table tmp2
+                        select ... where <cond2>
+                这样的方式可以指定原始表仅来自于表tb，并且只会扫描tb一次。
+            4).去重与排序
+                尽量避免使用distinct进行去重。因为distinct会将所有的数据全部交给一个reduce，由这个reduce进行去重，这样会有严重的数据倾斜。
+                使用group by来进行更好。
+                传统：select distinct key from tb;
+                优化：select key from tb group by key;
+            2).小表在前，大表在后。
+                因为reduce阶段，Join符号左边的表会被加载到内存中。这样可以有效的避免内存溢出。
+            3).如果join多个表中的连接字段，都采用同一个，则join会转为单mapreduce任务，以减少job数。
+            4).避免笛卡尔积，即一定要在on上加条件，并且连接的字段组合尽量唯一。
+            5).join前过滤掉不需要的数据。
+                传统方式 select * from A join B on .... where ... 这样的话会先连接在过滤，连接可能会影响性能。
+                优化方式 select * from (select * from A where ...) tb1 join (select * from B where ...) tb2 on ....
+                即通过子查询过滤掉不需要的数据，然后再连接。
+        2.semi join
+            通过semi join，可以高效实现in/exists子查询。
+            传统方案：
+                - select * from A where A.key in (select B.key from B);      将A.key和B.key进行连接。
+                - select * from A left outer join B on A.key=B.key where B.key is not null;
+            高效的方案:
+                - select * from A left semi join B on A.key = B.key;
+            B表有重复值的情况，semi join产生一条，join会产生多条。
+        3.map join
+            当大表与小表join时，可以采用map join，即将较小的表加载到每个mapper(大表数据所分布的mapper)的内存中，并省略掉reduce的步骤。这样做也可以避免数据倾斜。

@@ -1,0 +1,43 @@
+一、基础概念
+    Hive服务是建立在HDFS和MapReduce基础之上的：
+    
+    client <--> Hive <--> Hadoop
+
+    Hadoop，是数据保存和获取的地方。通过hdfs进行保存，通过mapreduce来组织并获取数据。
+    hive，用于解析hql并组织为mapreduce提交给hadoop运行。hive也负责表的元数据(即表的结构数据，各个表名 各个表的字段名等)保存。
+    客户端，发出请求。
+
+二、数据类型和文件格式
+    1.数据类型
+        TINYINT     SMALLINT
+        INT         BIGINT
+        BOOLEAN     FLOAT
+        DOUBLE      TIMESTAMP
+        STRING      BINARY(字节数组)
+        STRUCT      MAP
+        ARRAY
+    2.分隔符
+        Hive中的默认分隔符：
+            \n 换行符用于分割记录
+            ^A 用于分割字段(列)
+            ^B 用于分割ARRAY和STRUCT中的元素，以及Map的KV对。
+            ^C 用于Map的KV的分割。
+        也可以在建表的时候指定分隔符：
+            
+三、DDL
+
+四、DML
+    1.导入数据
+    2.查询
+    3.where
+    4.group by
+    5.join
+    6.order by和sort by
+    7.distribute by
+    8.cluster by
+    9.类型转换
+五、调优
+
+六、视图
+
+七、索引
