@@ -44,16 +44,57 @@
 		create external table <tb-name> ... location '<path>'	创建外部表，location指定数据文件的位置，删除表的时候，表数据是不会被删除的，只会被删除表的元数据。
 四、DML
     1.导入数据
+		1).普通插入
+		2).查询插入
+			insert [overwrite] table <tbname> [partition ...] select ...
+			将查询结果放到表中
+			开启overwrite，则会覆盖表中原有数据，若不开启则在后面插入。
+			原表和目标表之间的记录格式可以不同，会自行转换。
+			还可以进行多查询插入：
+			form <ori-table>
+			insert [overwrite] table <tbname> [partition ...]
+				select ...
+			insert [overwrite] table <tbname> [partition ...]
+				select ...
+			....
+			并且只会对<ori-table>进行一次扫描。
+		3).动态分区插入
+			在多查询插入中，往往会把不同的select结果插入到不同的分区，如果分区数过多，就需要写很长的sql语句。
+			动态分区基于查询参数推断出需要创建的分区名称。
+			insert [overwrite] table <tbname> partition(<partition-field>)
+			select ...
+			会将select的最后两个字段作为分区的依据对查询的记录进行分区。
+			也可以动静结合，也就是动态分区中指定部分静态分区。
+			insert [overwrite] table <tbname> partition(<static-partition-field>=<value> <dynamic-partition-field>)
+			select ..., <static-field> <dynamic-field> from <otbname> where <static-field> = <value>
+			动态分区需要人为打开，否则不能使用。
+		4).初始化建表数据
+			之前的insert将查询结果插入表中，要求表已经存在。还可以在查询得到结果时，直接将数据给一个新的表。
+			create table <tbname>
+			as select ... from <ori-tbname> where ...
+			新建的表的模式和查询结果相同。
     2.查询
+		就是select，这里强调一下STRUCT ARRAY MAP的结构。
+		这些特殊类型的结果显示都是采用JSON字符串。
+		select array[index], map["key"], struct.property from tb;
+		这样可以检索到更细节的数据。
     3.where
     4.group by
+		和sql一样，group by通常和聚合函数一起使用，聚合函数对一组数据进行操作得到一个结构。
+		在group by后可以使用having，对分组查询的结果做一个过滤，即把一些不满足结果的组给过滤掉。
+		select avg(col) from tb group by dt having avg(col) > 50 即先查询出每天的平均值，然后把那些平均值小于等于50的结果给滤掉得到最终结果。
     5.join
     6.order by和sort by
     7.distribute by
     8.cluster by
     9.类型转换
 五、调优
-
+	1.explain
+		可以看到hql执行的细节，包括抽象语法树、各个执行阶段、mapreduce的执行情况等等。
+	2.限制调整
+		limit用于限制结果，但是其实还是要查询完所有的结果再返回部分的结果，比较浪费。通过配置，可以让limit对源数据进行抽样。
+	3.join优化
+	4.本地模式
 六、视图
 
 七、索引
