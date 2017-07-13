@@ -34,10 +34,9 @@
 				mapper和reducer的分配。
 				job要处理数据的路径。
 				job结果输出的路径。
-			
 	3.执行
 		mapreduce框架中的datanode主机，每次读一行数据，都将这一行的信息传递给map方法。
-		
+
 二、demo
 	1.代码
 		public class WCMapper extends MApper<Long, String, String, Integer>{

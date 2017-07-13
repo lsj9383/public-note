@@ -77,6 +77,7 @@
 						缓存不下就溢出到本地磁盘中的小文件。小文件大小有限制，写满一个小文件就写一个新的小文件。
 						写在这个磁盘文件时，已经分完组，同一组里面也已经排序。一个文件里面会存在多个分组数据的情况。
 	fetch : 在map全部处理完后，将所有小文件整合在fetch中，将会对其分组并且重新排序。
+	partition:  每个mapper输出的kv对会根据接下来需要传输的reducer不同，将其放在不同的partition中。
 	reducer :	将所有map的i组，传递给第i个reducer，由于它们分别有序，全局并非有序。
 				因此将在reducer的磁盘上进行排序，排完序后传递给reducer逻辑处理，最后输出。
 	注意，REDUCER本身并不知道自己是什么组，不同的组在不同的MAPPER的fetch中在哪里，范围是多少。中间的一切MAPPER和REDUCER的信息交互，都依赖于MRAppMaster.

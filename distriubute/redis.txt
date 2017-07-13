@@ -21,7 +21,7 @@
             select 1，进入1号数据库。
             quit    退出redis控制台
         4).基础指令
-            keys <通配符>  查询数据库中满足通配符的所有key，*代表任意字符，?代表1个任意字符，[0-9]代表1个数字
+            keys <通配符>    查询数据库中满足通配符的所有key，*代表任意字符，?代表1个任意字符，[0-9]代表1个数字
             del <key>       删除一个kv对，返回删除了几个
             exists <key>    判断是否存在这个键
             type <key>      返回key所对应的value类型
@@ -40,7 +40,7 @@
             值还可以是Set，不重复，无序。
         5).zset
             值也能使Zset，不重复，有序。
-        6).HyperLogLog
+        6).HyperLog
             很少用。
     5.配置
         配置文件是安装目录下的redis.conf。
@@ -199,7 +199,7 @@
         通过slaveof no one指令，可以让从数据库断开，成为1个独立的主数据库。
         slave默认只能有master，但也可以通过修改slave的配置文件来放弃这样的策略。
     2.主从机制
-        a).当slave启动，回想master发送sync的同步指令。
+        a).当slave启动，会向master发送sync的同步指令。
         b).master接受到sync，master就回保存快照(rdb)，期间受到的命令缓存起来。
         c).rdb完成后，redis会把快照和缓存命令发送给slave。
         d).slave收到数据后，加载rdb，并执行缓存命令。此后slave都会周期性ping master。

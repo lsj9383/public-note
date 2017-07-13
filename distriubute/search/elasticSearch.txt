@@ -1,97 +1,97 @@
-Ò»¡¢¼ò½é
-	esÆäÊµ¾ÍÊÇ¶Ôluncene½øĞĞÁËÒ»¸ö·â×°£¬esÊÇÎªÁË·Ö²¼Ê½ËÑË÷¶øÉú¡£
-	»¹ÓĞÒ»¸öËÑË÷ÒıÇæsolr£¬Ò²ÊÇ¶Ôluncene½øĞĞÁË·â×°£¬Ò²ÓĞsolar cloud¡£
-	esÊÇÒ»¸ö»úÓölunceneµÄÊµÊ±·Ö²¼ËÑË÷ºÍ·ÖÎöÒıÇæ¡£»ùÓÚRESTful½Ó¿Ú£º
-		ÆÕÍ¨ÇëÇó½Ó¿ÚÊÇ ...get?a=1
-		restÇëÇó½Ó¿ÚÊÇ ...get/a/1
-	esÖ»Ö§³Öjson¸ñÊ½
+ä¸€ã€ç®€ä»‹
+	eså…¶å®å°±æ˜¯å¯¹lunceneè¿›è¡Œäº†ä¸€ä¸ªå°è£…ï¼Œesæ˜¯ä¸ºäº†åˆ†å¸ƒå¼æœç´¢è€Œç”Ÿã€‚
+	è¿˜æœ‰ä¸€ä¸ªæœç´¢å¼•æ“solrï¼Œä¹Ÿæ˜¯å¯¹lunceneè¿›è¡Œäº†å°è£…ï¼Œä¹Ÿæœ‰solar cloudã€‚
+	esæ˜¯ä¸€ä¸ªæœºé‡lunceneçš„å®æ—¶åˆ†å¸ƒæœç´¢å’Œåˆ†æå¼•æ“ã€‚åŸºäºRESTfulæ¥å£ï¼š
+		æ™®é€šè¯·æ±‚æ¥å£æ˜¯ ...get?a=1
+		restè¯·æ±‚æ¥å£æ˜¯ ...get/a/1
+	esåªæ”¯æŒjsonæ ¼å¼
 
-¶ş¡¢½Ó¿ÚÊ¹ÓÃ
-	curl -XPUT 'http://hosts:9200/index-base'							½¨Á¢Ë÷Òı¿â£¬putÓÃ¸üĞÂ
-	curl -XPOST/XPUT 'http://hosts:9200/index-base/type/id' -d '...'	postÓÃÓÚ²åÈëĞÂµÄjsonÊı¾İ
-	curl -XGET 'http://hosts:9200/index-base/type/id'					·µ»Ø¶ÔÓ¦µÄjsonÊı¾İ£¬°üÀ¨°æ±¾ºÅ
-	curl -XGET 'http://hosts:9200/index-base/type/id?pretty'			·µ»Ø¶ÔÓ¦µÄ¸ñÊ½»¯jsonÊı¾İ£¬°üÀ¨°æ±¾ºÅ
-	curl -XGET 'http://hosts:9200/index-base/type/id?_source?pretty'	·µ»Ø¶ÔÓ¦µÄ¸ñÊ½»¯jsonÊı¾İ£¬²»°üÀ¨°æ±¾ºÅµÈÆäËûÊı¾İ
-	curl -XGET 'http://hosts:9200/index-base/type/_search?pretty'		·µ»ØtypeÏÂµÄËùÓĞÊı¾İjsonÊı¾İ£¬°üÀ¨°æ±¾ºÅ
-	curl -XGET 'http://hosts:9200/index-base/_search?pretty'			·µ»ØË÷Òı¿âÏÂµÄËùÓĞÊı¾İjsonÊı¾İ£¬°üÀ¨°æ±¾ºÅ
-	curl -XGET 'http://hosts:9200/index-base/_search?q=name:xx&pretty'	·µ»ØË÷Òı¿âÏÂµÄjsonÊı¾İÖĞname×Ö¶ÎÎªxxµÄÊı¾İ£¬°üÀ¨°æ±¾ºÅ
-	curl -XGET 'http://hosts:9200/index-base/_mget?pretty' -d .....		·µ»Ø¶àÌõ½á¹û
-	curl -XPOST/XPUT http://hosts:9200/index-base/type/id/_create 		¶ÔÓ¦µÄÊı¾İ´æÔÚ£¬Ôò±¨´í¡£
+äºŒã€æ¥å£ä½¿ç”¨
+	curl -XPUT 'http://hosts:9200/index-base'							å»ºç«‹ç´¢å¼•åº“ï¼Œputç”¨æ›´æ–°
+	curl -XPOST/XPUT 'http://hosts:9200/index-base/type/id' -d '...'	postç”¨äºæ’å…¥æ–°çš„jsonæ•°æ®
+	curl -XGET 'http://hosts:9200/index-base/type/id'					è¿”å›å¯¹åº”çš„jsonæ•°æ®ï¼ŒåŒ…æ‹¬ç‰ˆæœ¬å·
+	curl -XGET 'http://hosts:9200/index-base/type/id?pretty'			è¿”å›å¯¹åº”çš„æ ¼å¼åŒ–jsonæ•°æ®ï¼ŒåŒ…æ‹¬ç‰ˆæœ¬å·
+	curl -XGET 'http://hosts:9200/index-base/type/id?_source?pretty'	è¿”å›å¯¹åº”çš„æ ¼å¼åŒ–jsonæ•°æ®ï¼Œä¸åŒ…æ‹¬ç‰ˆæœ¬å·ç­‰å…¶ä»–æ•°æ®
+	curl -XGET 'http://hosts:9200/index-base/type/_search?pretty'		è¿”å›typeä¸‹çš„æ‰€æœ‰æ•°æ®jsonæ•°æ®ï¼ŒåŒ…æ‹¬ç‰ˆæœ¬å·
+	curl -XGET 'http://hosts:9200/index-base/_search?pretty'			è¿”å›ç´¢å¼•åº“ä¸‹çš„æ‰€æœ‰æ•°æ®jsonæ•°æ®ï¼ŒåŒ…æ‹¬ç‰ˆæœ¬å·
+	curl -XGET 'http://hosts:9200/index-base/_search?q=name:xx&pretty'	è¿”å›ç´¢å¼•åº“ä¸‹çš„jsonæ•°æ®ä¸­nameå­—æ®µä¸ºxxçš„æ•°æ®ï¼ŒåŒ…æ‹¬ç‰ˆæœ¬å·
+	curl -XGET 'http://hosts:9200/index-base/_mget?pretty' -d .....		è¿”å›å¤šæ¡ç»“æœ
+	curl -XPOST/XPUT http://hosts:9200/index-base/type/id/_create 		å¯¹åº”çš„æ•°æ®å­˜åœ¨ï¼Œåˆ™æŠ¥é”™ã€‚
 	
-	es¿ÉÒÔÊ¹ÓÃput»òÕßpost½øĞĞ¸üĞÂ£¬Èç¹ûÖ¸¶¨idµÄÎÄµµÒÑ¾­´æÔÚ£¬ÔòÖ´ĞĞ¸üĞÂ²Ù×÷¡£Ö´ĞĞ¸üĞÂ²Ù×÷µÄÊ±ºò£º
-		- esÊ×ÏÈ½«¾ÉµÄÎÄµµÉ¾³ı
-		- Ìí¼ÓĞÂµÄÎÄµµ
-		- ¾ÉµÄÎÄµµ²»»áÁ¢¼´ÏûÊ§£¬µ«ÊÇÒ²ÎŞ·¨·ÃÎÊ
-		- es»áÔÚ¼ÌĞøÌí¼ÓÌí¼Ó¸ü¶àÊı¾İµÄÊ±ºòÔÚºóÌ¨ÇåÀíÒÑ¾­±ê¼ÇÎªÉ¾³ı×´Ì¬µÄÎÄµµ
-	¾Ö²¿¸üĞÂ£¬Ö»ÄÜÊ¹ÓÃpost£¬¿ÉÒÔÌí¼ÓĞÂ×Ö¶Î»òÕßĞŞ¸ÄÒÑÓĞ×Ö¶Î£ºcurl -XPOST 'http://hosts:9200/index-base/type/id/_update' -d 'json'£¬°æ±¾ºÅ»áËæÖ®¸üĞÂ
-	É¾³ı£ºcurl -XDELETE 'http://hosts:9200/index-base/type/id',É¾³ıÒ»¸öÎÄµµ²¢²»»áÁ¢¼´ÉúĞ§£¬¶øÊÇ±ê¼ÇÎªÒÑÉ¾³ı£¬ÔÚºóÌ¨ÖĞÓÉÆäËûÏß³ÌÉ¾³ı¡£
-	2.ÅúÁ¿²Ù×÷
-		½ÇÉ«:
-			action£ºindex/create/update/delete
-			metadata£º_index, _type, _id
-			request body£º_source
-		¸ñÊ½:
-			{action:{metadata}}\n		//Ö¸¶¨¶ÔmetadataÖ´ĞĞµÄ²Ù×÷
-			{request body}\n			//²Ù×÷µÄ¾ßÌåÊı¾İ
+	eså¯ä»¥ä½¿ç”¨putæˆ–è€…postè¿›è¡Œæ›´æ–°ï¼Œå¦‚æœæŒ‡å®šidçš„æ–‡æ¡£å·²ç»å­˜åœ¨ï¼Œåˆ™æ‰§è¡Œæ›´æ–°æ“ä½œã€‚æ‰§è¡Œæ›´æ–°æ“ä½œçš„æ—¶å€™ï¼š
+		- esé¦–å…ˆå°†æ—§çš„æ–‡æ¡£åˆ é™¤
+		- æ·»åŠ æ–°çš„æ–‡æ¡£
+		- æ—§çš„æ–‡æ¡£ä¸ä¼šç«‹å³æ¶ˆå¤±ï¼Œä½†æ˜¯ä¹Ÿæ— æ³•è®¿é—®
+		- esä¼šåœ¨ç»§ç»­æ·»åŠ æ·»åŠ æ›´å¤šæ•°æ®çš„æ—¶å€™åœ¨åå°æ¸…ç†å·²ç»æ ‡è®°ä¸ºåˆ é™¤çŠ¶æ€çš„æ–‡æ¡£
+	å±€éƒ¨æ›´æ–°ï¼Œåªèƒ½ä½¿ç”¨postï¼Œå¯ä»¥æ·»åŠ æ–°å­—æ®µæˆ–è€…ä¿®æ”¹å·²æœ‰å­—æ®µï¼šcurl -XPOST 'http://hosts:9200/index-base/type/id/_update' -d 'json'ï¼Œç‰ˆæœ¬å·ä¼šéšä¹‹æ›´æ–°
+	åˆ é™¤ï¼šcurl -XDELETE 'http://hosts:9200/index-base/type/id',åˆ é™¤ä¸€ä¸ªæ–‡æ¡£å¹¶ä¸ä¼šç«‹å³ç”Ÿæ•ˆï¼Œè€Œæ˜¯æ ‡è®°ä¸ºå·²åˆ é™¤ï¼Œåœ¨åå°ä¸­ç”±å…¶ä»–çº¿ç¨‹åˆ é™¤ã€‚
+	2.æ‰¹é‡æ“ä½œ
+		è§’è‰²:
+			actionï¼šindex/create/update/delete
+			metadataï¼š_index, _type, _id
+			request bodyï¼š_source
+		æ ¼å¼:
+			{action:{metadata}}\n		//æŒ‡å®šå¯¹metadataæ‰§è¡Œçš„æ“ä½œ
+			{request body}\n			//æ“ä½œçš„å…·ä½“æ•°æ®
 			{action:{metadata}}\n
 			{request body}\n
 		curl -XPOST 'http://hosts:9200/_bulk' -d 
 		' {"index":{"_index":"index-base", _type:"emp", "_id":10"}}		//
 		  {"name":"test10", "age":10}									//request body
 		'
-		curl -XPOST 'http://hosts:9200/_bulk' --data-binary @<ÎÄ¼şÃû>	//½«Ö´ĞĞÎÄ¼şÀïÃæµÄbulk²Ù×÷
-	3.°æ±¾¿ØÖÆ
-		ÀÖ¹Û¿ØÖÆ£º²»»á×èÈûÄ³Ò»Êı¾İµÄĞŞ¸Ä£¬µ«ÊÇÈç¹ûÔÚ¶ÁÈ¡ºÍĞ´ÈëÖ®¼äÊı¾İ·¢ÉúÁË±ä»¯£¬¸üĞÂ¾Í»áÊ§°Ü£¬ÓÉ³ÌĞò¾ö¶¨ÈçºÎ½â¾öÕâ¸ö³åÍ»£¬Ò»°ãÖØĞÂ¶ÁÈ¡Êı¾İÔÙ¸üĞÂ¡£
-		curl -XGET 'http://hosts:9200/index-base/type/id'									//»ñÈ¡Êı¾İ£¬°üÀ¨Êı¾İµÄ°æ±¾ºÅ¡£
-		curl -XPUT 'http://hosts:9200/index-base/type/id?version=<version>' -d '{...}'		//´«¹ıÈ¥°æ±¾ºÅ½øĞĞ¸üĞÂ£¬es»á»ñÈ¡´«¹ıÈ¥µÄ°æ±¾ºÅ£¬½øĞĞ¶Ô±È£¬Èç¹û°æ±¾ºÅÏàµÈ²Å»áÖ´ĞĞ¸üĞÂ¡£¸üĞÂ²Ù×÷»áĞŞ¸Ä°æ±¾ºÅ¡£
-																							//²»´«°æ±¾ºÅ£¬¾Í»áÇ¿ÖÆĞÔÊ¹ÓÃ×îĞÂ°æ±¾ºÅ½øĞĞ¸üĞÂ£¬µ±¸üĞÂ²Ù×÷²»ÒÀÀµÓÚ±£´æµÄÊı¾İÊ±¾Í¿ÉÒÔÓÃÕâÑùµÄ·½Ê½¡£
-Èı¡¢ºËĞÄ¸ÅÄî
-	1.cluster(¼¯Èº)
-		¼¯ÈºÓĞ¶à¸ö½Úµã£¬¼¯ÈºÄÚ²¿ÓĞÖ÷½Úµã£¬¶ÔÓÚÍâ²¿¶øÑÔ·ÃÎÊÈÎºÎ½Úµã¶¼¿ÉÒÔ£¬Òò´Ë¶ÔÓÚÍâ²¿¶øÑÔÀ´ËµesÊÇÈ¥ÖĞĞÄ»¯µÄ¡£
-		Ö»ĞèÒªÔÚÍ¬Ò»Íø¶ÎÆô¶¯¶à¸öes½Úµã£¬¾Í¿ÉÒÔ×Ô¶¯×é³É¼¯Èº¡£Ä¬ÈÏÇé¿öÏÂes¿ÉÒÔ×Ô¶¯·¢ÏÖÍ¬Ò»Íø¶ÎÄÚµÄ½Úµã£¬×Ô¶¯×é³É¼¯Èº¡£
-	2.shards(·ÖÆ¬)
-		es¿ÉÒÔ½«Ò»¸öÍêÕûµÄË÷Òı¿â·Ö³É¶à¸ö·ÖÆ¬£¬²»Í¬µÄ·ÖÆ¬·ÅÔÚ²»Í¬µÄ½ÚµãÉÏÒÔÊµÏÖ¿ÉÉìËõĞÔ¡£ÕâÀàËÆÓÚhdfsµÄfile·Ö³É¶à¸ö¿é£¬½«¶à¸ö¿é·ÅÔÚ²»Í¬µÄ½ÚµãÉÏ¡£
-		·ÖÆ¬ÊıÁ¿Ö»ÄÜÔÚ´´½¨Ë÷Òı¿âÇ°Ö¸¶¨¡£
-	3.replicas(¸±±¾)
-		ÎªÏµÍ³Ìá¹©Èİ´íĞÔºÍ¸ºÔØ¾ùºâ¡£¸±±¾ÊÇ°´·ÖÆ¬½øĞĞ±¸·İµÄ£¬ÕâÒ²ÀàËÆÓÚhdfsµÄ¸±±¾»úÖÆ¡£
-		¸±±¾ÊıÖ»ÄÜÔÚ´´½¨Ë÷ÒıÇ°Ö¸¶¨¡£
+		curl -XPOST 'http://hosts:9200/_bulk' --data-binary @<æ–‡ä»¶å>	//å°†æ‰§è¡Œæ–‡ä»¶é‡Œé¢çš„bulkæ“ä½œ
+	3.ç‰ˆæœ¬æ§åˆ¶
+		ä¹è§‚æ§åˆ¶ï¼šä¸ä¼šé˜»å¡æŸä¸€æ•°æ®çš„ä¿®æ”¹ï¼Œä½†æ˜¯å¦‚æœåœ¨è¯»å–å’Œå†™å…¥ä¹‹é—´æ•°æ®å‘ç”Ÿäº†å˜åŒ–ï¼Œæ›´æ–°å°±ä¼šå¤±è´¥ï¼Œç”±ç¨‹åºå†³å®šå¦‚ä½•è§£å†³è¿™ä¸ªå†²çªï¼Œä¸€èˆ¬é‡æ–°è¯»å–æ•°æ®å†æ›´æ–°ã€‚
+		curl -XGET 'http://hosts:9200/index-base/type/id'									//è·å–æ•°æ®ï¼ŒåŒ…æ‹¬æ•°æ®çš„ç‰ˆæœ¬å·ã€‚
+		curl -XPUT 'http://hosts:9200/index-base/type/id?version=<version>' -d '{...}'		//ä¼ è¿‡å»ç‰ˆæœ¬å·è¿›è¡Œæ›´æ–°ï¼Œesä¼šè·å–ä¼ è¿‡å»çš„ç‰ˆæœ¬å·ï¼Œè¿›è¡Œå¯¹æ¯”ï¼Œå¦‚æœç‰ˆæœ¬å·ç›¸ç­‰æ‰ä¼šæ‰§è¡Œæ›´æ–°ã€‚æ›´æ–°æ“ä½œä¼šä¿®æ”¹ç‰ˆæœ¬å·ã€‚
+																							//ä¸ä¼ ç‰ˆæœ¬å·ï¼Œå°±ä¼šå¼ºåˆ¶æ€§ä½¿ç”¨æœ€æ–°ç‰ˆæœ¬å·è¿›è¡Œæ›´æ–°ï¼Œå½“æ›´æ–°æ“ä½œä¸ä¾èµ–äºä¿å­˜çš„æ•°æ®æ—¶å°±å¯ä»¥ç”¨è¿™æ ·çš„æ–¹å¼ã€‚
+ä¸‰ã€æ ¸å¿ƒæ¦‚å¿µ
+	1.cluster(é›†ç¾¤)
+		é›†ç¾¤æœ‰å¤šä¸ªèŠ‚ç‚¹ï¼Œé›†ç¾¤å†…éƒ¨æœ‰ä¸»èŠ‚ç‚¹ï¼Œå¯¹äºå¤–éƒ¨è€Œè¨€è®¿é—®ä»»ä½•èŠ‚ç‚¹éƒ½å¯ä»¥ï¼Œå› æ­¤å¯¹äºå¤–éƒ¨è€Œè¨€æ¥è¯´esæ˜¯å»ä¸­å¿ƒåŒ–çš„ã€‚
+		åªéœ€è¦åœ¨åŒä¸€ç½‘æ®µå¯åŠ¨å¤šä¸ªesèŠ‚ç‚¹ï¼Œå°±å¯ä»¥è‡ªåŠ¨ç»„æˆé›†ç¾¤ã€‚é»˜è®¤æƒ…å†µä¸‹eså¯ä»¥è‡ªåŠ¨å‘ç°åŒä¸€ç½‘æ®µå†…çš„èŠ‚ç‚¹ï¼Œè‡ªåŠ¨ç»„æˆé›†ç¾¤ã€‚
+	2.shards(åˆ†ç‰‡)
+		eså¯ä»¥å°†ä¸€ä¸ªå®Œæ•´çš„ç´¢å¼•åº“åˆ†æˆå¤šä¸ªåˆ†ç‰‡ï¼Œä¸åŒçš„åˆ†ç‰‡æ”¾åœ¨ä¸åŒçš„èŠ‚ç‚¹ä¸Šä»¥å®ç°å¯ä¼¸ç¼©æ€§ã€‚è¿™ç±»ä¼¼äºhdfsçš„fileåˆ†æˆå¤šä¸ªå—ï¼Œå°†å¤šä¸ªå—æ”¾åœ¨ä¸åŒçš„èŠ‚ç‚¹ä¸Šã€‚
+		åˆ†ç‰‡æ•°é‡åªèƒ½åœ¨åˆ›å»ºç´¢å¼•åº“å‰æŒ‡å®šã€‚
+	3.replicas(å‰¯æœ¬)
+		ä¸ºç³»ç»Ÿæä¾›å®¹é”™æ€§å’Œè´Ÿè½½å‡è¡¡ã€‚å‰¯æœ¬æ˜¯æŒ‰åˆ†ç‰‡è¿›è¡Œå¤‡ä»½çš„ï¼Œè¿™ä¹Ÿç±»ä¼¼äºhdfsçš„å‰¯æœ¬æœºåˆ¶ã€‚
+		å‰¯æœ¬æ•°åªèƒ½åœ¨åˆ›å»ºç´¢å¼•å‰æŒ‡å®šã€‚
 	4.recovery
-		esÓĞ½Úµã¼ÓÈë»òÍË³öÊ±»á¸ù¾İ¸ºÔØ½«·ÖÆ¬ÖØĞÂ·Ö²¼¡£¹ÒµôµÄ½Úµã»Ö¸´ºó£¬Ò²»á½øĞĞÊı¾İµÄ»Ö¸´¡£
+		esæœ‰èŠ‚ç‚¹åŠ å…¥æˆ–é€€å‡ºæ—¶ä¼šæ ¹æ®è´Ÿè½½å°†åˆ†ç‰‡é‡æ–°åˆ†å¸ƒã€‚æŒ‚æ‰çš„èŠ‚ç‚¹æ¢å¤åï¼Œä¹Ÿä¼šè¿›è¡Œæ•°æ®çš„æ¢å¤ã€‚
 	5.gateway
-		esµÄ³Ö¾Ã»¯·½Ê½£¬Ä¬ÈÏÏÈ½«Ë÷Òı·Åµ½ÄÚ´æ£¬µ±ÄÚ´æÂúÁËÔÙ³Ö¾Ã»¯µ½Ó²ÅÌ¡£
-		µ±Õâ¸ö¼¯Èº¹Ø±ÕÔÙÖØÆôÊ±£¬»á´ÓgatewayÖĞ¶ÁÈ¡Êı¾İ¡£esµÄgatewayÓĞ¶àÖÖ·½Ê½£¬±¾µØÎÄ¼şÏµÍ³ºÍ·Ö²¼Ê½ÎÄ¼şÏµÍ³¡£Ò»°ã¾Í·Å±¾µØ¡£
+		esçš„æŒä¹…åŒ–æ–¹å¼ï¼Œé»˜è®¤å…ˆå°†ç´¢å¼•æ”¾åˆ°å†…å­˜ï¼Œå½“å†…å­˜æ»¡äº†å†æŒä¹…åŒ–åˆ°ç¡¬ç›˜ã€‚
+		å½“è¿™ä¸ªé›†ç¾¤å…³é—­å†é‡å¯æ—¶ï¼Œä¼šä»gatewayä¸­è¯»å–æ•°æ®ã€‚esçš„gatewayæœ‰å¤šç§æ–¹å¼ï¼Œæœ¬åœ°æ–‡ä»¶ç³»ç»Ÿå’Œåˆ†å¸ƒå¼æ–‡ä»¶ç³»ç»Ÿã€‚ä¸€èˆ¬å°±æ”¾æœ¬åœ°ã€‚
 	6.discovery.zen
-		esµÄÍ¬Íø¶Î×Ô¶¯·¢ÏÖ»úÖÆ¡£esÊÇÒ»¸ö»ùÓÚp2pµÄÏµÍ³£¬ËüÏÈÍ¨¹ı¹ã²¥Ñ°ÕÒ´æÔÚµÄ½Úµã£¬ÔÙÍ¨¹ı¶à²¥Ğ­ÒéÀ´½øĞĞ½ÚµãÖ®¼äµÄÍ¨ĞÅ£¬Í¬Ê±Ò²Ö§³Öµã¶Ôµã½»»¥¡£
-		Èç¹ûÊÇÒªÔÚ²»Í¬Íø¶ÎÖ®¼ä×é³É¼¯Èº£¬¾ÍĞèÒª½ûÖ¹discovery.zen»úÖÆ£¬ÔÙÉèÖÃĞÂ½ÚµãÆô¶¯Ê±ÄÜ¹»·¢ÏÖµÄÖ÷½ÚµãÁĞ±í¡£
+		esçš„åŒç½‘æ®µè‡ªåŠ¨å‘ç°æœºåˆ¶ã€‚esæ˜¯ä¸€ä¸ªåŸºäºp2pçš„ç³»ç»Ÿï¼Œå®ƒå…ˆé€šè¿‡å¹¿æ’­å¯»æ‰¾å­˜åœ¨çš„èŠ‚ç‚¹ï¼Œå†é€šè¿‡å¤šæ’­åè®®æ¥è¿›è¡ŒèŠ‚ç‚¹ä¹‹é—´çš„é€šä¿¡ï¼ŒåŒæ—¶ä¹Ÿæ”¯æŒç‚¹å¯¹ç‚¹äº¤äº’ã€‚
+		å¦‚æœæ˜¯è¦åœ¨ä¸åŒç½‘æ®µä¹‹é—´ç»„æˆé›†ç¾¤ï¼Œå°±éœ€è¦ç¦æ­¢discovery.zenæœºåˆ¶ï¼Œå†è®¾ç½®æ–°èŠ‚ç‚¹å¯åŠ¨æ—¶èƒ½å¤Ÿå‘ç°çš„ä¸»èŠ‚ç‚¹åˆ—è¡¨ã€‚
 	7.transport
-		esÄÚ²¿µÄ½Úµã»ò¼¯ÈºÓë¿Í»§¶ËµÄ½»»¥·½Ê½¡£
-		Ä¬ÈÏÄÚ²¿²ÉÓÃtcp·½Ê½¡£
+		eså†…éƒ¨çš„èŠ‚ç‚¹æˆ–é›†ç¾¤ä¸å®¢æˆ·ç«¯çš„äº¤äº’æ–¹å¼ã€‚
+		é»˜è®¤å†…éƒ¨é‡‡ç”¨tcpæ–¹å¼ã€‚
 
-ËÄ¡¢±à³Ì
-	ImmutableSettings settings = ImmutableSettings.settingsBuilder().put("client.transport.sniff", true).build();	//ÆôÓÃ×Ô¶¯·¢ÏÖ»úÖÆ£¬Ö»ĞèÒªÔÚ¿Í»§¶ËÖ¸¶¨Ò»¸öip£¬¾Í¿ÉÒÔ»ñµÃ¸ÃipËùÔÚ¼¯ÈºµÄËùÓĞ½Úµã¡£
-	TransportClient client = new TransportClient(settings);															//»ñÈ¡es transport¿Í»§¶Ë¶ÔÏó
-	client.addTransportAddress(new InetSocketTransportAddress("<ip>", 9300));										//Ö¸¶¨Á¬½ÓµÄes½ÚµãipºÍ¶Ë¿Ú£¬¶Ë¿ÚÄ¬ÈÏ9300£¬¿ÉÒÔÌí¼Ó¶à¸öesµÄ½ÚµãµÄip£¬Ö»ÒªÁ¬½Óµ½ÈÎºÎÒ»¸ö½Úµã£¬´úÂë¾ÍÄÜÕı³£Ê¹ÓÃ¡£Èç¹ûÌí¼ÓÁË×Ô¶¯·¢ÏÖ»úÖÆ£¬ÄÇÃ´»á×Ô¶¯ËÑÑ°ÆäËû½Úµã¡£
-	1.´´½¨Ë÷Òı¿âÊı¾İ
-		IndexResponse response = client.prepareIndex(index, type, id).setSource(jsons/hashmap).execute().actionGet();	//´´½¨Ë÷Òı¿âÖĞµÄÊı¾İ¡£Èç¹ûË÷Òı¿â²»´æÔÚ£¬Ôò´´½¨Ë÷Òı¿â¡£
-	2.²éÑ¯Êı¾İ
-		GetResponse response = client.prepareGet(index, type, id).execute().actionGet();					//»ñµÃÖ¸¶¨Ë÷Òı¿â-ÀàĞÍ-idµÄÊı¾İ
-	3.¸üĞÂÊı¾İ
-		UpdateResponse response = client.prepareUpdate(index, type, id).setDoc(json/hashmap).actionGet();	//¸üĞÂ£¬version×ÔÔö¡£
-	4.¸üĞÂ²åÈëÊı¾İ
-		ÓĞÔò¸üĞÂ£¬Ã»ÓĞÔò²åÈë
+å››ã€ç¼–ç¨‹
+	ImmutableSettings settings = ImmutableSettings.settingsBuilder().put("client.transport.sniff", true).build();	//å¯ç”¨è‡ªåŠ¨å‘ç°æœºåˆ¶ï¼Œåªéœ€è¦åœ¨å®¢æˆ·ç«¯æŒ‡å®šä¸€ä¸ªipï¼Œå°±å¯ä»¥è·å¾—è¯¥ipæ‰€åœ¨é›†ç¾¤çš„æ‰€æœ‰èŠ‚ç‚¹ã€‚
+	TransportClient client = new TransportClient(settings);															//è·å–es transportå®¢æˆ·ç«¯å¯¹è±¡
+	client.addTransportAddress(new InetSocketTransportAddress("<ip>", 9300));										//æŒ‡å®šè¿æ¥çš„esèŠ‚ç‚¹ipå’Œç«¯å£ï¼Œç«¯å£é»˜è®¤9300ï¼Œå¯ä»¥æ·»åŠ å¤šä¸ªesçš„èŠ‚ç‚¹çš„ipï¼Œåªè¦è¿æ¥åˆ°ä»»ä½•ä¸€ä¸ªèŠ‚ç‚¹ï¼Œä»£ç å°±èƒ½æ­£å¸¸ä½¿ç”¨ã€‚å¦‚æœæ·»åŠ äº†è‡ªåŠ¨å‘ç°æœºåˆ¶ï¼Œé‚£ä¹ˆä¼šè‡ªåŠ¨æœå¯»å…¶ä»–èŠ‚ç‚¹ã€‚
+	1.åˆ›å»ºç´¢å¼•åº“æ•°æ®
+		IndexResponse response = client.prepareIndex(index, type, id).setSource(jsons/hashmap).execute().actionGet();	//åˆ›å»ºç´¢å¼•åº“ä¸­çš„æ•°æ®ã€‚å¦‚æœç´¢å¼•åº“ä¸å­˜åœ¨ï¼Œåˆ™åˆ›å»ºç´¢å¼•åº“ã€‚
+	2.æŸ¥è¯¢æ•°æ®
+		GetResponse response = client.prepareGet(index, type, id).execute().actionGet();					//è·å¾—æŒ‡å®šç´¢å¼•åº“-ç±»å‹-idçš„æ•°æ®
+	3.æ›´æ–°æ•°æ®
+		UpdateResponse response = client.prepareUpdate(index, type, id).setDoc(json/hashmap).actionGet();	//æ›´æ–°ï¼Œversionè‡ªå¢ã€‚
+	4.æ›´æ–°æ’å…¥æ•°æ®
+		æœ‰åˆ™æ›´æ–°ï¼Œæ²¡æœ‰åˆ™æ’å…¥
 		UpdateRequest request = new UpdateRequest(index, type, id);
 		request.doc(json/hashmap/XContent);
 		request.upsert(json/hashmap/XContent);
 		UpdateResponse response = client.update(request).get();
-	5.É¾³ıÊı¾İ
+	5.åˆ é™¤æ•°æ®
 		DeleteRequest request = new DeleteRequest();
 		request.index(index);
 		request.type(type);
 		request.id(id);
 		DeleteResponse response = client.delete(request).get();
-	5.²éÑ¯Ö¸¶¨Ë÷Òı¿âÖĞµÄ×ÜÊı
+	5.æŸ¥è¯¢æŒ‡å®šç´¢å¼•åº“ä¸­çš„æ€»æ•°
 		long count = client.prepareCount(index).execute().get().getCount();
-	6.ÅúÁ¿²Ù×÷
+	6.æ‰¹é‡æ“ä½œ
 		BulkRequestBuilder builder = client.prepareBulk();
 		IndexRequest request1 = new IndexRequest(index, type, id);
 		request.source(....);
@@ -101,18 +101,18 @@
 		builder.add(request2);
 		...
 		builder.execute().actionGet();
-	7.×¨ÃÅµÄ²éÑ¯
+	7.ä¸“é—¨çš„æŸ¥è¯¢
 		SearchResponse response = client.prepareSearch(index)
 										.setTypes(type)
-										.setSearch(SearchType.DFS_QUERY_THEN_FETCH)			//Ö¸¶¨²éÑ¯ÀàĞÍ
-										.setQuery(QueryBuilders.matchQuery(key, value))		//Ö¸¶¨²éÑ¯¹Ø¼ü×Ö
-										.addSort(key, SortOrder.ASC)						//°´¸Ã¹Ø¼ü´ÊÅÅĞò
-										//fromºÍsizeÊÇÓÃÓÚÊµÏÖ²éÑ¯½á¹ûµÄ·ÖÒ³£¬¿ÉÒÔ»ñÈ¡½á¹ûÖĞÄ³¸ö·¶Î§¶îÄÚÈİ
+										.setSearch(SearchType.DFS_QUERY_THEN_FETCH)			//æŒ‡å®šæŸ¥è¯¢ç±»å‹
+										.setQuery(QueryBuilders.matchQuery(key, value))		//æŒ‡å®šæŸ¥è¯¢å…³é”®å­—
+										.addSort(key, SortOrder.ASC)						//æŒ‰è¯¥å…³é”®è¯æ’åº
+										//fromå’Œsizeæ˜¯ç”¨äºå®ç°æŸ¥è¯¢ç»“æœçš„åˆ†é¡µï¼Œå¯ä»¥è·å–ç»“æœä¸­æŸä¸ªèŒƒå›´é¢å†…å®¹
 										.setFrom(from)
 										.setSize(10)
 										.execute().actionGet();
-		SearchHit[] hits = response.getHits().getHits();		//»ñµÃ²éÑ¯½á¹û
-		²éÑ¯ÀàĞÍ:
+		SearchHit[] hits = response.getHits().getHits();		//è·å¾—æŸ¥è¯¢ç»“æœ
+		æŸ¥è¯¢ç±»å‹:
 			- QUERY_THEN_FETCH
 			- QUERY_AND_FETCH
 			- DFS_QUERY_THEN_FETCH

@@ -44,7 +44,7 @@ NN的元数据管理：
 		6).上传fsimage.chkpoint文件到nn主机。
 		7).nn将edits删除，并将edits.new重命名为edits log,fsimage.chkpoint重命名为fsimage
 	5.checkpoint条件
-		1) edits log达到fs.checkpoint.size(默认64M)，chekcpoint一次.
+		1) edits log达到fs.checkpoint.size(默/认64M)，chekcpoint一次.
 		2) edits log隔fs.checkpoint.period(默认3600秒)，checkpoint一次.
 		3) 这些参数在hdfs-site.xml，会生效。
 	6.nn职责
