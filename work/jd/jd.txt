@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 一、经历过的业务
 	1.天网风控首页开发
 		主要是CSS方面的内容。
@@ -20,11 +19,18 @@
 二、算法
 	1.可视化树模型
 	
-三、后台
+三、后台/服务器/大数据
 	1.树结构的数据库插入方法
 	2.mybatis
 	3.hive
-	
+	4.modules层次
+		Java后台可以分成4个层次：web表现层，service服务层，dao数据库交互层，domain领域模型层。
+		以往每个层是一个package，但是每个层将会比以往更为复杂，所以将每个层转换为module。
+		module是maven module：
+			1.创建maven project，并将在pom中设置为<packaging>pom</packaging>，意味着该pom将会被继承。
+			2.在maven project的pom中指定其中的module。module主要是指定parent，可以继承parent中写好的依赖。
+			3.分别创建各个module。
+			4.在每个module中添加依赖，以进行module关联。依赖关系不能成环，依赖顺序为：web->service->dao->domain。
 四、并发
 	1.多线程分组任务处理
 		- 利用CountLatchDown构造endGate进行分组处理。
