@@ -579,3 +579,34 @@
 			final class ValueIterator extends HashIterator;
 			final class EntryIterator extends HashIterator;
 		}
+	5.LinkedHashMap
+		HashMap提供了字典功能，但是当通过迭代器遍历HashMap时不会以put的先后顺序遍历进行，而是无序的。LinkedHashMap补全了这个不足。
+		以下展示了主要的接口方法和重要的私有方法及其逻辑描述。
+		原理上是LinkedHashMap维护了一个链表，该链表顺序保存put的kv对，迭代器是直接遍历该kv对链表。对于get和put这样的和顺序无关的操作而言，主要是利用父类HashMap的功能。
+		public class LinkedHashMap<K,V> extends HashMap<K,V> implements Map<K,V>{
+			//该类是一个kv对链表节点，并且是双向的
+			static class Entry<K,V> extends HashMap.Node<K,V> {
+				Entry<K,V> before, after;							//当前节点左右两个节点
+				Entry(int hash, K key, V value, Node<K,V> next) {super(hash, key, value, next);}
+			}
+
+			//维护了一个链表
+			transient LinkedHashMap.Entry<K,V> head;				//最【老】添加进去的元素(kv对)，相当于是链表头指针。
+			transient LinkedHashMap.Entry<K,V> tail;				//最【新】添加进去的元素(kv对)，相当于是链表尾指针。
+			final boolean accessOrder;								//设置是否在get操作时在链表中进行顺序调整。
+
+			public LinkedHashMap(int initialCapacity, float loadFactor);	//对hashMap进行初始化，参数是初始化容量和加载因子，主要是调用super。
+			public LinkedHashMap(int initialCapacity);						//指定初始化容量，主要是调用super。
+			public LinkedHashMap();											//默认初始化，主要是调用super。
+			public LinkedHashMap(int initialCapacity, float loadFactor, boolean accessOrder)		//该构造函数配置了accessOrder
+
+			public boolean containsValue(Object value);						//遍历链表，能找到链表中的entry.value与value值相同的元素，返回true否则false。
+			public V get(K key);											//获取kv对的value值。逻辑是获取到对应的value值后，若accessOrder为true，则会将对应的kv对节点移动到末尾。主要是调用afterNodeAccess方法实现。
+			
+
+			private void linkNodeLast(LinkedHashMap.Entry<K,V> p);				//在尾部添加一个新节点p
+			private void afterNodeAccess(Node<K,V> e);			 				//将该节点移动到最后，逻辑上是先获得节点e的前后两个节点，然后将前后两个节点连接在一起(即先删除节点e)，然后将节点e添加到最后并设为尾节点。
+			protected boolean removeEldestEntry(Map.Entry<K,V> eldest);			//是否删除最老的节点，默认是不删除，需要通过继承的方式来修改其实现。
+			private Node<K,V> newNode(int hash, K key, V value, Node<K,V> e);	//HashMap在put时将会通过newNode方法来生成一个kv对，这个newNode覆盖了put的方法。该逻辑是不仅仅是创建kv对，还会把该kv对放在链表末尾。
+
+		}
