@@ -423,3 +423,288 @@
 									fun(oldRef), 
 									oldVersion, 
 									oldVersion+1);
+
+十六、其他
+	3.读写锁原理解析
+		读写锁是为了提升“大量读 少量写”这样场景的并发性和吞吐量而设计的。
+		多个读线程不会阻塞，读写或写写的情况下会阻塞。
+		读写锁有个比较细节的问题是公平性：
+			无论现在资源是被读者占有还是写者占有，当有新的写线程请求时，该写线程将会阻塞，而后的读写请求都会阻塞，这时需要一个清晰的策略来描述下次线程调度时(读者或者写着释放掉锁)如何选择被阻塞的线程来运行。
+			1).公平锁
+				阻塞的读写线程都会进入队列，该队列类似于记录线程的请求时间。公平锁认为每个线程都是公平的，需要根据时间来调度。
+				若出队是写线程，则会将写锁交给该线程。
+				若出队的是读线程，则会一直出队直到队头为写线程或队列为空。这批读者将会开始运行。
+			2).非公平锁
+				a).写优先(默认采用的方式)
+					当有写线程请求时，下次调度总是运行写线程。若有多个写线程，则随机选择一个。写线程较多时，可能会造成读线程饥饿。
+				b).读优先
+					当有读线程请求时，下次调度总是运行读线程。因为读写锁的场景本来就是“读多写少”，因此写线程将会饥饿。
+		最基本的【写优先】实现：
+			public class MyReadWriteLock {
+				private int readers = 0;			// 现在正在读的读者
+				private int writers = 0;			// 现在正在写的写者，一般为1
+				private int writeRequesters = 0;	// 发出了写请求，但是被阻塞的写线程个数
+				
+				public synchronized void lockRead() throws InterruptedException{
+					while( writers>0 || writeRequesters>0 ){		//正在写，或者有 写请求 阻塞。读请求直接阻塞。
+						wait();
+					}
+					readers++;						//读者+1
+				}
+				
+				public synchronized void unlockRead(){
+					readers--;
+					notifyAll();
+				}
+				
+				public synchronized void lockWrite() throws InterruptedException{
+					writeRequesters++;
+					while( writers>0 || readers>0 ){				// 正在写 或者 正在读 则阻塞
+						wait();
+					}
+					writeRequesters--;
+					writers++;
+				}
+				
+				public synchronized void unlockWrite(){
+					writers--;
+					notifyAll();
+				}
+				
+			}
+			上述实现存在的问题是：锁无法重入:
+				1). 写者重新进行读/写请求时，将会因为writers>0而阻塞，单其实这时候的writers就是他自己。
+				2). 存在读者A时，若线程B发起了写请求，这时候读者A重新请求读锁，将会阻塞。这会造成死锁。
+		对于写优先且可重入的读写锁的实现，主要是要支持：1).读锁重入 2)写锁重入 3)读锁升级 4)写锁降级
+			public class MyReentrantReadWriteLock {
+				private Map<Thread, Long> readThreads = new HashMap<Thread, Long>();
+				private Thread writeThread = null;
+				private int readers = 0;			// 现在正在读的读者
+				private int writers = 0;			// 现在正在写的写者，一般为1
+				private int writeRequesters = 0;	// 发出了写请求，但是被阻塞的写线程个数
+				
+				synchronized public void lockRead() throws InterruptedException{
+					while(!canAcquireReadLock(Thread.currentThread())){
+						wait();
+					}
+					readers++;
+					Long times = readThreads.get(Thread.currentThread());
+					if(times == null){times = 0L;}
+					readThreads.put(Thread.currentThread(), ++times);
+				}
+				
+				synchronized public void unlockRead(){
+					Long times = readThreads.get(Thread.currentThread())-1;
+					if(times == 0){
+						readers--;
+					}else{
+						readThreads.put(Thread.currentThread(), times-1);
+					}
+					notifyAll();
+					
+				}
+				
+				public void lockWrite() throws InterruptedException{
+					writeRequesters++;
+					while(!canAcquireWriteLock(Thread.currentThread())){
+						wait();
+					}
+					writeRequesters--;
+					writers++;
+					writeThread = Thread.currentThread();
+				}
+				
+				public void unlockWrite(){
+					writers--;
+					if(writers==0){
+						writeThread = null;
+					}
+					notifyAll();
+				}
+				
+				private boolean canAcquireReadLock(Thread thread){
+					if(readThreads.get(thread) != null) return true;	//当前线程正在读，允许获得读锁
+					if(writers>0 || writeRequesters>0) return false;
+					return true;
+				}
+				
+				private boolean canAcquireWriteLock(Thread thread){
+					if(writeThread == thread)	return true;			//当前线程正在写，允许获得写锁
+					if(readers > 0 || writers > 0) return false;
+					return true;
+				}
+			}
+	4.AbstractQueuedSynchronizer
+		AQS类提供了一个队列锁框架，队首的线程获取锁，后面的线程等待锁。核心的模板方法是acquire和release。
+		tryAcquire和tryRelease将会交给子类来实现，这两个方法是判断当前线程竞争锁和释放锁的关键。
+		1).获得锁
+			线程主要是通过调用acquire来获得锁。具体的锁竞争逻辑由子类实现。
+			a).acquire
+				public final void acquire(int arg) {
+					if (!tryAcquire(arg) &&
+						acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+						selfInterrupt();
+				}
+				先判断是否竞争获得锁，若竞争失败则会通过addWaiter将线程节点入队，通过accquireQueued来竞争锁，竞争失败将会在这个方法里面阻塞。
+			b).addWaiter
+				private Node addWaiter(Node mode) {
+					Node node = new Node(Thread.currentThread(), mode);
+					Node pred = tail;
+					if (pred != null) {
+						node.prev = pred;
+						if (compareAndSetTail(pred, node)) {
+							pred.next = node;
+							return node;
+						}
+					}
+					enq(node);
+					return node;
+				}
+				先获取到队列尾节点，若尾节点不为null，则将尾节点设置为node，设置的方式采用cas避免竞争。
+				若由于竞争导致尾节点添加失败，或是对列为空，则调用enq(node)，该方法通过死循环的方式保证尾节点设置成功。
+				private Node enq(final Node node) {
+					for (;;) {
+						Node t = tail;
+						if (t == null) { // Must initialize
+							if (compareAndSetHead(new Node()))
+								tail = head;
+						} else {
+							node.prev = t;
+							if (compareAndSetTail(t, node)) {
+								t.next = node;
+								return t;
+							}
+						}
+					}
+				}
+				若队列为空，首先设置头节点，然后设置尾节点。若队列不为空，则一直在尾部添加节点，直到成功为止。
+			c).acquireQueued
+				final boolean acquireQueued(final Node node, int arg) {
+					boolean failed = true;
+					try {
+						boolean interrupted = false;
+						for (;;) {
+							final Node p = node.predecessor();
+							if (p == head && tryAcquire(arg)) {
+								setHead(node);
+								p.next = null; // help GC
+								failed = false;
+								return interrupted;
+							}
+							if (shouldParkAfterFailedAcquire(p, node) &&
+								parkAndCheckInterrupt())
+								interrupted = true;
+						}
+					} finally {
+						if (failed)
+							cancelAcquire(node);
+					}
+				}
+				首先从队列中拿出前个节点，若前个节点为头节点，并且tryAcquire竞争获得了锁，则重置头节点。
+				若竞争锁失败，则会通过shouldParkAfterFailedAcquire方法对队列进行重构，主要是删除已经被中断取消的线程，然后通过parkAndCheckInterrupt()将进行阻塞。
+				退出acquireQueue有两种可能，一种是竞争拿到了锁，另一种是线程被取消，将会在finally中判断线程退出的原因，若是取消则设置该线程的状态为取消，后续会在重构时将该线程节点从队列中删除。
+				private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+					int ws = pred.waitStatus;
+					if (ws == Node.SIGNAL)
+						return true;
+					if (ws > 0) {
+						do {
+							node.prev = pred = pred.prev;
+						} while (pred.waitStatus > 0);
+						pred.next = node;
+					} else {
+						compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+					}
+					return false;
+				}
+				ws>0时，就是进行重构的手段。
+		2).释放锁
+			释放锁主要由线程调用release方法来实现。tryRelease是具体释放锁的逻辑，由子类实现。release方法主要是在释放锁的情况下对队列做调整，并解除阻塞。
+			a).release
+				public final boolean release(int arg) {
+					if (tryRelease(arg)) {
+						Node h = head;
+						if (h != null && h.waitStatus != 0)
+							unparkSuccessor(h);
+						return true;
+					}
+					return false;
+				}
+				首先若可以释放所，则对首节点做h一个简单的判断，然后unparkSuccessor将会释放开当前线程节点的后面那个有效线程。
+	4.ReentrantLock解析
+		ReentrantLock基于AQS类(AbstractQueuedSynchronizer)来实现。也就是说阻塞的线程，都是放在了一个队列中进行管理。
+		该类中实现了两种AQS：公平锁与非公平锁：
+			公平锁是新线程总是放在队列尾，不会参与竞争锁。
+			非公平锁【默认】中新线程会先竞争锁，竞争不到才会放到对列尾巴。
+		在ReentrantLock中实现了Syn类，该类继承AQS，并实现了释放锁的逻辑，以及非公平锁的逻辑。
+		1).tryRelease
+			protected final boolean tryRelease(int releases) {
+				int c = getState() - releases;
+				if (Thread.currentThread() != getExclusiveOwnerThread())
+					throw new IllegalMonitorStateException();
+				boolean free = false;
+				if (c == 0) {
+					free = true;
+					setExclusiveOwnerThread(null);
+				}
+				setState(c);
+				return free;
+			}
+		2).非公平锁的竞争实现
+			final void lock() {
+				if (compareAndSetState(0, 1))
+					setExclusiveOwnerThread(Thread.currentThread());
+				else
+					acquire(1);
+			}
+			首先通过cas来竞争锁，这是非公平的体现。竞争不到会调用acquire，该方法是在AQS的模板方法，在该方法中会首先调用tryAcquire以再次竞争锁。
+
+			protected final boolean tryAcquire(int acquires) {
+				return nonfairTryAcquire(acquires);
+			}
+			nonfairTryAcquire在下面实现。
+
+			final boolean nonfairTryAcquire(int acquires) {
+				final Thread current = Thread.currentThread();
+				int c = getState();
+				if (c == 0) {
+					if (compareAndSetState(0, acquires)) {				//竞争，新线程也会执行该逻辑，非公平的体现。
+						setExclusiveOwnerThread(current);
+						return true;
+					}
+				}
+				else if (current == getExclusiveOwnerThread()) {		//偏向锁，避开cas开销
+					int nextc = c + acquires;
+					if (nextc < 0) // overflow
+						throw new Error("Maximum lock count exceeded");
+					setState(nextc);
+					return true;
+				}
+				return false;
+			}
+		3).公平锁的实现
+			final void lock() {
+				acquire(1);
+			}
+			这里没有cas竞争操作。
+
+			protected final boolean tryAcquire(int acquires) {
+				final Thread current = Thread.currentThread();
+				int c = getState();
+				if (c == 0) {
+					if (!hasQueuedPredecessors() &&
+						compareAndSetState(0, acquires)) {
+						setExclusiveOwnerThread(current);
+						return true;
+					}
+				}
+				else if (current == getExclusiveOwnerThread()) {
+					int nextc = c + acquires;
+					if (nextc < 0)
+						throw new Error("Maximum lock count exceeded");
+					setState(nextc);
+					return true;
+				}
+				return false;
+			}
+			在这里可以看到，这里面的竞争锁的逻辑是当前线程节点前面没有线程了才开始cas竞争。
