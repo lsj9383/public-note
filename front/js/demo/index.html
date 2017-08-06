@@ -2,18 +2,14 @@
     <head></head>
     <body>
         <script>
-            var mark = function(balance){
-                var b = 3;
-                if(balance>b){
-                    function a(){
-                        console.log("hello");
-                    }
-                }
-                debugger;
-                a();
-            }
-
-            var W1 = mark(0);
+            var scope = "global";
+			var f = function(){
+				var scope = "local";
+				return function(){
+					alert(scope);
+				};
+			}
+			f()();
         </script>
     </body>
 </html>

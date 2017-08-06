@@ -76,8 +76,10 @@
         对于同名变量，采用就近原则。
         作用域链：
             这非常类似于scheme、lisp等函数式编程语言。
-            js的函数有个这样的特性：每个函数在触发运行的时候，会首先在内存开启一个作用域链，作用域链中保存了函数在运行时可以找到的变量。
+            js的函数有个这样的特性：每个函数在定义时，便会有一个作用域链，当该函数触发时会新建一个对象放在作用域链的首部，函数中的变量将会绑定在这个新对象中。
+			函数定义时，其作用域链中就是所定义环境时采用的作用域链。
             当函数运行时，使用x这一变量时，会先在作用域链中找第一个对象的属性，若存在则使用，否则找链中的第二个对象的属性...若没有链中没有一个对象有该属性，则抛出异常。
+			这其实很类似于sicp里面的作图法，每个函数都有两个圆圈，第一个圆圈是函数体，第二个圆圈是指向其作用域链。当方法执行时，将会产生一个新的环境，新环境的指向和函数定义时的第二个圆圈相同，这其实就是作用域链。
 
 三、表达式
     1.对象和数组的初始化表达式
@@ -181,7 +183,7 @@
             - 内置对象，由ECMAScript规范定义的对象或类，如数组，函数，日期和正则表达式。
             - 宿主对象，由Js的宿主环境定义的，如表示网页结构的HTMLElement对象。
             - 自定义对象，运行中的js创建的对象。
-        - 自由属性，直接在对象中定义ide属性。
+        - 自有属性，直接在对象中定义ide属性。
         - 继承属性，对象原型中定义的属性。
     2.创建对象
         可以通过new、Object.create()、{}均可以创建对象。
@@ -194,7 +196,7 @@
         3).通过Object.create()创建
             var o = Object.create([prototype, otherProperty);
             其中prototype是o的原型，otherproperty是对o属性的进一步描述。
-        3).原型
+        4).原型
             js除了null外，都和另外一个对象关联，这个对象就是原型。
                 - 通过对象直接量({...}的方式)创建的对象，都有同一个原型，即Object.prototype。
                 - 通过new创建的对象，原型就是构造函数的prototype属性。
@@ -203,3 +205,94 @@
             当设置o.x的值时，会直接在o中创建x，并不会修改原型的值。
             var o = {x:1, y:2};
             fun(Object.create(o));          通过这样的机制，可以避免在fun中对o的意外修改。
+	3.属性
+		查询对象o的属性x，如果o中不存在x，则到o的原型对象中继续查找，直到没有原型对象为止。
+		对o.x进行赋值，如果o中有不存在x则给o添加新属性x，不会对原型造成影响。
+		1).删除属性
+			delete o.<key>
+			只是断开属性和宿主的联系，属性引用的对象其实并没有消失。
+			var o = {p:{x:1}};
+			var i = o.p;
+			delete o.p;
+			i.x仍然为1.
+			delete也只能删除自有属性，不能删除继承属性。
+			delete始终返回true。
+			delte不能删除可配置性为false的属性。
+		2).检测属性
+			"<key>" in o，可以检查<key>是否存在于o中。
+			也可以通过o.<key> !== undefine 来判断是否存在该属性。但是若属性存在但是值为undefine时，这个方法不能区分，必须用in。
+			o.hasOwnProperty(<key>)可以判断<key>是否为o的自有属性。
+			o.propertyIsEnumerable(<key>)可以判断<key>是否为o的可枚举属性。
+		3).getter/setter
+			由getter setter定义的属性，被称为'存取器属性'。
+			查询属性时，将会调用getter方法，该方法返回的值就是读取到的值。
+			属性赋值时，将会调用setter方法。
+			和普通的数据属性不同，存取器属性不具备可读/写性，只有当属性同时具备getter和setter时，它才是一个可读写的属性。
+			var o = {
+				get prop(){  },
+				set prop(val){  }
+			};
+			在方法中，要获取所在对象的属性，需要采用this.xxx的方式，不能直接通过xxx来引用。直接xxx是寻找的函数的作用域链。
+	4.属性的特性
+	5.对象的3个属性
+		1).原型
+		2).类
+		3).可扩展性
+六、数组
+七、函数
+	函数的每次调用，都会自动传入本次调用的上下文，该上下文通过this参数来引用。
+	当函数属于某个对象的方法时，调用该函数，传入的上下文就是这个对象自己。
+	用于初始化一个新创建的对象的函数被称为构造函数。
+	1.构造函数调用
+		如果函数或者方法调用之前带有new，它就构成了构造函数调用。
+		构造函数将会创建一个新对象，该对象继承自构造函数的prototype属性。构造函数创建的新对象，并将这个对象用作其调用的上下文。
+		因此构造函数可以通过this来引用新创建的对象。也就是说new o.m()中，m的this并不是o，而是这个新创建的对象。
+		构造函数也不会用return，它们通常初始化新对象，函数执行完毕时会自动返回该新对象。
+	2.闭包
+八、类和模块
+九、服务器端的Js
+十、脚本化Http
+十一、客户端存储
+	客户端存储支持一下几种形式：
+		Web存储
+		cookie
+		Web离线应用
+		Web数据库
+		文件系统API
+	1.localStorage和sessionStorage
+		localStorage和sessionStorage的区别在于其有效期和作用域不同。
+		1).有效期
+			localStroage的有效期是永久的，除非人为删除。
+		2).作用域
+			localStrage的作用域是同一文档源，文档源由协议(http/ftp/...)，主机名，端口号决定。
+			同一文档源的localStorage是公用的。由于localStorage是保存在浏览器里的，因此若不同浏览器之间不共享localStorage。
+	2.cookie
+		cookie代表了少量的数据。cookie会自动在Web浏览器和Web服务器之间传输，因此服务器的程序方便拿到cookie值。因此cookie其实是为服务器准备的。
+		可以通过navigator.cookieEnable来检测cookie是否启用。
+		1).cookie的有效期和作用域
+			a).有效期
+				cookie的默认有效期很短，只能持续在web浏览器会话期间，一旦用户关闭浏览器，cookie保存的数据便丢失。
+				需要注意的是cookie的默认有效期并非是单个窗口线程，而是整个浏览器进程，进程关闭才会丢失cookie。
+				通过max-age属性，可以设定cookie的生存周期。以前是expire属性，现在统一采用max-age属性。
+			b).作用域
+				cookie的作用域是通过domain和path来确定的。
+				默认情况下，cookie和创建它的页面有关，并对该页面和该web页面同目录及其子目录的其他web页面可见：
+					url/index.html页面下创建了cookie，
+					那么url/index2.html可见cookie
+					并且url/file/index3.html同样可见cookie
+				通过设置cookie的path，可以让cookie和path的兄弟目录及其子目录下cookie可见。特殊的，若将path设为"/"，以为这cookie和localStorage具有相同的作用域，即仅有文档源决定的作用域。
+				需要注意的是，path不能用以作为访问控制，因为在某个页面下可见的cookie，当该页面有iframe形式加载其他页面时，那些页面同样可以读取cookie。
+				通过设置cookie的domain，可以让cookie在不同域名下可见。如设置domain为.jd.com，那么所有.jd.com为后缀的站点都可见。默认情况下的domain是当前Web服务器的主机名。需要注意的是，domain只能设置当前服务器的域。
+		2).保存cookie
+			document.cookie="key=value";	下次读取document.cookie时，该kv对就在文档cookie列表中了。path domain max-age均采用默认值。
+			document.cookie="key=value;max-age=seconds"		cookie生存时间为seconds秒。
+			docuemtn.cookie="k=v;max-age=seconds;path=xxx;domain=xxx"
+		3).设置cookie
+			要改变cookie的值，需要使用相同的key，domain和path，否则会添加新的cookie。设置新的value和max-age可以改变以前的值。
+			要删除一个cookie，需要使用相同的名字，路径和域，然后使用一个非空的值，并将其max-age设置为0，再次设置该cookie即可。
+			document.cookie="key=nn;domain=...;path=...."
+		4).读取cookie
+			使用Js来读取document.cookie时，返回的是一个字符串。该字符串包含了一系列的kv值，并以分号分割。但是并不包含这些cookie-kv的属性。
+			
+			
+十二、多媒体和图形编程
