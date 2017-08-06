@@ -1,0 +1,58 @@
+一、基础
+    HBase是一个在HDFS上开发的面向列的分布式数据库，这不是i个关系型数据库，不支持SQL。
+    可以通过简单的增加节点来达到线性扩展。
+
+二、数据模型
+    数据库中有很多表，表大致上由行和列组成。
+    RowKey : 表中每个记录的主键。
+    Column Family : 每条记录有多个列族。
+    Column : 每个列都是属于某个Column Family的，换句话说每个列族中有多个列。
+    Version Number : 版本号，默认值是系统时间戳。
+    Value : 保存的数据。
+    通过RowKey, Column Family, Column, Version Number来索引一个Value。
+    在建表的时候，就需要确定该表的Column Family，而Column是可以在后面随意添加的。这其实也很类似每个Column Family下面有多个key:value，这个key就是column。
+
+三、物理模型
+    1.Region
+        HBase自动把表进行水平拆分，即将连续的一些行拆分出来作为区域(Region)。每个表初始只有一个区域，当陆续增加记录时会分为多个区域。
+        区域按大小分割，是Hbase分布式存储和负载均衡的最小单位，不同的Region在不同的regionserver中。
+    2.Store
+        一个Region又有多个Store组成，每个Store保存一个了column family。
+    3.memstore/storeFile
+        每个Store由1个memostore和多个store file组成。
+        memstore是内存区域。
+        store file是硬盘区域。
+    4.ROOT和META表
+        这两个表帮助检索出指value所处的Region节点机器位置。
+        这是由于一个表的记录非常之多，会将其水平拆分放到不同的节点上，客户端并不知道某个记录所处的Region，需要再META表中找到对应的Region然后客户端再去读写数据。
+        用户Region的位置存储在META表中，由于大数据应用中Region会非常的多，因此META表也会非常大，理应将META分为多个Region，然后由ROOT表记录META的各个Region的位置。
+        但其实现在META是个单Region的表，ROOT表直接可以定位到META表的Region。
+    4.实际读写过程
+        1).写入
+            当检索到记录的Region后，写操作首先会被追加到commit log中，然后加入内存中的memstore中，当memstore满了后其内容将会被刷入文件系统(store file)。
+        2).读出
+            在读的时候，查看Region的memstore，如果在memstore中找到了需要的数据，就查询接受，否则去文件中找。
+
+四、角色
+    1.client
+        包含hbase的接口，并且维护cache以加快对hbase的访问。
+    2.master
+        为regionserver分配region。
+        负责regionserver的负载均衡。(即检索到记录所处regionserver的过程)
+        发现实现的regionserver，并重新分配region。
+        管理用户对table的crud。
+    3.regionserver
+        维护region，处理客户端对记录的请求。
+        切分在运行过程中过大的region。
+    4.zookeeper
+        确保集群中只有一个master，master和regionserver均会向zk注册。
+        regionserver的上线和下线会通知master。
+        存储所有region的寻址入口。
+
+五、高可用
+    hbase本是master-slave模型，master的宕机会给使整个服务崩溃。
+    1.master高可用
+        master宕机，zk上的临时znode会被取消，并重新选取一台作为新的master。
+    2.regionserver的高可用
+        regionserver宕机，zk将会通知master，而master会将该regionserver上的region重新分配到其他regionserver上去。
+        失效的regionserver上写好的日志发送给新的regionserver。
