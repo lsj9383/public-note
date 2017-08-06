@@ -423,8 +423,33 @@
 									fun(oldRef), 
 									oldVersion, 
 									oldVersion+1);
-
+									
 十六、其他
+	1.线程协调
+		每个对象都有一个互斥锁，notify()，notifyAll()，wait()方法。
+		每个对象都有一个类似于wait set的空间，当线程调用某个对象的wait()时，便会将其放入该set并挂起，当调用某个对象的notify()时便会从wait set中取出一个线程试图运行。
+		1).wait()
+			线程等待，并把线程放入对象的wait set，若该线程拥有该对象的互斥锁，则会释放锁。
+		2).notify()
+			将对象的wait set中的一个线程取出来运行，若该线程之前wait()在synchronized代码块内，则会阻塞直到拿到锁。
+		3).notifyAll()
+			将对象的wait set中的所有线程都取出来，在synchronized内wait的线程，会阻塞直到拿到锁。
+	2.ProducerConsumer的简单实现
+		public class BlockinQueue<T>{
+			Queue<T> q = new ArrayList<>();
+			
+			synchronized public void push(T item){
+				q.push(item);
+				notifyAll();		//通知因为空而阻塞的线程
+			}
+			
+			synchronized public T take(){
+				if(q.isEmpty()){
+					wait();			//空，则阻塞
+				}
+				return q.poll();
+			}
+		}
 	3.读写锁原理解析
 		读写锁是为了提升“大量读 少量写”这样场景的并发性和吞吐量而设计的。
 		多个读线程不会阻塞，读写或写写的情况下会阻塞。
