@@ -125,7 +125,7 @@
         需要注意的是，数组元素被删除，其长度仍然不变，其被删除的元素用undefine代替。
         var 语句声明的变量不可删除，function定义的函数和函数参数也不可删除。
 四、语句
-    1.声明语句a
+    1.声明语句
         var <name>;
     2.function
         函数定义
@@ -234,10 +234,49 @@
 			};
 			在方法中，要获取所在对象的属性，需要采用this.xxx的方式，不能直接通过xxx来引用。直接xxx是寻找的函数的作用域链。
 	4.属性的特性
+		一个属性包含4个特性：值、可写性、可枚举性和可配置性。
+		一个存取器属性也包含4个特性：get、set、可枚举型和可配置性。
+		有一个被称为“属性描述符”的对象，这个对象描述了一个属性的4个特性。
+		通过【Object.getOwnerPropertyDescriptor(o, "<key>")】可以获取某个对象o特定属性<key>的属性描述符。这个函数只能取出自有属性的属性描述符对象。
+		通过【Object.defineProperty(o, "<key>", <property-descriptor-object>)】。该方法要不新增属性，要不修改自有属性，不会修改继承属性。
+		若需要批量修改或创建多个属性，可以通过属性映射的方式来进行：
+			Object.defineProperty({},{
+				x : {属性描述符对象},
+				y : {属性描述符对象},
+				r : {属性描述符对象},
+				...
+			});
 	5.对象的3个属性
 		1).原型
-		2).类
+			对象的原型属性是用来继承属性的，并在实例对象创建之初就设置好了：
+				var o = {...};		//Object.prototype是o的原型
+				var o = new Con();	//Con.prototype是o的原型
+				var o = Object.create(t);		//t是o的原型
+			【Object.getPrototype(o)】可以查询o的原型。
+			也可以通过o.constructor.prototype来查询o的原型。 (o.constructor是创建o使用的构造函数)
+			有些浏览器支持o.__proto__来查询原型，但是不建议使用，因为并不广泛用于所有浏览器。
+		2).类属性
+			
 		3).可扩展性
+			用以表示是否可以给对象添加新属性，所有的内置对象和自定义对象都是可扩展的。宿主对象的可扩展性由Js引擎定义。
+			Object.isExtensible(o)			可以用来判断对象o是否为可扩展的。
+			Object.preventExtensions(o)		可以将o设置为不可扩展的对象。当然不可扩展只针对对象自身，不影响原型。若给原型对象增加属性，不可扩展对象仍然可以使用新属性。将会返回传入的对象。
+			Object.seal(o)					可以将o设置为不可扩展，且自有属性不可配置。将会返回传入的对象。
+			Object.freeze(o)				将对象设置为不可扩展，属性设置为不可配置，自有属性设置为只读。将会返回传入的对象。
+	6.序列化对象
+		var json = JSON.stringify(o);	可以将对象o转换为json字符串
+		var o = JSON.parse(json);		可以将json转换为js对象
+		JSON.stringify只能序列化o的【自有属性】，并且stringify支持的值类型是有限制的，比如函数是不能序列化的。
+	7.Object.prototype的方法
+		所有对象都继承Object.prototype，因此有必要了解下该对象提供了什么方法。
+		1).toString()
+			在需要将对象转为字符串时，都会调用该方法。
+		2).toLocalString()
+			字符串本地化，Object.prototype的toLocalString()只是调用toString()。
+		3).toJSON()
+			Object.prototype其实并没有这个方法，但是JSON.stringify会首先调用o.toJSON()，只有在没有实现这个方法的时候，才会调用默认的序列化。
+		4).valueOf()
+			和toString()类似，但是这个是为了将对象转换为原始数值，而非字符串。
 六、数组
 七、函数
 	函数的每次调用，都会自动传入本次调用的上下文，该上下文通过this参数来引用。
