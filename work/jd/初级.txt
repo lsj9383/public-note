@@ -95,7 +95,7 @@ HIVE:
             level-3 5
         4.cluster by
             cluster by 是distribute by和sort by的结合，只能asc。
-            cluster by level 等价于 distribute level sort by level。
+            cluster by level 等价于 distribute by level sort by level。
             其分组的字段和排序的字段是一样的，因此cluster by比较受限。
             （用了distribute by不代表一种类型的记录就占用一个reduce，在reduce少，而字段值类型多时，通过hash值和reduce求余进行分配，一个reduce里面应该会有好几种记录。因此需要这样的排序。）
     三、查询和Join优化
