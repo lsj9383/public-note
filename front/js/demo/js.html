@@ -1,0 +1,19 @@
+<html>
+    <head></head>
+    <body>
+
+		<a href="javascript:new Date().toLocaleTimeString();" id='hhh'>哈哈哈</a>
+		<div onclick='fun()'>click</div>
+        <script>
+            var fun = function(){
+				document.getElementById('hhh').innerHTML=2;
+				for(var i=0; i<100; i++){
+					for(var j=0; j<100; j++){
+						console.log(i+j);
+					}
+				}
+					
+			}
+        </script>
+    </body>
+</html>
