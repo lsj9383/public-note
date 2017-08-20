@@ -223,10 +223,44 @@
         v-show总是会渲染，但是display属性受控。初始渲染开销比v-if大，但切换开销小。
         v-if  若为false，初始并不会渲染。但是其切换开销较大。
 七、列表渲染
-2220794
-rvcmonitor
+	1.v-for
+		语法有多种变形：
+			item in items，items是源数组，item是元素迭代的别名。
+			(item, idx) in items，idx是当前项的索引。
+			value in object，object是源对象，value是对象中的值(kv中的v)。
+			(value, key, idx) in object,  key是kv中的k，idx是索引。
+			n for <number>， <number>是一个数字，n是从0到该数字的值。
+			源对象和源数组均来自于Vue实例：
+			new Vue({
+				data : {
+					items : [],
+					object: {},
+				}
+			});
+			v-for语法是作用于标签的，可以将标签进行复制，并且复制的标签可以访问数组中的内容。
+			<li v-for="item in items">{{item}}</li>
+			当有多个标签需要进行循环时，可以使用template + v-for的方式。
+	2.v-for与v-if
+		当v-for与v-if出现在同一标签上时，v-for的优先级更高。也就是说v-if将会重复作用于每个v-for循环标签中。
+	3.数组更新检测
+		Vue有一组变异方法，这组方法将会是数组改动，并被Vue观测到，且更新渲染。
+		push()    unshift()   reverse()
+		pop()     splice()
+		shift()   sort()
+		非变异方法，并不会触发数组的改动，而是生成新的数组。当用新数组替换旧数组时，也会触发视图更新渲染。
+		1).当利用索引进行值的设置时，也不会更新渲染。需要依赖Vue.set(vueObj.items, idx, newValue); 来设置新值。
+		2).直接设置数组的length元素时，也不能进行渲染。
+	4.过滤
+		当要进行循环的显示根据值进行过滤时，可以依赖计算属性。	
+		computed: {
+			evenNumbers: function () {
+				return this.numbers.filter(function (number) {
+				return number % 2 === 0
+			})
+		}
 八、事件处理器
-
+	可以用v-on指令监听DOM事件来触发js。
+	
 九、表单控件绑定
 
 十、组件
