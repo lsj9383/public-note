@@ -1,5 +1,12 @@
 package offer;
 
+/**
+ * 
+ * 二叉搜索树转双向链表
+ * 
+ * @author lu
+ *
+ */
 public class Solution26 {
 
 	public static void main(String[] args) {
