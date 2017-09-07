@@ -1,2 +1,58 @@
 一、网络IO模型
+
 二、NIO基础
+	NIO基于Channel和Buffer进行操作。数据总是从Channel读到Buffer，或是从Buffer写入Channel。
+	1.核心角色
+		1).Channels
+			类似于流，可以读写数据。流是单向的，Channels是全双工的。并且Channels可以异步读写，Channels总是先读到一个Buffer或是从一个Buffer中写入。
+			Channel有几种常用类比：
+				- FileChannel, 从文件中读写数据。
+				- DatagramChannel，通过UDP读写网络中的数据。
+				- SocketChannel，通过TCP读写网络中的数据。
+				- ServerSocketChannel，可以监听新进来的TCP连接。
+		2).Buffers
+			缓冲区本质上是一块可以读写的内存，这块内存被包装为NIO Buffer对象，并提供了一组方法用来方便访问该内存。
+			a).从Buffer中读写数据一般遵循以下四个步骤:
+				- 写入数据到Buffer
+				- 调用filp方法
+					在写入数据时，buffer会记录写入了多少数据。一旦需要读取数据，需要通过filp从写模式切换到读模式。在读模式下，可以读取之前写入到buffer的数据。
+				- 从buffer中读取数据
+				- 调用clear或者compact方法
+					clear会清空整个缓冲区，compact会清空已经读过的数据。
+			b).Buffer的本质
+				Buffer有3个关键属性：Capacity，Position，limit。
+				capacity：
+					作为一个内存块，Buffer有一个固定的大小值，也叫capacity。一旦buffer满了，需要清空buffer(可以通过读来清理buffer)才能继续往里面写数据。
+				position：
+					当写模式时，position表示当前的写入位置。写入一个数据后position往后移动。
+					当读模式时，position表示当前的读出位置。读出一个数据后position往后移动。
+				limit：
+					在写模式下，limit表示最多能写入多少数据，因此此时limit等价于capacity。
+					在读模式下，limit表示最多能读到多少数据。因此当切换到写模式时，limit会变成写模式下的position(可以读到那里)。
+				写模式->读模式，通过filp实现，limit=position; position=0;
+				读模式->写模式，通过compact实现，将position的数据全部移动到buffer的开头，并设置position为数据末，limit为capacity。
+			c).Buffer的操作
+				i).分配
+					每一个Buffer类都有一个allocate方法，主要是用来确定capacity。
+				ii).写入数据
+					写入Buffer有两种方式：
+						- 由Channel写入Buffer
+							int byteRead = inChannel.read(buf);		从Channel中读取数据，会写入到buf中。虽然这是读，但这是相对于Channel的读。对于Buffer是写。
+						- 通过Buffer的put方法写入Buffer
+							buf.put(127);
+				iii).filp方法
+					将Buffer从写模式切换到读模式。调用filp方法将会设置limit为position的值，把position设置为0.
+				iv).读取数据
+					读取数据也分了两种方式：
+						- Channel直接读取Buffer
+							int byteWritten = inChannel.write(buf);	Channel将会读取buf中的数据
+						- 使用get方法读取Buffer
+							byte aByte = buf.get();
+				v).rewind方法
+					在读模式时使用，会将position设置为0且limit不变，即重读buffer中的数据。
+				vi).clear与compact方法
+				vii).mark与reset
+					通过Buffer.mark将会标记position为markPosition，然后在reset可以将position重置为该markPosition。
+		3).Selectors
+			Selectors上会绑定一些Channels，并且Selectors会阻塞当前线程并等待，当Channels满足一些触发事件时将会唤醒Selectors线程。
+			
