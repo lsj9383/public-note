@@ -1,5 +1,12 @@
 package offer;
 
+/**
+ * 
+ * 对称的二叉树
+ * 
+ * @author lu
+ *
+ */
 public class Solution58 {
 
 	public static void main(String[] args) {

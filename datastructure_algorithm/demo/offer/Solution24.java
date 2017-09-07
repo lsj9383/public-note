@@ -1,7 +1,6 @@
 package offer;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 /**
  * 
@@ -16,35 +15,26 @@ public class Solution24 {
 		
 	}
 
+	ArrayList<ArrayList<Integer>> paths = new ArrayList<>();
 	public ArrayList<ArrayList<Integer>> FindPath(TreeNode root,int target) {
-		ArrayList<ArrayList<Integer>> paths = new ArrayList<>();
-		Stack<Info> s = new Stack<>();
-		
-		s.push(new Info(root, root.val));
-		while(!s.isEmpty()) {
-			Info info = s.pop();
-			if(info.cost == target) {
-				
-			}
-			if(info.tn.left!=null) {
-				s.push(new Info(info.tn.left, info.cost+info.tn.left.val));
-			}
-			
-			if(info.tn.right!=null) {
-				s.push(new Info(info.tn.right, info.cost+info.tn.right.val));
-			}
-		}
+		p(root, target, new ArrayList<Integer>(), 0);
 		return paths;
     }
 	
-	static class Info{
-		TreeNode tn;
-		int cost;
-		
-		public Info(TreeNode tn, int cost) {
-			this.tn = tn;
-			this.cost = cost;
+	void p(TreeNode root, int target, ArrayList<Integer> path, int val) {
+		if(root == null) {
+			return ;
 		}
+		val += root.val;
+		path.add(root.val);
+		
+		if(root.left==null && root.right==null && val == target) {
+			paths.add(new ArrayList<Integer>(path));
+		}
+		p(root.left, target, path, val);
+		p(root.right, target, path, val);
+		path.remove(path.size()-1);
+		val-=root.val;
 	}
 	
 	static class TreeNode {

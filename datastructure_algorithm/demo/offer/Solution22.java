@@ -4,6 +4,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
 
+/**
+ * 
+ * 从上往下打印二叉树
+ * 
+ * @author lu
+ *
+ */
 public class Solution22 {
 
 	public static void main(String[] args) {

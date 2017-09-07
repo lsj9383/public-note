@@ -12,15 +12,21 @@ import java.util.Stack;
 public class Solution20 {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		Solution20 so = new Solution20();
+		int[] nums = new int[] {32, 94, 4, 3, 13, 34, 32, 53};
+		for(int i:nums) {
+			so.push(i);
+		}
+		System.out.println(so.min());
+		so.pop();so.pop();so.pop();so.pop();so.pop();so.pop();
+		System.out.println(so.min());
 	}
 
 	Stack<Integer> s = new Stack<>();
 	Stack<Integer> min = new Stack<>();
 	
 	public void push(int node) {
-		if(node < min.peek()) {
+		if(min.isEmpty() || node < min.peek()) {
 			min.push(node);
 		}
         s.push(node);

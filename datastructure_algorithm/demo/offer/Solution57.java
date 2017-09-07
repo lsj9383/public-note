@@ -15,7 +15,22 @@ public class Solution57 {
 	}
 
 	public TreeLinkNode GetNext(TreeLinkNode pNode){
-        return null;
+		if(pNode==null) {return null;}
+		if(pNode.right!=null) {
+			TreeLinkNode resNode = pNode.right;
+			while(resNode.left!=null) {
+				resNode = resNode.left;
+			}
+			return resNode;
+		}
+		if(pNode.next!=null) {
+			TreeLinkNode resNode = pNode;
+			while(resNode.next!=null && resNode.next.left != resNode) {
+				resNode = resNode.next;
+			}
+			return resNode.next;
+		}
+		return null;
     }
 	
 	static class TreeLinkNode {
