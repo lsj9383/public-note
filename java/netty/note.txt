@@ -54,5 +54,127 @@
 				vii).mark与reset
 					通过Buffer.mark将会标记position为markPosition，然后在reset可以将position重置为该markPosition。
 		3).Selectors
-			Selectors上会绑定一些Channels，并且Selectors会阻塞当前线程并等待，当Channels满足一些触发事件时将会唤醒Selectors线程。
-			
+			Selector是一种组件，该组件可以检测多个Channel是否触发了一些事件。这样一个单线程可以借助Selector管理多个Channel。以便管理多个网络连接。
+			a).创建与注册
+				Selector selector = Selector.open();				// 创建selector
+				channel1.configBlock(false);						// channel和selector一起使用时，必须使用非阻塞模式。FileChannel不能配置为非阻塞，因此FileChannel不能和selector一起使用。
+				channel2.configBlock(false);
+				channel1.register(selector, SelectionKey.OP_READ);	// 将channel注册到selector，并且指定selector监听Channel【可读】事件。
+				channel2.register(selector, SelectionKey.OP_WRITE);	// 当channel的写缓冲区为空的时候，就会触发。此时channel可写。
+				selector可以监听以下事件：
+					SelectionKey.OP_CONNECT
+					SelectionKey.OP_ACCEPT
+					SelectionKey.OP_READ
+					SelectionKey.OP_WRITE
+				可以通过 SelectionKey.OP_READ | SelectionKey.OP_WRITE 来监听多个感兴趣的事件
+			c).selectionKey
+				其实本质上，注册的并非是Channel，而是SelectionKey。而SelectionKey和Channel是一对一关系。
+				register其实是有返回值的，就是返回的注册的SelectionKey：
+					SelectionKey key = channel.register(selector, Selectionkey.OP_READ);
+				每个SelectionKey都对应着一个Channel。在SelectionKey中包含以下属性：
+					- interest集合
+						这个是对Channel所选择的感兴趣的事件集合
+					- ready集合
+						int readySet = selectionKey.readyOps();  这个数据为1的bit就代表对应的发生了对应的事件
+						也可以通过以下的方式更轻松获悉ready
+							selectionKey.isAcceptable();
+							selectionKey.isConnectable();
+							selectionKey.isReadable();
+							selectionKey.isWritable();
+					- Channel和Selector
+						由于SelectionKey和Channel是一对一关系，在SelectionKey中的Channel属性中保存着对应的Channel。
+						SelectionKey也保存了对应的Selector。
+					- 附加对象(可选)
+						可以将一个对象附着到SelectionKey上，例如可以附加与Channel一起使用的Buffer。
+						key.attach(obj);
+						Object obj = key.attach();
+			d).select方法
+				Selector可以执行select方法，该方法会阻塞线程，直到有感兴趣的Channel事件触发为止。
+				int n = selector.select();				// 阻塞到至少有一个通道在注册上的事件就绪
+				int n = selector.select(long timeout);	// 阻塞到事件就绪，或者发生超时
+				int n = selector.selectNow();			// 不会阻塞
+				返回的n代表有多少Channel准备好了。主要是指 从上次调用select到现在调用select之间，有多少通道准备好了。
+			e).selectedKeys方法
+				返回一个Set，该Set里面有已经准备就绪的Channel对应的SelectoionKey。
+					Set selectedKeys = selector.selectedKeys();
+					Iterator keyIterator = selectedKeys.iterator();
+					while(keyIterator.hasNext()) {
+						SelectionKey key = keyIterator.next();
+						....
+						keyIterator.remove();
+					}
+			f).wakeUp方法
+				某个线程调用select方法阻塞后，若需要让其唤醒需要通过其他线程调用selector的wakeUp方法。
+			g).close方法
+				调用Selector的close方法，会让注册到Selector上的所有SelectionKey实例无效。但是Channel本身并不会关闭。
+	2.Scatter/Gather
+		scatter(分散)：从channel中读取的数据写入多个buffer中。
+		gather(聚集) ：多个buffer的数据写入到同一个channel中。
+		scatter/gather适合于将传输的数据进行分块处理的场合，例如消息头和消息体放在不同的buffer中。
+		scatter read：
+			channel.read(new ByteBuffer[]{ByteBuffer.allocate(128), ByteBuffer.allocate(1024)});
+			channel的read接收一个数组，数组中放了多个buffer，channel将会按顺序把数据写入到buffer中，写满一个buffer后就会写下一个buffer。
+		gather write：
+			channel.write(new ByteBuffer[]{ByteBuffer.allocate(128), ByteBuffer.allocate(1024)});
+			channel的write接收一个数组，数组中有多个buffer，channel按顺序读出这些buffer的数据写入到channel中。只有position和limit之间的数据需要写入。
+	3.通道之间的数据传输
+		两个channel中，若有一个channel是FileChannel那么可以让这两个channel直接传输，而不必将数据输入到内存。
+		FileChannel.transerFrom(position, count, fromChannel);
+			将fromChannel中的数据从0开始，传输count个到FileChannel。
+			count仅仅代表最多传输的字节数，若fromChannel中没有count个则不会传输那么多。对于socketChannel，只会传输准备好的数据。
+		FileChannel.to(position, count, toChannel)
+			将FileChannel中的数据从position，传输count个到toChannel。
+			若toChannel是SocketChannel，那么会将Channel的写缓冲区填满为止，也并不一定就得写完count个。
+	4.SocketChannel
+		1).创建与关闭
+			有两种方式创建SocketChannel:
+				- 打开SocketChannel并连接到互联网上的某台服务器
+					SocketChannel socketChannel = SocketChannel.open();
+					socketChannel.connect(new InetSocketAddress(<ip>, <port>));
+				- 一个新连接到达ServerSocketChannel时，会创建一个SocketChannel
+			socketChannel.close();	可以关闭socketChannel。
+		2).读写
+			读出数据：
+				ByteBuffer buf = ByteBuffer.allocate(48);
+				int byteRead = socketChannel.read(buf);
+				byteRead是此次读出的数据大小。如果返回-1，那么就读到尾了，对端的socketChannel已经关闭。此时本机也可以关闭掉该socketChannel了。
+				对方如果关闭了socketChannel，也会触发OP_READ的，此时读的就是-1。
+			写入数据：
+				ByteBuffer buf = ByteBuffer.allocate(48);
+				buf.put("hello world".getBytes());
+				buf.flip();		// Buffer即将被channel读，所以要切换为读模式
+				while(buf.hasRemaining){
+					socketChannel.write(buf);
+				}
+				由于write方法无法确保可以把buf里面的数据全部写入到channel(因为这受channel缓冲区的限制，网络拥堵时channel缓冲区很可能满)，因此需要反复的写。
+				这里通过while人为进行write的阻塞。
+				还可以把buf放在attach中，并注册channel的OP_WRITE事件，在缓冲区有空间的时候把buf取出来再将数据写入到channel，直到写完buf就可以删除掉对OP_WRITE事件的注册了。
+			非阻塞模式
+				对于read，在尚未读取到任何数据就可能返回。只需要关心返回的int，就能得知现在读出了多少字节。
+				对于write，在尚未将buffer中的数据写入到channel就可能返回，可以通过while人为阻塞，也可以注册write事件。
+				对于connect，可能在连接建立前就返回了，为了确认是否建立连接可以使用socketChannel.finishConnect();
+	5.ServerSocketChannel
+		该channel主要用于监听新进来的TCP连接通道。
+		1).打开与关闭
+			ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+			serverSocketChannel.close();
+		2).非阻塞监听
+			serverSocketChannel.socket().bind(new InetSocketAddress(<port-number>));
+			serverSocketChannel.configureBlocking(false);
+			SocketChannel sc = serverSocketChannel.accept();
+			通常此时会把sc注册到selector以便监听。
+	6.Pipe
+		Pipe又称管道，是两个线程间的一种单向数据通信机制。
+		Pipe对象是个线程安全对象，可以在两个线程间共享，在Pipe对象中有两个Channel：SinkChannel和SourceChannel。
+		SinkChannel用于写数据，SourceChannel用于读出数据
+		Pipe pipe = Pipe.open();
+		()->{	//线程1
+			SinkChannel sinkChannel = pipe.sink();
+			while(buf.hasRemaining()){
+				sinkChannel.write(buf);
+			}
+		}
+		()->{	//线程2
+			SourceChannel sourceChannel = pipe.source();
+			int bytesRead = sourceChannel.read(buf);
+		}
