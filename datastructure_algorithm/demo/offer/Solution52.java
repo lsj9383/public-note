@@ -10,7 +10,6 @@ package offer;
 public class Solution52 {
 
 	public static void main(String[] args) {
-		String[] parts = "-1.23".split("-");
 		System.out.println(new Solution52().p("+-5"));
 		
 	}
