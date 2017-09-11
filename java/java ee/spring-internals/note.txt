@@ -1,0 +1,80 @@
+一、IoC
+	对于SpringIoC主要依赖于几个关键的类和接口来实现：
+		- BeanFactory
+			这是容器的抽象，该接口的职责是提供最基本的接口，用于获取对应的bean。
+		- BeanDefinition
+			这是对bean的数据抽象，也是生成bean的关键。在BeanFactory中有一个map用于保存这些抽象数据。
+		- Resource
+			这是对资源的抽象。提供获取资源IO流的接口。
+		- Reader
+			该类的职责负责解析Resource中的数据，生成BeanDefinition并将其注册到容器中。
+	1.IoC容器的设计
+		1).BeanFactory接口
+			BeanFactory <---- HierarchicalBeanFactory <---- ConfigurableBeanFactory
+			BeanFactory提供了关于获取bean，判断bean等最基本的接口，方法都是只读的。
+			HierachicalBeanFactory提供了BeanFactory的继承功能，一个BeanFactory可以有双亲BeanFactory，这样寻找一个bean可以在继承链上找。
+			ConfigurableBeanFactory提供了对BeanFactory的配置功能。父接口都提供的只读方法，该接口提供的方法可以对BeanFactory进行配置，如配置双亲Factory。
+		2).ApplicationContext接口
+			ApplicationContext接口也称应用上下文接口，提供了比beanFactory更高层的应用。
+	2.BeanFactory的产品类
+		1).DefaultListableBeanFactory
+			该factory只是提供了对bean的保存获取等功能，但是并不提供对资源的定位，以及对资源的解析加载等功能。
+			并且该类中定义了BeanDefiniton的池子。
+				private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<String, BeanDefinition>();
+			当直接使用DefaultListableBeanFactory时，必须要和Resource和Reader配合使用。
+				Resource resource = new ClassPathResource("beans.xml");
+				DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
+				XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);	//将reader绑定到factory上，reader的加载方法会将beanDefinition放到factory中。
+				reader.loadBeanDefinitions(resource);		// 加载资源
+		2).XmlBeanFactory
+			这个是DefaultListableBeanFactory更高层的应用产品，这类产品它已经指定了资源类型(这里为XML)，因此可以将reader放到XmlBeanFactory中。
+				// 构造函数
+				public XmlBeanFactory(Resource resource, BeanFactory parent){
+					super(parent);
+					this.reader.loadBeanDefinitions(resource);		// 这个this.reader就是XmlBeanDefinitionReader
+				}
+	3.ApplicationContext的产品类
+		ApplicationContext的IoC功能都是通过对BeanFactory实例进行包装实现的。
+		1.相较于BeanFactory类，上下文类具备更多的高级功能:
+			- 支持不同的信息源。主要是体现在继承了MessageSource接口上。
+			- 访问资源。主要是继承了ResourceLoader后，提供了获取Resource的功能。也就是对资源路径进行定位的能力。
+			- 支持事件。继承了ApplicationEventPublisher接口，可以引入回调事件机制。
+			- 附加服务。
+		2.IoC容器的初始化过程
+			在构造函数有触发IoC初始化的入口
+				a).构造函数
+					public FileSystemXmlApplicationContext(String[] configLocations, boolean refresh){
+						super(parent);
+						setConfigLocations(configLocations);
+						if(refresh){
+							refresh();		// refresh触发初始化。其实refresh相当于是重置，因为若已经存在了beanFactory是会销毁掉它，并重新获取一个。
+						}
+					}
+				b).初始化框架
+					void refreshBeanFactory(){
+						if(hasBeanFactory()){
+							//销毁以前的beanFactory
+							...
+						}
+						try{
+							DefaultListableBeanFactory beanFactory = createBeanFactory();	// 创建新的beanFactory
+							beanFactory.setSerializationId(getId());
+							customizeBeanFactory(beanFactory);
+							loadBeanDefinitions(beanFactory);		// 在这里触发beanDefiniton的解析和加载
+							synchronized(this.monitor){
+								this.beanFactory = beanFactory;		// 使用创建好后的beanFactory
+							}
+						}catch(Exception e){....}
+					}
+			1).Resource的定位
+				ApplicationContext通过继承了ResourceLoader提供了获取Resource的接口。
+				更进一步，需要在具体的产品类里面实现getResourceByPath(String path)的方法，这个用于在path无法被父类解析时用户自定义解析方式。
+				父类的解析方式主要是通过Classpath前缀来进行识别是否为Classpath。
+			2).BeanDefinition的解析和加载
+				在初始化框架中可以看到在refreshBeanFactory()的loadBeanDefinitions(beanFactory)中，将会解析beanDefinition。
+				在该方法中将会通过类的getConfigSources()获得资源，通过局部定义的对象beanDefinitionReader来解析和加载beanDefinition。
+				在这里面，每解析出一个beanDefinition都会将其注册到IoC容器中。
+			3).BeanDefinition注册到IoC容器中
+				beanDefinition的注册，本质上其实就是得到解析的bd后，将其放入IoC的map中，该map是个beanName-BeanDefinition的字典。
+				bd的注册原则是不能运行beanName重叠的，但可以通过allowBeanDefiniitionOverriding来进行设置可以定义重名bean，重名时后来的bd会覆盖以前的bd。
+	4.依赖注入
