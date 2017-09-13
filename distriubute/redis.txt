@@ -383,3 +383,46 @@
             JedisCluster cluster = new JedisCluster(nodes, poolConfig);
             cluster.get(...);
         }
+
+十二、其他
+	1.Redis底层数据结构与实现。
+		1).Redis的基本数据类型
+			Redis整体来说是一个KeyValue结构，而Value有很多种类型：
+				- String	字符串
+				- List		链表
+				- Hash		字典
+				- Set		无序集合 sadd <key> <v>				给<key>集合添加一个值
+				- ZSet		有序集合 zadd <key> <score> <v>		给<key>集合添加一个kv对，k即score且集合中按score排序，这个的val表现类似于TreeMap
+		2).Redis的底层数据结构
+			是基本数据结构类型的基本实现：
+				- REDIS_ENCODING_INT	long 类型的整数
+				- REDIS_ENCODING_EMBSTR	embstr 编码的简单动态字符串
+					当String对象的字节数小于39时采用embstr，该类型对于较小的字符串效率更高。该对象只需要为自己分配一次内存。
+					但embstr是只读的，对embstr进行操作实际上是转换为raw进行的。
+				- REDIS_ENCODING_RAW	简单动态字符串
+					就是传统的字符数组实现的字符串，但是会为里面的sds对象分配空间。
+				- REDIS_ENCODING_HT		字典
+					字典结构中的属性dictht ht[2]中，h[0]是实际保存数据的地方，h[1]是个临时变量，主要用于在ht进行桶扩大时中转数据。
+					dictht中的dictEntry **table是保存kv对的地方。
+				- REDIS_ENCODING_LINKEDLIST	双端链表
+					就是简单的双端链表实现。
+				- REDIS_ENCODING_ZIPLIST	压缩列表
+					这是一个压缩链表，好处是节省空间，因为所存储的内容都是在连续的内存区域中。当列表元素不大，且数量较小时可以采用ziplist。ziplist本质上就是数组。
+					当数据较大时不适合用ziplist，因为数组的插入删除效率都是o(N)。并且在插入时若链表已满，会重新申请多的内存空间。
+				- REDIS_ENCODING_INTSET	整数集合
+				- REDIS_ENCODING_SKIPLIST	跳跃表
+					skiplist提供了元素的有序性，可以保证数组的有序。且插入，删除，查找效率平均是O(lgN)。
+					每个节点以随机的方式提供了N个后向节点的指针，指向哪个节点也是随机的，只需要保证指向越后面的指针排在越前。
+					这样从某个节点开始，可以较快的跳到后面更合适的节点上去。对于定位，插入，删除都非常有帮助。
+			对上层的支持
+				- String
+					字符串。
+				- List
+					链表。
+				- Hash
+					字典。
+				- Set
+					无序集合 sadd <key> <v>	给<key>集合添加一个值。
+				- ZSet		
+					有序集合 zadd <key> <score> <v>	给<key>集合添加一个kv对，k即score且集合中按score排序，这个的val表现类似于TreeMap。
+					是skiplist和ht的机会。由skiplist提供有序，由ht提供score->Node的字典以提供快速定位节点的能力。
