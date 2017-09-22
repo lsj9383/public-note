@@ -1,0 +1,63 @@
+一、基本数据结构
+	1.动态字符串
+		Redis采用简单动态字符串(Simple Dynamic String, 即SDS)的抽象类型，并将SDS用作Redis的默认字符串表示。
+		1).定义
+			struct sdshdr{
+				int len;		// buf中已经使用的字节数量，注意len不包含'\0'结尾符。
+				int free;		// 记录buf数组中未使用的直接的数量
+				char buf[];		// 字节数组，用于保存字符串
+			}
+		2)优点
+			- 常数复杂度获取字符串长度
+			- 杜绝缓冲区溢出
+			- 减少修改字符串长度时所需的内存重分配次数
+			- 二进制安全
+			- 兼容部分C字符串函数
+	2.链表
+		1).定义
+			链表节点
+			typedef struct listNode{
+				struct listNode *prev;		// 前置节点
+				struct listNode *next;		// 后置节点
+				void * value;				// 节点值
+			}listNode;
+			链表
+			typedef struct list{
+				listNode *head;
+				listNode *tail;
+				unsigned long len;
+				void *(*dup)(void *ptr);				// 节点值复制函数, 复制节点链表所保存的值。
+				void (*free)(void *ptr);				// 节点值释放函数, 将节点链表的空间释放掉。
+				int (*match)(void *ptr, void *key);		// 节点值比较函数, 比较链表积淀所保存的值和另一个输入的值是否相等。
+			}list;
+	3.字典
+		1).定义
+			- hash表
+				typedef struct dictht{
+					dictEntry **table;
+					unsigned long size;
+					unsgined long sizemask;
+					unsgined long used;
+				}dictht;
+			
+			- hash表节点
+				typedef struct dictEntry{
+					void *key;
+					union{
+						void *val;
+						uint64_tu64;
+						int64_ts64;
+					}v;
+					dictEntry *next;
+				}dictEntry;
+			
+			- 字典
+	4.跳跃表
+		跳表是一种有序数据结构，它通过在每个节点中维持多个指向其他节点指针，从而达到快速访问的目的。
+		跳表支持平均O(logN)、最坏O(N)复杂度的节点查找。大部分情况下效率媲美平衡树，并且实现简单。
+		跳跃表在Redis中主要是作为有序集合的实现 以及 集群节点中用作内部数据结构。
+		1).定义
+			
+	5.整数集合
+	6.压缩列表
+	7.对象
