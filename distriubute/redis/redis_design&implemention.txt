@@ -34,30 +34,188 @@
 		1).定义
 			- hash表
 				typedef struct dictht{
-					dictEntry **table;
-					unsigned long size;
-					unsgined long sizemask;
-					unsgined long used;
+					dictEntry **table;			// table[i]指第i个桶，每个桶中又是一个dictEntry指针，用于构建链表
+					unsigned long size;			// 桶个数
+					unsgined long sizemask;		// 用于计算索引值，值恒定为size-1
+					unsgined long used;			// hash表中已有的kv对数量
 				}dictht;
 			
 			- hash表节点
 				typedef struct dictEntry{
-					void *key;
-					union{
+					void *key;					// entry的键
+					union{						// entry的值，值可以采用指针，或是uint64的整数，或是int64的整数
 						void *val;
-						uint64_tu64;
-						int64_ts64;
+						uint64_t u64;
+						int64_t s64;
 					}v;
-					dictEntry *next;
+					dictEntry *next;			// 下一个entry
 				}dictEntry;
 			
 			- 字典
+				typedef struct dict{
+					dictType *type;		// 类型特定函数
+					void *privdata;		// 私有数据
+					dicht ht[2];		// 两个hashtable，第二个是用于扩容的辅助空间。
+					int rehashidx;		// 用于rehash，记录rehash目前的进度。
+				}dict;
+				type是指向的dictType提供了一系列的函数集合，不同的dictType实现不同的函数
+			- 操作特定类型kv对的函数
+				typedef struct dictType{
+				}dictType;
+		2).rehash
+			当hash表保存的kv对太多或者太少时，程序需要对hash表的大小进行扩大和缩小。
+			a).为字典ht[1]哈希表分配空间，如果是扩容操作那么ht[1].size>=ht[0].used*2，如果是收缩操作那么ht[1].size>=ht[0].used，这样尽量让他退化成数组，以便快速读写。
+			b).将保存在ht[0]的所有kv对计算k在ht[1]上的桶数，并放到ht[1]上。
+			c).释放ht[0]，将ht[1]设置为ht[0]，并在ht[1]上新建
+		3).渐进式rehash
+			一次性完成rehash在hash表特别大的时候是不太合适的，因为此时rehash操作将非常的耗时，此时应该考虑渐进式rehash。
+			即分多次，渐进式的完成rehash。
+			a).在ht[1]分配空间
+			b).dict中维护这rehashidx，并将值设置为0，表示rehash正式开始。
+			c).在rehash期间，每次对字典执行添加，删除，查找或者更新操作的时候，程序除了执行指定操作外还会将rehashidx对应的桶上的所有节点放到ht[1]中，并且rehashidx++。
+			d).ht[0]的所有kv对都放到ht[1]上后，把rehashidx=-1，代表rehahs结束，再将ht[1]设置为ht[0]。
 	4.跳跃表
 		跳表是一种有序数据结构，它通过在每个节点中维持多个指向其他节点指针，从而达到快速访问的目的。
 		跳表支持平均O(logN)、最坏O(N)复杂度的节点查找。大部分情况下效率媲美平衡树，并且实现简单。
 		跳跃表在Redis中主要是作为有序集合的实现 以及 集群节点中用作内部数据结构。
 		1).定义
-			
+			header，指向跳跃表头结点
+			tail，指向跳跃表尾节点
+			level，记录目前跳跃表内，最大的节点层数(排除开头结点)
+			length
 	5.整数集合
+		1).定义
+			typedef struct intset{
+				uint32_t encoding;		// 编码方式，指定数组中的元素采用什么类型。取值为INTSET_ENC_INT16, INTSET_ENC_INT32, INTSET_ENC_INT64。
+				uint32_t length;		// 集合包含元素的数量。
+				int8_t   contents[];	// 保存元素的数组，虽然这里的类型是int8_t，但实际的类型取决于encoding。
+			}intset;
+		2).升级
+			
+		3).降级
+			intset不支持降级操作，一旦升级后就一直保存升级后的状态，就算集合里面最大值并非需要高级的状态。
 	6.压缩列表
 	7.对象
+		Redis并没有直接使用底层数据结构，而是构建了五种对象，并且在应用层上使用的是这些对象。
+		Redis实现了基于【引用计数】的内存回收机制，当程序不再使用某个对象的时候，这个对象所占用的空间将会被回收。
+		Redis也利用引用计数实现了内存共享机制，通过让多个数据库共享同一个对象来节约内存。
+		Redis的使用是kv形式的，k和v分别为一个对象。
+		Redis的对象抽象如下：
+		typedef struct redisObject{
+			unsigned type:4;			// 类型,取值有:REDIS_STRING, REDIS_LIST, REDIS_HASH, REDIS_SET, REDIS_ZSET
+			unsigned encoding:4;		// 编码,取值有:REDIS_ENCODING_INT(long整数), EMBSTR(embstr编码的sds), RAW(sds), HT, LINKEDLIST(双端链表), ZIPLIST, INTSET, SKIPLIST(跳跃表和字典)
+			unsigned lru:22;			// 记录对象最后一次被命令程序访问的时间
+			void *ptr;					// 指向底层实现数据结构的指针，具体的类型由encoding指定
+		}robj;
+		通过 TYPE <key> 可以看到<key>所对应value的type。
+		通过 OBJECT ENCODING <key> 可以看到<key>所对应value的encoding。
+		1).字符串对象
+			字符串对象的编码可以是int，raw，embstr。
+			- int
+				当一个字符串对象保存的是整数值，并且整数值可以用long来表示，那么ptr属性(此时为long *)里面就会保存该整数值。
+				通过append向里面追加一个非数字的字符时，会被转换为raw。
+			- raw
+				当一个字符串对象保存的是一个字符串，并且该字符串长度大于32字节，那么使用sds来保存这个字符串。
+			- embstr
+				如果字符串长度<=32字节，采用embstr。和raw的区别在于：
+					raw的内存申请和内存释放都是两次(因为有redisObject和sds两个对象)，embstr一次性分配连续的空间给redisObject和sds。
+					连续空间能更好的使用缓存带来的优势。
+				embstr是只读的，若通过append等函数修改，则会转换为raw格式。
+			需要注意的是，浮点数实际保存也是当做字符串的，即把浮点数转换成字符串来保存。执行运算操作时会把字符串转换成浮点数再运行。
+			String类型的redisObject，将会被其他4种对象复用，其他四种对象里面保存的元素其实就是type=string的redisObject(raw和embstr的选择仍然根据上述判断)。
+		2).列表对象
+			编码方式可以是ziplist，linkedlist。
+			当同时满足以下两个条件时，列表对象使用ziplist编码，否则使用linkedList:
+				* 列表对象保存的所有字符串元素的长度都小于64字节。
+				* 列表对象保存的元素数量小于512个。
+		3).hash对象
+			编码方式可以是ziplist, hashtable.
+			当同时满足以下两个条件时，hash对象采用ziplist编码，否则使用hashtable：
+				* hash对象保存的所有kv对的字符串长度都小于64字节。
+				* kv对象的个数小于512个。
+			- ziplist
+				一个kv对象在ziplist中总是紧挨着的，k在前，v在后。
+				新添加的kv对将放在最后。
+			- hashtable
+				用dict保存kv对。
+		4).集合对象
+			编码方式可以是intset，hashtable。
+			当同时满足以下两个条件时，使用intset编码，否则使用hashtable：
+				- 集合对象保存的所有元素都是整数值。
+				- 集合中的元素个数不超过512。
+			在用hashtable是，采用的策略是在dict中key放集合元素，value放null。
+		5).有序集合对象
+			编码方式可以使ziplist，skiplist。
+			zset <key> <score> <member>  在<key>这个有序集合中，添加一个分值为<score>的成员<member>
+			- ziplist
+				在使用ziplist时，每个集合元素使用两个紧挨的节点来保存，第一个节点是member，第二个节点是score，即member在前，score在后。
+				score较小的放在靠近表头的方向，较大的靠近表尾。
+			- skiplist
+				跳跃表的object属性保存了元素的member，score元素保存了元素的score。
+				并且有一个dict保存了从成员->分值映射，可以O(1)找到给定成员的分值。这样方便在跳跃表中通过成员来定位其位置。
+			当同时满足以下两个条件时，对象使用ziplist，否则使用skiplist：
+				* 有序集合所有成员的的字符串长度小于64。
+				* 有序集合的元素数量小于128。
+		6).引用计数
+			- 内存自动回收
+			- 复用节约内存
+二、单机数据库的实现
+	1.数据库
+		Redis服务器将所有数据库都保存在redisServer结构的db数组中。	
+		struct redisServer{
+			int dbnum;			// 服务器数据库数量	, 由服务器配置的database选项决定，默认为16。
+			redisDb **db;		// 
+		};
+		1).切换数据库
+			每个Redis客户端都会有目标数据库，客户端的读写操作都是在目标客户端中进行的。Redis客户端默认的目标数据库是0号数据库。
+			可以通过SELECT指令来切换目标数据库。并且服务器内部，通过redisClient来维护客户端当前的状态，该状态中包含了客户端所用的目标数据库。
+			typedef struct redisClient{
+				redisDB *db;
+			}redisClient{};
+			SELECT指令就是修改这个属性。
+		2).数据库键空间
+			每个数据库都包含了一个hash结构，数据库中包含了很多的kv对。k是字符串的redisObject，v是有5种可能的redisObject。
+			typedef struct redisDB{
+				dict *dict;
+				dict *expires;		// 过期字典。记录带过期时间的key
+			}redisDB;
+			在读取一个key后，会更新这个key里面的lru时间。
+			若在读取一个key时，发现这个key过期了将会删除这个key。
+			当有某个key被watch后，该key会被标记为脏，修改一次脏计数加1，这个计数会触发服务器的持久化以及复制操作。
+		3).key的生存时间和过期时间
+			EXPIRE 可以以秒为精度来设置某个key的生存时间(TTL)，在经过指定的时间之后就会自动删除生存时间为0的键盘。
+			TTL 可以返回一个带有生存时间的key 剩余的生存时间。
+			PERESIT 可以移除一个key的生存时间。
+			- 保存过期时间
+				redisDB中的expires属性保存了数据库中所有key的过期时间。所以expires被称为过期字典。
+				expires的key指向某个数据库键，value是一个long long类型的整数，是一个unix时间戳。
+			- 计算剩余生存时间
+				过期时间戳-当前时间戳 即为 剩余生存时间。
+			- 过期键的判断
+				首先 检查键是否存在过期时间，如果存在，那么取得过期时间。
+				最后 检查当前时间戳是否大于过期时间戳，大于那么过期，否则没有过期。
+		4).过期键的删除策略
+			a).通用策略
+				- 定时删除
+					行为：在设置key的过期时间的同时，创建一个timer，timer在key的过期时间到达时立即执行对key的删除操作。
+					优点：过期及时删除，保证内存最优。
+					缺点：当有多个键过期时，将会在删除上花费大量的cpu时间，使对高并发的请求响应过慢。而其实现在内存够用，根本不用删除进行释放内存。
+				- 惰性删除
+					行为：放任key过期不管，但是每次从dict取值时，都判断key是否过期，若过期则删除，没有过期则返回。
+					优点：CPU时间最优，只有在必要的时候才会删除键。
+					缺点：过期键太多，而这些键根本不可用，这属于一种内存泄露的行为。浪费大量的内存。
+				- 定期删除
+					行为：每隔一段时间，程序对过期字典进行检查，删除过期键盘。
+					优点：通过一段时间的进行清理，优化了cpu时间和内存占用。
+					缺点：定期时间如果隔得太短，清理时间太长，影响并发性。定期时间太长，清理时间太短，内存浪费现象仍然存在。不好取舍。
+			b).redis策略
+				redis的删除策略是惰性删除和定期删除相互配合的方式，在合理使用CPU时间和避免内存浪费之间取得了平衡。
+				- 惰性删除的实现
+				- 定期删除的实现
+					Redis服务器周期性的操作serverCron时，activeExpireCycle就会被调用，在规定时间内分多次遍历服务器中的各个数据库
+					随机抽出数据库中expires一部分键的过期时间，并删除其中的过期键。
+				
+	2.RDB
+	3.AOF
+	4.客户端
+	5.服务器端
