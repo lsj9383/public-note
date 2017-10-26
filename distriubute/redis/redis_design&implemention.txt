@@ -428,6 +428,7 @@
 							# 硬性限制，当超过了硬性限制，服务器立即关闭客户端。
 							# 软性限制，记录超过软性限制的时间(obuf_soft_limit_reached_time)，若在一定时间内始终超过软性限制，则关闭客户端。
 						硬性限制 软性限制 和 软性限制检测时间 都是可以配置的。
+
 			b).Lua脚本伪客户端
 				服务器会在初始化时，创建一个负责执行Lua脚本命令的伪客户端，即专门用来执行Lua脚本的进程。
 				Lua脚本的伪客户端关联在redisServer的lua_client属性上。
@@ -435,6 +436,112 @@
 				服务器载入aof文件时，会创建用于执行aof文件中redis命令的伪客户端，并在载入完成后，关闭这个伪客户端。
 三、多机数据库的实现
 	1.复制
-		通过SLAVEOF，让一个服务器可以去复制另外一个服务器。主从服务器保存相同的数据，被称为“数据库状态一致”
+		通过SLAVEOF，让一个服务器可以去复制另外一个服务器。主从服务器保存相同的数据，被称为“数据库状态一致”。
+		1).复制过程
+			复制是为了保证从服务器和主服务器从不一致到一致，并且保持后续状态一致的操作。
+			复制主要分了两个部分：同步和命令传播。
+			a).同步
+				同步主要发生在两个时刻：
+					* 初次复制，从服务器和主服务器之间曾经没有任何联系，完全是新的复制。
+					* 断线后复制，建立连接后，网络中断，在网络恢复以后重新连接，继续复制主服务器。
+					对于老版本而言，同步采用SYNC命令，即：
+						# 从服务器向主服务器发送SYNC命令。
+						# 收到SYNC命令的主服务器开始执行BGSAVE，并且从此时开始有一个缓冲区用于记录在RDB文件生成好前执行的所有写命令。
+						# 主服务器的BGSAVE执行完成以后，将生成好的RDB文件发送给从服务器，从服务器接收并载入该RDB文件，并将数据库状态更新。
+						# 主服务器将记录在缓冲区里面的所有写命令发送给从服务器，从服务器执行这些写命令，将自己数据库状态更新至主服务器数据库当前所处的状态。
+					老版本不管是初次复制，还是断线复制，都采用SYNC指令。对于断线复制不应该采用这也的策略，新版本(redis 2.8)采用的PSYNC命令。
+					PSYNC对于初次复制，采用【完整同步】，该策略和SYNC相同，但是对于断线后复制采用【部分重同步】策略。即：
+						# 如果服务器以前父之过任何主服务器，或者之前执行过SLAVEOF no one命令，那么从服务器在开设一次性的复制时将想主服务器发送
+						  PSYNC ? -1命令，【主动请求】主服务器进行【完整同步】。
+						# 如果从服务器已经复制过某个主服务器，那么从服务器在开始一次性的复制时，向主服务器发送PSYNC <runid> <offset>命令。
+						  其中runid是上一次主服务器id，offset则是从服务器当前的复制偏移量，接收到命令的主服务器会根据这两个参数来判断执行什么操作。
+						# 服务器由以下几种回复：
+							+FULLRESYNC <runid> <offset>，那么表示主服务器将于从服务器执行完整同步操作，runid是主服务器id，offset则是主服务器当前的复制偏移量。
+							+CONTINUE，表示主服务器将于从服务器进行部分同步操作。
+							-ERR，表示主服务器版本低于redis2.8，不支持PSYNC。
+					部分重同步的具体过程在下面给出。
+			b).命令传播
+				命令传播是在主从服务器保持一致时，主服务器接收到写命令时，对主从一致性的继续维持。当主服务器接收到了写命令，会【异步】的将这些命令
+				发送给所有的从服务器。由于是异步的，因此是可能会有丢失。但是由于采用了1秒周期性同步，因此就算丢失不一致性最多维持1秒。
+		2).部分重同步
+			有4个关键参数：
+				主服务器的复制偏移量(maser-offset)
+					主服务器每次想从服务器传播N个直接前，先给自己的复制偏移量上加N。
+				从服务器的复制偏移量(slave-offset)
+					从服务器每次接收到主服务器传播来的N个直接的数据时，就在自己的复制偏移量上+N。
+				主服务器的复制积压缓冲区
+					主服务器有一个固定大小的FIFO缓冲区用于保存写指令，大小可设置，默认为1M。
+				主服务器的运行ID
+					从服务器会保存主服务器的运行ID(run ID)。
+			master-offset和slave-offset一致时，代表主从服务器状态一致，否则不一致。
+			当从服务器重新连接上主服务器后，会将run id和slave-offset发送给主服务器，主服务器用于判断是否一致。若不一致，则将需要的数据从缓冲区里面提取出来发送给从服务器。
+			但是，若掉线天就，所需要的数据已经超出了缓冲区存储的，那么就会触发服务器BGSAVE，发送RDB给slave。
+		3).心跳检测
+			在命令传播阶段，从服务器默认会以每秒1次的频率，向主服务器发送命令：REPLCONF ACK <slave-offset>。
+			用以检测主从服务器的网络连接状态，辅助实现min-slaves，检测命令是否丢失。
+			a).由于命令传播是异步的，因此可能会有丢失，通过这个方式用来周期性的检查slave和master的状态是否一致，若不一致则进行部分重同步。保证不一致性不超过1s。
+			b).Redis可以防止主服务器在不安全的情况下执行写命令，通过min-slaves-to-write和min-slaves-max-lag来判断是否安全
+			   若slave的个数少于min-slaves-to-write 或则 min-slaves-to-write个从服务器的延迟(lag)值都大于或等于min-slaves-max-lag则不安全，master会拒绝写指令。
+			   master通过心跳检测技术来得悉slave的个数和各自的延迟。
+			由于redis2.8以前，不存在slave-offset，因此2.8以前的版本是无法避免不一致情况发生的。
 	2.Sentinel
+		有一个或多个Sentinel实例组成的Sentinel系统，该系统可以监听多个master，当master下线时可以选举出一个slave代替master。
+		1).初始化
+			Sentinel是特殊状态的redis，所以首先是初始化普通的redis服务器。接着将redis使用的代码和命令表切换为sentinel使用的代码和命令表。
+			初始化Sentinel状态在sentinelState结构中保存。
+			struct sentinelState{
+				uint64_t current_epoch;			// 当前纪元，用于选取领头
+				dict *masters;					// 记录了当前sentinel检测的master，key是ip:port, value是sentinelRedisInstance。
+				...								// 其他的属性，这里暂不介绍
+			};
+			接着初始Sentinel监视的master属性
+			typedef struct sentinelRedisInstance{
+				int flags;						// 标识值，比如主观下线
+				char *name;						// 通过ip:port命名
+				char *runid;					// master的运行id
+				uint64_t config_epoch;			// 配置纪元
+				sentinelAddr *addr;				// ip+port
+				mstime_t down_after_period;		// master无响应时间，当超时后将会被该sentinel判断为主观下线
+				int quorum;						// 该sentinel认为该master客观下线所需要的票数
+				int parallel_syncs;				// 在执行故障转移操作时，可以同时对新的主服务器进行同步的从服务器数量
+				mstime_t failover_timeout;		// 刷新故障迁移状态的最大时限
+				dict *slaves;					// master的slave信息，key是ip:port, value是sentinelRedisInstance。
+				dict *sentinels;				// 共同监听该master的sentinels，这组成了一个无形的分布式网络。key是ip:port, value是sentinelRedisInstance。
+			}sentinelRedisInstance;
+			通过配置文件可以配置一个sentinel的master属性，其中包括master的ip:port，master无响应时间，客观下线所需票数等等。
+		2).获取必要信息
+			a).获取主服务器信息
+				sentinel会创建连接master的命令通道，作为获取master信息的渠道。
+				sentinel默认每秒10次的频率，通过INFO来获取master的信息，这个指令也会获取到master的slave的信息！
+				获取到master的runid和role域，一般不会对master的sentinelRedisInstance的属性做太大的更新。
+			b).获取从服务器信息
+				sentinel通过命令通道向master发送INFO指令，来获得每个master的所有slave信息。
+				sentinel会通过命令通道和从服务器建立连接，目的是为后期故障转移选择更合适的slave。
+			c).获取其他Sentinel的信息
+				sentinel创建订阅通道和master和slave连接，作为获取其他Sentinel的渠道。
+				Sentinel会订阅__sentinel__:hello频道，sentinel会通过命令通道向master和slave的该频道周期性的发送该sentinel的数据，默认为2s一次。
+				发送的目的是为了告知其他监听了该master的sentinel自己(发送信息的sentinel)的存在。
+				publish __sentinel__:hello "<s_ip>,<s_port>,<s_runid>,<s_epoch>,<m_name>,<m_port>,<m_epoch>"
+				s开头的为sentinel的信息，m开头的为master的信息。
+			最终 sentinel会通过命令通道和订阅通道与master和slave都建立连接，通过命令通道在sentinel之间建立连接。
+		3).检测主观和客观下线
+			默认情况下，sentinel会以每秒1次频率向所有与它创建了命令连接的实例(包括master，slave和其他sentinel)发送PING命令，来判断是否在线。
+			如果一个实例响应超时(由该实例的down_after_period决定)，则在flags属性打开SRI_S_DOWN表示。
+			当一个sentinel检测到了一个master下线了，为了确保真的下线，会想其他sentinel询问(通过SENTINEL is-master-down-by-addr进行询问)。
+			其他sentinel回复他们的判断，此时发起询问的sentinel将认为其下线的票数和quorm进行对比，若大于等于该设定则认为其下线。
+			为了避免脑裂情况，会强行发送kill进程去杀死master的redis进程。
+		4).选举领头Sentinel
+			采用raft算法，较为复杂。
+		5).故障转移
+			由选举出的sentinel完成以下工作：
+				a).从slave中选择一个作为master
+					选择的方式是：
+						# 删除sentinel的slave列表中处于断线状态的slave，保证其他slave都是online的。
+						# 删除列表中最近5s内没有UI福过Sentinel的INFO的slave，保证其他slave都是最近成功进行通信的。
+						# 删除所有与前master连接断开超过down-after-milliseconds*10毫秒的服务器，保证其他slave数据比较新。
+						# 根据优先级排序，选出优先级最高的slave。
+						# 从最高优先级的slave中选出slave-offset最大，保证其数据最新。
+						# 最后选出runid最小的slave作为master。
+				b).让其他slave更新他们的主服务器
+				c).前master重新上线后，将其设置为slave
 	3.集群
