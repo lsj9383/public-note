@@ -545,3 +545,47 @@
 				b).让其他slave更新他们的主服务器
 				c).前master重新上线后，将其设置为slave
 	3.集群
+		一个redis服务器的容量是有限的，可以通过redis集群进行横向扩展。
+		槽是一个逻辑概念，一个节点拥有多个槽，一个槽又拥有多个kv对。
+		1).集群关系的维护
+			连接各个节点的工作通过CLUSTER MEET <ip> <port>命令来完成，指示将指定的节点加入到当前节点所在的集群中。
+			a).维护关系的数据结构
+				typedef struct clusterState{	// 记录集群的状态(当前节点的视角下，其他节点的视角下可能不一致)
+					clusterNode *myself;			// 指向当前节点的指针
+					uint64_t currentEpoch;			// 集群当前的配置纪元，用于故障转移
+					int sate;						// 集群当前的状态(online or offline)
+					int size;						// 集群中处理槽的节点数量
+					dict *nodes;					// 集群中节点名单(包含myself)，key是节点的名字，value是节点的clusterNode结构。
+				}clusterState;
+				
+				struct clusterNode{				// 记录节点的状态
+					mstime_t ctime;					// 创建节点的时间
+					char name[];					// 节点的名字
+					int flags;						// 节点标识(在线或者下线)
+					uint64_t configEpoch;			// 配置纪元，用于实现故障转移
+					char ip[];						// 该节点ip地址
+					int port;						// 该节点的端口
+					clusterLink *link;				// 当前节点到节点的连接信息
+				};
+				
+				typedef struct clusterLink{		// 当前节点到目标节点的连接信息
+					mstime_t ctime;					// 连接的创建时间
+					int fd;							// 套接字描述符
+					sds sndbuf;						// 输出缓冲区
+					sds rcvbuf;						// 输入缓冲区
+					struct clusterNode *node;		// 与这个连接相关连的节点
+				}clusterLink;
+				
+				在clusterState中保存了当前节点认为的状态，其中包括了集群中所有的节点信息。
+				节点信息通过clusterNode来进行保存，这里面通过clusterLink来保存当前节点和指定节点的连接信息。
+			b).集群的建立
+				在节点A上采用CLUSTER MEET <ip> <port>，会将目标节点B加入到A所在的集群。
+				# A为B创造一个clusterNode结构，添加到clusterState.nodes中去
+				# 节点A发送一条MEET消息给B
+				# B接收到MEET消息，得知A已经知道了自己的存在，B也要保存好A的存在，因此创建A的clusterNode，添加到clusterState.nodes中去
+				# B发送一条PONG消息给A
+				# A返回B一条PING消息
+				# B收到PING消息，握手完成
+				# A节点会将B的信息通过Gossip协议传播给集群中其他的节点，让其他节点也与B握手，最终B加入到集群中
+		2).槽指派
+		3).重新分槽
