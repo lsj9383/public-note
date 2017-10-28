@@ -556,6 +556,8 @@
 					int sate;						// 集群当前的状态(online or offline)
 					int size;						// 集群中处理槽的节点数量
 					dict *nodes;					// 集群中节点名单(包含myself)，key是节点的名字，value是节点的clusterNode结构。
+					clusterNode *slots[16384];		// 集群中槽的指派信息，若槽i没有被分配则slots[i]为NULL，否则指向对应节点的clusterNode。
+					zskiplist *slots_to_keys;		// 通过跳跃表保存槽和键之间的关系。目的是提供一个简单的反向索引
 				}clusterState;
 				
 				struct clusterNode{				// 记录节点的状态
@@ -566,6 +568,8 @@
 					char ip[];						// 该节点ip地址
 					int port;						// 该节点的端口
 					clusterLink *link;				// 当前节点到节点的连接信息
+					unsigned char slots[16384/8];	// 该节点slot的bitmap，若拥有该槽则对应的bit为1否则为0
+					int numslots;					// 该节点的槽个数
 				};
 				
 				typedef struct clusterLink{		// 当前节点到目标节点的连接信息
@@ -588,4 +592,36 @@
 				# B收到PING消息，握手完成
 				# A节点会将B的信息通过Gossip协议传播给集群中其他的节点，让其他节点也与B握手，最终B加入到集群中
 		2).槽指派
-		3).重新分槽
+			redis集群的整个数据库被分为16384个槽，当所有槽都有节点再处理时，集群处于上线状态，否则处于下线状态。
+			通过CLUSTER ADDSLOTS <slots> 用来给对应的节点分配槽。
+			a).槽信息
+				在clusterNode的slots和numslot中，保存了该节点的槽信息，分别是槽的bitmap和槽的个数。
+				在clusterState的slots中，保存了集群的槽信息，若槽i被分配给了某个节点，则slots[i]指向该节点的clusterNode结构。
+				通过clusterState.slots[i]的方式，可以很快的找到槽i被分配的节点。
+				clusterNode.slots和clusterNodeState.slots都是有必要存在的，
+				前者可以快速查询出槽i所对应的节点，方便进行重定向操作。
+				后者方便传递当前节点的槽bitmap给其他的节点。
+			b).槽信息的传播
+				当节点收到来自客户端的CLUSTER ADDSLOTS指令后，先在自己节点的clusterNodeState.slots和clusterNode.slots进行配置。
+				并将自己的clusterNode.slots数组发送给集群中其他的所有节点，让其他节点配置该节点的槽信息。
+		3).集群接收指令工作流程
+			客户端向集群中的任何节点发起命令，节点接收到命令，解析出命令要处理的key的所属槽，然后得到该槽所在的节点：
+				若该槽就在当前节点，直接处理返回结果。
+				否则，节点向客户端返回MOVED错误，指示客户端重定向到槽所在节点执行该指令。
+			所属槽的计算slot_number(key) : CRC16(key) & (2^14-1)
+			集群节点和单击模式的区别:
+				# 节点只能使用9号数据库。
+				# clusterState结构中有用slots_to_keys来保存槽和键之间的关系。这样可以提供一个槽到key的反向索引。
+		4).重新分槽
+			Redis集群的重新分槽，可以将任意数量的已经分配过的槽 从源节点分配到目标节点。主要是在已存在的集群中引入新的节点。
+			* 在重新分槽的过程中，集群保持在线，并且源节点和目标节点都可以继续处理命令请求(通过返回的ACK错误实现)。
+			i).redis-trib是Redis的集群管理软件，由其负责重新分槽：
+				a). redis-trib对目标节点发送SETSLOT指令，让目标节点准备好导入属于slot的kv对。
+				b). redis-trib对源节点发送SETSLOT指令，让源节点准备好将slot的kv对导出。
+				c). redis-trib对源节点发送GETKEYSINSLOT指令，获取最多count个属于slot的kv对
+				d). redis-trib对源节点发送一个MIGRATE指令，将被选中的kv对发送给目标节点。
+				e). 重复cd两步，直到发送完毕。
+			ii).解决分槽过程中的指令执行问题
+				在分槽过程中，也是可以处理客户端命令请求的。
+				当客户端向源节点发出关于key的命令，首先判断key是否存在于源节点数据库，若是则直接执行指令。
+				若不存在与源节点数据库，且正在迁移key的槽i，那么就返回ASK错误，让客户端到目标节点上去执行与该key相关的指令。
