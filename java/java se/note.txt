@@ -151,7 +151,6 @@ CLASS_PATH就是import的路径，换句话说，就是程序里面使用的clas
 		Object <|-- Throwable <|-- Error
 							  <|-- Exception <|-- RuntimeException
 											 <|-- 编译时异常类
-							  
 		1).Throwable
 			可抛出，所以异常都是可抛出的。
 		2).Error 错误
