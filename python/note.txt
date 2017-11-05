@@ -49,6 +49,48 @@
 	在进行不同类型对象进行混合运算时，会尝试转换为精度更高的类型进行计算。
 	print可以通过都好来将各个参数内容进行拼接。对于非字符串内容，会默认采用str()来进行强制转换。
 三、容器
+	1.数组
+		在Python中有两种数组的形式，列表和元组。
+		1).列表
+			列表中可以保护任何类型对象的引用。
+			创建：通过[ref1, ref2, ...]创建列表。当里面没有引用时，那么创建的是空列表。也可以通过list将非列表转换为列表，方式是Copyt-Write。
+			索引：通过array[index]获取对应位置的元素。若index小于0，则从尾巴计数。0为第一个元素，-1为最后一个元素。
+			长度：len(list)
+			添加：通过list.append(ref)，将新的对象引用添加到末尾。通过insert(idx, ref)，将新的对象引用插入到指定位置。添加的元素也是copy-write。
+			扩展：通过list.extend()或+=可以将多个列表扩。扩展的方式也是copy-write。
+			删除：通过list.pop()，可以将末尾元素弹出，也会删除末尾元素。也可以通过pop(idx)，返回并删除指定索引的元素。del(idx)，只会删除指定索引元素，不会返回该元素。remove(ref),会在列表中删除该元素。
+			定位：通过list.index(ref)，可以查询该元素第一个出现的索引。若不存在则返回错误。通过ref in list可以判断元素释放在列表中。
+			排序：通过sorted(list)，可以返回一个排序好的list，输入的list不变。通过list.sort(),会对原list进行排序。
+			复制：通过newlist=oldlist并非真正的复制，这个只是复制的引用，他们所代表的都是相同的集合。可以通过newlist=oldlist.copy() or oldlist[:] or list(oldlist)来创建新的对象。
+			其他：
+				通过count()可以记录元素出现的次数。
+				通过join可以将列表转为字符串，不过用法是str.join(list)，合并后两两中间通过str连接。
+				具备切片功能，list[start:end]。
+				也可以通过var1,va2,...,varN=list进行多变量赋值，要求len(list)==N。即解包。
+		2).元组
+			元组创建以后不可修改，包括元组的大小，里面的内容均无法修改(引用无法修改，但是引用的对象还是可以修改的)。
+			创建：通过(ref1, ref2, ...)创建元组，也可以省略括号。直接()可以创建空元组
+			解包：其实就是多变量赋值，list也具备一样的功能。var1,va2,...,varN=tuple
+	2.字典
+		其实就是hashmap。
+		创建：通过{key1:val1, key2:val2, ...}来创建字典。{}会创建空的字典。也可以通过dict([[key1, val1], [key2, val2], ...])来创建字典。key和val可以为任何对象的引用。
+		添加和修改：通过map[key]=val，若key不存在于字典，可以在字典中添加新元素。若key存在于字典，则是进行修改。
+		合并：通过map1.update(map2)，map2中的内容会拷贝到map1中，并且若map2和map1的key有重合，则以map2中的为准。
+		删除：通过del map[key]，可以删除map中对应的kv对。通过map.clear，可以删除所有元素。
+		复制：通过map.copy()的形式。
+		所有键：
+			map.keys()获取所有的key的迭代形式。 map.values()获取所有值的迭代形式。map.items()获取所有的kv对的迭代形式，kv对以元组形式存在。
+			在Python2返回的是列表，在Python3返回的是迭代形式。返回迭代形式可以避免大map会创建列表耗费时间。
+			通过list(迭代形式)，可以得到list形式。
+		其他：
+			通过key in map，可以判断是否存在该key。
+	3.集合
+		创建：空集合set()，或者{ref1, ref2, ...}。可以通过set(other-container)将其他容器保存的数据转换为集合。
+		运算：
+			a&b作交集运算(或a.intersection(b))，a|b作并集运算(或a.union(b))
+			a-b作差集运算(或a.difference(b)，即返回a中存在b中不存在的元素)，a^b做异或运算(或a.symmetric_difference(b)，a和b不相交的部分)
+			a<=b判断a是否为b的子集，a<b判断a是否为b的真子集
+			a>=b判断a是否为b的超集，a>b判断a是否为b的真超集
 四、基本语法
 五、模块化
 六、类和OOP
