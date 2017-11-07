@@ -29,7 +29,9 @@
 二、数据类型
 	通过type(<var>)，可以得知变量所引用对象的类型。
 	Python提供的基本数据类型有：
-		# 布尔型(仅包含True和False) 
+		# 布尔型(仅包含True和False)
+			整数0，浮点数0.0，None，空字符串''，空列表[]，空元组()，空字典{}，空集合set()，通过bool()强制转换的结果都是False。
+			其他bool()结果为True。
 		# 整数 强制转换，int(<var>)，True转换成1，False转换成0，浮点数保留整数部分。需要注意的是在Python3中没有long，只有int，且int的范围不受限。
 		# 浮点数(小数和科学计数法表示) 强制转换，float(<var>)，True转换成1.0，False转换成0.0，整数添加.0作为小数部分。
 		# 字符串
@@ -92,7 +94,155 @@
 			a<=b判断a是否为b的子集，a<b判断a是否为b的真子集
 			a>=b判断a是否为b的超集，a>b判断a是否为b的真超集
 四、基本语法
+	在其他语言中，通常采用{}和begin-end来标志代码块。Python通过缩进来标明代码块。
+	1.运算
+		需要注意，逻辑运算是and和or。
+	2.条件语句
+		if <exp1> :
+			<statement1>
+		elif <exp2> :
+			<statement2>
+		else
+			<statement3>
+	3.循环语句
+		1).while
+			while <exp>:
+				<statement>
+				[break]			# 可跳出循环
+				[continue]		# 循环体重新执行
+			[else:
+				<statement>]	# 循环正常退出时执行(即执行了while的判断不满足时，将会执行else)，break属于非正常退出。
+		2).for
+			for <item> in <iterable> ：
+				<statement>
+			<iterable>为可迭代对象，列表，字符串，元组，字典，集合都是可迭代对象。
+			本质上和Java的for迭代类似，通过可迭代对象生成迭代器，遍历迭代器的每个元素。
+			需要注意的是：
+				字符串在这里的迭代每次访问一个字符。
+				字典在这里的迭代每次访问一个key。
+				统一可以采用break,continue,else。
+			a).并行迭代
+				for <var1>, <var2>, ... <varN> in <iterable> :
+					<statement>
+				当iterable的迭代器每次返回的元素是一个长度为N的列表或是元组时可以使用。在二维矩阵中，这相当于是每次返回一行的N个数到具体的变量中。
+				可以通过zip()将多个列表组成一个二维的列表的迭代器：
+					zip(list1, list2, list3)，该迭代器每次返回一个元组，第i次返回的元组为所有列表的第i个元素所组成的元组。迭代器元素的个数是最短列表的个数。
+					比如list(zip([1,2,3],[4,5],[6,7]))，结果是[(1,4,6),(2,5,7)]
+			b).range
+				range(start, stop, step)，返回一个可迭代对象。
+	4.推导式
+		推导式可以快速创建列表，字典等数据结构。
+		1).列表推导式
+			list = [<exp> for <item> in <iterable> if <condition>];  # if <condition>可省略
+			等价于
+			list = [];
+			for <item> in <iterable> :
+				if <condition> :
+					list.append(<exp>);
+			即每次迭代，将满足条件的<exp>结果放入列表中。若省略if conditon，则所有的<exp>放入列表。
+		2).列表推导式
+			dict = {<key-exp>:<val-exp> for <item> in <iterable>}
+			等价于
+				dict={};
+				for <item> in <iterable>
+					dict[key-exp] = <val-exp>;
+		3).集合推导式
+			set = {<exp> for <item> in <iterable>}
+		4).生成器推导式
+			generator = (<exp> for <item> in <iterable>)
+			虽然是圆括号，但是并非元组推导式(元组没有推导式)
+		不同的推导式主要是外边的括号不相同。
+	5.函数
+		def fun([<var1>, <var2>, <var3>=<default>...]):
+			<statement>
+			[return <exp>;]
+		参数直接用变量名即可，若有返回值直接用return即可。若没有return，则返回NoneType的None。
+		调用时可以通过参数的声明顺序进行传参，也可以通过fun(<var1>=<ref1>, <var2>=<ref2>, ...)的方式进行传参。
+		1).可变参数
+			def fun(*args):
+				<statement>
+			args将会是一个元组，其中的元素顺序和传参的顺序相同。
+			fun(*args)，是将元组按普通顺序传参的方法将参数传给函数。
+		2).字典传参
+			def fun(**kwargs):
+				<statement>
+			当函数调用的传参是字典形式是，用**的形式来接收。
+			fun(**kwargs)，是将字典按命名传参的方法将参数传给函数。
+			可以通过fun(*args, **kwargs)将合适的数据传给函数。
+		3).函数也是对象
+			所以函数对象是可以作为参数进行传递。
+		4).内部函数和闭包
+			函数中还可以定义函数，这样的特性也被称为闭包。Python对闭包的支持和Lisp是类似的。
+			需要注意的是，当前作用域是不能修改外部作用域的局部变量以及全局变量的，只能对其进行访问。
+		5).匿名函数
+			lambda <var>:<exp>					# 参数<var>，返回值为<exp>
+			Python对匿名函数的支持有限，仅仅支持简单的匿名函数。
+			(lambda <var>:<exp>)(...);			# 进行函数调用
+	6.生成器
+		生成器本质上就是一个快速生成的迭代器。并且生成器只能迭代一次。
+		def gen():
+			yield 1
+			yield 2
+			yield 3
+		gen是一个函数，执行后返回一个生成器，该生成器每次迭代按yield的顺序返回结果。
+		a = gen();
+		a每次迭代分别返回1,2,3。迭代玩所有元素后，a不能重新迭代，其实就是相当于迭代器迭代到最后面的元素了，不能再返回新元素。
+	7.装饰器
+		装饰器并非一种语法，而是一种设计模式，用于对现成函数外围进行一个修改：
+			def decorate(func):
+				def new_func(*args, **kwargs):
+					<statement>
+					func(*args, **kwargs);
+					<statement>
+				return new_func
+			
+			newfun = decorate(fun);
+			newfun(...);
+			上述代码可以给原函数fun在开始和结束之前添加代码。
+		Python内置了装饰器的语法，该语法免去了人工调用decorate(fun)的过程:
+			@decorate
+			def fun(...):
+				...
+			执行fun(...)的效果等同于decorate(fun)(...)
+	8.命名空间和作用域
+		每个程序的主要部分定义了全局命名空间，这个空间的变量被称为【全局变量】。
+		在函数的命名空间中，可以获取全局变量，但是不能修改全局变量，否则运行该函数时报错。
+		更具体的说，当函数中操作一个全局变量名时，若先赋值，则会创建相同名字的局部变量。若先获取，则该变量就是全局变量本身。
+		若希望在函数中控制全局变量，则需要添加global进行声明，后面对全局变量进行修改其实是生成了一个新的变量，因为两者的id(<var>)不同。
+	9.异常处理
+		和Java一样，一个异常是一个类：
+			class MyException():
+				<statement>
+			
+			def myFun():
+				<statement>
+				raise MyException();			# 这里将会生成异常对象并抛出，类似throw new Exception();
+		可以通过try-except来捕捉异常：
+			try:
+				<statement>
+			except [Exception as e]				# 可以捕获所有的异常，若加上了中括号中的内容，可以获取异常信息。
+				<statement>
+		也可以通过except <exceptionType> as <var>来捕获具体的异常，<var>为异常信息。
+		
+	1.其他
+		通过#进行注释，Python中无多行注释，需要在注释的开头都打上#。
+		当一行过长时可以将后面的内容放在下一行，通过\来标志和下一行进行连接。当然一个符号单位是不能通过\进行连接的，比如2\<换行>3，不代表23.
 五、模块化
+	每个py文件都有自己的全局变量空间，可以通过import在一个py文件中引入别的py文件的全局变量空间。
+	1.import
+		imort module
+		<statement>
+		module为模块名，模块名是py的文件名(除后缀)
+		当Python运行到import module时，将会在【环境变量】(sys.path)指定的路径下去寻找module.py文件，并运行该文件，得到里面的全局对象。
+		通过 module.<function> 来使用模块中的全局变量。
+	2.别名
+		import module as alias
+		通过alias.<function>使用全局变量
+	3.部分引入
+		from module import <function>
+		直接通过<function>使用。
+		也可以在这里使用别名
+		from module import <function> as alias
 六、类和OOP
 七、数据存储
 八、WEB
