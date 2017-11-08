@@ -244,6 +244,96 @@
 		也可以在这里使用别名
 		from module import <function> as alias
 六、类和OOP
+	1.基本用法
+		1).定义
+			class <ClassName>():
+				# 初始化变量
+				<var> = <defaultValue>
+				
+				# 构造器
+				def __init__(self):
+					<statement>
+				# 一般方法
+				def method(self):
+					<statement>
+			类的方法第一个参数【必须】是self，和Java类中的this同理。
+			可以通过obj.<var>来给对象添加属性，并且访问不会受到任何限制，完全靠自觉。
+			obj.method()和obj.method(obj)的效果完全相同。
+			python中的方法不允许重载，若有同名方法，以最后定义的那个为准。
+		2).实例化
+			<ref> = <ClassName>(<args>);		# 调用构造器进行初始化
+	3.继承
+		1).定义
+			class <ClassName>(ParentClassName):
+				<statement>
+			子类继承父类的所有方法。
+			需要注意的是，子类如果没有__init__方法，则会自动调用父类的__init__方法.
+			若之类有构造器的话则不会自动调用父类的构造器，需要显示调用:super().__init__();
+		2).override
+			子类方法可以覆盖父类同名方法，需要注意的是并不要求方法的标签相同，只需要方法名相同就会被覆盖。
+			本质上就是以后定义的方法为主。
+		3).调用父类方法
+			通过super().<ParentMethod>(<args>)
+	4.属性
+		Python的属性不可以像C++/Java在类的直接作用域中编写属性及其初始化值，也可以直接在需要属性的时候通过obj.<var>来添加或者使用属性。
+		1).getter-setter方法
+			属性的getter-setter方法是为了在获取和使用属性的时候定义自己的操作，通常是需要辅助变量的。
+			obj.<property> = xxx;		# 调用setter
+			obj.<property>;			# 调用getter
+			其实obj.<property>并发数据保存的地方，而是方法的入口名。
+			class <ClassName>():
+				def <getter-method>(self):
+					<statement>
+				def <setter-method>(self, input):
+					<statement>
+				<property> = property(<getter-method>, <setter-method>);
+			通过obj.<property>和obj.<property>=xxx就可以访问两个方法，若需要保存数据则通常需要一个辅助的私有变量进行真正的数据保存。
+			若不需要读取或是写入功能，则对应参数传入None即可。
+			也可以通过注解的方式提供这样的功能
+		2).私有属性
+			上述的getter-setter方法提供了 只读/只写/读写/不可读写 的选择，但是会有对辅助变量的需要，而辅助变量还是可以直接访问的。
+			当变量名是双下划线开头时 并在类中方法使用时，该变量即为私有变量，不可以直接通过变量名访问。
+			即在类的方法中self.__<var> = xxx;在类外不可以通过obj.__<var>进行任何相关访问。
+			Python是通过重命名来进行私有变量保护的，即self.__<var>=xxx;在内部实际上是self._<ClassName>__<var>=xxx，在外部也可以通过这个变量名来访问。
+			当然在类的外部 obj.__<var>并非设置的私有变量，这个是不会做重命名的。
+		3).类属性
+			若在Python的类的作用域的最顶层定义属性，那么这些属性是类属性
+			class <ClassName>():
+				<ClassProperty> = <defaultValue>
+			需要通过<ClassName>.<ClassProperty>来进行控制。
+	5.方法
+		1).实例方法
+			实例方法就是直接在类中进行正常定义的，这些方法本质上就是函数对象。
+			obj.method=3;是可以直接破坏掉方法的。
+		2).类方法
+			类所拥有的方法，没有self作为第一个参数的限制，并且需要通过@classmethod注解进行声明。
+			类方法的第一个参数cls就是类引用本身。
+			class <ClassName>():
+				@classmethod
+				def classMethod(cls):
+					<statement>
+			通过<ClassName>.<classMethod>()进行访问。
+		3).静态方法
+			不需要self，不需要cls，并通过注解@staticmethod进行声明。
+		4).魔方方法
+			本质上就是对于运算的重载：
+				# self==other => __eq__(self, other)
+				# self!=other => __ne__(self, other)
+				# self <other => __lt__(self, other)
+				# self >other => __gt__(self, other)
+				# self<=other => __le__(self, other)
+				# self>=other => __ge__(self, other)
+				# self +other => __add__(self, other)
+				# self -other => __sub__(self, other)
+				# self *other => __mul__(self, other)
+				# self /other => __truediv__(self, other)
+				# self %other => __mod__(self, other)
+				# self//other => __floordiv__(self, other)
+				# self**other => __pow__(self, other)
+				# str(self)   => __str__(self, other)
+				# repr(self)  => __repr__(self, other)
+				# len(self)   => __len__(self)
+			
 七、数据存储
 八、WEB
 九、并发与网络
