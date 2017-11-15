@@ -428,5 +428,89 @@
 					如果origin等于0(默认为0), 则从开头偏移。
 					如果origin等于1，则从当前位置偏移。
 					如果origin等于2，则从最后结尾处偏移。
-八、WEB
+		2).文件系统
+			import os
+			os.path.exists(<path-string>);		# 判断指定路径的文件或文件夹是否存在
+			os.path.isfile(<path-string>);		# 判断指定路径是否为文件
+			os.path.isdir(<path-string>);		# 判断指定路径是否为文件夹
+			os.path.abspath(<path-string>);		# 返回文件的决定路径
+			os.path.realpath(<path-string>);	# 返回文件(符号链接)的真实路径
+			os.mkdir(<dir>);					# 创建目录
+			os.rmdir(<dir>);					# 删除目录
+			os.listdir(<dir>);					# 列出目录的内容
+			os.remove(<path-string>);			# 删除文件
+			os.rename(<origin-filename>, <target-filename>);	# 重命名文件
+			shutil.copy(<src-file-path-string>, <target-file-path-string>);	# 文件复制
+			shutil.move(<src-file-path-string>, <target-file-path-string>);	# 文件移动
+八、网络
+	1.WEB客户端
+		1).标准Web库
+			http库， 会处理所有客户端-服务器HTTP请求细节：
+				client，处理客户端部分。
+				server，处理服务器部分。
+				cookies和cookiejar，处理cookie。
+			urllib库，基于http的应用库
+				request，客户端发送请求相关。
+				response，客户端处理响应相关。
+				parse，解析URL。
+			通过import urllib.request as ur来引入
+			conn = ur.urlopen(url)		# 开始连接
+			conn.status					# 状态码
+			conn.read()					# 读取内容
+		2).第三方库requests
+			通过pip install requests可以下载第三方requests库。
+			import requests;
+			resp = requests.get(url);
+			resp.text					# 获得内容
+	2.WEB服务器
+		python -m http.server 可以快速开启一个demo性质的python服务器。
+		通用网管接口(CGI)，客户端发送请求，Web服务器运行外部的满足CGI的程序并得到结果。由于每次个请求都会启动一次，因此会有较大的等待时间。
+		Web服务器网格接口(WSGI)，连接Python Web应用和Web服务器。
+		1).框架
+	3.网络底层
+		1).TCP客户端
+			import socket
+			address = (<host-string>, <port>);
+			client = socket.socket(socket.AF_INET, socket.SOCK_STREAM);	# 创建客户端对象，AF_INET表示因特网套接字，SOCK_STREAM表示创建的客户端对象采用TCP的报文。
+			client.connect(address);			# 客户端对象连接目标机
+			client.sendall(<string>);			# 想服务器发送数据
+			data = client.recv(<max_size>);		# 接收数据
+		2).TCP服务器
+			import socket
+			address = (<host>, <port>);
+			server = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+			server.bind(address);
+			server.listen(<size>);				# 设置服务器对象最多可以和5个客户端保持连接，超过5个会拒绝
+			
+			client, addr = server.accept();		# 获取连接客户端的socket对象 以及 客户端的地址信息
+			data = client.recv(<max_size>);
+			client.close();
+			server.close();
+			
+			
 九、并发与网络
+	1.程序和进程
+		import os
+		os.getpid();		# 获取进程的pid
+		os.getcwd();		# 获得当前工作目录
+		os.getuid();		# 获得当前用户ID
+		os.getgid();		# 获得当前用户组ID
+		
+		import subprocess
+		ret = subprocess.getoutput(<shell-cmd>);		# 开启一个新进程执行shell指令，并且阻塞直到获得输出
+		ret = subprocess.getstatusoutput(<shell-cmd>);	# 开启一个新进程执行shell指令，并且阻塞直到获得进程返回的状态码和输出
+		ret = subporcess.call(<shell-cmd>);				# 同上，但只能获得状态码
+		
+		import multiprocessing
+		p = multiprocessing.Process(target=<function-obj>, args=<tuple>);	# 创建一个新进程，该进程执行指定函数的逻辑，并且参数为<tuple>
+		p.start();			# 开始进程
+		p.terminate();		# 终止进程
+	2.并发
+		1).线程
+			import threading
+			t = threading.Thread(target=<function-obj>, arg=<tuple>);	# 创建一个线程
+			t.start();			# 开始线程
+			线程不能通过terminate终止
+		2).事件编程
+			一个基于事件的程序会运行一个核心事件循环，分配所有的任务，然后重复这个循环。【gevent】是一个基于事件的库。
+		3).回调
