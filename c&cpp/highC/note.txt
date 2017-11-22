@@ -1,0 +1,19 @@
+一、概述
+	linux环境下通过gcc <cfile> -o <exefile>可以生成对应的二进制码。
+	若<cfile>中有函数入口main函数，则可以通过.../<exefile>来运行程序。
+	由于每次重新编写后，都需要重新编译再运行，因此也可以通过gcc <cfile> -o <exefile> && .../<exefile>来运行编译并运行程序。
+	&&的意思是成功变执行。
+
+二、字符串
+	1.输入
+	2.数组和指针使用字符串的区别
+	
+	重定向
+		./<exefile> < <stdin> > <stdout>
+		stdout, stdin, stderr
+		fprintf
+		fscanf
+疑问
+	1.char *s = "abc",  char s[] = "abc"的区别。为什么第二个可以修改，第一个数据不可以修改。
+		char *s="abc"，指的是栈空间有个s，常量区有个"abc"，栈空间的s指向常量区，因此不能修改。
+		char s[] = "abc"，指的是栈空间有个s，栈空间还有个字符数组'a','b','c'，常量区也有个"abc"没有指向它的指针。因此可以修改。

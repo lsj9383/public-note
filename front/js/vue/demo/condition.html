@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+  <div id="app">
+   <input v-if="loginType === 'username'" placeholder="Enter your username">
+    <input v-else placeholder="Enter your email address">
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        loginType : 'username '
+      }
+    });
+  </script>
+</body>
+</html>

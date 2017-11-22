@@ -1,0 +1,2 @@
+print("moduleA")
+o = object();

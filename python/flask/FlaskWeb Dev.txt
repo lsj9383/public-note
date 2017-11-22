@@ -1,0 +1,132 @@
+一、Flask程序的结构
+	1.初始化
+		Flask程序需要创建一个Flask对象，该对象实现了WSGI接口，会接收来自Web服务器发送过来的请求。
+		import flask;
+		app = flask.Flask(__name__);		# 创建Flask对象需要主模块或包名。
+		if __name__ == '__main__'
+			app.run(debug=True);			# run方法启动Flask集成的Web服务器
+		由于经常会采用apache或是nginx等其他Web服务器来运行Python代码，因此需要判断是否采用Flask自己的服务器。
+		若是直接运行该模块(__name__为__main__)，那么就采用Flask自己的服务器。
+		若是其他服务器来引入的该模块，那么应该由那些服务器自己来启动服务。
+	2.Flask路由
+		路由是指的URL如何映射到某个函数逻辑。在Flask中是通过Python修饰器来实现的。
+		@app.route(<URL>)
+		def <function-name>():
+			pass;
+		通过上述方式，请求可以到对应的URL执行逻辑中去。
+		URL直接路由的函数被称为视图函数。通常在代码中直接嵌入响应的静态字符串会让代码边的难以维护。
+		@app.route(<URL>/<param>, methods=['GET', 'POST', ...])
+		def <function-name>(param):
+			pass;
+		通过这样的方式可以获取URL中的参数。这些参数默认是字符串，也可以通过<int:param>进而获得整型。
+		并且通过methods可以指定该路由支持的方式，默认为GET。
+	3.上下文全局变量
+		1).current_app
+			程序上下文，当激活程序的程序实例。
+		2).g
+			程序上下文，处理请求时作临时存储的对象。每次请求都会重设该变量。
+		3).request
+			请求上下文，请求对象。
+		4).session
+			请求上下文，用户会话。程序可以把数据存储在用户会话中，以保持一个会话数据的完整性。
+			sesssion[<key>]=<value>，可以设置sesson。其实session本质上就是一个map。
+		每个请求都有自己独立的信息，因此每次接收到一个请求Python都会创建一个请求对象，并且请求对象是线程内全局可访问的。
+	4.响应
+		1).简易返回
+			视图函数返回的时候可以有三个参数：字符串，状态码，首部字典。
+			首部字典会将里面的kv对添加到http响应头中。
+		2).response对象返回
+			视图函数返回的时候，可以返回response对象。response对象可以设置cookie。
+			response = make_response(<string>);
+			response.set_cookie(<key-string>, <value-string>);
+			return response;
+		3).重定向
+			return redict(<url>);
+		4).跳转
+		5).模板
+			return render_template(<template-file>);		# 返回渲染出的模板。
+		6).静态文件
+			Flask默认设置下静态文件是放置在程序的根目录的static子目录中。
+			<host>/static/<file>，可以对静态文件资源进行定位。
+			本质上，静态文件有一个特殊的路由定义，该特殊的路由定义由Flask自己完成：
+			@app.route("/static/<filename>")
+			def static(filename):
+				pass;
+	5.请求钩子
+		这是一些回调函数，通过修饰器来注册。
+		before_first_request, 注册一个函数，在处理第一个请求前运行。
+		before_request, 注册一个函数，在每次请求之前运行。
+		after_request, 注册一个函数，如果没有未处理的异常抛出，在每次请求之后运行。
+		teardown_request, 注册一个函数，即使有未处理的异常抛出，也在每次请求之后运行。
+		errorhandler(<status>)，注册一个函数，当发生对应状态的错误时，将触发该函数，方便自定义错误页面。
+二、模板
+	Python自带Jinjia2模板引擎，并且默认情况是在服务器工作路径的templates文件夹下寻找模板。
+	1.返回
+		return render_template(<file>, <key>=<value>)
+	2.变量
+		通过双大括号的方式来引入变量：{{<var-name>}}，变量在render_template调用时进行赋值。
+		变量还有一些过滤器，过滤器本质上就是一些特殊的函数，对变量做一些加工。
+		{{ <var-name> | <filter-name> }}，其中<filter-name>包括了：
+			- safe, 渲染时不转义。采用了safe，文本里有js或者标签会进行解释，否则不进行解释而是直接显示。需要确保文本的安全性，避免xss攻击。
+			- lower, 把值转换为小写形式。
+			...
+	3.控制结构
+		1).条件语句
+		2).循环语句
+		3).模板继承
+			在基模板中定义基本的布局框架，以及相关的block，而block的代码在子模板中实现。
+	4.自定义错误页面
+		@app.errorhandler(404)
+		def page_not_found(e):
+			return render_template('404.html'), 404;
+		@app.errorhandler(500)
+		def internal_server_error(e):
+			return render_template('500.html'), 500;
+	5.链接生成
+		直接在模板中写死url会导致不必要的依赖关系，在模板中的连接适合用url_for函数来生成连接。
+		url_for可以用视图函数的【函数名】来获取对应的url：
+			@app.route('<url>')
+			def <function-name>():
+				pass;
+			通过url_for(<function-name>, _external=True)，可以获得http://<host>/<url>
+		若视图函数需要参数，也可以直接在参数列表中设置。
+		模板函数会引用静态资源，而静态资源对应了URL为/static/<filename>, 函数名为static这一特殊的路由，
+		因此通过url_for('static', filename=<filename>, _external=True)可以得到http://<host>/static/<filename>的URL。
+三、表单
+	首先要知道，表单类只能在动态模板中使用。使用Flask提供的表单类以及相关操作，需要下载flask-wtf:pip install flask-wtf。
+	需要注意，使用表单类，一定要进行密钥设置，该密钥是用于解决CSRF问题的。若不分配密钥，则无法实例化表单类。
+	app = Flask(__name__);
+	app.config['SECRET_KEY'] = 'hard to guess string';
+	1).表单类
+		from flask.ext.wtf import Form
+		from wtforms import <Field>, SubmitField
+		from wtforms.validators import Required
+		
+		class <FormClass>(Form):
+			<field1> = <FieldClass>(..., validators=[Required()]);
+			<field2> = <FieldClass>(..., validators=[<validators>, ...]);
+		这个类可以定义表单中的所有字段，并且每个字段在类中用一个对象表示，这个对象被称为【字段对象】。
+		字段对象赋给表单类中的类变量，并且附属一个或多个验证函数(validators)。validators用来验证用户提交的输入值是否符合要求。
+	2).实例化表单对象
+		form = <FormClass>();
+		实例化本质上是为了更方便的获取post上来的数据，并进行相关的验证。
+		form.<field1>.data, 就可以获取对应字段post上来的数据。
+	3).表单对象的渲染
+		return render_template(<template-file>, form=form);
+		要渲染表单的时候，需要传入表单数据，并在模板中通过
+		{{form.<field>()}} 来进行字段的渲染。
+四、数据库
+五、程序结构
+	- Flask
+		- app，这里面包含了Flask程序，包括所有的业务代码、模板和静态文件。
+			- templates, 这里面包含了动态模板
+			- static, 这里面包含了静态资源
+			- main
+				* __init__.py，蓝本，定义休眠状态的路由，蓝本注册到程序上后才能真正成为程序的一部分。
+			* __init__.py，程序工厂函数，编写程序的启动方式。
+		- migrations，包含数据库迁移脚本。
+		- tests，单元测试编写。
+		- venv，Python虚拟环境。
+		* requirements.txt，列出了所有依赖包，便于在其他电脑中重新生成相同的虚拟环境。
+		* config.py，存储配置。
+		* manage.py，用于启动程序以及其他的程序任务。

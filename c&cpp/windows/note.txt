@@ -1,0 +1,150 @@
+一、概述
+	1.系统层级
+		1).POSXI和win32(windows api)
+			POSXI是一套系统函数的接口标准，统一了unix linux osx等操作系统的系统函数。
+			windows api是一套自己的标准，和posxi不兼容。
+			但其实winNT以后，windows就暗含了posxi子系统，但是该子系统和posxi是部分兼容，而非完全兼容的。
+		2).ANSI C
+			ANSI C就是C语言标准，ANSI标准C库就是C标准库，该库提供了和操作系统无关的函数，易于移植。
+			在windows中，该库通过windows API实现，在unix linux osx等操作系统中，通过posxi实现。
+	2.windows准则
+		对于unix而言，所有的东西都是一个文件，通过文件描述符控制。在windows api中，系统资源以【内核对象】存在
+		进程通过【句柄】来引用内核对象。
+		far/near * 指的是远指针和近指针，16bitCPU常用，32bit及其以上far/near都相当于是*。
+		DWORD   -> unsigned long
+		BOOL    -> int
+		LPDWORD -> unsigned long far *
+		LPVOID  -> void far *
+		LPCVOID -> const void far *
+		
+	3.常用API
+		1).ANSI C
+			memst(void *Dst, int _val, size_t _Size);						// 将内存区域的每个字节赋值为_val
+			void * ZeroMemory(void *Dst, size_t _Size);						// 等价于memst(dst, 0, size)
+		2).WINDOWS API
+			DWORD GetCurrentDirectory(DWORD nBufferLength,LPWSTR lpBuffer);		// 获取当前进程的工作目录
+			HANDLE GetStdHandle(DWORD nStdHandle);								// 获取标准设备对应的句柄
+			BOOL SetStdHandle(DWORD nStdHandle, HANDLE hHandle);				// 设置标准设备的句柄
+			BOOL CloseHandle(HANDLE hObject);									// 关闭句柄
+			
+			BOOL CreateFile(LPCTSTR lpName, DWORD dwAccess, DWORD dwShareMode, LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreate, DWORD dwAttribsAndFlags, HANDLE hTemplateFile);	// 创建文件句柄
+			BOOL CreatePipe(PHANDLE phRead, pHANDLE phWrite, LPSECURITY_ATTRIBUTES lpsa, DWORD cbPipe);	// 创建匿名管道
+			BOOL CreateProcess();	// 创建进程
+二、基本IO操作与字符
+	1.基本IO操作
+		1).打开文件句柄
+		2).关闭文件句柄
+		3).读文件
+			BOOL ReadFile(
+				HANDLE hFile,					// 文件句柄
+				LPVOID lpBuffer,				// 数据保存的位置
+				DWORD nNumberOfBytesToRead,		// 期望读到的字节数
+				LPDWORD lpNumberOfBytesRead,	// 返回读取的字节数
+				LPOVERLAPPED loOverlapped);
+		4).写文件
+			BOOL WriteFile(
+				HANDLE hFile,
+				LPCVOID lpBuffer,
+				DWORD nNumberOfBytesToWrite,
+				LPDWORD lNumberOfBytesWritten,
+				LPOVERLAPPED lpOverLapped);
+	2.标准的输入输出
+		unix每个进程的0 1 2文件描述符是标准设备文件描述符，默认绑定的是屏幕和键盘。
+		在windows也是一样的，每个进程都有标准设备，绑定的是屏幕和键盘。
+		1).获取标准设备对应的句柄
+			HANDLE GetStdHandle(DWORD nStdHandle);
+			其中nStdHandle的取值可以是：STD_INPUT_HANDLE, STD_OUTPUT_HANDLE, STD_ERROR_HANDLE。
+			返回有效句柄则成功，否则反馈INVALID_HANDLE_VALUE。
+		2).设置标准设备的句柄
+			这个用于标准IO的重定向。
+			BOOL SetStdHandle(DWORD nStdHandle, HANDLE hHandle);
+			返回TRUE或者FALSE，分别表示成功或失败。
+	3.字符集
+	
+三、异常处理
+四、内存管理、内存映射和DLL
+五、进程管理
+	1.内核对象
+	2.进程创建
+		windows进程没有父-子进程的关系。A进程创建B进程，虽然名义上说A是B的父进程，但是windows并不维护这个父子关系，是完全独立的。
+		BOOL CreateProcess(
+			LPCSTR lpApplicationName,				// 指定可执行映像, 通常为NULL
+			LPTSTR lpCommandLine,					// 指定可执行命令行
+			LPSECURITY_ATTRIBUTES lpsaProcess,		// 进程句柄的安全属性, 通常为NULL，采用默认安全属性
+			LPSECURITY_ATTRIBUTES lpsaThread,		// 线程句柄的安全属性, 通常为NULL, 采用默认安全属性
+			BOOL bInheritHandles,					// 可继承句柄，标志了子进程是否继承父进程中的可继承句柄, TRUE为可继承
+			DWORD dwCreationFlags,					// 创建标志
+			LPVOID lpEnvironment,					// 新进程的环境变量，若为NULL，采用父进程的环境变量
+			LPCTSTR lpCurDir,						// 新进程的工作目录，若为NULL，采用父进程的工作目录
+			LPSTARTUPINFO lpStartupInfo,			// 设置进程的标准IO设备句柄和主窗口外观
+			LPPROCESS_INFORMATION lpProcInfo);		// 返回进程/线程句柄
+		1).可执行映像和命令行
+			lpApplicationName不为NULL时，采用lpApplicationName而不采用lpCommandLine，
+			lpApplicationName是为NULL时，采用lpCommandLine。
+			lpApplicationName可以指定进程的路径和文件名，在【当前工作目录】搜索，不会有额外的搜索。
+			lpCommandLine可以指定进程的完整路径或相对路径，采用相对路径时会按以下目录顺序进行搜索：
+				- 当前进程映像所在目录
+				- 当前工作目录
+				- Windows系统目录，可以通过GetSystemDirectory来获取
+				- Windows目录，可以通过GetWindowsDirectory来获取
+				- 环境变量PATH所指定的目录
+		2).可继承句柄
+			子进程要继承父进程创建的句柄，需要在创建继承时指定bInheritHandles，
+			并且相关句柄的SECURITY_ATTRIBUTES的bInheritHandle标志位TRUE。
+	3.进程的退出与终止
+		ExitProcess(UINT uExitCode);
+			在完成工作以后，进程中的线程可以带着退出码调用
+		DWORD GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
+			可以获得指定进程的退出码，当退出码为STILL_ACTIVE时，代表该进仍处于活跃状态。
+		DWORD WaitForObject(HANDLE hObject, DWORD dwMilliseconds);
+			可以等待指定的HANDLE变成已传状态。当一个进程终止时，系统会将该进程句柄变成已传状态。因此该函数可以用来等待进程结束。
+			dwMilliseconds是以毫秒计算的超时时间，0代表测试了指定对象的状态之后立即返回，这样就可以轮询查看系统是否终止。
+			若不需要超时时间，而是等待进程终止为止，可以使用INFINITE。
+		DWORD WaitForMultipleObjects(DWORD nCount, CONST HANDLE *lpHandles, BOOL fWaitAll, DWORD dwMilliseconds);
+			基本同上，该函数可以用来等待多个进程。fWaitAll代表是等待多个进程中的1个进程，还是等待多个进程。
+		这两个wait，返回等待完成的原因，若错误返回-1。
+六、进程间通信
+	1.匿名管道
+		匿名管道的通信可以设置为半双工或者单向的，通常设置为单向的。单向的需要在两个进程一个关闭读句柄，一个关闭写句柄。
+		1).创建匿名管道
+			BOOL CreatePipe(
+				PHANDLE phRead,					// 匿名管道的读句柄
+				pHANDLE phWrite,				// 匿名管道的写句柄
+				LPSECURITY_ATTRIBUTES lpsa,		// 匿名管道的安全策略属性，需要设置为可继承才能由子进程继承。
+				DWORD cbPipe);					// 管道字节尺寸, 直接设置0以采用默认值。
+			需要注意的是，管道为空时进行数据读取会导致句柄阻塞，直至管道接收到了ReadFile中指定的数量的数据位置。
+			对管道的写操作是在内存缓冲区中实现的，若管道写满，会导致写操作阻塞。
+		2).父子进程管道通信配置(父进程获取子进程的输出信息)
+			// 打开管道
+			HANDLE hReadPiple, hWritePiple;		// 读写句柄
+			SECURITY_ATTRIBUTES pipeSA = {sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};		// 配置句柄可继承
+			
+			// 初始化进程信息和启动信息
+			PROCESS_INFORMATION procInfo;		// 进程信息
+			STARTUPINFO startInfo;				// 进程启动相关信息，其中包括设置进程标准设备的句柄绑定
+			
+			ZeroMemory(&procInfo, sizeof(procInfo));
+			ZeroMemory(&startInfo, sizeof(startInfo);
+			startInfo.cb = sizeof(startInfo);
+			CreatePipe(&hReadPiple, &hWritePiple, &pipeSA, 0);	// 创建管道
+			startInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+			startInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+			startInfo.hStdOutput = hWritePipe;	// 设置子进程的标准输出是输出到匿名管道上
+			
+			// 创建进程
+			CreateProcess(
+				NULL, 			// LPCSTR lpApplicationName
+				command, 		// LPTSTR lpCommandLine
+				NULL,			// LPSECURITY_ATTRIBUTES lpsaProcess
+				NULL,			// LPSECURITY_ATTRIBUTES lpsaThread
+				TRUE,			// BOOL bInheritHandles
+				0,				// DWORD dwCreationFlags
+				NULL,			// LPVOID lpEnvironment
+				NULL,			// LPCTSTR lpCurDir
+				&startInfo,		// LPSTARTUPINFO lpStartupInfo
+				&procInfo);		// LPPROCESS_INFORMATION lpProcInfo
+			CloseHandle(hWritePipe);	// 写句柄交给了子进程，父进程可以关闭写句柄了。
+	2.命名管道
+	3.邮槽
+七、线程调度
+八、线程同步
