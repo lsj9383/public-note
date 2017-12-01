@@ -19,6 +19,12 @@
 		
 	3.常用API
 		1).ANSI C
+			setvbuf(FILE *file, char *buff, int mode, size_t size);			// 配置文件输出的缓冲区。
+				写文件的时候，通常会将数据放在缓冲区中，
+				mode可以配置刷新模式：
+					_IOFBF(满缓冲）：当缓冲区为空时，从流读入数据。或者当缓冲区满时，向流写入数据。
+				　　_IOLBF(行缓冲）：每次从流中读入一行数据或向流中写入一行数据。
+				　　_IONBF(无缓冲）：直接从流中读入数据或直接向流中写入数据，而没有缓冲区。
 			memst(void *Dst, int _val, size_t _Size);						// 将内存区域的每个字节赋值为_val
 			void * ZeroMemory(void *Dst, size_t _Size);						// 等价于memst(dst, 0, size)
 		2).WINDOWS API
@@ -118,6 +124,7 @@
 			// 打开管道
 			HANDLE hReadPiple, hWritePiple;		// 读写句柄
 			SECURITY_ATTRIBUTES pipeSA = {sizeof(SECURITY_ATTRIBUTES), NULL, TRUE};		// 配置句柄可继承
+			CreatePipe(&hReadPiple, &hWritePiple, &pipeSA, 0);	// 创建管道
 			
 			// 初始化进程信息和启动信息
 			PROCESS_INFORMATION procInfo;		// 进程信息
@@ -126,11 +133,10 @@
 			ZeroMemory(&procInfo, sizeof(procInfo));
 			ZeroMemory(&startInfo, sizeof(startInfo);
 			startInfo.cb = sizeof(startInfo);
-			CreatePipe(&hReadPiple, &hWritePiple, &pipeSA, 0);	// 创建管道
 			startInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 			startInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 			startInfo.hStdOutput = hWritePipe;	// 设置子进程的标准输出是输出到匿名管道上
-			
+			startInfo.dwFlags = STARTF_USESTDHANDLES;
 			// 创建进程
 			CreateProcess(
 				NULL, 			// LPCSTR lpApplicationName

@@ -1,0 +1,82 @@
+0.配置
+	git config -e 			编辑版本级别的配置文件，进入当前git工作区的.git/config文件中进行编辑
+	git config -e --global	编辑全局级别的配置文件，进入~/.gitconfig文件中进行编辑(~为home目录，windows下~通常为C:/User/<userName>)
+	git config -e --system	编辑系统级别的配置文件，进入/etc/gitconfig文件中进行编辑(windows中，/为Git安装目录下目录，并且所在目录实际上为/mingw64/etc/gitconfig)
+	git config <key>		获得当前工作目录下，使<key>生效的<val>
+	git config [--global/--system] <key> <value>	设置配置项，包括全局和系统级别的
+		git config --global alias.<alias> <command>	为<command>创建别名<alias>
+		git config --global user.name <name>		用于记录提交人的用户名和邮箱
+		git config --global user.email <email>
+	git config --unset --global <config-key>	取消设置
+		git config --unset --global user.name
+		git config --unset --global user.email
+1.提交与比较
+	git log					查看当前HEAD到根节点上的commit历史
+		git log -status				查看commit历史包括每次commit和上次commit进行的修改
+		git log --pretty=oneline	精简化历史查看
+	git status				查看当前HEAD的状态
+		git status -s			精简状态信息
+	git add <file>			将指定的文件加入暂存区
+		git add .				将工作区所有目录和子目录的所有【修改】加入暂存区
+	git diff				比较工作磁盘数据与暂存区的差异。
+		git diff <commithash>	比较工作磁盘与指定提交历史间的不同。
+		git diff HEAD			比较commit后进行的修改和原始记录之间的不同。
+2.删除和撤销
+	git reset <commithash>	将<commithash>的数据覆盖暂存区(其实主要是目录树覆盖)，不做其他任何操作，比如工作区的数据不会受影响。
+		git reset HEAD			用HEAD覆盖暂存区
+		git reset HEAD^			
+	git checkout .			用暂存区所有的文件代替工作区的指定文件，主要是目的是为了恢复之前未提交到暂存区的修改。
+		git checkout -- <file>	用暂存区指定的文件代替工作区对应的文件，主要是目的是为了恢复之前未提交到暂存区的修改。
+	git rm --cached <file>	直接从暂存区中删除指定的文件，目的是为了避免文件提交到仓库中。
+	git revert
+	
+3.分支
+	git branch					显示所有的分支，并通过*来标记当前HEAD所在的分支
+	git branch <branch>			在当前的记录上创建新分支
+	git checkout <branch>		从当前分支切换到指定分支
+	git checkout -b <branch>	创建一个新分支，并切换到该分支上
+	git merge <branch>			将指定分支的内容，合并到当前分支上. 若<branch>继承于当前分支时，会直接将<branch>移动到master。
+4.记录翻阅	
+	cat .git/HEAD				查看HEAD指向的分支
+	git symbolic-ref HEAD		查看HEAD指向的分支
+	git log						查看提交记录的哈希值
+	git checkout <commithash>	每个提交历史都有个哈希值，可以通过这个方式将当前的HEAD指向对应的提交记录
+	git checkout <commithash>^	将HEAD指向<commit-hash>的上一个
+	git checkout HEAD^			将当前HEAD移至上一个提交节点
+	git checkout <commithash>~n 将HEAD指向<commithash>
+	git branch -f <branch> <commithash>		将指定的分支指针强行指向某次提交历史记录
+	HEAD是一个特殊的指针:
+		1).HEAD是文件系统中将会显示的提交版本。
+		2).通过HEAD指向的分支来判定当前使用的是哪个分支。
+		3).commit时，HEAD会指向最新的提交节点。
+	上面的<commit-hash>可以通过git log查阅每个提交历史的hash值，也可以用分支名代替hash值，也可以用HEAD代替hash值。
+5.Rebase
+
+原理：
+	1.提交流程
+		【工作磁盘(工作区)】 ---（git add）---> 【暂存区】---（git commit）---> 【Git仓库记录磁盘】。
+		因此，每次git commit后，暂存区和Git仓库记录是一模一样的(本来就是从暂存区进行记录的)。
+	2.Git文件夹
+		1).index
+			.git/index是一个目录数，记录了工作区中每个文件的时间和长度。
+			git status和git add等命令，都会更新index的文件时间和长度。
+			git status扫描工作检查每个文件的时间戳和长度，当发生改变的时候就认为文件可能被修改，会打开文件和原始进行对比。
+			每次git status文件新的信息包括时间和长度都会被更新到.git/index文件中.
+		2).
+	3.Commit对象
+		每个Commit对象包含了以下信息：
+			Id,		当前Commit节点的ID
+			Tree,	当前Commit节点所指向的目录索引文件的Id
+			Parent,	Commit父节点的ID
+			Authro,	当前Commit的提交人
+		Commit对象可以认为是一个快照数据，保存了那次Commit时的所有数据，可以抽象为一个节点(实际上在画Flow时就是这么做的)。
+	3.HEAD
+		HEAD始终指向一个分支或是一个提交的HASH记录：
+			当指向分支的时候.git/HEAD保存的是分支的文件夹名字
+			当指向commit记录时.git/HEAD保存的就是该commit记录的HASH值
+		每次commit时，生成的commit记录都记录着上一次HEAD所在的commit记录，并且HEAD指向新的commit记录的HASH。
+		若HEAD指向的是分支，那么HEAD和分支都会指向新的commit记录。
+		HEAD可以通过git checkout <commitHash>来随意移动。
+		commit_old <--- commit_new
+	4.分支
+		分支也是一个指针，每个分支都有自己的文件，保存了一个commit记录。
