@@ -13,7 +13,7 @@
 1.提交与比较
 	git log					查看当前HEAD到根节点上的commit历史
 		git log -status				查看commit历史包括每次commit和上次commit进行的修改
-		git log --pretty=oneline	精简化历史查看
+		git log --oneline			精简化历史查看
 	git status				查看当前HEAD的状态
 		git status -s			精简状态信息
 	git add <file>			将指定的文件加入暂存区
@@ -22,16 +22,23 @@
 		git diff <commithash>	比较工作磁盘与指定提交历史间的不同。
 		git diff HEAD			比较commit后进行的修改和原始记录之间的不同。
 2.删除和撤销
-	git reset <commithash>	将<commithash>的数据覆盖暂存区(其实主要是目录树覆盖)，不做其他任何操作，比如工作区的数据不会受影响。
-		git reset HEAD			用HEAD覆盖暂存区
-		git reset HEAD^			
-	git checkout .			用暂存区所有的文件代替工作区的指定文件，主要是目的是为了恢复之前未提交到暂存区的修改。
+	git reset <commit>	将当前分支移动到指定的提交记录(仓库和缓存区和该记录的相同)，但工作区的数据不会受影响。HEAD始终指向分支的
+		git reset --hard <commit>	该指令比较危险，工作区的数据和缓存区与仓库的将一致。
+		git reset HEAD				目的是用HEAD的仓库状态覆盖暂存区
+		git reset HEAD^				将分支上移动，并保持修改不变(本质上就是工作区的数据不受影响)。
+		git reset					同git reset HEAD。
+		git reset -- <commit> <path>	将指定<commit>的文件<path>代替当前暂存区中的文件<path>
+		git reset -- HEAD <path>	用HEAD仓库中的文件代替当前暂存区中的文件。本质上就是取消之前对这个文件的add。
+		综上,git reset都是将某个commit的状态【代替当前暂存区】的状态，不过有的工作区也会被修改(--hard)，有的分支指针会跟着修改。
+	git checkout .			用暂存区所有的文件代替工作区的所有文件，主要是目的是为了恢复之前未提交到暂存区的修改。
 		git checkout -- <file>	用暂存区指定的文件代替工作区对应的文件，主要是目的是为了恢复之前未提交到暂存区的修改。
+		综上，git checkout主要是将【暂存区的数据覆盖工作区】。
 	git rm --cached <file>	直接从暂存区中删除指定的文件，目的是为了避免文件提交到仓库中。
 	git revert
 	
 3.分支
 	git branch					显示所有的分支，并通过*来标记当前HEAD所在的分支
+		git branch -v				显示所有的分支，以及显示每个分支指向的hash值和分支所指向的commit的备注。
 	git branch <branch>			在当前的记录上创建新分支
 	git checkout <branch>		从当前分支切换到指定分支
 	git checkout -b <branch>	创建一个新分支，并切换到该分支上
