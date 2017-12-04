@@ -18,12 +18,15 @@
 		git status -s			精简状态信息
 	git add <file>			将指定的文件加入暂存区
 		git add .				将工作区所有目录和子目录的所有【修改】加入暂存区
-	git diff				比较工作磁盘数据与暂存区的差异。
-		git diff <commithash>	比较工作磁盘与指定提交历史间的不同。
-		git diff HEAD			比较commit后进行的修改和原始记录之间的不同。
+	git diff				比较工作区与暂存区的差异。
+		git diff <commit>			比较工作区与指定提交历史间的不同。
+		git diff HEAD				比较工作区和最新commit的不同。
+		git diff --cached <commit>	比较暂存区与指定提交历史间的不同。
+		git diff --cached			比较暂存区和最新commit的不同。
 2.删除和撤销
 	git reset <commit>	将当前分支移动到指定的提交记录(仓库和缓存区和该记录的相同)，但工作区的数据不会受影响。HEAD始终指向分支的
 		git reset --hard <commit>	该指令比较危险，工作区的数据和缓存区与仓库的将一致。
+		git reset --soft <commit>	只将当前分支移动到对应的提交记录，缓存区和工作区都不做改变。
 		git reset HEAD				目的是用HEAD的仓库状态覆盖暂存区
 		git reset HEAD^				将分支上移动，并保持修改不变(本质上就是工作区的数据不受影响)。
 		git reset					同git reset HEAD。
@@ -32,8 +35,14 @@
 		综上,git reset都是将某个commit的状态【代替当前暂存区】的状态，不过有的工作区也会被修改(--hard)，有的分支指针会跟着修改。
 	git checkout .			用暂存区所有的文件代替工作区的所有文件，主要是目的是为了恢复之前未提交到暂存区的修改。
 		git checkout -- <file>	用暂存区指定的文件代替工作区对应的文件，主要是目的是为了恢复之前未提交到暂存区的修改。
-		综上，git checkout主要是将【暂存区的数据覆盖工作区】。
-	git rm --cached <file>	直接从暂存区中删除指定的文件，目的是为了避免文件提交到仓库中。
+		git checkout <commit> <file>	用指定提交记录的暂存区的<file>覆盖当前工作区<file>，主要目的是用历史文件恢复被删除或是被修改的文件到工作区中。
+		git checkout <commithash>	每个提交历史都有个哈希值，可以通过这个方式将当前的HEAD指向对应的提交记录
+		git checkout <commithash>^	将HEAD指向<commit-hash>的上一个
+		git checkout HEAD^				将当前HEAD移至上一个提交节点
+		git checkout <commithash>~n 	将HEAD指向<commithash>
+		综上，git checkout主要是【暂存区的数据覆盖工作区】或是【移动分支】。
+	git rm <file>			从工作区和暂存区删除指定的文件
+		git rm --cached <file>	仅从暂存区删除指定文件，工作区不擅长。主要是为了将工作区的一些文件不提交到仓库中。
 	git revert
 	
 3.分支
@@ -43,20 +52,26 @@
 	git checkout <branch>		从当前分支切换到指定分支
 	git checkout -b <branch>	创建一个新分支，并切换到该分支上
 	git merge <branch>			将指定分支的内容，合并到当前分支上. 若<branch>继承于当前分支时，会直接将<branch>移动到master。
-4.记录翻阅	
-	cat .git/HEAD				查看HEAD指向的分支
-	git symbolic-ref HEAD		查看HEAD指向的分支
-	git log						查看提交记录的哈希值
-	git checkout <commithash>	每个提交历史都有个哈希值，可以通过这个方式将当前的HEAD指向对应的提交记录
-	git checkout <commithash>^	将HEAD指向<commit-hash>的上一个
-	git checkout HEAD^			将当前HEAD移至上一个提交节点
-	git checkout <commithash>~n 将HEAD指向<commithash>
-	git branch -f <branch> <commithash>		将指定的分支指针强行指向某次提交历史记录
-	HEAD是一个特殊的指针:
-		1).HEAD是文件系统中将会显示的提交版本。
-		2).通过HEAD指向的分支来判定当前使用的是哪个分支。
-		3).commit时，HEAD会指向最新的提交节点。
-	上面的<commit-hash>可以通过git log查阅每个提交历史的hash值，也可以用分支名代替hash值，也可以用HEAD代替hash值。
+4.其他操作
+	git tag			显示所有标签
+		git tag -m"<content>" <tagName>		创建一个含附注的标签
+		git tag -a <tagName> -m"<content>"	同上
+		由于直接记录commit记录的hash值太过困难，因此通过标签给记录设置一个别名。
+	git describe	显示离最新提交最近的tag，和该tag里最新提交之间的距离(做了多少次commit)以及一个HASH值。
+	git add -i		进入选择性添加的交互式命令行界面
+	.gitignore
+		该文件用于忽略不需要跟踪的文件。
+		1).可以将.gitignore放在仓库的任意目录中，其通配符只对其所处的目录及子目录有效。
+		2).忽略只对未跟踪的文件有效，对已经跟踪的文件是无效的，始终会显示其修改的情况。
+		3).被忽略的文件无法用git add <file>添加，要强行跟踪需要采用git add -f <file>。
+		4).该文件是共享式的，因此该文件会成为版本库的一部分。
+		5).常用语法：
+			#，注释
+			*，任意多字符
+			/<path>，表明要忽略的文件在该目录下，而非子目录的文件
+			<path>/，表明要忽略的是整个目录，同名文件不忽略
+			<path>，同名文件和目录都忽略
+			!，代表不忽略
 5.Rebase
 
 原理：
