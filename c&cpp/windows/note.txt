@@ -153,4 +153,62 @@
 	2.命名管道
 	3.邮槽
 七、线程调度
+	Windows的线程有以下特点：
+		- 每个线程有其自己的栈用于函数调用和其他处理。
+		- 每个线程可分配TLS(线程本地存储)，可以用全局的方式读取和设置本地线程的值。
+		- 创建线程的时候可以给线程传递一个参数，通常是指针。这将其他线程共享数据。
+	1.线程管理
+		1).线程创建
+			HANDLE CreateThread(
+				LPSECURITY_ATTRIBUTES lpsa,				// 安全属性结构
+				DWORD dwStackSize,						// 新线程的栈空间大小，用0表示使用主线程的栈大小
+				LPTHREAD_START_ROUTINE lpStartAddr,		// 要执行的线程函数，该函数接受一个单一的指针参数并返回一个DWORD的退出码
+				LPVOID lpThreadparm,					// 线程函数的参数指针
+				DWORD dwCreationFlags,					// 0表示程序已经准备好，可以立即运行。若是CREATE_SUSENDED那么新线程将会处于挂起状态，直到通过ResumeThread函数将函数转移到准备状态
+				LPDWORD lpThreadId						// 线程的DWORD标识符
+			);
+		2).线程退出
+			void ExitThread(DWORD dwExitCode);			// 线程带着退出码退出
+			若退出的线程是进程中的最后一个线程，那么进程也终止。
+			TerminateThread，可以终止另一个线程，但是被终止的线程资源无法得到释放！不推荐使用。
+			BOOL GetExitCodeThread(HANDLE hThread, LPDWORD lpExitcode);		// 获得指定线程的退出码，若线程还未退出则退出码为STILL_ACTIVE.
+		3).线程标识
+			GetCurrentThread, 返回当前线程不可继承的伪句柄
+			GetCurrentThreadId, 获取线程ID
+			GetThreadId, 从线程的句柄获取线程ID
+			OpenThread, 利用线程ID获得该线程的句柄
+		4).线程的挂起和恢复
+			每个线程都有一个【挂起计数】，只有在计数为0时线程才会执行，否则挂起。
+			DWORD ResumeThread(HANDLE hThread);			// 将指定线程的挂起计数+1
+			DWORD SuspendThread(HANDLE hThread);		// 将指定线程的挂起计数-1
+		5).等待线程终止
+	2.线程中使用ANSI C库
+		C标准库是在单一线程的背景下编写的，因此不具备线程安全性，对于某些函数可能通过static存储了全局中间变量，在多线程的环境下会造成竞争。
+		因此多线程环境下不能简单实用C标准库。
+		在windows中，Microsoft C通过提供名为LIBCMT.LIB这一线程安全的C库来解决这些问题，但是调用这些C库的线程不能通过CreateThread来创建，而是：
+			- _beginthreadex 创建线程
+			- _endthreadex 终止线程
+	3.线程本地存储(TLS-ThreadLocalStorage)
+		TLS为每个线程提供一个本地全局的数组，也就是说可以在线程的任意地方调用以获得该线程中对应的值。
+		DWORD TlsAlloc(VOID);				// 返回分配的索引>=0，若返回的-1则无索引可用
+		BOOL TlsSetValue(
+			DWORD dwTlsIndex,				// 存放数据的索引，需要确保该索引可用(TlsAlloc分配且没有被释放过的)
+			LPVOID lpTlsValue);				// 保存的数据
+		LPVOID TlsGetValue(DWORD dwTlsIdx);	// 获取指定索引上的值
+		BOOL TlsFree(DWORD dwIndx);			// 释放掉该索引
+		通常TLS交由主线程管理，也就是说由主线程申请和释放TLS索引，子线程只负责使用。
+		这些函数都是全局的调用，但是获得的数据都是和本地线程相关的。在DLL中常使用TLS作为全局存储的替代，这是因为函数需要全局存储，然而普通的全局存储隐含竞争问题。
+	4.线程优先级
+		线程的优先级是继承于进程优先级的。进程提供【优先级类】来描述进程的优先级，进程的优先级类在CreateProcess时设置。
+		进程具备如下几种优先级类：
+			IDLE_PRIORITY_CLASS, 只在系统空闲时才运行线程。
+			NORMAL_PRIORITY_CLASS, 表示没有特殊的调度需求。
+			HIGH_PRIORITY_CLASS, 表示时间关键的任务，应该立刻执行。
+			REALTIME_PRIORITY_CLASS, 最高优先级
+			- BOOL SetPriorityClass(HANDLE hProcess, DWORD dwPriority);		设置进程的优先级类
+			- DWORD GetPriorityClass(HANDLE hProcess);						获取进程的优先级类
+		线程可以设置优先级的绝对值，也可以设置相对于进程优先级类的相对值, 相对优先级在进程优先级类的基础上+-2以内的范围进行设置。
+		BOOL SetThreadPriority(HANDLE hTrhead, int nPriority);				设置线程优先级
+		int GetThreadPriority(HANDLE hThread);								获得线程优先级
+	5.线程状态
 八、线程同步
