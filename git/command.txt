@@ -1,4 +1,4 @@
-0.配置
+﻿0.配置
 	git config -e 			编辑版本级别的配置文件，进入当前git工作区的.git/config文件中进行编辑
 	git config -e --global	编辑全局级别的配置文件，进入~/.gitconfig文件中进行编辑(~为home目录，windows下~通常为C:/User/<userName>)
 	git config -e --system	编辑系统级别的配置文件，进入/etc/gitconfig文件中进行编辑(windows中，/为Git安装目录下目录，并且所在目录实际上为/mingw64/etc/gitconfig)
@@ -10,6 +10,10 @@
 	git config --unset --global <config-key>	取消设置
 		git config --unset --global user.name
 		git config --unset --global user.email
+	ssh-keygen		生成ssh的公钥秘钥对
+		ll ~/.ssh/		在该目录下保存了公钥秘钥对
+		cat ~/.ssh/id_rsa.pub	打印公钥
+		cat ~/.ssh/id_rsa	打印私钥
 1.提交与比较
 	git log					查看当前HEAD到根节点上的commit历史
 		git log -status				查看commit历史包括每次commit和上次commit进行的修改
