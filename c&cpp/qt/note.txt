@@ -1,0 +1,418 @@
+一、必要的C++基础
+	1.类定义
+	2.指针
+	3.引用
+	4.数组
+	5.类型转换
+	6.命名空间
+	7.lambda
+		lambda即匿名函数，在编写较短，不复用的匿名函数是有较好的帮助，语法更为简洁。
+		[capture](parameters) mutable -> returnType{ statement; }
+		1).capature
+			告知匿名函数如何捕获上下文中的变量供lambda使用。有值传递 和 引用传递两种形式进行捕获。
+			[var], 以值传递的形式捕获var，即函数中对var的修改并不会修改上下文中的var。
+			[=],以值传递的形式捕获所有上下文中的变量，包括this。可能会捕获一些指针，这些指针指向的内存可能在匿名函数执行的时候已经不可用了、
+			[&var], 以引用传递的形式捕获var，即函数中对var的修改会影响上下文中的var。需要确保匿名函数在执行的时候，var还可用。不要捕获一些栈上的空间。
+			[&], 以引用传递的形式捕获上下文中的所有变量。需要注意有些变量可能在匿名函数执行的时候已经不可用了。
+			[this], 以值传递的形式捕获this指针。
+			需要注意的是，重复捕获会报错。
+		2).parameters
+			函数的参数列表。
+		3).mutable
+			通常情况下，lambda返回的是一个const指针，即不可变的，若需要指针指向改变，需要指定mutable声明。
+		4).returnType
+			即返回类型，当没有返回值时可以省略。
+		5).statement
+			即普通语句。
+二、编译QT
+	按照qt通常会顺带按照minGW，并实际采用minGW中的gcc或者g++来编译工程。
+	qmake也是与Qt一起的，在minGW工具中，用来生成qt的.pro文件。
+	1.pro文件语法:
+		<key> = <value>, <key> += <value>, <key> -= <value>构成，用于配置val或者卸载val，意思都是顾名思义。
+		<key> += <value1> --|
+		<key> += <value2> --|-- 等价于 <key> = <value1> <value2> <value3>
+		<key> += <value3> --|
+		<key> -= <value2> 等价于 <key> = <value1> <value3>
+		<key> *= <value4> 等价于 <key> = <value1> <value3> <value4>
+		<key> *= <value1> 等价于 <key> = <value1> <value3> <value4> (也就是不存在则添加，存在则不添加)
+	2.pro工程文件的<key>主要包含了一下几种：
+		1).TEMPLATE
+			指定工程文件类型。通常有三种工程文件：app, lib, subdirs。
+			更具体的说，是指将工程编译成什么，app是可以允许的，lib是静态库，subdirs是编译子目录里面的.pro文件(即有很多子工程文件, 还需要SUBDIRS变量来指定.pro文件到哪里搜寻)。
+			没有TEMPLATE时，默认为app
+		2).HEADERS, 指定工程的C++头文件。
+		3).SOURCES, 指定工程的C++源文件。
+		4).FORMS, 指定QtDesigner的.ui文件。
+		5).RESOURCES，指定需要rcc处理的.qrc文件。
+		6).DEFINES，指定预定义的C++预处理器符号。
+		7).INCLUDEPATH，指定C+编译器搜寻全局头文件的路径。
+		8).LIBS，指定工程要链接的库。
+		9).QT，指定工程所需要使用的Qt模块。默认的是core gui，对应于QtCore和QtGui模块。
+		10).VERSION，指定目标库版本号。
+		11).TARGET，指定可执行文件或库的基本文件名(默认为当前文件名)，其中不包含任何扩展，前缀以及版本号。
+		12).DESTDIR, 指定可执行文件存放的位置目录(默认值和平台相关，Windows中是debug或者release目录下，Linux是当前目录下)。
+		13).DLLDESTDIR，指定目标库文件防止的目录，默认与DESTDIR相同。
+		14).CONFIG
+			指定各种用于工程配置和编译的参数。该参数控制编译过程中的各个方面，并支持一下参数:
+				* debug
+				* release
+				* warn_off
+				* qt
+				* dll
+				* staticlib
+				* plugin
+				* console
+				* app_bundle
+				* lib_bundle
+	3.qmake编译步骤
+		1).直接生成exe
+			* qmake -project, 搜寻当前目录下.h, .cpp, .ui文件，生成一个包含这些文件的.pro文件, 文件名为当前目录的文件夹名。
+			* 根据实际情况，微调.pro。例如添加QT += gui core Widget ... 等等
+			* qmake <pro-file>，根据该工程文件，生成和平台相关的makefile文件。
+			* make, 生成exe文件。有的minGW配的make指令为【mingw32-make】
+		2).生成visual studio的工程文件
+			qmake -tp vc <pro-file>
+三、QDialog
+	图形用户界面是由一个或多个主窗口()以及多个对话框来完成的。
+	QDialog是对话框的基类，继承于QWidget，通过继承该类可以实现我们自己的对话框。
+	对话框中，通常需要Slot和Signal，这是因为对话框中一般有按钮，因此需要槽来接收按钮发出的信号。主窗口需要获得对话框的信息，所以需要信号以便主窗口可以获得。
+	既然需要支持Slot和Signal，所以需要添加宏定义Q_Object，以此生成相关的的元数据。
+		class FindDialog : public QDialog{
+			Q_OBJECT
+			
+			public:
+				FindDialog(QWidget *parent=0);
+				~FindDialog();
+			
+			// 会发射的信号
+			signals:
+				void findNext(const QString& str);
+			
+			// 声明槽
+			private slots:
+				void findClicked();
+				void enableFindButton(const QString &text);
+			
+			// 对话框中的组件
+			private:
+				QLabel *labe;
+				QLineEdit *lineEdit;
+				QPushButton *findButton;
+				...
+				// 布局函数
+				void layout();
+		}
+		
+		FindDialog::FindDialog(QWidget *parent):QDialog(parent){
+			// 组件初始化代码
+		}
+		
+		FindDialog::~FindDialog(){
+			// 释放
+		}
+		
+		void FindDialog::layout(){
+			QHBoxLayout *hLayout = new QHBoxLayout();	// 对一行进行布局，默认居中。
+			QVBoxLayout *vLayout = new QVBoxLayout();	// 对一列进行布局，默认居中。
+		}
+		上述通过信号来驱动的对话框是非阻塞的，也就是对话框存在的情况下，是可以回到原窗口上的。即【非模态】。
+	除了自定义对话框外，还可以调用已经存在的对话框, 这类对话框都是阻塞的，也就是没办法回到原窗口，必须要在对话框处理完成以后才能返回。即【模态】。
+		QMessageBox::<type>(this, <title>, <message>, <button>);
+		
+		<type>是对话框类型，有warning, information, question, critical等。
+		<button>通过按位与来提供，例如提供三个按钮：QMessageBox::YES | QMessageBox::No | QMessage::Cancel | 
+四、QMainWindow
+	QMainWindow也是直接继承QWidget的，他和QDialog不同之处主要体现在QMainWindow可以设置【中心窗口部件，菜单栏，状态来和工具栏】。
+	1.Action
+		Action主要用在菜单栏和工具栏中，菜单栏和工具栏中的每个点击事件都被抽象成了Action。具体配置可见：
+			action = new QAction("<action-name>", this);
+			action->setIcon(QIcon("..."));	// 设置图标
+			action->setShortcut(......);	// 设置快捷方式
+			action->setStatusTip("...");	// 设置提示语
+			connect(action, SIGNAL(triggered()), this, SLOT(<slot-function>));	// Action点击接收信号的slot
+	2.菜单栏
+		菜单栏有很多菜单项，每个菜单项又有多个Action组成。
+		通过this->menuBar()->addMenu()可以用来添加一个菜单项，菜单项中可以添加很多Action:
+			QMenu *itemMenu = menuBar()->addMenu("<item-menu-name>");
+			itemMenu->addAction(<action>);		// 添加Action
+			...
+			itemMenu->addAction(<action>);
+			itemMenu->addSeparator();			// 添加分隔符
+			itemMenu->addAction(<action>);
+	3.工具栏
+		工具栏可以有很多个Tools，每个Tools有多个Tool(Action)，旨在将常用的Action拉在面板中。其创建形式和菜单项很类似:
+			QToolBar bar = this->addToolBar("<toolBarName");
+			bar->addAction(...);
+	4.状态栏
+		this->statusBar()返回状态栏指针.
+		状态栏通过添加Widget来添加信息。文本信息添加QLabel即可。
+		statusLabel = new QLabel("status");
+		statusBar()->addWidget(statusLabel);
+		也可以通过
+		statusBar()->showMessage(<message>, <ms-time>);	来定时显示一段信息
+	5.CentralWidget
+		CentralWidget即中央窗口部件，是QMainWindow所特有的。QMainWindow的cw都包含了一个layout，并且在mainWindow上的布局均在cw的layout上完成。
+		一般来说，中央窗口部件是空的，只需要【this->setCentralWidget(new QWidget(this))】即可
+五、UI Designer
+	在Qt中，除了自己手动编写布局代码以外，也可以借助QtDesigner的拖动式布局。QtDesigner拖动完成以后，将会生成对应的ui文件用以描述布局信息。
+	ui文件是通过xml的形式来描述布局信息的，和HTML较为类似。
+	需要注意的是，为了将布局信息应用到QWidget上，还需要借助一个.h文件：UI_<WidgetName>.h。
+	将布局的设置交给class UI_<WidgetName>的setupUi方法来完成：
+	class WidgetName : public QWidget{
+		Q_OBJECT
+		
+		public:
+			WidgetName(QWidget *paretn = 0);
+			~WidgetName();
+			
+		private:
+			Ui_WidgetName ui;
+	}
+	
+	WidgetName::WidgetName(QWidget *parent):QWidget(parent), ui(new Ui_WidgetName){
+		// 将布局信息应用到WidgetName上。
+		ui->setupUi(this);
+	}
+	
+	=======================================================
+	class Ui_WidgetName{
+		// 组件信息是交给Ui管理的
+		public:
+			QLabel ...
+			QPushButton ...
+		public:
+			void setupUi(QWidget *widget){
+				// 具体的布局信息是自动生成的
+			}
+	}
+	可以看出，在使用Designer时，若在WidgetName中需要直接使用其中的组件，需要借助ui指针，也就是this->ui->label的方式。
+	不过实际上，还通过namespace将Ui_WidgetName封装了一层：
+	namespace Ui{
+		class WidgetName : public Ui_WidgetName;
+	};
+六、QWidget
+七、回调机制
+	qt中，在QWidget里面需要编写回调函数，而回调函数主要由两类情况触发：
+	1.Windows事件机制
+		这是底层机制，每个Windows事件都会封装为QEvent并入队，在事件处理循环期间会将事件出队，以此触发QWidget的回调。
+		在这个回调里面，QWidget可能会emit signal，以此通知其他监视该QWidget的QObject。
+		该回调机制是【异步】的，因为事件发生时并不会立即执行回调，而是要等到进入了事件处理循环了才会回调。
+		1).特殊事件处理器
+			QWidget提供了很多事件处理器回调函数，只需要直接子类化并重写即可。
+			* mousePressevent(QMouseEvent *event);
+			* keyPressEvent(QKeyEvent *event);
+			* keyReleaseEvent(QKeyEvent *event);
+			* paintEvent(QPaintEvent *event);
+				需要重绘时，会回调该函数。重绘发生在必要时刻，例如窗口第一次出现时，窗口从遮盖物中出来时，等等都需要进行重绘。
+				当人为希望改变窗体中显示的数据时：
+					- 可以执行widget->repaint()来进行异步重绘(即将重绘事件生成，在事件分发的时候重绘)
+					- 可以执行widget->update()来进行同步重绘，即立刻重绘，不等到事件分发。
+			* resize(QResizeEvent *event);
+			* timerEvent(QTimerEvent *event);
+				每一个QWidget都有定时功能。
+					int id = this->startTimer(ms-time);可以开启定时器。
+					this->killTimer(id);	关闭指定定时器。
+				可以通过startTimer方法开启多个定时器，但是需要维护每个定时器的id。可以用QTimer代替，这是一个定时器对象，超时后会发射信号到slot，用slot捕获超时信号即可。
+		2).event全事件处理器
+			bool event(QEvent *event){...}
+			通过event->type()可以获得事件的具体类型。
+		3).QObject事件过滤器
+			QObject发生事件时，在该对象的事件函数回调前，可以由别的QObject对象先捕获这个事件。这样的捕获函数叫做事件过滤器。
+				widget1->installEventFilter(filterObject);
+				widget2->installEventFilter(filterObject);
+				...
+			在这些对象发生事件时，并在这些对象的事件处理函数回调前，会先调用：
+				bool FilterObject::eventFilter(QObject *target, QEvent *event){
+					...
+					return QWidget::eventFilter(target, event);
+				}
+			若返回true，则告知Qt已经处理了事件，不会将事件传递给目标对象。
+			若返回false，则告知Qt没有处理事件，将会传递事件给目标对象。
+			按顺序注册的过滤器，将会按【逆顺序】来调用过滤器。
+		4).QApplication事件过滤器
+			一旦给QApplication注册了事件处理器，则应用程序中的每个对象的每个事件都会在发送给其他过滤器之前，发送给QApp的事件过滤器。
+			QApplication app(argc, argv);
+			widget->installEventFilter(app);
+			return app.exec();
+	2.Singal-Slot机制
+		这是基于Windows事件机制基础上的观察者模式，通过connect进行观察者的注册：
+		connect(sender, SIGNAL(signal-function-declare), 
+				recive, SLOT(slot-function-decalre));
+		这样就能recive注册为观察者，sender通过signal-function-declare发出通知。所有监视sender该信号的观察者都会依次回调slot-function-decalre。
+		slot-function-decalre有具体的实现，而singal-function-decalre没有具体的实现，只是声明信号名称，以及以何种参数调用slot-function。
+		并且需要注意，两者的【参数需要对应】。
+		该回调机制是【同步】的，发出信号的同时就会回调每个观察者。
+		信号和槽都是相对于QObject的，这些对象可以接收信号，也可以发送信号。在编写子类的QObject时，为了让这些子类对象具备信号和槽的能力，需要在定义的最开始写Q_OBJECT，如：
+		class MyObject : public QObject{
+			Q_OBJECT
+			...
+		}
+		现在可以用lambda语法来编写slot：
+		connect(sender, &QWidget::signalFunction, this, [=](params){
+			...
+		});
+		若编译不成功，尝试加上CONFIG += C++11
+	事件机制通常用于实现一个Widget，Signal-Slots机制通常用于使用一个Widget。
+八、布局
+	Qt中的布局通常有三种方法：
+		* 绝对位置法
+			直接通过对QWidget::setGeometry来进行位置和大小的设置。
+			该方法非常死板，无法适应窗口大小的变化而变化，人工计算位置也太过麻烦。
+		* 人工布局法
+			类似于将其百分数化，可以在resizeEvent的窗体大小改变事件里面对窗体中的内容进行重新设置。
+			也需要人工计算位置，业务复杂繁琐。
+		* 布局管理器
+			主要是将布局任务交给QHBoxLayout, QVBoxLayout, QGridLayout，QStackLayout
+			再通过设置QWidget的QSizePolicy来设置每个部件自动拉伸和压缩行为。
+	1.Layout
+		1).QHBoxLayout
+			主要用于设置布局中的元素水平方向上对齐。也就是这些QWidget的中心在同一条水平线上。
+			QHBoxLayout layout = new QHBoxLayout;
+			layout->addWidget(widget1);
+			layout->addWidget(widget2);
+			layout->addLayout(other-layout);
+		2).QVBoxLayout
+			主要用于设置布局中的元素竖直方向上对齐。也就是这些QWidget的中心在同一条竖直线上。
+			QVBoxLayout layout = new QVBoxLayout;
+			layout->addWidget(widget1);
+			layout->addWidget(widget2);
+			layout->addLayout(other-layout);
+		3).QGridLayout
+		4).QStackLayout
+	2.QSizePolicy
+九、绘图
+	通过重写QWidget的paintEvent用来进行绘图，该函数会在组件不得不重绘图像时调用。
+	而在paintEvent中主要是通过QPainter来进行绘图，该类经过了OpenGL的优化。
+十、多线程
+	1.创建线程
+		主要是子类化QThread，并重写run方法。当对QThread对象调用start方法时，便开启线程。
+		class MyThread : public QThread{
+			Q_OBJECT
+		public:
+			Thread(){...}
+		protected:
+			void run(){...}
+		}
+		需要注意的是，多线程中共享的变量，需要用volatile来进行声明以此保证可见性。
+		QThread提供terminate函数，可以在线程还在运行的时候直接终止该线程。
+	2.同步线程
+		Qt提供了线程同步工具：
+		1).QMutex
+			Qt提供的独占锁，一次只能让一个线程获得锁，其他获得锁的线程将会阻塞。
+				QMutex mutex;
+				...
+				{
+					mutex.lock();
+					... 保护的变量 ...
+					mutex.unlcok();
+				}
+			lock和unlock需要配对，否则线程无法释放锁。可以用QMutexLocker来提供简单的自动释放的锁。
+			{
+				
+				QMutexLocker locker(&mutex);
+				... 保护的变量 ...
+			}
+			当出了代码块，QMutexLocker被释放，所以QMutexLocker保护的是代码块里面的内容。
+		2).QReadWriteLock
+			读写锁。线程可以指定获得读锁还是写锁，读锁可以并发执行，读写不能并存，必须阻塞其中之一。
+			QReadWriteLock lock;
+			{
+				lock.lockForRed();
+				...
+				lock.unlock();
+			}
+			{
+				lock.lockForWrite();
+				...
+				lock.unlock();
+			}
+		3).QSemaphore
+			信号量，可以用来保护一定数量的相同资源。可以用来实现生产者-消费者模式。
+			QSemaphore在初始化的时候，需要指定资源数。
+			QSemaphore semaphore(resource-number);
+			semaphore.acquire();	// 申请资源，若已经没有资源了会阻塞。
+			semaphore.release();	// 释放资源
+		4).QWaitCondition
+		5).QThreadStorge
+	3.Qt并线转串行
+		1).并转串的原因
+			主线程中的耗时任务若在主线程中运行，会导致主线程响应较慢甚至卡死。
+			这是因为耗时任务影响了主线程中的事件分发，导致无法将Windows相关事件封装并封发，也导致窗体重绘事件无法执行。
+		2).解决方案
+			主线程中的耗时任务应该开线程来执行，线程执行完毕需要通知主线程，或者调用一些Widget来显示线程结果。
+			但是，若直接调用Widget方法或是共享变量将会导致竞争，最佳方法是将子线程的结果放到主线程循环中，由主线程去读取并获得结果。
+			signal-slot机制可以并行转串行，即子线程执行完毕，通过emit signal来通知主线程的slot。
+			在底层子线程的emit将会用事件封装起来并放入主线程的事件分发队列中，在主线程中拿到了该事件，会在主线程调用slot的回调。
+		3).落实
+			在编写一个线程类的时候，应该明确该线程需要将哪些信息交给主线程，这样来指定信号接口。
+			对主线程而言，在new线程后，应该在start开始进行连接， 并且明确需要接受的信息的接口：
+				MyThread *t = new MyThread;
+				connect(t, &MyThread::Signal, this, [=](message){
+					...
+				});
+			这样在工程上有一个弊端：子线程的任务(子线程完成以后，设置Widget信息)交给了Widget来完成。
+			如果可以将子线程的任务全部在子线程对象中编写的话，应该更为解耦。
+			因此，建议将Widget传给Thread对象，在Thread对象中编写connect来实现Widget信息的设置。
+			虽然在一个Thread对象中编写了两个线程的逻辑，但是并不会有什么大碍，而且只需要牢记connect的slot函数在主线程中运行即可:
+				class MyThread : public QThread{
+				public :
+					MyThread(QWidget widget){
+						connect(this, &MyThread::Signal, this, [=](message){
+							widget.set...;
+						});
+					}
+				signals:
+					void messageSignal(message);
+				protected:
+					void run(){
+						... 耗时处理 ...
+						emit messageSignal(message);
+					}
+				}
+十一、多进程
+	1.进程对象的创建与运行
+		QProcess *p = new QProcess; 
+		p->setEnvironment(<QStringList>);			给进程添加环境变量
+		p->setWorkingDirectory("<pWorkspace>");		设置进程运行时的初试工作路径
+		p->start("<exePath>"[, command]);			异步非阻塞运行
+		p->execute("<exePath>"[, command]);			同步阻塞运行
+		<exePath>的搜寻路径：
+			- 当前进程的可执行文件所在路径
+			- 当前进程的工作目录
+		command是命令行参数，其实也可以吧这些参数直接写在<exePath>中
+			具体而言command是一个QStringList对象。
+			QStringList *list = new QStringList;
+			list->append(arg1);
+			list->append(arg2);
+	2.进程事件
+		进程提供了很多信号，方便主线程监控进程的情况。当然主线程也可以主动探寻进程的情况。
+		* readyRead, 进程有输出数据 : connect(p, &QProcess::readyRead, this, [=](){});
+		* finished, 进程结束的时候触发，当然进程结束的时候，可能进程输出还未读完，由于此时不会再触发readyRead, 因此需要在这里读出所有数据。
+		* error, 进程错误结束的时候触发，用来探测进程出的错误。这些错误是进程崩溃，并不包括assert等异常行为。
+	3.进程IO
+		QBytaArray ar - p->readAll();				// 读完待读的数据
+		int cnt = p->readLine(char *ar, maxlength);
+		或者 QByteArray ar = p->readLine();			// 进程有输出的时候，阻塞直到读取到换行符或者【一小段时间】。进程没有输出的时候直接返回0.读取到结尾符返回-1.
+		进程需要在有数据的时候再读取，因此有两种方式:
+			* 一个是通过监听readyRead信号，触发回调，然后进行数据读取。但是这个方式的问题是可能数据还没有读取完毕，就再次收到了readyRead信号。
+			* 一个是通过p->waitForReadyRead()，阻塞，知道数据准备好了以后才进行数据读取。这个更好些。
+十二、其他
+	1.拖放
+		一个QWidget若需要支持拖放操作，需要设置当前QWidget接收拖放【this->setAcceptDrops(true)】， 并且重写dragEnterEvent和dropEvent函数。
+		其中dratEnterEvent()是其他文件拖放到QWidget中时触发的事件，通过event->acceptProposedAction()来控制其接受dropEvent回调。
+		其中dropEvent()是拖放进QWidget，鼠标释放以后会触发的事件。
+		void MyWidget::dragEnterEvent(QDragEnterEvent *event){
+			event->mimeData();				// 获得拖入的文件的MIME形式。
+			event->acceptProposedAction();	// 接受拖放，光标也会向用户说明这是可以拖放的。
+		}
+		void MyWidget::dropEvent(QDropEvent *event){
+			QList<QUrl> urls = event->mimeData()->urls();
+			QString fileName = urls.first().toLocalFile();
+			...
+		}
+	2.路径问题
+		当初始化了QApplication(QApplication app(argc, argv);)后, 便可以用：
+			QApplication::applicationDirPath();		// 获得可执行程序路径
+			QDir::currentPath();					// 获得工作路径
+		通常Qt的工作路径是不确定的，在我电脑上工作路径默认是C:/User/Administrator, 因此为了确保工作路径和exe路径相同，可以通过：
+			QDir::setCurrent(QApplication::applicationDirPath()); 来设置工作路径为可执行程序路径
