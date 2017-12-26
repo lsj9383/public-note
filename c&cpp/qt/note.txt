@@ -117,10 +117,12 @@
 		}
 		上述通过信号来驱动的对话框是非阻塞的，也就是对话框存在的情况下，是可以回到原窗口上的。即【非模态】。
 	除了自定义对话框外，还可以调用已经存在的对话框, 这类对话框都是阻塞的，也就是没办法回到原窗口，必须要在对话框处理完成以后才能返回。即【模态】。
-		QMessageBox::<type>(this, <title>, <message>, <button>);
-		
-		<type>是对话框类型，有warning, information, question, critical等。
-		<button>通过按位与来提供，例如提供三个按钮：QMessageBox::YES | QMessageBox::No | QMessage::Cancel | 
+		1).QMessageBox::<type>(this, <title>, <message>, <button>);
+			<type>是对话框类型，有warning, information, question, critical等。
+			<button>通过按位与来提供，例如提供三个按钮：QMessageBox::Yes | QMessageBox::No | QMessage::Cancel
+		2).QString text = QInputDialog::getText(NULL, <title>, <message>, QLineEdit::Normal, <text>, <bool-ans>);
+			一个模态的带确定和取消两个按钮的输入对话框，返回对话框中输入的数据。
+			点击确定<bool-ans>返回true，否则返回false。
 四、QMainWindow
 	QMainWindow也是直接继承QWidget的，他和QDialog不同之处主要体现在QMainWindow可以设置【中心窗口部件，菜单栏，状态来和工具栏】。
 	1.Action
@@ -416,3 +418,9 @@
 			QDir::currentPath();					// 获得工作路径
 		通常Qt的工作路径是不确定的，在我电脑上工作路径默认是C:/User/Administrator, 因此为了确保工作路径和exe路径相同，可以通过：
 			QDir::setCurrent(QApplication::applicationDirPath()); 来设置工作路径为可执行程序路径
+	3.视图/模型
+		常用视图：
+			QTableView
+		常用模型:
+			QStandardItemModel
+		当对模型进行数据设置后，视图中将会自动渲染出最新的数据。
