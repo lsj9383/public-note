@@ -125,8 +125,9 @@
 			点击确定<bool-ans>返回true，否则返回false。
 		3).QFileDialog
 			QString path = QFileDialog::getOpenFileName(this, <title>, <currentDir>);
+			QString path = QFileDialog::getSaveFileName(this, <title>, <currentDir>);
 			QString dir = QFileDialog::getExistingDirectory(this, <title>, <currentDir>);
-			选择一个文件 以及 选择一个文件夹。
+			选择一个已经存在的文件(该文件必须存在) 准备保存的文件(该文件可以不存在) 以及 选择一个文件夹。
 四、QMainWindow
 	QMainWindow也是直接继承QWidget的，他和QDialog不同之处主要体现在QMainWindow可以设置【中心窗口部件，菜单栏，状态来和工具栏】。
 	1.Action
