@@ -123,6 +123,10 @@
 		2).QString text = QInputDialog::getText(NULL, <title>, <message>, QLineEdit::Normal, <text>, <bool-ans>);
 			一个模态的带确定和取消两个按钮的输入对话框，返回对话框中输入的数据。
 			点击确定<bool-ans>返回true，否则返回false。
+		3).QFileDialog
+			QString path = QFileDialog::getOpenFileName(this, <title>, <currentDir>);
+			QString dir = QFileDialog::getExistingDirectory(this, <title>, <currentDir>);
+			选择一个文件 以及 选择一个文件夹。
 四、QMainWindow
 	QMainWindow也是直接继承QWidget的，他和QDialog不同之处主要体现在QMainWindow可以设置【中心窗口部件，菜单栏，状态来和工具栏】。
 	1.Action
