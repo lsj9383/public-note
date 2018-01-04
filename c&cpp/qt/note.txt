@@ -429,3 +429,51 @@
 		常用模型:
 			QStandardItemModel
 		当对模型进行数据设置后，视图中将会自动渲染出最新的数据。
+	4.发布与部署
+		当完成了Qt程序以后，需要在其他没有安装Qt的电脑上运行该程序需要对程序进行编译，打包，甚至需要配置安装的工具。
+		1).打包
+			Qt程序可以通过Debug和Release进行编译，Debug编译的版本用于调试，Release具备更高的性能，因此程序调试完成以后，需要用Release版本进行重新编译。
+			由于该编译好的程序是依赖于Qt的，而Qt的运行也依赖其他的数据，比如dll动态库，因此将编译好的qt程序拷贝给无qt配置的计算机上时，是不能直接运行的，会提示缺失某些dll文件。
+			Qt自带了windeployqt.exe程序，用于判断该Qt程序依赖了哪些Qt文件，并将这些文件拷贝到程序文件所在目录下，有了这些文件就能直接运行了(因为在加载dll时，默认首先在exe文件所在目录进行搜寻)
+			因此，只需要将程序exe文件放在某个文件夹<directory>下，并通过windeployqt <directory>将所需要的Qt文件拷贝到该文件夹下，该文件夹就是对程序的打包，可以放在任何windows/linux计算机上运行，也就是绿色运行版。
+		2).发布
+			通常会将打包的程序进一步压缩，一般会压缩成一个专门的安装程序，200M的包，安装包只需要30M，压缩效率很高。
+			可以借助Qt Installer Framework程序辅助进行制作安装包。
+			a).下载
+				http://download.qt.io/official_releases/qt-installer-framework/ 中下载 QtInstallerFramework-win-x86.exe
+			b).结构组织
+				使用QtInstallerFramework，需要构建一定形式的文件结构：
+				installer-make/
+					config/
+						config.xml
+					packages/
+						component1/
+							meta/
+								package.xml
+								installscript.qs
+								license.txt
+								page.ui
+							data/
+								...
+						component2/
+							meta/
+							data/
+						component3/
+						component4/
+				i). config文件夹中的config.xml用于配置installer的内容显示。也就是安装过程中的内容控制。这里面的name和versionn元素是必须的。
+				ii). packages文件夹中有很多component文件夹，这些component文件夹是组件，在安装的时候可以选择是否进行安装。
+					组件本质上就是一堆文件，程序的运行可以依赖这些文件，也可以不依赖，因此以组件的形式存在。程序其实也是文件，因此程序本身所在的那堆文件，也是组件之一，并且是必须安装的组件。
+				iii). component文件下面又分了两个文件夹meta和data。
+					# data
+						也就是组件所打包的那堆文件。安装完成以后，就是将这些文件释放出来。
+					# meta
+						元数据，其实就是关于这个组件的相关信息，比如组件的名称等等。
+						package.xml，描述了一个组件的基本信息。
+						installscript.qs，组件采用哪个脚本由package.xml进行指定。
+							该脚本在执行安装程序并加载组件时被调用。该脚本可以添加新的安装程序向导页面，提示用户为组件定制路径等。
+						license.txt，密钥文件，由package.xml指定组件采用的密钥文件。
+						page.ui，组件安装时候的界面，由package.xml指定。
+			d).打包
+				binarycreator -c <configFile> -p <packageDirectory> <installerFileName> -v，只需要指定配置文件，组件根目录，安装器名称，就可以打包生成了。
+				简单来说，进入installer-make目录下，调用以下指令即可：
+				binarycreator -c config\config.xml -p packages installer.exe -v
