@@ -437,8 +437,7 @@
 			Qt自带了windeployqt.exe程序，用于判断该Qt程序依赖了哪些Qt文件，并将这些文件拷贝到程序文件所在目录下，有了这些文件就能直接运行了(因为在加载dll时，默认首先在exe文件所在目录进行搜寻)
 			因此，只需要将程序exe文件放在某个文件夹<directory>下，并通过windeployqt <directory>将所需要的Qt文件拷贝到该文件夹下，该文件夹就是对程序的打包，可以放在任何windows/linux计算机上运行，也就是绿色运行版。
 		2).发布
-			通常会将打包的程序进一步压缩，一般会压缩成一个专门的安装程序，200M的包，安装包只需要30M，压缩效率很高。
-			可以借助Qt Installer Framework程序辅助进行制作安装包。
+			可以借助Qt Installer Framework程序辅助进行制作安装包来进行发布。
 			a).下载
 				http://download.qt.io/official_releases/qt-installer-framework/ 中下载 QtInstallerFramework-win-x86.exe
 			b).结构组织
@@ -477,3 +476,5 @@
 				binarycreator -c <configFile> -p <packageDirectory> <installerFileName> -v，只需要指定配置文件，组件根目录，安装器名称，就可以打包生成了。
 				简单来说，进入installer-make目录下，调用以下指令即可：
 				binarycreator -c config\config.xml -p packages installer.exe -v
+			e).发布
+				将安装包发给他人安装使用即可。
