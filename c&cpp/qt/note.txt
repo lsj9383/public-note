@@ -4,6 +4,20 @@
 	3.引用
 	4.数组
 	5.类型转换
+		1).static_cast
+			A *a;
+			B *b = static_cast<B *>(a);
+			将类型A指针强制转换为类型B指针，要求B是A的子类。
+		2).dynamic_cast
+			A *a;
+			B *b = dynamic_cast<B *>(a);
+			同static_cast，不过是在运行时验证，如果不是则会返回NULL。
+		3).const_cast
+			const A *ca;
+			A * a = const_cast<A *>(ca);
+			添加或移除指针的外层const限定。
+		4).reinterpret_cast
+			把任意类型指针或引用转换为任意的其他类型。
 	6.命名空间
 	7.lambda
 		lambda即匿名函数，在编写较短，不复用的匿名函数是有较好的帮助，语法更为简洁。

@@ -1,0 +1,90 @@
+一、C++基本
+	1.C++语言联邦
+		C++主要有4种编程范式：
+			* Procedural
+				C++面向过程编程，主要是指C++对于C的兼容。局限性较大。
+			* Object-oriented
+				C++面向对象编程。
+			* Generic
+				C++泛型编程是建立在模板编程基础上的，可以将类型作为参数传递。
+				C++的模板元编程就是建立在模板编程基础上的。
+			* STL
+				一套标准模板库。
+	2.尽量以const, enum, inline替换#define
+		指导思想：
+			* 对于单纯的常亮，最好以const对象或enums替换#define和const。
+			* 对于形式函数的宏，最好改用inline替换#define和const。
+		原因：
+			#define和const enum inline最本质区别是对符号的处理时间不同。
+			#define是在预处理期间进行处理，主要是符号替换。而其他三者主要是在编译期间执行。
+			1.对于指导思想的第一点
+				1).因此在编译时如果出错，#define将会提醒是符号替换后的错误信息，而其他三者将会提示包含符号本身的错误信息。
+				2).#define没有作用于限制，const和enum可以在作用于中起作用，以此对常亮进行封装。
+					class ClassName{
+						const static int CV1 = 10;		// const static
+						enum{ CV2 = 20 };				// enum hack
+						const int CV3;					// cannot inital
+						const static double CV4;		// cannot inital
+					};
+					const static和enum都可以直接在声明时赋值， CV3必须在构造函数时初始化。
+					需要注意的是有些编译器不支持const static在声明时赋值，const static也只能定义int型，否则只能在类外进行定义：
+						const double ClassName::CV4 = 10;	
+			2.对于指导思想的第二点
+				内联函数应该直接使用inline，而非#define，因为#define可读性差(只能一行，多行需要添加换行结尾符)，并且#define会导致操作上的歧义。
+					#define fun(a) (a)+(a)
+					int a = 3;
+					fun(a++);
+					按通常的语音，执行完fun后，a只会进行一次叠加，而在#define中的实现，会执行两次a++，因此会叠加两次，这不符合通常语义。
+	3.尽可能使用const而不是#define
+		指导思想：
+			* 尽量添加const，可以增强安全性，避免客户端无意间的修改。
+			* 编译器强制性bitwise constness，但是编写程序需要使用logic constness。
+			* 当const和non-const有着等价的实现时，可以领non-const版本调用const版本可以避免重复代码。
+		原因：
+			1).对于指导思想的第一点
+				没什么好说的，需要遵循。
+			2).对于指导思想的第二点
+				首先，const对象不能调用任何non-const方法，因为编译器无法确认non-const方法不会对对象进行修改。
+				其次，相同标签的const方法和non-const方法可以重载，const对象调用const方法版本，non-const对象调用non-const方法版本。
+				再次，只要在方法内没有对任何成员进行修改，就可以将其声明为const方法，即bitwise constness观念，C++采用该方案。
+				接着，但是实际上，const方法可以返回non-const成员(const方法中并没对其修改，没有违反bitwise constness)，而在const方法外部可以对该引用进行修改，进而就修改了const对象的成员，这样就不能满足真正的const对象的语义了。
+				最后，应该采用logical constness的观念，即const对象的使用者也不应该有能力修改const对象成员的数据，因此若返回引用或指针时，需要为const引用或const指针。
+			3).对于指导思想的第三点
+				同一个标签一样的函数，可以分为const方法或是non-const方法。
+				对于const对象，执行的将是const方法。nons-const对象，执行的将是non-const方法。
+				const方法返回值必须是const(因为应该logic costness)，non-const方法返回值通常是non-const。
+				很多情况下两个方法实际执行的代码相同:
+					class ClassName{
+						 const int& fun(params) const{
+							...
+						 }
+						 
+						 int& fun(params){
+							return const_cast<int&>(
+								static_cast<const ClassName*>(this)->fun(params));
+						 }
+					}
+	4.确定对象使用前已经初始化
+		指导思想：
+			* 为内置类型对象进行手工初始化，因为C++不保证初始化他们。
+			* 构造函数最好使用成员初值列，而不要在构造函数中只用赋值操作。初值列变量顺序尽量和class中的声明顺序保持相同。
+			* 用单例模式代替non-local static对象(global对象).
+		原因：
+			1).对于第一点
+				int x, y;无论放在函数中，亦或是类中，C++都不保证对其初始化。因此需要我们强行进行初始化。
+			2).对于第二点
+				首先，一个对象的初始化顺序如下：
+					基类成员对象初始化->基类构造函数调用->派生类成员对象初始化->派生构造函数调用
+					简而言之，先在最上层调用初值列，再调用构造函数，然后到下一层，直到最后一层。
+				其次，初值列是真正的初始化位置，并且比构造函数先调用，构造函数中进行的是赋值，而非初始化。
+				再次，对于成员对象的初始化顺序，是按照其在类中的【声明顺序】进行的，而非初值列顺序。对于初始化依赖其他成员变量的成员变量，需要声明他在该成员变量后面。
+				最后，应该保证初始化在初值列中，并且初值列顺序和对象声明顺序相同。
+			3).对于第三点
+				C++对"定义于不同编译单元内的global对象"的初始化顺序无明确定义。
+				比如有两个global对象a和b， Object b = Object(a); 在进行b的初始化时，a可能还没有初始化完成。
+				因此此时需要采用单例模式的方案：
+					Object & getObjectA(){
+						static Object a();
+						return a;
+					}
+					Object b = getObjectA();

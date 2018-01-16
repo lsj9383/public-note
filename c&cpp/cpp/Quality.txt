@@ -1,0 +1,22 @@
+一、
+二、
+三、内存管理
+	1.C++内存模型
+	2.new/delete和new[]/delete[]
+		new/delete和new[]/delete[]必须配对使用。
+		也就是说，new申请的内存所指向的地址，必须通过delete释放。new[]申请的内存所指向的地址，必须通过delete[]释放。
+		原因：
+			在C++中，new将会记录两个数据，内存的大小和对象的个数。直接用new，则对象的个数为1，用new[size]则对象的个数为size。
+			在delete时，会默认内存中的对象个数为1个，调用1次析构函数，并直接释放掉这些内存，因此【多个对象只会调用1次析构函数】
+			在delete[]时，会采用实际的size个数，并【调用这些对象的析构函数】，再释放掉这个内存区域。
+			也就是说，根本原因是new[]-delete的使用，会导致析构函数无法正确全部执行。
+			也因此，对于无析构函数的对象，delete[]和delete没有区别，这也就是为什么C语言为什么只用malloc-free就够了，因为没有析构函数。
+			更进一步，内置类型int long等delete[]和delete没有区别。
+		在visual studio 2010及其以上版本中，若遇到了不配对使用的情况，会直接给出debug assertion failed的错误信息。
+	3.new的三种形式
+		* new operator
+		* operator new
+		* placement new
+	4.new内存分配失败后的处理
+		在原始的C编程中，若内存分配失败，返回NULL指针。
+		在C++中，用new申请内存若失败，则抛出bad_alloc exception。
