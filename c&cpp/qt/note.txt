@@ -87,50 +87,57 @@
 		2).生成visual studio的工程文件
 			qmake -tp vc <pro-file>
 三、QDialog
-	图形用户界面是由一个或多个主窗口()以及多个对话框来完成的。
-	QDialog是对话框的基类，继承于QWidget，通过继承该类可以实现我们自己的对话框。
-	对话框中，通常需要Slot和Signal，这是因为对话框中一般有按钮，因此需要槽来接收按钮发出的信号。主窗口需要获得对话框的信息，所以需要信号以便主窗口可以获得。
-	既然需要支持Slot和Signal，所以需要添加宏定义Q_Object，以此生成相关的的元数据。
-		class FindDialog : public QDialog{
-			Q_OBJECT
+	1.非模态对话框
+		图形用户界面是由一个或多个主窗口()以及多个对话框来完成的。
+		QDialog是对话框的基类，继承于QWidget，通过继承该类可以实现我们自己的对话框。
+		对话框中，通常需要Slot和Signal，这是因为对话框中一般有按钮，因此需要槽来接收按钮发出的信号。主窗口需要获得对话框的信息，所以需要信号以便主窗口可以获得。
+		既然需要支持Slot和Signal，所以需要添加宏定义Q_Object，以此生成相关的的元数据。
+			class FindDialog : public QDialog{
+				Q_OBJECT
+				
+				public:
+					FindDialog(QWidget *parent=0);
+					~FindDialog();
+				
+				// 会发射的信号
+				signals:
+					void findNext(const QString& str);
+				
+				// 声明槽
+				private slots:
+					void findClicked();
+					void enableFindButton(const QString &text);
+				
+				// 对话框中的组件
+				private:
+					QLabel *labe;
+					QLineEdit *lineEdit;
+					QPushButton *findButton;
+					...
+					// 布局函数
+					void layout();
+			}
 			
-			public:
-				FindDialog(QWidget *parent=0);
-				~FindDialog();
+			FindDialog::FindDialog(QWidget *parent):QDialog(parent){
+				// 组件初始化代码
+			}
 			
-			// 会发射的信号
-			signals:
-				void findNext(const QString& str);
+			FindDialog::~FindDialog(){
+				// 释放
+			}
 			
-			// 声明槽
-			private slots:
-				void findClicked();
-				void enableFindButton(const QString &text);
-			
-			// 对话框中的组件
-			private:
-				QLabel *labe;
-				QLineEdit *lineEdit;
-				QPushButton *findButton;
-				...
-				// 布局函数
-				void layout();
-		}
-		
-		FindDialog::FindDialog(QWidget *parent):QDialog(parent){
-			// 组件初始化代码
-		}
-		
-		FindDialog::~FindDialog(){
-			// 释放
-		}
-		
-		void FindDialog::layout(){
-			QHBoxLayout *hLayout = new QHBoxLayout();	// 对一行进行布局，默认居中。
-			QVBoxLayout *vLayout = new QVBoxLayout();	// 对一列进行布局，默认居中。
-		}
-		上述通过信号来驱动的对话框是非阻塞的，也就是对话框存在的情况下，是可以回到原窗口上的。即【非模态】。
-	除了自定义对话框外，还可以调用已经存在的对话框, 这类对话框都是阻塞的，也就是没办法回到原窗口，必须要在对话框处理完成以后才能返回。即【模态】。
+			void FindDialog::layout(){
+				QHBoxLayout *hLayout = new QHBoxLayout();	// 对一行进行布局，默认居中。
+				QVBoxLayout *vLayout = new QVBoxLayout();	// 对一列进行布局，默认居中。
+			}
+		对于自定义对话框，通过dialog.show()来显示对话框，由于该函数是【非阻塞】，因此显示【非模态】对话框。
+		可以通过Signal-Slot机制来获取对话框的数据。
+	2.模态对话框
+		对于自定义对话框，通过dialog.exec();来显示对话框，由于该函数是【阻塞】，因此显示【模态】对话框。
+		可以通过dialog.getValue();等自定义函数来获取对话框的返回值。
+		模态非模态对话框的区别不在于调用exec()或是show()，而是在于内部变量modal的取值，只是exec通常modal为true，show通常为false。
+		这个是可以独立控制的，以控制模态特性。
+	3.自定义对话框外，还可以调用已经存在的对话框, 这类对话框都是阻塞的，也就是没办法回到原窗口，必须要在对话框处理完成以后才能返回。即【模态】。
 		1).QMessageBox::<type>(this, <title>, <message>, <button>);
 			<type>是对话框类型，有warning, information, question, critical等。
 			<button>通过按位与来提供，例如提供三个按钮：QMessageBox::Yes | QMessageBox::No | QMessage::Cancel
@@ -142,6 +149,7 @@
 			QString path = QFileDialog::getSaveFileName(this, <title>, <currentDir>);
 			QString dir = QFileDialog::getExistingDirectory(this, <title>, <currentDir>);
 			选择一个已经存在的文件(该文件必须存在) 准备保存的文件(该文件可以不存在) 以及 选择一个文件夹。
+	
 四、QMainWindow
 	QMainWindow也是直接继承QWidget的，他和QDialog不同之处主要体现在QMainWindow可以设置【中心窗口部件，菜单栏，状态来和工具栏】。
 	1.Action
@@ -449,7 +457,9 @@
 			Qt程序可以通过Debug和Release进行编译，Debug编译的版本用于调试，Release具备更高的性能，因此程序调试完成以后，需要用Release版本进行重新编译。
 			由于该编译好的程序是依赖于Qt的，而Qt的运行也依赖其他的数据，比如dll动态库，因此将编译好的qt程序拷贝给无qt配置的计算机上时，是不能直接运行的，会提示缺失某些dll文件。
 			Qt自带了windeployqt.exe程序，用于判断该Qt程序依赖了哪些Qt文件，并将这些文件拷贝到程序文件所在目录下，有了这些文件就能直接运行了(因为在加载dll时，默认首先在exe文件所在目录进行搜寻)
-			因此，只需要将程序exe文件放在某个文件夹<directory>下，并通过windeployqt <directory>将所需要的Qt文件拷贝到该文件夹下，该文件夹就是对程序的打包，可以放在任何windows/linux计算机上运行，也就是绿色运行版。
+			因此，只需要将程序exe文件放在某个文件夹<directory>下，并通过
+				windeployqt <directory>
+			将所需要的Qt文件拷贝到该文件夹下，该文件夹就是对程序的打包，可以放在任何windows/linux计算机上运行，也就是绿色运行版。
 		2).发布
 			可以借助Qt Installer Framework程序辅助进行制作安装包来进行发布。
 			a).下载
@@ -492,3 +502,24 @@
 				binarycreator -c config\config.xml -p packages installer.exe -v
 			e).发布
 				将安装包发给他人安装使用即可。
+	5.QString
+		1).格式化
+			QString("...%1...%2...").arg(val1).arg(val2);
+		2).类型转换
+			QString("...").toInt();
+			QString::number(intNumber);
+		3).中文乱码问题
+			QString("你好")的默认行为是将UTF-8编码格式的二进制数据解码为QString。类似于Java，QString的存储格式为Unicode。
+			在Qt Creator之所以不会乱码，是因为该IDE的存储格式默认为UTF-8，因此可以准确的转换到QString。
+			在VS中之所以会乱码，是因为该IDE的存储格式默认为GB2312，然而转换到QString是从UTF-8->Unicode的过程，这样就会得到和预期不符的Unicode字符串。
+				utf8编码(中文)   --utf8转unicode--> 预期的Unicode中文字符
+				gb2312编码(中文) --utf8转unicode--> 错误的Unicode中文字符
+			问题主要出在gb2312编码的字符，使用了utf8转unicode的操作。因此解决方案是：
+				- 修改编码方式。中文保存的时候直接保存为utf8。
+					可以通过文件->高级保存选项->保存为UTF-8的，将文件保存为utf8格式。字符串在编译的时候也就直接保存为utf8格式的二进制。
+					也可以通过#program execution_character_set("utf-8")，文件保存的时候仍然为gb2312，但字符串在编译的时候按把gb2312转换为utf8存储。
+				- 修改转换方式
+					QString::fromLocal8bit("xxx");		修改转换方式为 ide编码方式转unicode。这样就能确保Unicode中文字符解码正确。
+					这个方案更好。不用修改编码方式，根据IDE的方式，灵活进行编码。
+			在写文件的时候也需要通过
+				file.write("你好".toLocal8bit());	这样将Unicode中文编码为ide的编码模式。
