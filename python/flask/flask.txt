@@ -1,0 +1,178 @@
+零、常见问题
+	1.服务器使用客户端数据
+		1).URL路径数据
+		2).GET参数
+		3).POST参数
+		4).cookie
+		5).session
+
+一、Flask环境
+	1.virtualenv
+		该工具可以用于隔离项目之间的包关系。
+		我们使用pip install <package>安装的是全局包，在任何Python项目下都会导入。
+		我们可以给项目配置virtualenv，也就是虚拟环境，在虚拟环境下install <package>只会影响该项目，其他项目不会用到该虚拟环境下安装的包。
+		1).安装
+			pip install virtualenv
+		2).使用
+			cd <项目目录>
+			virtualenv <虚拟环境目录>		# 给项目配置虚拟环境空间
+			. venv/bin/activate				# 进入虚拟环境，Linux/OS X下
+			venv\scripts\activate			# 进入虚拟环境，Windows下
+			进入虚拟环境后，所有的安装包操作，都是针对虚拟环境的
+	2.flask
+		在虚拟环境下进行安装:
+			venv\scripts\activate
+			pip install flask
+二、启动Flask
+	1.Flask项目入口
+		app.py文件:
+			from flask import Flask
+			app = Flask(__name__)		# 先建立WSGI的服务器：app = Flask(__name__)，该服务器会监听接口，并将请求路由到对应的URL上。
+			app.run()					# app.run() 是正式开始监听工作。默认端口为5000
+		通过命令行：python app.py 就可以运行服务器了。
+		传入的__name__通常为'__main__'，用以告诉Flask到哪里找模板和静态文件。
+		默认情况下，服务器不会响应来自其他计算机的访问，只会响应来自localhost的访问。
+			app.run(host='0.0.0.0')
+		这会让操作系统监听所有公网 IP。
+	2.调试模式
+		默认情况Flask是以非调试模式运行的
+		调试模式下，服务器会在代码修改后自动重新载入。
+			app.debug = True
+			app.run()
+		或直接
+			app.run(debug=True)
+三、路由
+	路由就是一个kv对，url为k，执行的操作为v。
+	每次有url到wsgi后，前置服务器将会解析url，并提取出应该执行的函数。
+	在Flask中，路由的实现依赖于app.route()，该函数返回一个装饰器函数。
+	需要注意的是，所有的<url>，都必须以"/"开头
+		@app.route('<url>')
+		def index():
+			pass
+	当在web上输入<url>时，就回到该函数进行执行。
+	0.装饰器原理
+		def wrapper(method):
+			def inner(* args, **argv):
+				return method(args, argv)
+			return inner
+		wrapper将method进行封装，返回一个封装后的method
+			@wrapper
+			def method():
+				pass
+		等价于
+			def method():
+				pass
+			method = wrapper(method)
+	1.路由原理
+		app.route是一个返回装饰器的函数，将url和method进行连接是在装饰器中进行的。
+		class Flask():
+			def route(self, url):
+				def wrapper(method):
+					def inner(*args, **argv):
+						return method(args, argv)
+					self.mapper[url]=inner
+					return inner
+				return wrapper
+		因此app.route('url')返回一个wrapper函数，该函数是一个装饰器函数，装饰器会将method加载到mapper中。
+	2.变量规则
+		有些参数就暗含在url中。并非用?x=a&y=b这样的GET参数模式，而是路径形式。
+		可以把这些特殊的字段标记为 <variable_name>
+		默认为字符串格式，若希望转换成自己希望的格式，可以通过转换器：可以用 <converter:variable_name>
+		@app.route('/.../<var-name1>/<var-name2>')
+		def method1(var-name1, var-name2):			# 直接用，并且必须和上述的名字相同。需要注意，两个参数都必须传。var-name1, var-name2的顺序无所谓，因为是通过关键词传参的。
+			return var-name
+			
+		@app.route('/.../<int:id>')
+		def method1(id):
+			pass
+		注意！！！这样的传参格式并非GET的请求格式。
+	3.唯一URL
+		<url>头部的斜杠【不可省略】，尾部的斜杠省略不省略都可以，但是会表现有差异。
+		app.route("/abc/")		在访问"/abc"时，会自动重定向到"/abc/"
+		app.route("/abc")		在访问"/abc/"是，会报错
+	4.url查询
+		1).动态处理函数的url处理
+			Flask可以通过<url>找到对应的处理函数，也可以通过【处理函数名】找到对应的<url>
+				url_for('<function-name>', [kv1[, kv2[, ...]]])
+			url_for将会返回函数的url，并且可以传入url变量参数，若变量参数在url中并不存在，则会以get参数的形式进行构造。若变量参数没有传递，会报错。
+				@app.route('/abc/<name>):
+				def nameshow(name):
+					pass;
+			那么
+				url_for("nameshow", name='lsj')					-->>  "/abc/lsj"
+				url_for("nameshow", age = '18')					-->>  报错，没有传入参数name
+				url_for("nameshow", name='lsj', age = '18')		-->>  "/abc/lsj?age=18"
+		2).静态文件的URL查询
+			首先，需要注意的是，Flask的静态文件都放在__main__所在目录的static目录下。非static目录下的文件都不可通过url直接访问。
+				url_for('static', filename="style.css")
+			将会返回"/static/style.css"
+		之所以通过url_for来获取，是为了避免将url硬编码，因为url是易变的。
+	5.HTTP方法
+		在app.route中，可以指定该函数接收什么HTTP方法。
+		@app.route('<url>', methods=['<method-name>', '<method-name>'])		# method-name是指的post/get等
+		如果存在 GET ，那么也会替你自动地添加 HEAD，无需干预。
+		用错误的方法访问url，会返回405，Method Not Allowed。
+四、静态文件
+	Flask的静态文件都放在__main__所在目录的static目录下。
+	非static目录下的文件都不可通过url直接访问。
+
+五、模板渲染
+	Flask配置Jinja模板引擎，进行动态模板渲染。
+	可以通过
+		render_template('<HTML>', <关键词传参>)
+	该函数直接返回模板渲染后的【字符串】，模板中可以拿到关键词传参拿进来的数据。
+	render_template(<file>), 会在templates文件夹下寻找名为<file>的模板。
+六、请求数据
+	在 Flask 中由全局的 request 对象来提供客户端发送的请求信息。
+	1.多线程问题
+		request虽然是全局对象，但是采用了类似于ThreadLocal的技术，也就是说requst实际上是线程隔离的。
+	2.请求对象
+		import flask
+		
+		flask.request.method			# 返回HTTP方法字符串。
+		flask.request.form["key"]		# 获取POST/PUT表单中key对应的val, 若表单不存在"key"，则抛出KeyError异常。
+		flask.request.args.get("key")	# 获得<url>?key=val中的数据，也就是GET数据。需要注意的是，这个不能拿表单的数据。
+	3.文件上传
+		文件上传，最重要的是在HTML的表单中配置enctype="multipart/form-data"
+		request.files['key']			# 可以获取对应的文件信息
+		request.files['key'].save(path)	# 保存到硬盘
+	4.cookies
+		1).获取cookie
+			request.cookies.get('key')			# 获取来自客户单的cookie的数据			
+		2).设置cookie
+			resp = make_response("<content>")	# 构造响应对象
+			resp.setCookie("<key>", <val>)
+			return resp
+七、响应内容
+	1.路由函数返回值的几种情况：
+		1).字符串，会生成一个以字符串为主体，状态码为200 OK，MIME类型为TEXT/HTML的响应对象。
+		2).元组，必须是(body, status, headers)的顺序，并且至少包含一个顺序。headers是作为【额外】的消息头。
+		3).响应对象，通过make_respone()来进行构建
+		4).如果上述条件都不满足，会假设返回了一个合法的WSGI应用程序，并转换为一个请求对象。
+	2.响应对象
+		resp = make_response("<content>")
+		resp.headers["key"] = val
+八、会话对象
+	session也是类似request这样的线程独立的全局对象。
+	可以直接通过session['key']来获取和设置会话对象。
+
+九、重定向和错误
+	可以通过redirect()函数生成一个响应对象，该响应对象用于重定向。
+		return redirect(url_for("<重定向的目标函数>"))
+	放弃请求，返回错误页面，可以用abort函数。
+		abort(errorCode)		# 根据错误代码重定向到错误页面
+	可以通过@errorhandler装饰器，配置errorCode对应的错误页面
+		@errorhandler
+		def page_not_found(error):
+			return "<page-str>", 404
+十、日志记录
+	Flask预置了日志系统，可以通过
+		app.logger.<note-mthod>()
+	来进行记录，可以选择的记录方法有debug, warning, error等。
+	在使用前需要对其进行配置：
+		handler = logging.FileHandler('<file>', encoding='UTF-8')		# 日志输出的文件
+		handler.setLevel(logging.DEBUG)									# 日志输出级别
+		logging_format = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')	# 日志的输出格式
+		handler.setFormatter(logging_format)
+		app.logger.addHandler(handler)									# 在进行日志输出的时候调用该handler
+十一、部署

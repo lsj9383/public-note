@@ -1,0 +1,287 @@
+一、开始
+	pyton -V查看python版本
+	# 编码
+		pythoon3源码文件以utf8进行编码。而字符串都是Unicode的(也就是python的字符串都是utf8->unicode的)。
+	# 注释：
+		通过#进行单行注释
+	# 缩进
+		python用缩进来代替代码块。错误的缩进会导致运行错误。
+	# 多行语句
+		total = a + \
+		        b + \
+				c
+	# 空行
+		函数之间和类之间通过空行分割。空行表示一段新的代码的开始。其实不插入空行，也不户导致解释错误，但是这样更美观些。
+	# 控制台IO
+		1).输出
+			print(string)
+			print(str, end='xx')		以xx为str的结尾。默认end是换行，因此默认情况下print会占一行，通过修改end可以取消换行。
+	# import
+		python用import导入相应模块。
+		import <module> 把模块全部导入
+		from <module> import <componet1>,<componet2>,... 将模块的指定组件导入
+二、基本元素
+	Python中数据类型是动态的。
+	通过type(var)可以查询变量所指的对象类型。
+	通过isinstance(var, type)可以查看is-a关系，注意，这是满足里氏替换原则的，并强烈用该方案，而杜绝type(var)==type来判断，因为后者不采用里氏替换原则。
+	0.引用：
+		通过var=val建立引用关系，通过del var来删除引用关系。
+		尝试引用不存在的值将会报错。
+	1.Number
+		# 整数，数字长度并不受限。
+		# 浮点数
+		# 复数
+		# 布尔
+			本质上true是1，false是0，可以进行数学运算。
+	2.字符串
+		str = "abcd"
+		将字符数据以Unicode的形式存储在内存中。python中可以通过单引号和双引号来使用字符串。三引号(或三个双引号)可以指定多行字符串。
+		字符串是不可变的。
+		str[头下标:尾下标]可以进行字符串截取，生成新的截取字符串。
+	3.列表
+		list = [a, b, c, d]
+		listA + listB 将会连接生成新的列表
+		list[头下标:尾下标]可以进行截取
+		list.append(newval)			# 添加新元素
+		list.insert(idx, newval)
+	4.元组
+		tuple = (a, b, c, d)
+		元组是不可修改的列表。
+		tupleA + tupleB 将会连接生成新的列表
+		也可以截取。
+	5.集合
+		set = {a, b ,c, d}
+		集合是一个无序不重复序列。
+	6.字典
+		dict = {key1 : val1, key2 : val2}
+		dict[key]=val			# 存在key则覆盖，不存在则添加
+		dict[key]				# 获取值，若key不存在则跑出异常
+	7.迭代器
+		可以从集合中获取迭代器。
+		iterator = iter(<collection>)	#获取集合的迭代器
+		迭代对象可以用常规for进行循环
+			for <item> in iterator:
+				<statement>
+	8.生成器
+		使用了yield的函数被称为生成器。
+		生成器是一个返回迭代器的函数，可以说生成器就是一个迭代器，生成器决定了具体的迭代逻辑。
+		调用：
+			iterator = generate()		# 并不会执行函数，而是返回一个迭代器
+			next(iterator)				# 这样才会真正的执行函数
+			在next调用时，每次遇到 yield 时函数会暂停并保存当前所有的运行信息，返回yield的值。并在下一次执行 next()方法时从当前位置继续运行。
+三、流程控制
+	1.if语句
+		if condition:
+			<statment>
+		elif condition:
+			<statement>
+		else:
+			<statment>
+		需要注意每个条件后面的冒号，以及缩进。
+	2.while语句
+		while <condition>:
+			<statment>
+	3.for语句
+		for <item> in <collection>:
+			<statement>
+		[else:
+			<statment>
+		]
+		将会顺序遍历<collection>中的所有元素，每次遍历都以<item>表示。
+		range是一个生成器，可以通过range(start, end)来生成一个从start到end的迭代器。
+		for循环可以有else子句，当不满足循环条件时执行，但用break退出不执行(因为break时肯定当前是满足循环条件的)
+四、函数
+	def <function-name>(<param-list>):
+		<statement>
+	Python的函数传递是值传递，类似Java。
+	# 函数调用，实参可以通过以下方式传递：
+		必需参数：调用时的参数必须和声明时的一一对应，并且数量相等。
+		关键字参数：调用时指明是参数名字 fun(a=3)，并且可以不按顺序。
+		默认参数：如果没有传递参数，将会使用默认参数。
+		不定长参数：
+			def <function-name>([formal_args,] *var_args_tuple ):
+				<statement>
+				return [expression]=
+			加了*的变量名会存放所有未命名的参数。
+	# 匿名函数：
+		lambda [arg1, [arg2, [...]]] : expression
+		用于返回expression，因此python的lambda函数只能写一行。
+	# 函数嵌套
+		def <outer-function>:
+			def <inner-function>:
+				<statement>
+			inner-lambda = lambda <arg-list> : <expression>
+		在函数里面的这些lambda函数，定义的函数，都属于嵌套函数。
+	# 变量作用域
+		Python中变量的作用于取决于这个变量在哪里赋值。
+			L （Local） 局部作用域
+			E （Enclosing） 闭包函数外的函数中
+			G （Global） 全局作用域
+			B （Built-in） 内建作用域
+		对一个变量引用的查找规则是 L->E->G->B。
+		当内部作用域希望修改【全局作用域】的变量时，需要用global关键字声明该变量来自全局作用域。
+		当内部作用域希望修改【上层作用域】的变量时，需要用global关键字声明该变量来自全局作用域。
+		除此之外类，模块会引入新的作用域。那些作用域的行为就较为简单了。
+五、模块
+	# 模块原理：
+		import <module>，本质上就是运行该模块。
+			需要通过<module>.<component>来使用组件，也就是说存在<module>的命名空间作用域。
+		from <module> import <componet>		并不会运行该模块，只会找到合适的组件并建立依赖关系。
+			可以直接通过<component>使用模块的指定组件
+		from <module> import *
+			可以直接通过<component>使用模块的组件，将<module>命名空间给消除掉了。
+		一个模块只会被导入一次，不管你执行了多少次import。这样可以防止导入模块被一遍又一遍地执行。
+	# 搜寻路径
+		sys.path，是Python的搜寻路径。其实这是环境变量中的路径。最重要的一点是，当前工作空间是搜寻路径之一。
+		可以在脚本中修改sys.path来引入一些不在搜索路径中的模块。这并不会影响系统环境变量。
+	# 深入模块
+		模块除了函数和类外，也具备可执行代码，这些代码可以视为模块的初始化等。
+		每个模块有各自独立的符号表，在模块内部为所有的函数当作全局符号表来使用。
+		每个py都有自检的一些属性：
+			__name__:
+				当Python解释器直接启动该py文件时，__name__为"__main__"，否则为模块名。因此可以通过
+					if __name__=="__main__":
+						<statement>
+					else:
+						<statement>
+				来区分不同的启动方式时，该如何运行程序。
+		内置的dir(<module>)函数，可以找到<module>内定义的所有名称，并以字符串列表的方式返回。其实就是<module>符号表的所有key值。
+		若<module>省略，则返回自身符号表。
+	# 包
+		包是一种管理 Python 模块命名空间的形式。比如一个模块的名称是 A.B， 那么他表示一个包 A中的子模块 B。
+		包结构的目录布局应该是：
+			<root-package>/				# 顶层包
+				__init__.py				# 顶层包初始化
+				<sub-package-1>/			# 子包1
+					__init__.py				# 子包1初始化
+					xxx.py
+				<sub-package-2>/			# 子包2
+					__init__.py				# 子包2初始化
+					yyy.py
+				<sub-package-3>/			# 子包3
+					__init__.py				# 子包3初始化
+					zzz.py
+		只有中包含了__init__.py的目录，才是包。
+		# 模块的导入：
+			import <package>.<module>		根据包名和模块名，导入该模块。使用模块中组件的方式需要全部的前缀：<package>.<module>.<component>
+			from <package> import <item>	<item>可以是<module>，也可以是<sub-package>.<module>，也可以是具体的组件。只要找得到<package>.<item>是一个模块或是一个组件就成。引用模块时，可以省略<package>前缀。
+			from <package> import *			<package>的__init__.py中存在__all__列表变量，则将该列表的所有名字作为包内容导入。如果__all__没定义，咋会把__init__.py的内容导入进来。
+		# 兄弟包导入
+			如果一个模块需要用到兄弟模块，或是兄弟包，则可以通过相对路径来导入：
+				from . import <packae-module>			# 导入兄弟包或是模块
+				from .. import <packae-module>			# 导入父包中的包或模块
+				from ..filters import <packae-module>	# 导入父包的兄弟包中的包或模块
+六、面向对象
+	Python的OOP支持以下技术：
+		类: 用来描述具有相同的属性和方法的对象的集合。
+		实例化：创建一个类的实例，类的具体对象。
+		方法：类中定义的函数。
+		实例变量：定义在方法中的变量，只作用于当前实例的类。
+		对象：对象包括类变量、实例变量和方法。
+		类变量：所有对象共享，类变量通常不作为实例变量使用。
+		数据成员：包含了 类变量 和 实例变量。
+		多态：可以对BaseClass的方法进行override。
+		继承：即一个派生类继承基类的字段和方法。
+	定义：
+		class ClassName:
+			<key> = <val>			# 基本属性的定义和初始化
+			def __init__(self):		# 构造函数, 实例化的时候进行调用
+				<statement>
+			def method(self, <param-list>):
+				<statement>
+		需要注意，方法的定义，必须显示定义self，但是调用时self是隐式传递的。通过self.来引用对象的属性。
+	实例化：
+		object = ClassName()
+	继承和多态：
+		class ChildrenClass(Base[, Base2, Base3]):
+			def __init__(<param-list>):
+				Base.__init__(self, <param-list>)		#调用父类的构函
+			def method(<param-list>):
+				Base.method(self, <param-list>)			#调用父类的方法
+		于多重继承，需要注意的是：若是父类中有相同的方法名，而在子类使用时未指定，python从左至右搜索 
+		即方法在子类中未找到时，从左到右查找父类中是否包含方法。
+	类的属性与方法：
+		1).访问权限
+			类中属性定义为__<attr-name>时，表示属性私有，外部无法访问。内部通过self.__<attr-name>访问。
+			私有方法也一样。
+		2).专有方法
+			__init__ : 构造函数，在生成对象时调用
+			__del__ : 析构函数，释放对象时使用
+			__repr__ : 打印，转换
+			__len__: 获得长度
+			__cmp__: 比较运算
+			__call__: 函数调用
+			__add__: 加运算
+			...
+			主要是一些特殊的方法，用于管理对象生命周期，重载运算符等。
+七、文件
+	# 打开
+		file = open(filename, mode);	# 返回一个file对象
+			mode :	r,  只读方式打开文件
+					rb, 只读方式打开二进制文件
+					r+, 打开文件用于读写
+					rb+, 以二进制方式打开一个文件用于读写
+					w, wb, w+, wb+
+					a, ab, a+, b+
+	# 读取
+		content = fil.read(<size>)		# 返回指定大小的字符串/列表, <size>省略时，将会读取完。
+		line = file.readline()			# 读到一个换行符为止。若返回空字符，说明已经读完最后一行了。
+		lines = file.readlines(<size>)	# 返回指定行数，若省略<size>则返回一个文件包含的所有行。
+		for line in file:				# 也可以通过这样的迭代形式读取每行
+			<statement>
+	# 写入
+		file.write(string)				# 将string写入文件中。返回写入的字符个数。
+	# 关闭
+		file.close();
+	# 其他
+		file.tell()						# 返回文件对象所处的位置。
+		file.seek(offset, where)		# 设定文件指针相对位置。当where为0时代表相对文件头，为1是表示相对于当前位置，为2时表示相对于文件的结尾。但若用非b模式打开，只能相对于文件头。
+八、CGI
+	CGI，即通用网关接口(Common Gateway Interface),运行在服务器上
+九、多线程
+十、异常处理
+	Python中将【语法错误】称为错误，【运行时错误】称为异常。
+	在Python中可以对异常进行捕获并处理：
+		try:
+			<statement-body>
+		except <ExceptionClass> as e:			# 获得抛出的异常对象e
+			<statement-except>
+		except (<ExceptionClass1>, <ExceptionClass2>, <ExceptionClass3>, ...):
+			<statement-except>
+		except Exception as e:				# Exception是所有异常的基类，因此可以通过这个来捕获所有异常
+			<statement>
+		except:								# 也可以通过这个来捕获所有异常，可以通过sys.exc_info来拿到异常相关信息，比如sys.exc_info()[0]是指的抛出异常的类 sys.exc_info()[1]指抛出的异常对象
+			<statement-other-except>
+		except sys.exc_info()[0] as e:		# 也可以通过这个来捕获异常
+			<statement>
+		[else:
+			<statement-else>]				# 没有发生任何异常时执行
+		[finally:
+			<statement-finally>]			# 无论是否抛出异常，都将会执行
+		当程序在<statement-body>中抛出异常，就可以进行捕获，从上到下按异常类型进行捕获。若没有任何类型匹配，就交给<statement-other-except>处理。
+	抛出异常
+		raise <ExceptionClass>(<args>)		# 和Java类似，就是新建一个异常类抛出
+	自定义异常
+		class UserExceptionClass(Exception):	# 总之要继承异常基类Exception
+			...
+	若没有进行捕获，则异常继续往上抛出。
+十一、其他
+	1.http-lib
+	2.urllib
+		python3中，urllib包的request可以进行http请求。
+		1).请求
+			可以通过urllib.request.Request来封装请求对象：
+				request = urllib.request.Request(url, data=None, headers={}, method=None)
+			再通过urllib.request.urlopen来发送请求体：
+				urllib.request.urlopen(request)
+			最简单的方法是直接通过urllib.request.urlopen进行请求发送：
+				urllib.request.urlopen(url, data=None, [timeout, ]*, cafile=None, capath=None, cadefault=False, context=None)
+			请求方式：
+				当data数据为空时，进行Get请求，当data有数据时，进行Post请求。
+				具体来说, 对POST而言，最重要的是把kv对进行编码然后传入参数：
+					data = urllib.parse.urlencode({key:val,...})
+					urllib.request.urlopen(url, data)
+				对于GET而言，最重要的是把kv对进行编码然后拼接到url
+					param = urllib.parse.urlencode({key:val,...})
+					urllib.request.urlopen((url+"?%s")%params, data)
+	3.BeautifulSoup
