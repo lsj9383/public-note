@@ -65,7 +65,7 @@
 						 }
 					}
 	4.确定对象使用前已经初始化
-		指导思想：
+		建议：
 			* 为内置类型对象进行手工初始化，因为C++不保证初始化他们。
 			* 构造函数最好使用成员初值列，而不要在构造函数中只用赋值操作。初值列变量顺序尽量和class中的声明顺序保持相同。
 			* 用单例模式代替non-local static对象(global对象).
@@ -88,3 +88,279 @@
 						return a;
 					}
 					Object b = getObjectA();
+
+二 构造/析构/赋值运输
+    1.C++ Class自动生成的Method
+        建议:
+            自动生成default ctor, dtor, copy ctor, copy assign.
+        分析:
+            需要注意的是只有当生成的代码合法且有意义时，才会生成。
+            若一个class中包含了reference或const成员，而默认的copy assign将会对象中的每一个成员，而对象中的reference和const部分都是无法修改的，因此不会生成默认copy assign。
+            此时需要自行实现。
+    2.拒绝class自动生成的Method
+        建议:
+            为驳回编译器自动生成的方法，可将相应的成员函数声明为private，并且不予以实现。使用Uncoppyable这样的base class也是一种做法。
+        分析:
+            copy assign和copy ctor都会自动生成，而且考虑起来较为麻烦，当不需要这些方法的时候，将这些方法声明为private。
+            声明为private是不够的，因为若做了实现，class的friend或是成员函数，都能够执行该赋值。
+            可以继承Uncopyable这样的base class以达到一劳永逸的功效：
+                class Uncopyable{
+                protected:
+                    Uncopyable(){}
+                    ~Uncopyable(){}
+                private:
+                    Uncopyable(const Uncopyable&);
+                    Uncopyable& operator=(const Uncopyable&);
+                }
+            由于Derived Class生存的默认copy函数，会自动调用Base Class的Copy函数，而Base Class的Copy函数为private且未实现，因此是自动无法调用的。
+            虽然只要无定义或是只要私有都可以让Derived不生成默认的copy ctor或是copy assign。
+    3.virtual dtor
+        建议：
+            - 带有多态性质的base classes应该声明一个virtual析构函数。也就是说，如果class带有任何的virtual函数，那么它就应该有一个析构函数。
+            - 如果不作为base classes使用，则不需要virtual析构函数。
+        分析：
+            只有在析构函数为virtual时，指针的动态类型为Derived Class，静态类型为Base Class的delete，会先执行Derived Class的析构函数，再执行Base Classes的析构。
+            若静态类型就为Derived Class，当然也是先Derived Class析构再执行Base Class的析构。
+    4.dtor中的异常
+        建议：
+            - 析构函数绝对不能吐出异常，若一个析构函数里面调用的函数可能抛出异常，析构函数必须捕捉所有的异常，然后结束程序或是吞掉异常(记录异常)。
+            - 如果客户需要对某个操作函数期间抛出异常作出反应，那么class应该提供一个接口用于执行该操作，由用于来捕捉异常。
+        分析：
+            首先，若析构函数可以抛出异常，那么对于一个容器被释放，进而里面的对象被释放时，这些对象的析构可能回抛出异常，而C++最多允许两个异常同时存在，否则会导致程序结束执行或是不明确行为。因此C++析构函数不要抛出异常。
+            其次，若某个对象的结束伴随着异常的可能性，那么需要提供一个close接口，提供给用于捕获这些异常的可能。并且在析构函数中也应该自动执行close，以避免用于遗忘调用close。
+            最后，若用户没有执行close，在析构函数中执行，析构函数捕捉该异常，可以选择记录该异常，或是结束程序。
+    5.ctor和dtor中不能调用virtual函数
+        建议：
+            不要在base ctor或是base dtor中调用virtual函数，因为此时不会下降至derived class执行，而是执行的base class版本。
+        分析：
+            编译器层面，在base ctor中，对象的类型时base class，而不是derived class，此时的typeid或是dynamic_cast也会将this视作base class。
+            逻辑层面，在执行base ctor中，derived的状态还未进行构造，而virtual一般时根据derived状态来进行运行的，因此不应该调用virtual。若virtual不需要derived的数据，那么也不应该使用virtual来声明了。
+            若有些操作非得在base class中执行，而不同的Derived表现又不同，又希望代码复用较好时，比如init方法所有的Derived的构造都要用，需要把该方法声明为non-virtual，再通过static方法来提供所其需要的数据。
+    6.copy assign返回reference to *this
+        建议：
+            copy assign以及链式调用，应该返回一个reference to *this
+        分析：
+            copy assign的返回值，就是赋值运算符的返回值。
+            o1 = o2 = o3 = 4 ，为了支持这样子的赋值操作，要求copy assign需要返回当前this的引用。
+    7.copy assign中处理自我赋值
+        建议：
+            - 确保copy assign在自我赋值中有良好的行为，可以通过比较"来源对象"和"目标对象"的地址，以及copy-and-swap.
+            - 确定任何函数操作一个以上的对象，而其中多个对象时同一个对象，其执行仍然正确。
+    8.复制对象时勿忘每个成分
+        建议：
+            - Copying函数应该正确复制对象内所有的成员变量，以及所有的"base class成分"。
+            - 将copy ctor和copy assign共同的部分放在某个private函数中以复用。
+        分析：
+            自行实现的copy函数，是不会默认调用base class的copy函数的。为了完成对象的完全复制，应该调用base class的copy。
+            class Derived : Base{
+                Derived(const Derived& rhs) : Base(rhs), ...{
+                    ...
+                }
+                Derived& operator=(const Derived& rhs){
+                    Base::operator=(rhs);
+                    ...
+                    return *thisl
+                }
+            }
+三 资源管理
+    1.以对象管理资源
+    2.在资源管理类中小心copy行为
+    3.在资源管理类中提供对原始资源的访问
+    4.成对使用new和delete
+    5.以独立语句将newd对象置入智能指针
+六 继承与面向对象设计
+    1.public继承在逻辑上是is-a关系
+        建议：
+            "public继承"意味着is-a关系，适用于base classes身上的操作，也同样可以作用于derived classes，因为每个dervied class也是base class。
+    2.避免遮掩继承而来的名称
+        建议：
+            1.derived classes内的名称将会遮掩base classes内的名称。
+            2.通过using声明式或转交韩式，可以避免被遮掩。
+        分析：
+            1.无论base class中的名称是virtual或是non-virtual或是static或是什么，都会被子类同名遮掩。
+                通过{
+                    ...
+                    name
+                }来进行访问时，查询的顺序为：local -> current class -> base class -> namespace of base class -> global
+                需要注意，不在类中时，不会在current class所在的namespace中去找，而是在base calss所在的namespace中找。
+                当在某个作用域找到了name，无论其形式(无论标签是否相同，是否为函数，是否为变量)，都会停止搜索。
+                其实作用域问题主要是在编译期，编译期需要进行链接，若无法找到名字的定义，则无法链接成功。
+            2.命名遮掩的解决
+                1).重载函数问题
+                    核心问题是base class有多个同名函数，只需要重载其中少数几个，其他仍然有效。
+                    命名遮掩在derived class重写base class的重载函数时影响最大，因为base class存在多个重载函数，derived class可能只会重写其中一个，由于命名遮掩，对于derived class的对象而言其他的重载函数将会失效。
+                    在derived class将不希望命名遮掩的名称都用: using <BaseClass>::<name>来显示声明，这样就不会存在命名遮掩了。
+                    class Base{
+                        virtual void method();
+                        virtual void method(int);
+                    }
+
+                    class Derived : public Base{
+                        using Base::method;
+                        virtual void method() override;
+                    }
+                2).转交函数问题
+                    核心问题是base class多个同名函数，只希望其中少数几个起作用，其他无效。
+                    class Derived : public Base {
+                        virtual void method(){      // 转交函数
+                            Base::method();
+                        }
+                    }
+    3.区分接口继承和实现继承
+        建议：
+            1).pure virtual只具体指定接口继承
+            2).impure virtual指定接口继承及缺省实现继承
+            3).non-virtual只能实现继承
+        分析:
+            该条例很容易理解，只提对于virtual的一点。
+            impure virtual提供接口和缺省实现的继承，这样很可能导致“误会”。
+            新开发的类继承原有的类，并“忘记”提供某种impure virtual接口的实现，因此采用的时缺省实现。
+            这种“没有明确进行实现的情况下，OOP提供了默认实现”，很可能这样的默认实现是错误的，对于很重要的接口，不应该采用impure virtual:
+                1).defaultMethod
+                    class Base{
+                    public:
+                        virtual void method()=0;
+                    protected:
+                        void defaultMethod(){...}
+                    };
+                    class Derived : public Base{
+                        void method() override(){ defaultMethod(); }
+                    };
+                2).pure virtual implements
+                    上述方案需要提供一个defaultMethod()函数，这样一方面会污染命名空间，而且可读性也比较差。
+                    可以直接为pure virtual接口提供实现：
+                    class Base{
+                    public:
+                        virtual void method()=0{...}
+                    };
+
+                    class Derived : public Base {
+                    public:
+                        void method() override{ Base::method(); }
+                    };
+                    也就是说，pure virtual可以提供函数实现，但是其类仍然无法实例化，必须要通过Derived来实现该pure virtual。
+                    这样可以将接口和实现分开，这里的接口指的说pure virtual, 实现指的是impure virtual or non-virtual也可以避免对命名空间的污染。
+    4.考虑public-virtual外的其他选择
+        建议：
+            1).virtual的替代方案包括：NVI和Strategy模式。
+            2).Strategy的缺点是无法访问class的non-public成员，优点是可以运行时修改表现。
+            3).通过tr1::function是"可调用物"的抽象，包括函数指针，函数对象或成员函数指针。
+        分析:
+            1).NVI
+                NVI(non-virtual interface)，其核心是Template Method，即模板方法模式。
+                该模式通过non-virtual来实现接口，该方案可以为具体的实现提供一些其他的功能，包括日志记录，异常处理等。
+                NVI将virtual私有化，并提供一个non-virtual作为接口：
+                class Base{
+                public:
+                    void method(){
+                        ...
+                        doMethod();
+                        ...
+                    }
+                private/protected:
+                    virtual void doMethod(){
+                        ...
+                    }
+                }
+
+                class Derived{
+                private/protected:
+                    void doMethod() override { ... }    // 提供子类实现。
+                }
+            2).Strategy
+                策略模式，其优点是一方面多个相同类型的对象，可以具备不同的执行策略，另一方面是对象的执行策略可以在运行时期修改。
+                策略模式可以实现更细粒度的特异化，将实现放在对象外部，通过对象提供的接口来完成对对象的操作。
+                其缺点越是很明显的，需要为策略方法提供public接口，导致non-public成员无法访问，若为了给予策略自由(增加接口或friend)，会导致封装性的下降。
+                a).函数指针
+                    函数指针是实现策略的最简陋的方案，在对象中保存一个函数指针作为策略，必要时刻执行该策略。
+                b).tr1::function
+                    函数指针的抽象程度不够高，可以用tr1::function来指代一切【可调用物】。
+                    class Base{
+                        typedef std::tr1::function<outputType, InputTypes> strategyFunc;
+                    publci:
+                        public Base(strategyFunc _func = defaultFunc):func(_func){}
+
+                    private:
+                        strategyFunc func;
+                    };
+                    需要注意的是，对于成员函数指针，由于成员函数是在类中的函数，其实际的形参列表还包含了自己，即this，通常tr1::function为了泛化，一般不会将this作为参数的，因此需要对成员函数进行转换。
+                    可以借助tr1::bind进行转换:
+                        Class object = new Class;
+                        tr1::function func = tr1::bind(&Class::MethodName, object, _1)
+                        该函数回返回一个tr1::function的func对象，并且调用该func对象，会自动将object作为this传入。本质上就是将成员函数和一个对象绑定在一起，当通过function调用该函数时会自动进行传入。
+                c).传统方案
+                    传统方案就是设计模式原本的方案，定一个抽象策略类，然后需要多少策略就进行实现，而object中包含的就是这个抽象策略类。
+    5.绝不重新定义继承而来的non-virtual
+        建议：
+            绝不要重新定义non-virtual函数。
+        分析：
+            non-virtual意味这【不变性】，重新定义意味着【特异性】，若重写non-virtual，则是矛盾的。
+    6.绝不重新定义继承而来的缺省参数值
+        建议：
+            绝不要重新定义一个继承而来的缺省参数值，因为缺省参数值是静态的，而重写的东西只应该是动态的。
+        分析：
+            可以重写的仅有virtua，而virtual是动态调用的，缺省参数值在编译期决定，因此是静态的，重新定义缺省参数值会导致表现不同一。
+                Derived o = new Derived;
+                Base b = o;
+                o.method();
+                b.method();
+            在编译期，就会决定method的默认参数，会根据o和b的静态类型来判断，若进行了重新定义，则效果会不一样的。
+            另外，若在子类中没有定义缺省值，编译不会通过。
+            但是，若base class改变了初始值，则需要程序员手动对Derived class的初始值修改，否则就导致了缺省参数值的重新定义。
+            可以通过NVI手段来解决该问题：
+                class Base{
+                public:
+                    void method(int v = defaultValue){
+                        doMethod(v);
+                    }
+                private:
+                    void doMethod(int v){...}
+                };
+
+                class Derived : public Base{
+                private:
+                    void doMethod(int v){...}        // 重写实现, 不用在意初始值问题，因为由non-virtual interface传入了。
+                };
+    7.has-a关系和is-implements-in-terms-of关系
+        建议：
+            1).复合意味这has-a关系或is-implements-in-terms-of关系
+            2).在应用域意味着has-a关系，在实现域意味着is-implements-in-terms-of关系
+        分析：
+            1).应用域
+                应用域的对象意味着对象是对现实生活的模拟，是具备现实意义的，比如 人，地址，学生等。
+            2).实现域
+                实现域的对象意味着是计算机界的产物，如查找树，互斥器，缓冲区等。
+            3).复合与public继承
+                复合对象发生在应用域，则是has-a关系
+                复合对象发生在实现域，则是is-implements-in-terms-of关系(根据某物实现出)
+                public继承是is-a关系。
+                has-a关系和is-a关系很好区分
+                is-implements-in-terms-of关系和is-a关系不好区分，如set可以通过继承list来实现，但是list是可以包含重复，但是set不能包含重复，因此set和list是is-implements-in-terms-of关系。                
+    8.private继承
+        建议：
+            1).private继承意味着is-implements-in-terms-of，当derived需要访问base的protected成员时，这样是合理的。
+            2).private继承可以将empty base最优化，减少derived的尺寸占用。
+        分析：
+            private继承不是is-a关系，这是因为他将接口全部私有化，禁止外部访问，但是类本身可以访问这些接口。因此对base的操作不能施加于derived上。
+            private继承意味着derived可以借助base来实现某些功能。
+    9.多重继承
+        建议：
+            1).多重继承可能导致歧义性，以及对虚基类的需要。
+            2).virtua继承回导致大小，速度，初始化及复杂度的成本提升。若虚基类不带仍和数据将是最好的。
+            3).多重继承通过"public继承Interface" 以及 "private继承某个协助实现的class"可以发挥很好的作用。
+        分析:
+            1).歧义性
+                歧义性，主要是指当多个base中都含同一个名字时，这样在derived中使用该名字时，编译期不知道将其链接到什么上面。
+                因此在使用可能具有歧义的名字时，需要指定起所在的类：BaseName::<name>.
+                当然，若这些名字时纯虚函数名，则不存在歧义性，因为必须在子类中定义其实现。
+            2).虚基类
+                当多个base又有相同的base时，需要使用虚基类，否则会导致有多个相同的副本。之所以c++默认不采用virtual base，是因为这会影响效率。
+                尽量避免在virtual base中放置数据，以避免可能会出现的莫名其妙的问题。(有数据就会涉及到初始化，很可能出错)。
+            在Java的语法中，有专门的interface结构，该结构主要就是为了解决多重继承带来的歧义性和虚基类的问题，强制性的要求所有的方法都是纯虚函数
+
+七.模版与反型编程
+    由于在常用的c++编程中，编写模版程序的要求并不多，这里只列出几个有趣和常用的条例。
+    1.隐式接口于编译期多态
+    2.模版参数类型兼容问题
+    3.Traits Classes
+    4.TMP
