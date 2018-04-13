@@ -1,0 +1,104 @@
+一、代码组成
+	1.总览
+		├── pages					页面根目录，该目录下包含了小程序的所有页面
+		|	├── pageName				页面目录，该目录下包含了页面所需要的js交互代码、布局代码以及样式代码
+		|	|	├── pageName.js
+		|	|	├── pageName.wxml
+		|	|	└── pageName.wxss
+		|	├── ...
+		|	└── ...
+		|
+		├── utils
+		|	└── utils.js
+		|
+		├── app.js
+		├── app.json
+		├── app.wxss
+		└── project.config.json
+		
+	2.JSON配置
+	3.WXML模板
+	4.Javascript脚本
+二、宿主环境
+	1.逻辑层和渲染层
+		小程序的wxml和wxss工作在渲染层，js工作在逻辑层。
+		1).渲染方案
+			逻辑层负责产生、处理数据，并通过Page实例的setData方法传递数据到渲染层。
+			Page({
+			  onEvent: function () {
+				this.setData({ <varBName>: <val> })
+			  }
+			})
+			这里的this就是Page实例。
+		2).通信模型
+			渲染层和逻辑层分别由2个进程管理，渲染层界面使用了WebView进行渲染，逻辑层采用JsCore进程运行Js脚本。
+			逻辑层和渲染层的通信，通过微信客户端Native进行中转，逻辑层的网络请求也藉由Native进行转发。
+		3).数据驱动
+			视图和变量之间是关联的，以数据驱动的手法将视图和变量进行关联，使得逻辑层修改数据的时候并不需要了解视图布局。
+			wxml会先转换成js对象，并将变量带入到js对象中，再渲染出Dom树。当变量修改，wxml对应的js对象被修改，重新渲染Dom树。
+	2.程序与页面
+		一个小程序由多个页面组成。
+		1).App
+			宿主环境提供App()构造器用来注册一个程序App，App()构造器必须写在app.js中。
+			通过提供事件处理函数以及全局初始化数据，以对小程序实例进行初始化。
+			也可以提供其他参数，通过getApp()后可以直接使用。
+			App({
+				onLaunch:function(options){},
+				onShow:function(options){},
+				onHide:function(options){},
+				onError:function(options){},
+				globalData:{
+					...
+				}
+				others:....
+			})
+		2).App生命周期
+			首次打开小程序，微信客户端初始化宿主环境，并从【网络下载】或是【本地缓存】中拿到小程序代码包，再注入到宿主环境。
+			小程序初始化以后，会给App实例派发onLaunch事件。
+			小程序关闭后，小程序并【没有直接销毁】，而是进入后台运行，会派发App的onHide方法。
+			小程序重新打开，会派发App的onShow方法，进入前台。
+		3).全局数据
+			所有的渲染层都是共享使用逻辑层的，因此在切换页面时，需要确保逻辑层的干净，例如清空定时器等。
+		4).页面
+			一个页面由界面、逻辑和配置组成。wxml和js文件是必须的。
+			一个页面的文件必须在同一个目录下，在app.json的pages字段中对页面路径进行声明，这个是必须的，否则不会再宿主环境中进行注册。
+			app.json的pages中的第一项被设置为默认首页。
+		5).页面构造器
+			Page()在page.js中被调用，用来进行页面实例的初始化工作。
+			类似于App实例的初始化，同样传入一些初始数据以及事件回调函数。
+			Page({
+			  data: { text: "This is page data." },			页面初始数据
+			  onLoad: function(options) { },
+			  onReady: function() { },
+			  onShow: function() { },
+			  onHide: function() { },
+			  onUnload: function() { },
+			  onPullDownRefresh: function() { },
+			  onReachBottom: function() { },
+			  onShareAppMessage: function () { },
+			  onPageScroll: function() { }
+			})
+		6).Page生命周期
+			页面首次加载时，会派发Page的onLoad事件
+			页面显示之后，会派发Page的onShow事件，返回该页面时，也会回调该事件。
+			页面初次渲染后，会派发Page的onRead事件，触发时，表示Page准备妥当，可以和逻辑层进行交互了。
+			页面不可见时，会派发Page的onHide事件，页面切换出去时会触发该事件。
+			页面被回收时，会派发Page的onUnload事件，通过wx.redirectTo和wx.nativeBack返回其他页面时将会触发。
+		7).Page的Query
+			wx.navigateTo({ url: 'pages/detail/detail?k1=v1&k2=v2' })
+			通过上述方法可以切换页面，并且传递数据。
+			Page({
+			  onLoad: function(option) {
+					console.log(option.id)
+					console.log(option.other)
+			  }
+			})
+		8).页面数据
+			wxml绑定的数据位于Page实例的data域，在js中可以通过this.setData来设置data域的数据。
+			this.setData({
+				k:v
+			});
+			设置了data域中没有的数据，会将该数据进行添加，若data域中有该关键词数据，则进行数据更新。
+			需要注意，this.setData才能保证数据和页面的一致，若直接操作data域则不会进行页面更新。
+			不要把data中的任意一项的value设为undefined，否则可能会有引起一些不可预料的bug。
+			并且setData会消耗时间，每次设置的数据不应超过1024kB。
