@@ -85,7 +85,7 @@
 			页面不可见时，会派发Page的onHide事件，页面切换出去时会触发该事件。
 			页面被回收时，会派发Page的onUnload事件，通过wx.redirectTo和wx.nativeBack返回其他页面时将会触发。
 		7).Page的Query
-			wx.navigateTo({ url: 'pages/detail/detail?k1=v1&k2=v2' })
+			wx.navigateTo({ url: '<path>?k1=v1&k2=v2' })
 			通过上述方法可以切换页面，并且传递数据。
 			Page({
 			  onLoad: function(option) {
@@ -102,3 +102,41 @@
 			需要注意，this.setData才能保证数据和页面的一致，若直接操作data域则不会进行页面更新。
 			不要把data中的任意一项的value设为undefined，否则可能会有引起一些不可预料的bug。
 			并且setData会消耗时间，每次设置的数据不应超过1024kB。
+		9).页面跳转和路由
+			一个小程序有多个页面，可以通过wx.navigateTo来推入一个新的页面，并会形成页面栈。
+			wx.navigateBack()，从页面栈中弹出当前页面。
+			wx.redirectTo({url:'<path>'})，将页面栈中的当前页面替换。
+三、组件
+四、API
+五、事件
+	当小程序发生事件时，通过回调来告知程序员。事件分为两种：【用户在渲染层的行为反馈】以及【组件的状态变化反馈】。
+	1.组件事件
+		常见的事件有：
+			touchstart	手指触摸动作开始
+			touchmove	手指触摸后移动
+			touchcancel	手指触摸动作被打断，如来电提醒，弹窗
+			touchend	手指触摸动作结束
+			tap	手指触摸后马上离开
+			longpress	手指触摸后，超过350ms再离开，如果指定了事件回调函数并触发了这个事件，tap事件将不被触发
+			longtap	手指触摸后，超过350ms再离开（推荐使用longpress事件代替）
+		通过设置属性bind:<event>="callbackFunction"来将组件的对应事件回掉和具体的函数绑定在一起，例如：
+			<view bind:tap="tapcallback">view</view>
+			Page({
+				tapcallback : function(){...}
+			})
+		当点击view的时候，将会触发tapcallback的执行。需要注意的是，回调函数在Page实例初始化的时候配置。
+	2.捕获与绑定
+		组件的事件触发分为【向下传递】 以及 【向上传递(冒泡)】。
+		--->外----->内
+		    层		层
+			组		组
+		<---件<-----件
+		先有外层组件捕获事件，并触发回调，再有内层组件捕获事件，并触发回调。
+		然后内存组件冒泡，并触发回调，再有外层组件冒泡，并出发回调。
+		capture-bind:<event>，当事件是向下捕获时，回调。
+		bind:<event>，当事件是向上冒泡时，回调。
+		capture-catch:<event>，当事件是向下捕获时，回调，并且【阻止事件传递】。
+六、场景
+	1.flex布局
+		采用flex布局的元素，简称为【容器】，容器内的元素简称为【项目】
+		flex布局中，暗含一个坐标轴系统，水平是主轴，垂直是交叉轴。项目在主轴方向排列，满后向交叉轴方向换行。
