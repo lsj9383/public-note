@@ -4,7 +4,7 @@
 		|	├── pageName				页面目录，该目录下包含了页面所需要的js交互代码、布局代码以及样式代码
 		|	|	├── pageName.js
 		|	|	├── pageName.wxml
-		|	|	└── pageName.wxss
+		|	|	└── pageName.wxss		页面样式
 		|	├── ...
 		|	└── ...
 		|
@@ -13,12 +13,67 @@
 		|
 		├── app.js
 		├── app.json
-		├── app.wxss
+		├── app.wxss				项目公共样式
 		└── project.config.json
 		
 	2.JSON配置
 	3.WXML模板
-	4.Javascript脚本
+		是一套小程序框架设计的标签语言
+		<标签名 属性1="属性值1" 属性2="属性值2" ...>......</标签名>
+		1).数据绑定
+			WXML中可以绑定来自逻辑层的数据，以双大括号的形式来表明这个符号来自逻辑层：
+				<text>{{val}}</text>
+			属性也可以使用逻辑层数据：
+				<text attr="{{val}}">hello world</text>
+		2).逻辑语法
+			* 三元运算
+				{{ condition ? exp1 : exp2 }}
+				需要注意的是这里的condition、exp1和exp2都是Javascript中的语法。比如若是字符串需要加上双引号
+			* 算数运算
+				{{ a+b/c }}
+			* 条件逻辑
+					<view wx:if="<True/Flase>">...</view>
+				通过wx:if属性，以决定是否渲染该块。
+					<view wx:if="<True/Flase>">...</view>
+					<view wx:elif="<True/Flase>">...</view>
+					<view wx:else="<True/Flase>">...</view>
+				连续块的if-elif-else可以用来选择渲染哪个块
+					<block wx:if="...">
+						<view></view>
+						<view></view>
+						<view></view>
+					</block>
+				用来进行多个块的渲染抉择。
+			* 列表渲染					
+					<view wx:for="{{array}}">
+						{{index}}: {{item}}
+					</view>
+				上面的array是一个数组，可以使用数组中的数据，重复渲染【该组件】。渲染时index是数组的下标，item是index对应的值。
+		3).模板
+			可以在模板中定义代码片段，使用name属性标注模板名。模板中也可以使用数据绑定，在使用模板时需要将数据传入模板。
+				<template name="<templateName>"></template>
+				<template is="<templateName>" data="{{...}}"></template>
+		4).引用
+			* import
+				可以在该文件中使用目标文件的template。
+					<import src="xx.wxml" />
+					<template is="<templateName>"></template>
+				这里的<templateName>来自xx.wxml。
+				需要注意的是 import 只会添加目标文件中的template，其他的一切(包括目标文件的import)都不会被引用。也就是不会递归。
+			* include
+				可以将目标文件中除了 <template/> <wxs/> 外的整个代码引入，相当于是拷贝到 include 位置
+	4.WXSS
+		1).样式分类
+			项目公共样式：根目录下的wxss，会被诸如到小程序的每个页面。
+			页面样式：页面文件下的wxss
+			其他样式：可以被项目公共样式和页面样式引用
+			内联样式：类似于web的内联样式
+		2).尺寸单位
+			wxss中，以rpx为尺寸单位，用以适配具有不同分辨率的设备。
+		3).wxss引用
+			@import './xxx.wxss'
+			用以引用该wxss文件目录下的xxx.wxss，并且编译期会把xxx.wxss和本文件打包，以至于不会下载多个wxss。
+	5.Javascript脚本
 二、宿主环境
 	1.逻辑层和渲染层
 		小程序的wxml和wxss工作在渲染层，js工作在逻辑层。
@@ -140,3 +195,56 @@
 	1.flex布局
 		采用flex布局的元素，简称为【容器】，容器内的元素简称为【项目】
 		flex布局中，暗含一个坐标轴系统，水平是主轴，垂直是交叉轴。项目在主轴方向排列，满后向交叉轴方向换行。
+	2.界面交互反馈
+		1).触摸反馈
+			<button>标签可以带来触摸反馈
+			<button loading="true">...</button> 可以让按钮显示加载状态，以提示用户等待。
+		2).Toast和对话框
+			Toast用于提示用户操作结果，显示一段时间后自动消失。
+				wx.showToast({
+					title:"title",
+					icon:"success",
+					duration:1500		Toast的持续时间，毫秒单位
+				})
+			Toast不适合用于反馈用户错误通知，因为Toast总会消失，不便于用户接收操作错误的原因。
+				wx.showModal({
+					title: '标题',
+					content: '告知当前状态，信息和解决方法',
+					confirmText: '主操作',
+					cancelText: '次要操作',
+					success: function(res) {		点击对话框操作后的回调
+						if (res.confirm) {
+							console.log('用户点击主操作')
+						} else if (res.cancel) {
+							console.log('用户点击次要操作')
+						}
+					}
+				})
+	3.https网络通信
+		url参数是当前发起请求的服务器接口地址，小程序宿主环境要求request发起的网络请求【必须是https协议请求】。
+		同时为了保证小程序不乱用任意域名的服务，wx.request请求的域名需要在小程序管理平台进行配置。
+		1).wx.request接口
+			wx.request用于发起http请求
+				wx.request({
+					url: 'https://test.com/getinfo',
+					success: function(res) {				网络请求成功后的回调
+						console.log(res)// 服务器回包信息
+					}
+				})
+			可以包含的属性值有：
+				url:'.....'				url是有长度限制的，其最大长度是1024字节
+				method:"GET/POST/PUT/..."
+				dataType:"json/text/..."
+				success:function(res){}	收到开发者服务成功返回的回调函数
+				fail:function(){}		接口调用失败的回调函数
+				complete:function(){}	接口调用结束的回调函数（调用成功、失败都会执行）
+				data：{...}				请求的参数
+		2).收到响应
+			小程序端收到回包后会触发success回调，同时回调会带上一个Object信息：
+				data开发者服务器返回的数据
+				statusCode开发者服务器返回的 HTTP 状态码
+				header开发者服务器返回的 HTTP Response Header
+	4.微信登录
+		1).获取微信登录凭证code
+	5.本地数据缓存
+	6.设备能力
