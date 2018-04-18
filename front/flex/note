@@ -1,0 +1,68 @@
+一、概述
+    Flex即Flexible Box，即弹性布局，任何一个容器都可以指定为Flex布局。
+        .box{
+            display : flex;
+        }
+    行内元素也可以使用Flex布局
+        .line-box{
+            display : inline-flex;
+        }
+    设置了Flex属性的容器，被称为【Flex容器(container)】，所有子元素自动成为容器成员，称为【Flex项目(item)】。
+    容器默认两根轴：【水平轴】 和 【垂直交叉轴】。
+二、container属性
+    1.flex-direction
+        决定主轴的方向。
+            .box {
+                flex-direction: row | row-reverse | column | column-reverse;
+            }
+        * row(default)
+            主轴为水平方向，从左到右
+        * row-reverse
+            主轴为水平方向，从右到左
+        * column
+            主轴为垂直方向，从上到下
+        * column-reverse
+            主轴为垂直方向，从下到上
+    2.flex-wrap
+        默认情况下，item都在一条轴线上，如果一条轴线排不下，flex-wrap指导如何换行。
+            .box{
+                flex-wrap: nowrap | wrap | wrap-reverse;
+            }
+        * nowrap(default)
+            不换行
+        * wrap
+            换行，第一行在上方
+        * wrap-reverse
+            换行，第一行在下方
+    3.flex-flow
+        该属性时flex-direction和flex-wrap的合写形式。
+            .box {
+               flex-flow: <flex-direction> || <flex-wrap>;
+            }
+    4.justify-content
+        item在主轴上的对齐方式
+            .box {
+                justify-content: flex-start | flex-end | center | space-between | space-around;
+            }
+        * flex-start(default)   左对齐
+        * flex-enx      右对齐
+        * center        居中
+        * space-between 两端对其，item之间间隔相等
+        * space-around  每个项目两侧间隔相等
+    5.align-items
+        item在交叉丑上如何对齐
+    6.align-content
+        定义了多根轴线的对齐方式
+三、item属性
+    1.order
+        定义item的排列顺序，数值越小排列越靠前。
+    2.flex-grow
+        定义项目的放大比例，默认为0，即不放大。
+    3.flex-shrink
+        定义了项目的缩小比例，默认为1，即空间不足时该item将会缩小。
+    4.flex-basis
+        定义了在分配多余空间之前，项目占据的主轴空间
+    5.flex
+        flex属性是flex-grow, flex-shrink 和 flex-basis的合写。
+    6.align-self
+        允许单个item和其他item不一样的对齐方式，默认值为auto，即继承父元素的align-items。
