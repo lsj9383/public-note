@@ -2,9 +2,29 @@
 	1.服务器使用客户端数据
 		1).URL路径数据
 		2).GET参数
+			获取URL中的提交的参数
+				request.args[<key>]							不存在该<key>，则会抛出KeyError异常，可以进行捕捉。
+				request.args.get(<key>, <defaultValue>)		不存在该<key>，返回默认值，用get也可以避免被修改参数
 		3).POST参数
+			获取POST表单中的数据
+				request.form[<key>]							不存在该<key>，则会抛出KeyError异常，可以进行捕捉。
+				request.form.get(<key>, <defaultValue>)		不存在该<key>，返回默认值，用get也避免被修改参数
+			获取文件
+				f = request.files[<file-key>]
+				fn = f.filename
+				f.save(<path>)
 		4).cookie
+			获取cookie
+				request.cookies.get(<key>)			cookie是在请求里面的，因此应该通过request来进行cookie获取
+			设置cookie
+				resp = make_response()
+				resp.set_cookie(<key>, <val>)
+				return resp
 		5).session
+			from flask import session
+
+			session[<key>]=<val>
+			v = session[<key>]
 
 一、Flask环境
 	1.virtualenv
@@ -175,4 +195,5 @@
 		logging_format = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')	# 日志的输出格式
 		handler.setFormatter(logging_format)
 		app.logger.addHandler(handler)									# 在进行日志输出的时候调用该handler
+
 十一、部署

@@ -1,0 +1,41 @@
+一、关于对象
+    C++ Object 相比于 C，在布局和存取时间上的主要额外代价是由于virtual引起的。包括：
+        * virtual function, 也就是支持多态所需要的"运行期绑定"。
+        * virtual base class, 用以实现多重继承中的多次出现的base class被共享。
+    1.对象模型
+        C++的data member有两种：static和non-static
+        C++的func member有三种：static、non-static和virtual
+        1).简单对象模型
+            类中的每个member都会在object中有对应的指针所指向。
+            也就是members并没有直接放在object中，而是放的members的指针，并且三所有members的指针。
+            并没有实际使用该方案。
+        2).表格驱动对象模型
+            将data member和func member两部分抽取出来。
+            object中有一个指针指向了data members，另一个指针指向了func members。
+            并没有实际使用该方案，单身上virtual functions的一个方案。
+        3).c++对象模型
+            对于data members:
+                将所有的non-static member全部放在object中。
+                将所有的static member放在全局data segment中。
+            对于func members:
+                所有的func members均放在object外。
+                若存在virtual function，则会给object添加一个vptr指向vtbl，vtbl中有一堆virtual functions的指针。
+            对于继承：
+                单一继承，object中包含了父类中所有的non-static members。
+                virtual继承，object中为每一个有关联的virtual base class添加一个指针。
+            因此，object中一般只包含了non-static members，以及在需要的时候会添加vptr以及指向virtual base class的指针。
+    2.class和struct的差异
+    3.对象的差异
+        1).编程范式
+            * 程序模型
+            * 抽象数据类型模型，提供将数据进行封装，并且进行操作的接口，但是并不支持继承多台。
+            * 面向对象模型，将一些彼此相关的模型，通过抽象的base class进行封装起来，以提供不同的接口。
+        2).指针的类型
+            指针就是一个地址，从数据层面来说，任何类型的指针都是相同的。
+            指针类型主要为了指导编译器如何解释内存的内容。
+二、Data Member
+三、Function
+四、构造函数
+五、构造、析构、拷贝
+六、执行期
+七、对象模型的尖端
