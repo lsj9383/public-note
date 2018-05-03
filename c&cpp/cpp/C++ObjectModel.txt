@@ -21,7 +21,7 @@
                 所有的func members均放在object外。
                 若存在virtual function，则会给object添加一个vptr指向vtbl，vtbl中有一堆virtual functions的指针。
             对于继承：
-                单一继承，object中包含了父类中所有的non-static members。
+                单一继承，object中包含了父类中所有的non-static members。单一继承只会含一个vptr。
                 virtual继承，object中为每一个有关联的virtual base class添加一个指针。
             因此，object中一般只包含了non-static members，以及在需要的时候会添加vptr以及指向virtual base class的指针。
     2.class和struct的差异
@@ -34,6 +34,76 @@
             指针就是一个地址，从数据层面来说，任何类型的指针都是相同的。
             指针类型主要为了指导编译器如何解释内存的内容。
 二、Data Member
+    1.obj的空间问题
+        在C++中一个对象的空间大小主要受以下三方面影响：
+        1).语言本身的额外负担
+            在类或父类中存在virtual function时，会产生vptr，占用空间。
+            在virtual base class情况下，obj会产生一个指向virtual base class obj的指针 或 其offset，该指针将会占用空间。
+            在单一继承的情况下，obj中将会包含base class所有的nonstatic data member。
+        2).编译器的优化处理
+            主要是指virtual base class情况下，编译器会对empty virtual base class提供特殊的编译支持。
+        3).对齐的限制
+            通常要求obj是4字节的倍数，当obj大小不是4字节倍数时，将会进行填充。
+    2.data member布局
+        nonstatic data meber在【obj中的排列顺序】，和在class中的【声明顺序】是一致的。
+        access section(private、public、protected区域)不会对布局有影响和负担。
+    3.data member存取
+        对于Class中的静态成员x，如此使用：
+            Class1 obj;
+            Class2 *pt = &obj;
+            obj.x;
+            Class::x;
+            pt->x;
+            foo().x;
+        1).static data members
+            若x是static data member
+            static member存放在obj外部的data segment处，以上几种方式都是直接编译对某个地址的存取，因此存取效率都是相同的。
+            不同class的同名static data，在保存在data segment前，都会进行命名处理，避免命名冲突。
+        2).nonstatic data members
+            这类数据存放在obj中，通过.运算符对一个nonstatic data member进行存取操作的时候，将会编译为对应的地址：
+                obj.x  ====> &obj + (&Class1::x-1)
+            而对于指针计算
+                pt->x  ====> pt + (&Class2::x-1)
+            编译器将会优化，会直接编译出地址，以至于和obj.x没有区别。
+            并且需要注意的是pt->x是x所在pt类的偏移地址，而非x在obj类中的偏移地址，这对于父子类中存在同名data时尤为重要。
+            但其实若Class存在virtual base class，则会慢一些，这是因为编译期无法得知x的offset。
+            这是因为若virtual base class中有x，class中也有x，
+                VBase *bptr;
+                Class *ptr;
+                ptr->x;     将会转化为   ptr+(&Class::x-1)的存取操作。
+                bptr->x;    将会转换为   bptr->vbaseptr->x的存取。
+    4.继承
+        1).单一继承
+            * 没有多态：
+                obj中有base class的所有数据，包括填充部分。
+            * 存在多态:
+                每一个class都会编译出一个virtual table。
+                在obj中添加一个vptr，并加强constructor，设定vptr的指向virtual table
+                加强destructor，销毁vptr。
+                vptr通常放在obj的前端或者是后端。
+        2).多重继承 
+        3).虚继承
+            Class若base class包含了virtual base class，则被分割为两个区域：不变区域和共享区域。
+            * 不变区域：
+                不管后继如何，总是拥有固定的offset。
+            * 共享区域：
+                就是virtual class obj的数据。共享方案：
+                a).组合
+                    在cfront编译器中，会在每个derived class obj中添加一个指针，该指针指向一个virtual base obj。
+                    也就是每个obj，组合了一个virtual class obj。
+                    在对virtual base class中的data进行存取的时候，将会编译为对virtual class obj的操作。
+                    缺点：
+                        # 虚拟继承层数增加时，将会增加负担。
+                            obj中直接引入所有virtual base obj，这样牺牲空间减少时间负担。
+                        # 多重继承来自更多virtual base class时，将会增加virtual base obj的操作。
+                            obj中可以引入virtual base class table，类似与virtual table，并用一个指针指向该table。
+                b).offset
+                    将virtual base obj放在obj的最后，并通过offset指向该virtual base obj。
+        4).指向data members的指针
+            &Class::member, 是member在obj中的偏移地址+1。
+            之所以+1，是为了区分"没有指向任何data member的指针"和一个指向"第一个data member的指针"。
+            若不加1，&class:firstMember和NULL是等价的。
+
 三、Function
 四、构造函数
 五、构造、析构、拷贝
