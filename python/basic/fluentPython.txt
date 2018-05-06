@@ -115,5 +115,56 @@
         该装饰器用于装饰【生成器函数】，yield将函数分为上下两部分，将生成器的前半部分代码用作__enter__，后半部分代码用作__exit__(), yield的返回值就是__enter__的返回值。
         通过这个装饰器，可以快速的编写上下文管理器类。
 十五、协程
+    协程和生成器类似，包含了以下语法的函数就是协程工厂函数：
+        <receive> = yield <return>
+    当协程执行到yield，将会返回<return>给客户端代码。
+    当客户端代码调用<协程>.send(<val>)时，协程将通过<receive>进行接收，并开始运行，至到yield或者是协程返回。
+    1.协程的基本行为
+        如下定义的函数，就是协程工厂函数:
+            def coroutineFun():
+                ...
+                receive = yield returnval
+                ...
+            c = coroutineFun()      # 生成协程，但是协程还未启动.
+            r = next(c)             # 启动协程，在yield处停止或协程返回
+            r = c.send(val)         # 再次启动协程，传入数据val。
+        send()和next()都可以启动协程，next()本质上就是c.send(None)。
+    2.终止协程和异常处理
+        协程中未处理的异常会向上冒泡，传给next或send的调用方。
+        当协程抛出异常，协程就已经终止了，再次针对这个协程调用next或是send都会抛出StopIteration异常。
+    3协程返回值
+        协程返回时，抛出StopIteration异常，并将返回值交给异常e的value属性。
+            try:
+                c.send(None)
+            except StopIteration as e:
+                result = e.value
+        yiled from将会自动捕获这个异常，并取出返回值。
+    4.yield from
+        yiled from用于打开双向通道，把客户端代码的调用和最内层的子生成器链接起来。
+        1).角色
+            * 委派生成器/委派协程
+                包含yield from <gen-func/iterable>表达式的生成器函数
+            * 子生成器/子协程
+                由委派生成器的yield from所指明的<gen-func>返回的生成器
+            * 调用方
+                调用【委派生成器】的客户端代码。
+        2).语法近似
+            yield from其实也比较类似于语法糖：
+                def delegateGenFunc():  # 委派生成器
+                    ... 
+                    result = yield from <gen-func/iterable>
+                    ...
+            等价于
+                def delegateGenFunc():  # 委派生成器
+                    ... 
+                    gen = yield from <gen-func/iterable>
+                    r = next(gen)               # yield from将会自动激活协程
+                    while True:
+                        try:
+                            s = yield r         # 将来自子协程的数据返回给客户端
+                            r = gen.send(s)     # 将从客户端接收到的数据直接传给子协程
+                        except StopIteration as e:
+                            result = e.value        # yield from将会自动消化掉StopIteration异常，并拿到协程返回值
+                    ...
 十六、future处理并发
 十七、asyncio处理并发
