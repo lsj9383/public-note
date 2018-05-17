@@ -166,5 +166,10 @@
                         except StopIteration as e:
                             result = e.value        # yield from将会自动消化掉StopIteration异常，并拿到协程返回值
                     ...
+        3).本质
+            yield from虽然看似很复杂，但是本质和目的非常的清晰。
+            主要就是为了在协程中调用另外一个协程进行处理。
+            一个协程其实就是一个函数的定义，这个函数A中可以调用其他函数B，当A希望进行yiled的部分在别的函数B中时，就需要使用yiled from funB()。
+            若不通过yield from funB()，而是通过funB()进行调用，很明显，这个返回的是生成器，不会将运行代码的运行职责交给funB()。
 十六、future处理并发
 十七、asyncio处理并发
