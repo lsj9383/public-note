@@ -1,0 +1,36 @@
+一、安装
+	本文只是记录了在centos服务器上如何快速进行mysql的安装和配置。
+	1).获取mysql的安装包
+		wget -i -c http://dev.mysql.com/get/mysql57-community-release-el7-10.noarch.rpm;
+	2).将安装包添加到yum管理
+		yum -y install mysql57-community-release-el7-10.noarch.rpm;
+	3).通过yum进行下载和安装
+		yum -y install mysql-community-server;
+	4).启动mysql服务
+		service mysql start
+	5).获得密码(由mysql生成随机密码)
+		grep "password" /var/log/mysqld.log;
+	6).修改密码
+		set global validate_password_policy=0;
+		set global validate_password_length=1;
+		ALTER USER 'root'@'localhost' IDENTIFIED BY '你想设置的密码';
+		
+二、字符集配置
+	为了避免中文乱码等问题，通常统一采用utf-8进行字符编码。
+	1.查看字符集
+		SHOW VARIABLES LIKE 'character%';
+	2.修改字符集
+		1).vim /etc/my.cnf
+		2).在[mysqld]下添加 character_set_server = utf8
+		3).在[mysql] 下添加 default-character-set = utf8
+		4).重启服务 service mysqld restart
+		
+三、host访问权限配置
+	通常情况下，root只允许localhost进行mysql的访问，若需要远程的计算机通过root访问mysql，需要给root设置访问权限。
+	获悉用户可以通过哪些host进行访问
+		use mysql;
+		select user,Host from user;
+	修改为任意主机进行访问(直接改表)
+		update user set host = '%' where user = 'root';
+	重启服务
+		service mysql restart
