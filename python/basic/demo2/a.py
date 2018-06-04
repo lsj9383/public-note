@@ -1,2 +1,0 @@
-print("moduleA")
-o = object();

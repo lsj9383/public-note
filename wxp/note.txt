@@ -242,7 +242,51 @@
 				statusCode开发者服务器返回的 HTTP 状态码
 				header开发者服务器返回的 HTTP Response Header
 	3.微信登录
+		微信用户有唯一id，但是小程序若从微信服务器获取到自己的id后，和第三方服务器的通信完全基于微信id，那么很容易被其他人通过自造id来伪装并和第三方服务器通信。
+		因此，小程序和第三方服务器之间应该以code和SessionId为基础进行通信。第三方服务器通过code来获取微信用户的唯一id。
 		1).获取微信登录凭证code
+			code是一个临时凭证，由小程序访问微信服务器生成。
+				wx.login({
+					success: function(res){
+						var code = res.code			// 小程序获取临时凭证code
+					}
+				})
+		2).发送code到服务器
+			code的有效时间是5分钟，因此第三方服务器要及时获取code并向微信服务器请求用户id。
+				wx.login({
+					success:function(res){
+						if(res.code){
+							wx.request({
+								success:function(){
+									url : 'https://....',
+									data : {
+										code : res.code
+									},
+									success : function(res){}	// 将code交给第三方服务器成功
+								}
+							})
+						}else{
+							console.log("获取code错误")
+						}
+					}	
+				})
+		3).服务器通过code获取微信id
+			从第三方服务器的角度来看，小程序客户端发送来了一个临时凭证，第三方服务器需要通过该临时凭证到微信服务器获取用户的id。
+			code本质上就代表了用户赋予了第三方服务器临时到微信服务器上查询自己数据的权利。
+			第三方服务器通过发送如下get请求来获取数据：
+				https://api.weixin.qq.com/sns/jscode2session?appid=<AppId>&secret=<AppSecret>&js_code=<code>&grant_type=authorization_code
+			其中，js_code是小程序传送过来的临时code，appid和secert是在微信小程序管理平台上配置的，appid是公开信息，secert是私有信息不能贡献。
+			微信服务器只有在appid和secert均注册以后，才认为该第三方服务器有权利获取微信id。
+			该请求将会返回3个字段：
+				* openid
+					微信id，用该id区别不同的用户。第三方服务器应该建立数据库，库中的业务数据会和该id进行绑定。
+				* session_key
+					会话密钥，第三方服务器可以用该session_key请求微信服务器返回更具体的信息。
+				* unionid
+					用户在微信开放平台的唯一标识，满足一定条件时才会返回。
+		4).生成sessionId并发送给客户端
+			session_key是第三方服务器和微信服务器之间的会话密钥，第三方服务器和小程序之间应该也有会话，以sessionId的形式存在。
+			当一个未登陆过的微信用户，首次登陆以后，服务器可以生成一个sessionId，微信用户后面的请求应该传送sessionId过去，以确保会话数据，以及表示该会话属于和哪个微信用户的，并且避免重复登陆。
 	4.本地数据缓存
 		小程序可以将数据保存在设备的硬盘上。
 		1).读写本地数据缓存
@@ -270,6 +314,18 @@
 			同一个设备，同一个小程序，不同的用户之间的缓存是隔离的。
 			同一个设备，同一个用户，不同的小程序之间的缓存是隔离的。
 			每个用户的每个小程序的本地缓存空间上限为10MB。若当前缓存达到10MB，写缓存将会失败。
-		3).利用本地缓存提前渲染界面
-		4).缓存用户登录态SessionId
 	5.设备能力
+		1).微信扫码
+			二维码其实就是一串字符串，通过扫描二维码可以从中提取出字符串。
+				wx.scanCode({
+					success : function(res){
+						var result = res.result				// 获取到二维码对应的字符串
+					}
+				})
+		2).设备能力
+			微信小程序可以获知当前设备和网络的连接类型，包括wifi、2g、3g、4g等。
+				wx.getNetworkType({
+					success : function(res){
+						var networkType = res.networkType
+					}
+				})

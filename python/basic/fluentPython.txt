@@ -1,0 +1,175 @@
+一、Python数据模型
+二、数组
+三、字典和集合
+四、文本与字节序列
+    1.字符
+        字符串的含义是"字符的序列"。在Python3中，字符代表的是unicode字符，str就是一系列unciode字符组成的序列。unicode就是utf-16。
+        Unicode可以包揽所有的人类字符，而每个字符在Unicode中都有唯一的标识，该标识被称为【码位】，范围是0-1114111的数字。Python中的字符全是Unicode字符。
+        json.dumps()对于非ascii的字符，将会转换为Unicode码位，并以\u开头，也以此表示后续的十六进制数是Unicode编码所得到的结果。
+        * 编码， 将【码位】转换为【字节序列】。可以理解为将Unicode编码转换为指定的其他编码。
+        * 解码，将【字节序列】转换位【码位】。可以理解为指定的编码转换位Unicode编码。
+    2.字节
+        bytes是不可变字节序列，bytearray是可变字节序列。
+        只有通过bytearray(<byte>)，才能得到bytearray序列。
+        除了格式化方法(format和format_map)，以及处理Unicode数据的方法，其他的字符串方法都支持bytes和bytearray。
+    3.编码问题
+        UnicodeEncodeError
+            把Unicode字符串转化位二进制序列的时候出错，通常是因为指定的编码方式无法将编码字符串中的某个字符，比如ascii不能编码中文。
+        UnicodeDecodeError
+            把二进制序列转化为Unicode字符串的时候出错，通常是因为字节无法转换为码位。
+        SyntaxError
+            在加载Python模块时可能抛出的问题。
+            Python3认为所有的模块都是用的UTF-8编码，因此会以此解码位Unicode，但是有的Windows编辑器中默认采用的是cp1252编码的py模块，因此在在导入此类模块的时候会出现SyntaxError。
+            在文件头引入：
+            # coding:<encode-type>
+            来指明该文件所采用的编码方案，方便在Python加载该模块文件的时候，知道是将<encode-type>转换为Unicode
+    4.BOM
+        UTF-16字符有2-3个字节，字节的顺序会的不同会产生不同的UTF-16编码方式
+        因此，UTF-16有两个变种：
+            UTF-16LE，即通过小字节序列进行编码，即低有效字节在前。(\u0045 --二进制--> 0x45 0x00)
+            UTF-16BE，即通过大字节序列进行编码，即高有效字节在前。(\u0045 --二进制--> 0x00 0x45)
+        字节序标记(Byte Order Mark, BOM)，指明编码时采用小字节序列，通过在文本前面加上不可见字符\ufeff，来进行指定。
+            s.encode('utf-16LE')    无BOM
+            s.encode('utf-16BE')    无BOM
+            s.encode('utf-16')      含BOM
+        如果是bom，utf-16会将前导字符去掉，但其他编码方案看到了前导字符，并不懂这个标识，常常造成解码问题。尤其是在Notpad++中经常出现这样的问题，它有时会添加\ufeff来进行前导。
+    5.处理文本文件
+        对于字符串形式打开的文件，在IO操作的时候将会做必要的编码和解码操作。
+        需要注意的是，open函数是可以指定IO操作的编解码方案，若忽略该参数将会使用系统默认编码：
+            * windows，IO默认编解码为cp1252
+            * linux/unix，IO默认编解码为utf-8
+        因此，windows中，采用默认编码写入的文本，都是cp1252编码的，读出的文本也是采用cp1252进行解码的。
+        可以通过open(<path>, encoding='<encode-type>')，来指定编解码方案，并且建议【一定】要写，不应该相信默认编码方案。
+        可以通过偏函数的方案来设定encoding的参数:
+            open = functools.partial(open, encoding='utf-8')
+五、函数
+六、函数设计模式
+七、函数装饰器和闭包
+八、对象引用
+九、Python对象
+十、接口
+十一继承
+十二、重载运算符
+十三、迭代器
+    1.迭代器
+        1).可迭代对象
+            * 简易可迭代对象
+                实现了__getitem__(self, idx)的是一个简易可迭代对象。
+                对于有这样方法的obj, iter(obj)将会返回一个简易迭代器，该迭代器的迭代就是调__getitem__(idx)。
+                class Iterable:
+                    __init__(self):
+                        pass
+                    __getitem__(self, idx):
+                        return items[idx]
+            * 标准可迭代对象
+                实现了类__iter__方法的，就是一个标准可迭代对象。
+                iter()是Python的内置函数，用于从可迭代对象中返回迭代器，它会调用__iter__方法。
+                迭代器在没有元素的时候，应该跑出StopIteration异常: raise StopIteration()。
+                可迭代对象本质上来说，是一个【集合】。range()，返回的就是可迭代对象。
+                class Iterable:
+                    __init__(self):
+                        pass
+                    __iter__(self):
+                        return Iterator(self)   # 可迭代对象把自己传给迭代器构造函数，用于构造迭代器。
+            * for语法糖
+                for-in循环结构大大简化了迭代的复杂性。
+                    for item in obj:
+                        <expression>
+                -->
+                    it = iter(obj)
+                    while True:
+                        try:
+                            item = next(it)
+                        except StopIteration as e:
+                            del it
+                            break
+                        <expression>
+        2).迭代器
+            实现了__next__和__iter__方法的类的实例就是迭代器。
+            __next__方法用于每次返回下一个值，__iter__用于返回迭代器自身，便于迭代器直接套用for语法糖。
+            当迭代器中无法迭代出元素时，__next__将会跑出StopIteration异常。
+    2.生成器
+        生成器的接口和迭代器完全一致，因此生成器从接口上来说，和迭代器是等价的。但是迭代器可以凭空生成元素，以满足【惰性】，迭代器是遍历集合中的所有元素。
+        并且iter(生成器)和iter(迭代器)都会返回自身，因此for的语法糖也可以直接用于生成器和迭代器。
+        1).生产器函数
+            定义中有yield的函数，就是生成器函数。对生成器函数的调用并不会运行函数，而是返回一个生成器。因此，生成器函数本质就是生成器工厂。
+        2).生成器
+            next(生成器)，将会运行函数，并在yield处暂停，并返回一个数据。
+            再次调用next(生成器)，函数将会恢复运行，在下一处yield暂停，并返回数据。
+            当生成器return或是运行结束，生成器对象将会抛出【StopIteration异常】。
+十四、上下文管理器
+    1.with语句块
+        with语句块将会创建临时上下文。
+        一个上下文对象，需要实现两个方法：
+            __enter__(self)，用于初始化上下文环境。
+            __exit__(self, exc_type, exc_value, traceback)，用于恢复环境。
+        with语句块，本身也就是一个语法糖：
+            with <contextObject> with <obj>:
+                <statement>
+        等价与:
+            <obj> = <contextObject>.__enter__()     # 初始化上下文
+            <statement>
+            <contextObject>.__exit__(...)           # 恢复上下文
+    2.contextlib
+        这是一个用于创建用户自定义上下文管理器类的模块。较为常用的是其中的【@contextmanager装饰器】。
+        该装饰器用于装饰【生成器函数】，yield将函数分为上下两部分，将生成器的前半部分代码用作__enter__，后半部分代码用作__exit__(), yield的返回值就是__enter__的返回值。
+        通过这个装饰器，可以快速的编写上下文管理器类。
+十五、协程
+    协程和生成器类似，包含了以下语法的函数就是协程工厂函数：
+        <receive> = yield <return>
+    当协程执行到yield，将会返回<return>给客户端代码。
+    当客户端代码调用<协程>.send(<val>)时，协程将通过<receive>进行接收，并开始运行，至到yield或者是协程返回。
+    1.协程的基本行为
+        如下定义的函数，就是协程工厂函数:
+            def coroutineFun():
+                ...
+                receive = yield returnval
+                ...
+            c = coroutineFun()      # 生成协程，但是协程还未启动.
+            r = next(c)             # 启动协程，在yield处停止或协程返回
+            r = c.send(val)         # 再次启动协程，传入数据val。
+        send()和next()都可以启动协程，next()本质上就是c.send(None)。
+    2.终止协程和异常处理
+        协程中未处理的异常会向上冒泡，传给next或send的调用方。
+        当协程抛出异常，协程就已经终止了，再次针对这个协程调用next或是send都会抛出StopIteration异常。
+    3协程返回值
+        协程返回时，抛出StopIteration异常，并将返回值交给异常e的value属性。
+            try:
+                c.send(None)
+            except StopIteration as e:
+                result = e.value
+        yiled from将会自动捕获这个异常，并取出返回值。
+    4.yield from
+        yiled from用于打开双向通道，把客户端代码的调用和最内层的子生成器链接起来。
+        1).角色
+            * 委派生成器/委派协程
+                包含yield from <gen-func/iterable>表达式的生成器函数
+            * 子生成器/子协程
+                由委派生成器的yield from所指明的<gen-func>返回的生成器
+            * 调用方
+                调用【委派生成器】的客户端代码。
+        2).语法近似
+            yield from其实也比较类似于语法糖：
+                def delegateGenFunc():  # 委派生成器
+                    ... 
+                    result = yield from <gen-func/iterable>
+                    ...
+            等价于
+                def delegateGenFunc():  # 委派生成器
+                    ... 
+                    gen = yield from <gen-func/iterable>
+                    r = next(gen)               # yield from将会自动激活协程
+                    while True:
+                        try:
+                            s = yield r         # 将来自子协程的数据返回给客户端
+                            r = gen.send(s)     # 将从客户端接收到的数据直接传给子协程
+                        except StopIteration as e:
+                            result = e.value        # yield from将会自动消化掉StopIteration异常，并拿到协程返回值
+                    ...
+        3).本质
+            yield from虽然看似很复杂，但是本质和目的非常的清晰。
+            主要就是为了在协程中调用另外一个协程进行处理。
+            一个协程其实就是一个函数的定义，这个函数A中可以调用其他函数B，当A希望进行yiled的部分在别的函数B中时，就需要使用yiled from funB()。
+            若不通过yield from funB()，而是通过funB()进行调用，很明显，这个返回的是生成器，不会将运行代码的运行职责交给funB()。
+十六、future处理并发
+十七、asyncio处理并发
