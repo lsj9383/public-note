@@ -1,0 +1,316 @@
+一、函数参数
+	1.位置参数
+		在调用函数传参时，要求传参顺序严格按照函数定义时的顺序。
+			def proc(a, b, c) : pass
+			proc(1, 2, 3)
+	2.默认参数
+		在位置参数的【末尾】可以使用默认参数，以简化调用，当没有传递该参数时，使用默认值。
+			def proc(a, b, c=3) : pass
+			proc(1, 2)
+		需要注意，如果默认参数初始化为一个可变对象时，每次调用该函数，都使用的是同一个对象，并不会新生成一个可变对象。
+			def proc(o = []): o.append('END')
+		反复调用proc(), 并不会每次都让o指向新生成的[]， 而是使用的最初初始化的那个。
+		因此从本质上讲，默认参数为对象时，只会生成一次，并且缓存，当调用的时候将会直接使用该对象作为默认参数。
+	3.可变参数
+		可变参数是传入参数个数可变。
+			def proc(*numbers):pass		# numbers是传入的所有参数的【元组】
+			proc(1, 2, 3, 4, 5)
+	4.关键词参数
+		传入含关键词的参数时，会自动进行参数匹配，若多余的含关键词的参数，将会自动生成dict。
+			def proc(a, b, **kw):pass
+			proc(1, b='2', c='3')
+		需要注意的是，在【调用】时，关键字参数应放在最后。不能有proc(a='1', '2')这样的形式。
+		并且，如果没有**kw，那么是不能传入无法匹配的关键字参数的。
+			def proc(a, b, *, c, d)
+		上述proc强制性要求的c和d只能通过关键字参数来调用
+			1).不能传入任意key的原因：没有**kw这样的dict可以用来保存。
+			2).c和d无法位置调用的原因：c和d前面有可变参数，因此多余的内容不会是c和d
+	5.参数组合
+		参数定义的顺序必须是：位置参数、默认参数、可变参数、关键字参数。
+		调用的时候同样需要如此。
+二、高级特性
+	1.切片
+		用于取list与tuple的部分元素。
+			collection[<startIdx>:<endIdx>]
+				将会取出collection[<startIdx>],...,LIST[<endIdx>-1]中的数据，并构成list/tuple(看collection是list还是tuple)
+			collection[<startIdx>:]
+				当<startIdx> > 0
+					将会取出collection[<startIdx>],...,最后一个元素的数据，并构成list/tuple(看collection是list还是tuple)
+				当<startIdx> < 0
+					将会取出collection[<startIdx>],...,collection[0]的数据，并构成list/tuple(看collection是list还是tuple)
+			collection[<startIdx>:<endIdx>:<step>]
+	2.列表生成式
+		一维列表生成式
+			L = [<exp> for <var> in <iterable>]
+		等价于
+			L = []
+			for <var> in <iterable>:
+				L.append(<exp>)
+		二维列表生成式
+			L = [<exp> for <var1> in <iterable1> for <var2> in <iterable2>]
+		等价于
+			for <var1> in <iterable1>:
+				for <var2> in <iterable2>:
+					L.append(<exp>)
+	3.生成器
+		生成器包括生成式和生成器函数
+		* 生成式
+			和列表生成式一样，但是用()代替[]
+		* 生成器函数
+			在函数中用yield，那么就是生成器函数，调用该函数得到的是生成器。
+				def generatorFunc():
+					...
+					yield <var>
+					...
+			g = generatorFunc()		# 得到生成器
+			next(g)					# 运行到yield，并返回对应的<var>
+			next(g)					# 从上次yield的地方继续运行，运行到下一个yield或者return
+			有时候数据量很大，而生成器可以在需要的时候才计算出下一个数据。
+			生成器是基于协程实现的。其实本身比较类似于SICP中提到的"流"。
+	4.迭代器
+		实现Iterable接口的都是迭代器。
+三、函数式编程
+	1.高阶函数
+		变量可以指向函数，函数的参数能接收变量，因此函数的参数可以接收另一个函数作为参数，这种函数被称为高阶函数。
+	2.返回函数
+		函数的返回值也可以是函数，并且这个被返回的函数中可以使用外层函数的变量，换句话说，被返回的函数中引用了外层函数的变量。这种就是闭包。
+	3.匿名函数
+	4.装饰器
+		1).无参数装饰器
+				@deractor
+				def fun():
+					pass
+			等价于
+				fun = deractor(fun)
+			也就是说deractor是一个高阶函数，传入fun，并且也会返回一个函数，并把这个新返回的函数用fun变量去引用。
+			deractor通常会在内部定义一个函数，这个函数中将会有对fun如何进行调用的描述：
+				def deractor(func):
+					def inner(*args, **kw):
+						...
+						res = func(args, kw)		# 调用被装饰的函数
+						...
+						return res
+					return inner
+		2).含参数装饰器
+				@deractor(param)
+				def fun():
+					pass
+			等价于
+				fun = deractor(param)(fun)
+			也就是说deractor是一个返回【无参数装饰器的函数】，然后再用无参数装饰器对fun进行装饰。参数在最外层的deractor处进行传递。
+				def deractor(param):
+					def nonParamDeractor(func):
+						def inner(*args, **kw):
+							...
+							res = func(args, kw)
+							...
+							return res
+						return inner
+					return nonParamDeractor
+		需要注意的是通过上述方式进行装饰，会导致一些反射特性的变化。例如:
+			def hello():pass
+			hello.__name__   ---> 'hello'
+			hello = deractor(hello)			# 或者@deractor来代替
+			hello.__name__   ---> 'inner'
+		因此，为了避免反射特性的改变，需要借助functools.wraps。对于任何inner函数都应该如下定义：
+			@functools.wraps(func)
+			def wrapper(*args, **kw):
+				...
+				res = func(*args, **kw)
+				...
+				return res
+	5.偏函数
+		偏函数本质上就是固定函数的一些参数，并生成一个新的函数。有点类似于动态生成具有默认参数的函数。
+		functools.partial可以实现这样的功能。
+四、OOP
+	1.类和实例
+	2.访问限制
+	3.继承和多态
+	4.反射
+	5.实例属性和类属性
+	6.__slots__
+	7.@property
+		该装饰器主要是将方法调用转换为属性操作。
+			class <class-name>():
+				@property
+				def <property-name>(self):
+					return self._score
+				@<property-name>.setter(self, val):
+					self._score = val
+			s = <class-name>()
+			s.<property-name> = 1	# 调用setter方法
+			s.<property-name>		# 调用getter方法
+		@property对方法进行装饰，将会生成以"方法名 .setter"命名的新装饰器。
+		若没有给setter方法配置该装饰器，则该以"方法名"命名的属性是只读属性的。
+	8.Python魔术方法
+	9.枚举类
+	10.元类
+五、进程线程
+	线程是最小的执行单元，进程至少有一个线程，如何调度线程和进程完全由操作系统控制。
+	1.多进程
+		1).fork
+			由Unix/Linux提供的，在Windows下无法使用。
+			fork()调用一次，操作系统把当前进程复制了一份，并在两个进程中分别返回。
+			子进程返回0，父进程返回子进程的ID。子进程可以通过getppid()获得父进程的进程id。
+				pid = os.fork()
+		2).multiprocessing
+			这是一个模块，提供Process来代表进程对象。
+				from multiprocessing import Process
+				def run_proc(): pass
+				p = Process(target=run_proc)
+				p.start()
+				p.join()
+			Process类将会传入Python函数以及对应的参数，并打开一个进程执行该函数，函数执行完该进程结束。
+			需要注意的是，在执行这个进程函数时，也同样会复制父进程的数据，比如全局数据等。
+			p.join()是一种进程同步手段，用于等待子进程结束。
+		3).Pool
+			用于启动大量的子进程。这其实比较类似于线程池。
+				p = Pool(<pool-size>)
+				p.apply_async(<fun-name>, args=(...))
+				...
+				p.close()
+				p.join()
+			在调用p.join()之前必须先close，close可以禁止再向池中添加进程。
+			<pool-size>的默认大小是CPU核数，当已经由这么多进程在运行时，新添加的进程则会等待。
+		4).进程间通信
+			multiprocessing可以执行多个进程，进程间也是需要进行通信的。可以使用Queue和Pipes进行进程间通信。
+			* Queue
+				Queue是一个FIFO队列，是一种生产者消费者模式的管理方式。
+					q = Queue()
+					p1 = Process(target=run_proc1, args=(q,))
+					p2 = Process(target=run_proc2, args=(q,))
+				p1和p2之间可以通过q来进行读写数据。
+					val = q.get(True)	读数据
+					q.put(val)			写数据
+			* Pipes
+				是管道模式
+					out_pipe, in_pipe = multiprocessing.Pipe()
+				将会返回管道两端，即入口和出口。
+				在有管道的时候进行子进程的创立，子进程中也有管道的两端，因此一个管道连接了两个进程，其中输入输出分布都存在于这两个进程中。
+				这时，只需要在一个进程中关闭输入，另一个进程中关闭输出，那么就形成单方面的连接。
+		5).subprocess
+			multiprocessing和Pool都用于以进程的形式执行Python内的函数。
+			subprocess提供以进程的形式执行可执行程序。
+				p = subprocess.Popen(<exe-path>, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			通过line = p.stdout.readline()，可以获得进程的输出。
+	2.多线程
+		1).threading
+			Python提供了_thread和threading两个模块以支持多线程工作，threading是高级模块，对_thread进行了封装。
+				t = threading.Thread(target=loop, name='LoopThread')
+				t.start()
+				t.join()
+			很明显，和multiprocessing的调用非常类似，但是其满足线程的功能，例如内存共享。
+				threading.current_thread()，返回当前线程实例。
+		2).Lock
+			为了避免线程中所存在的资源竞争问题，在线程使用资源时都应该获取锁，使用完资源后再释放锁。
+				lock = threading.Lock()
+				def threadFun():
+					lock.acquire()
+					try:
+						...
+					finally:
+						lock.release()
+		3).GIL
+			任何Python线程执行前，都应该获得GIL(Global Interpreter Lock)，每次执行100条字节码，解释器就释放GIL，并进行线程调度。
+			因此Python中无论使用了多少线程，实际上执行线程的都只会是一个核。
+			因此对于需要利用多核CPU的情况，Python中只能利用多进程。
+		4).ThreadLocal
+			在多线程中，使用全局变量，会导致线程中对于数据的竞争，而使用局部变量，会导致每次在使用该数据的函数中都需要传递该参数。
+			为了更方便的传递参数，使用了ThreadLocal对象。
+				threadLocal = threading.Local()
+				def threadFun():
+					threadLocal.key = val
+					print(threadLocal.key)
+			ThreadLocal中的变量，在不同线程之间是相互隔离的。
+六、virtualenv
+	python中，通过pip进行第三方包的安装，并且所有包都会安装到python下的site-packages目录下。
+	多个应用程序，可能对同一个包所依赖的版本不一样，为了隔离这些应用程序对包版本的共享，采用virtualenv来解决。
+	virtualenv是用来为一个应用创建一套隔离的Python运行环境。
+		pip3 install virtualenv
+	使用virtualenv，需要创建虚拟环境的文件夹，然后再创建独立的Python运行环境
+		virtualenv --no-site-packages venv
+	--no-site-packages代表已经安装在Python环境中的所有第三方包都不会复制过来，这是一个"完全干净"的环境。
+		venv\scripts\activate	打开Python虚拟环境。
+		deactivate				关闭Python虚拟环境。
+七、Web开发
+	1.WSIG
+		专门的服务器软件实现了对HTTP请求的相关处理，服务器软件接收到http请求后将会调用wsgi接口。
+		wsgi接口非常简单：
+			def application(environ, start_response):
+				start_response('200 OK', [('Content-Type', 'text/html')])
+				return [b'<h1>Hello World</h1>']
+		该接口接收两个参数：
+			environ，包含了http请求头的dict信息。
+			start_response，一个发送http响应的函数。
+		application由wsgi服务器进行调用，这个服务器用来提供http所需要的参数。python内置了wsgi服务器，这个模块叫wsgiref。
+			from wsgiref.simple_server import make_server
+			httpd = make_server('', 8000, application)	# 创建一个服务器，IP地址为空，端口是8000，处理函数是application:
+			httpd.serve_forever()						# 开始监听HTTP请求:
+	2.Web Framework
+		WSGI接口将会接收所有的http请求，Web框架可以将请求不同的url以及不同的method类型拆分出来，并调用相应的处理函数，也就是进行【路由】。
+		Web框架可以将URL&Method和Controller绑定在一起，以实现路由功能。
+		绑定方式是装饰器形式。
+八、异步IO
+	IO相比于CPU执行指令的速度慢很多，因此一旦遇到IO操作，线程将会被阻塞，影响程序的效率。
+	异步IO是指的代码执行耗时的IO操作时，只发出IO指令，并不等待IO结果，当IO操作完成再通知CPU进行处理。
+	异步IO模型需要一个消息循环，主线程不断的重复【读取消息-处理消息】这一个过程。异步IO操作的本质就是添加事件，当事件完成，可以从中读取消息。
+		loop = get_event_loop()
+		while True:
+			event = loop.get_event()
+			process_event(event)
+	1.协程
+		协程(Coroutine)，即微线程。
+		协程是一个线程执行，协程没有切换的开销。协程也不需要锁机制，共享资源不加锁，而是判断状态。
+		Python中，协程是基于generator(生成器)实现的。但yield可以用来接收调用协程者的参数。
+			def coroutine():
+				r = ''
+				while True:
+					n = yield r
+					if not n:
+						return
+					...
+			c = coroutine()
+			c.send(None)		启动生成器		
+			r = c.send(2)		切换到协程执行, 协程通过yield拿到参数，一直重新执行到yield把结果返回
+			...
+			c.close()
+	2.asyncio
+		这是一个消息循环模型。从asyncio直接拿到一个EventLoop的引用，然后把需要执行的协程扔到EventLoop中执行，就实现了异步IO。
+		@asyncio.coroutine把一个generator标记为coroutine类型，并通过yield from在协程中发起IO操作，此期间线程将会切换到其他线程执行任务。
+			@asyncio.coroutine
+			def coroutineProc():
+				...
+				r = yield from <IO-Operation>	# 发起IO操作，切换到其他协程。返回时拿到操作结果
+				...
+			loop = asyncio.get_event_loop()
+			tasks = [coroutineProc(), coroutineProc(), coroutineProc(), ...]	# 将会发起异步IO操作的任务。某个任务发起IO操作时，将会切换到其他任务执行。若所有任务都在等待IO操作，则线程将会等待。
+			loop.run_until_complete(asyncio.wait(tasks))
+			loop.close()
+	3.async/await
+		async其实就是为了简化将函数标记为协程的过程。
+		await其实就是简化yield from的语法。
+			@asyncio.coroutine
+			def coroutineProc():
+				...
+				r = yield from <IO-Operation>
+				...
+		等价于
+			async def coroutineProc():
+				...
+				r = await <IO-Operation>
+				...
+	4.aiohttp
+		asyncio实现了tcp udp等，aiohttp是基于asyncio实现的HTTP框架。
+			pip install aiohttp
+		aiohttp处理http请求。
+			async def init(loop):
+				app = web.Application(loop=loop)
+				app.router.add_route(<method>, <url>, <func>)
+				app.router.add_route(<method>, <url>, <func>)
+				srv = await loop.create_server(app.make_handler(), <IP>, <PORT>)		# 异步创建TCP服务器，app创建的处理器中包括的路由。
+				print('start...')
+				return srv
+			loop = asyncio.get_event_loop()
+			loop.run_until_complete(init(loop))
+			loop.run_forever()
+九、实战

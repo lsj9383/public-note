@@ -1,0 +1,12 @@
+一、应用
+    通过bottle.run()来将Web服务器拉起来。
+    bottle.run(host=)
+二、路由
+    路由需要用到bottle模块中的route装饰器，将URL和Handler进行绑定。
+        @route(<url>)
+        def handler():
+            pass
+    动态路由，也是
+        @route(<url>/<param>)
+        def handler(param):
+            pass                # 可以通过<url>/<param>来获取url中的参数
