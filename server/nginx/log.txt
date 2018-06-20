@@ -1,0 +1,19 @@
+nginx使用记录：
+
+一、上传图片过大问题
+发送post请求返回"request entity too large 413"的异常，这是由于post实体过大造成的，通常上传图片就会造成实体过大。
+nginx默认实体超过1M
+
+二、最简单的服务器部署
+tomcat，django，flask都可以实现了http协议，可以直接接收http请求，并交给视图函数处理。
+Python中很多web框架可以通过simple_server实现的WSGI接口，提供最简单的http处理的支持。
+在调试完成以后，往往需要用uWSGI这样的服务器来运行web框架。
+无论怎样，只要http服务器存在，并且可以接收请求，就可以通过nginx的转发服务获得来自nginx的支持，进而享受nginx的服务。
+在server对象下的location中可以配置转发的目标：
+location / {
+	root   html; #站点目录
+	index  index.html index.htm;
+	proxy_pass http://localhost:5000;		# 本地已经存在的http服务器，此时在外网可以通过http://localhost:5000来访问，也可以走nginx监听的接口来访问。
+}
+
+三、SSL部署

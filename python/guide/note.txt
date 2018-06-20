@@ -1,0 +1,77 @@
+Python最佳实践指南(http://pythonguidecn.readthedocs.io/zh/latest/)
+
+一、虚拟环境
+1.pipenv
+    为了将包按项目为单位进行管理，需要以项目文件夹为基础构建运行环境，pipenv就是这样的一个工具。
+    安装pipenv：
+        pip install pipenv
+    在项目中安装依赖包：
+        cd <项目文件夹根目录>
+        pipenv install <依赖包>
+    将会在项目文件夹中创建Pipfile文件，这个Pipfile文件用于跟踪项目中需要的依赖。安装的包是放在C盘下的，并且每个项目的依赖文件夹被分离。
+    运行项目:
+        pipenv run <入口py>
+    更新项目依赖可以重新下载Pipfile中记录的依赖包：
+        pipenv update
+    查看项目的依赖：
+        pipenv graph
+    当pipenv run时，会先检查Pipfile，并将所需要的依赖包进行安装。
+2.virtualenv
+    virtualenv和pipenv相同，也是一种进行依赖包隔离的工具，不过更为底层，没有pipenv方便快捷。
+    安装virtualenv:
+        pip install virtualenv
+    建立项目的虚拟环境：
+        cd <项目文件夹根目录>
+        virtualenv <env-dir>
+    将会在项目中创建虚拟环境文件夹<env-dir>，该文件夹中包括Python、pip等Python可执行文件的拷贝。
+    很明显，其实这个<env-dir>文件夹就是Python运行的虚拟环境。可以为这个虚拟环境选择Python解释器：
+        virtualenv -p <解释器目录> <env-dir>
+    需要使用虚拟环境，需要进行虚拟环境的激活：
+        <env-dir>/bin/activate          # unix/linux
+        <env-dir>\Scripts\activate      # windows
+    此后所有的Python相关命令，都是使用的<env-dir>中的程序，并且pip安装的依赖也是放在<env-dir>中的(<env-dir>/Lib/site-package/)。
+    在虚拟环境中运行Python程序，用的都是虚拟环境中pip安装的依赖包:
+        python <入口py>
+    这里不能直接运行<入口py>，因为直接<入口py>用的是系统全局Python解释器，而不是虚拟环境中的Python解释器。
+    退出虚拟环境：
+        deactivate
+    很明显，可以给一个项目配置多个<env-dir>，可以是测试版，开发版，正式版等等。
+
+二、结构化工程
+    结构化工程关注最好的满足项目的“对象性”，目的是创建简洁、高效的代码，最重要的是逻辑和依赖清晰。
+    1.工程文件结构
+        通常开发分两种：【库开发】和【应用开发】。
+        a).先来看库开发，主要是为了开发一种让大家使用的模块。
+            README.rst                  # 
+            LICENSE                     # 许可说明和授权
+            requirements.txt            # 使用package所需要依赖的包(可以通过 pip install -r requirements.txt 来安装所有依赖，也可以把依赖放到setup.py中，在setup时进行安装)
+            <package-name>              # 开发的package, 是核心代码。
+            setup.py                    # package的安装，应和模块在同级目录
+            docs/                       # package文档的文件夹
+            tests/                      # 测试代码的文件夹
+        b).如何测试
+            测试代码中需要引入正在开发包，为了方便引入包，可以通过构建一个tests/context.py文件:
+                import os
+                import sys
+                sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+                # 引入包
+                import <package-name>
+            在测试文件tests/test_basic.py中：
+                from .context import <package-name>     # 将context.py中的包引入
+                ...
+    2.模块和包
+        1).命名
+            包和模块都应该尽量短小和简单，不应该有其他字符，如下划线_。
+            如果非得进行分割，尽量采用子模块。
+        2).引入模块
+            import <module>
+            将会在工作目录中寻找<module.py>，如果没有找到，则到PYTHON进程的PATH环境变量中查找该文件。
+            如果都找不到则抛出ImportError异常。
+        3).引入包
+            文件夹中含__init__.py，则这个文件夹代表一个包。可以直接导入这个包
+                import <pakcage>
+            导入包，会将包的__init__.py中的引用导入到用户代码。通过<package>.<ref>来进行引用。
+            也可以指定确定的模块进行导入。
+                import <package>.<module>           # 通过<package>.<module>.<ref>来进行引用
+                from <package> import <module>      # 通过<module>.<ref>来进行引用
+            无论是上述何种引入方法，都会执行包的__init__.py。
