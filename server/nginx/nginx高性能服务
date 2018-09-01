@@ -1,0 +1,95 @@
+一、安装和部署
+    1.软件
+        Nginx是一款免费开源的服务器产品，http://nginx.org/en/download.html可以找到unix和windows两个系统的nginx版本。
+            Mainline version 是仍在开发不过已经可以使用的版本
+            Stable version 是稳定的版本，可以进行商业化
+            Legacy versions 是过去的版本
+        由于一般在linux下搭建服务器，因此windows-nginx不讨论。
+    2.安装和编译
+        linux下面有两种安装途径:
+            1).yum安装，这是最基本的安装，快速简单，提供基本的模块和功能，但是无法自由的扩展第三方模块
+            2).编译安装，需要自行安装的模块，也可以编译自己的模块，便于扩展。
+        安装依赖的第三方库:
+            yum -y install
+                gcc g++ automake        # 编译工具
+                pcre pcre-devel         # 用于支持正则表达式
+                zlib zlib-devel         # 用于支持gzip压缩
+                open openssl-devel      # 用于支持https
+            yum -y install gcc g++ automake pcre-devel pcre zlib-devel zlib openssl-devel open
+        1).configure脚本
+            这个脚本根据配置会生成一些C一些源码文件以及MakeFile文件。配置项包括对各类路径的指定，以及模块开关，在这个层面关掉的模块，是不会编译进入nginx。
+                * --prefix=<path> nginx软件的安装目录，默认路径是/usr/local/nginx/
+                * --sbin-path=<path> nginx可执行文件安装路径，默认路径是<prefix>/sbin/nginx/
+                * --conf-path=<path> nginx的默认配置文件路径，默认是<prefix>/conf/nginx.conf
+                * --pid-path=<path> nginx的pid文件路径，默认是<prefix>/logs/nginx.pid
+##              * --lock-path=<path> nginx的锁文件，默认是/var/lock/
+                * --error-log-path=<path> nginx的error.log路径，默认是<prefix>/logs/error.log
+                * --http-log-path=<path> nginx的access.log路径，默认是<prefix>/logs/access.log
+                ... 还有各类模块开关项
+        2).Nginx编译安装
+            ./configure <options>
+            make                    # 根据configure生成的makefile和源文件，编译成二进制文件
+            make install            # 将二进制文件部署到指定目录
+        3).Nginx目录结构
+            * conf      存放配置文件
+            * html      存放预定义的html文件，包括nginx欢迎页面，错误页面
+            * logs      日志文件
+            * sbin      nginx启动文件
+    3.nginx的控制
+        1).最简单控制
+            ./nginx             启动nginx
+            ./nginx -c <cfg>    以指定的cfg文件启动nginx
+            ./nginx -s stop     停止nginx,平衡停止Nginx服务
+            ./nginx -s reload   nginx重新加载配置文件
+        2).信号控制
+            在获得nginx-master的pid后，可以通过信号来控制ngix的行为。
+                * TERM/INT      快速停止Nginx服务
+                * QUIT          平滑停止Nginx服务
+                * HUP           使用新的配置文件启动nginx进程，再平缓停止原有nginx进程。即平滑重启, 等同于./nginx -s reload。
+                * SGIUSR1       重新打开日志文件。
+                * SIGUSR2       使用新的Nginx文件文件启动服务，原有Nginx进程不会停止，主要就是修改pid文件。
+                * WINCH         平滑停止master的worker，worker工作完毕，worker才关闭。
+        3).平滑升级
+            kill -SIGUSR2 <pid>     开启新进程，修改pid文件
+            kill -WINCH <pid>       将原worker的工作切换到新worker上，再平滑关掉指定master的worker。在发送这个信号前，可以随便关掉新开的进程。
+            kill -QUIT <pid>        平衡关掉指定master
+
+二、Nginx配置基础
+    include 可以引入某个文件到配置文件
+    1.nginx配置文件包含了多个文件块，常用的有：
+        1).全局块
+            也就是最外层的文件块，主要是Nginx整体运行情况。
+            * worker process <number>, worker进程数量
+            * pid <pid-file>, pid文件存放路径
+            * error_log_file <file> <level>, 设置错误日子的存放路径，以及错误输出级别，默认为error级别
+        2).events块
+            主要用作与Nginx服务器与用户的网络连接。
+            * accept_mutex on|off, 多个进程监听同一个socket是否上锁，如果不上锁，可能会带来惊群现象。默认打开
+            * user <method>, 事件驱动模型，默认为epoll
+            * worker_connections, 设置每个worker的最大连接数
+        3).http块
+            用于配置http功能相关的
+            * access_log <file> <format>, 也可以作用于server和location块。请求访问完成后将会记录访问日志。
+            * log_format <name> <string>
+            * sendfile on|off, 开启或者关闭sendfile()传输文件，默认为off。http+server+location
+            * sendfile_max_chunk <size>, sendfile()传输的文件不能超过<size>。设置为0，无限制。默认为0。http+server+location
+            * keepalive_timeout <timeout>[header-timeout], 服务器长连接超时时间，超时了服务器断开连接。会加一个在http的response-header中，用来指示服务器的长连接断开时间。http_server+location
+            * keepalive_request <number>, 单连接请求上限。某个长连接允许用户发送请求的最大次数。http+server+location
+        4).server块
+            server嵌套在http中 用于配置虚拟主机，虚拟主机是一个二元组(server-name, server-port)，通过请求的域名和端口，将请求路由到各自的server。
+            * listen <address>[<port>] [default_server], port默认为80，address是具体监听的ip地址(一个机器有多个网卡，就有多个ip)。
+                 default_server代表将address:port设置为虚拟主机。defautl_server对于同一个ip和port，只能有一个配置该选项。若都没有配置，则一第一个ip:port的server为default_server.
+            * server_name 虚拟主机域名，请求的域名和server_name匹配时将会路由到这个server块。若请求是直接用的ip地址，需要看是否有配置default_server。
+            * error_page code
+        5).location块
+            请求路由到server后，会将uri和location的进行匹配，将请求交给最合适的location块进行处理
+                location [ = | ~ | ~* | ^~] uri { ... }
+            uri是待匹配字符串，[*]中的东西是确定如何与uri进行匹配的。
+                =, 要请uri完全匹配，如果匹配成功，停止往下搜索。
+                ~, 表示uri中包含了正则表达式，区分大小写。
+                ~*, 表示uri中包含了正则表达式，不区分大小写。
+            * root, 用于静态服务器，当匹配uri后，将root作为前缀，和uri进行结合，定位到资源。
+            * alias, 用于静态服务器，当匹配uri后，将定位到alias所指向的资源。
+            * index, 没有在uri中写具体资源时，将会定位到index的资源。index资源的相对路径时root路径。
+            * allow <address> | all, 运行访问的ip, 默认时全部运行
+            * deny <address> | all, 拒绝访问的ip
