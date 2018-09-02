@@ -93,3 +93,38 @@
             * index, 没有在uri中写具体资源时，将会定位到index的资源。index资源的相对路径时root路径。
             * allow <address> | all, 运行访问的ip, 默认时全部运行
             * deny <address> | all, 拒绝访问的ip
+            * proxy_pass 反向代理。如果uri用了正则表达式，那么proxy_pass不能指定uri部分。
+
+三、Nginx的模块与架构
+    1.模块分类
+        ngx_modules.c是configure脚本运行的输出文件，其中包含了会编译的模块
+            * 核心模块
+                包括进程管理，错误日志，权限控制等必不可少的模块。
+            * 标准HTTP模块
+            * 可选HTTP模块
+            * 邮件服务模块
+            * 第三方模块
+        按前文所述的编译方式，会将核心模块和标准http模块编译到nginx中
+    2.请求处理机制
+
+四、性能优化
+    1.Linux内核参数(/etc/sysctl.conf)
+        * net.core.netdev_max_backlog
+        * net.ipv4.tcp_synbac_retries, 作为服务器，内核放弃连接之前，向客户端返回的syn+ack的数量
+        * net.ipv4.tcp_sync_retries, 作为客户端，内核放弃连接之前，向服务器发送的syn数量
+    2.CPU性能参数(nginx.conf)
+        * worker_process, worker进程数量，和cpu核数相同最佳。在最外层块配置。
+        * worker_cpu_affinity, 将核与worker绑定，避免不同的worker抢占同一个核。在最外层块配置。
+    3.网络连接配置(nginx.conf)
+        * keepalive_timeout <timeout> <header-timeout>, 长连接超时时间和希望客户端关闭长连接的超时时间。通常第一个值>第二个值(避免由于服务器先关闭，带来time_wait)。
+        * send_timeout, Nginx发送数据以后，若客户端超过该时间没有回复，服务器关闭连接。
+        * client_header_buffer_size, 允许的客户端header的大小，默认为1KB。(若超过，会弹400的错误)
+        * client_body_buffer_size, 允许的客户端body的大小。32位系统默认为8KB，64位系统默认为16KB。
+        * multi_accept, Nginx是否尽可能多的接收网络连接请求，默认为false。
+    4.events的配置
+        * use, 指定Nginx服务器使用的事件驱动模型，linux默认为epoll
+        * worker_connections, 每个worker允许的最大连接数
+            这个配置需要注意下，最大连接数不能大于每个进程运行打开的文件句柄数量。
+            每个进程的文件句柄数量，在/proc/sys/fs/file-max中配置, sysctl -p使能配置
+#        * worker_rlimit_sigpending，事件信号队列长度。事件信号队列用来缓存客户端请求发生信号。若超过上限，转换成poll处理客户端请求。
+        * epoll_events, 表示epoll模式下，内核与nginx服务器之间可以传递信号的数量。
