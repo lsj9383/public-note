@@ -128,3 +128,24 @@
             每个进程的文件句柄数量，在/proc/sys/fs/file-max中配置, sysctl -p使能配置
 #        * worker_rlimit_sigpending，事件信号队列长度。事件信号队列用来缓存客户端请求发生信号。若超过上限，转换成poll处理客户端请求。
         * epoll_events, 表示epoll模式下，内核与nginx服务器之间可以传递信号的数量。
+
+五、Gzip压缩
+    gzip用于对响应进行压缩，相关的指令可以在http,server,location块中进行配置。Nginx通过ngx_http_gzip_module、ngx_http_gzip_static和ngx_http_gunzip_module进行配置。
+    1.ngx_http_gzip_module
+        * gzip on/off, 用于关闭或者开启gzip模块功能，默认为off关闭的
+        * gzip_buffers number size, 用于设定gzip压缩时向系统申请number * size大小的空间进行存储压缩数据
+        * gzip_comp_level level, gzip压缩程度级别，级别越高越耗时，压缩的越小
+        * gzip_min_length length, 当响应内容的长度超过该值了才进行压缩。响应内容通过Content-Length获取，若采用的chunk，则该指令不起作用
+        * gzip_disable regex ..., 针对不同类型客户端请求，可以选择性的开启和关闭gzip功能
+        * gzip_proxied <value>, 设置是否对后端返回的响应进行gzip
+            * off, 关闭对后端服务器返回的结果进行gzip，默认设置。
+            * expired, ...
+            * any， 无条件对响应数据进行gzip
+        * gzip_types <mime-type>, gzip针对指出的响应类型进行，默认是text/html, 可以通过gzip_types *来支持所有类型。
+#        * gzip_vary on/off, 在响应头中添加信息，用于告诉接收方数据经过了压缩处理。默认设置为off。
+
+    2.ngx_http_static_module, 用于静态压缩
+        * gzip_static on/off, 用于开启或关闭该模块功能, 默认为关闭
+        * 其他指令与ngx_http_gzip_module的相同
+        * gzip_proxied
+    3.ngx_http_gunzip_module
