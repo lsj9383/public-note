@@ -85,6 +85,7 @@
             请求路由到server后，会将uri和location的进行匹配，将请求交给最合适的location块进行处理
                 location [ = | ~ | ~* | ^~] uri { ... }
             uri是待匹配字符串，[*]中的东西是确定如何与uri进行匹配的。
+                无, 表示先从标准url中找到匹配对最高的，然后用正则url找第一个匹配的，匹配完成退出。没有在正则url中找到，则用标准url中匹配度最高的。
                 =, 要请uri完全匹配，如果匹配成功，停止往下搜索。
                 ~, 表示uri中包含了正则表达式，区分大小写。
                 ~*, 表示uri中包含了正则表达式，不区分大小写。
@@ -149,3 +150,40 @@
         * 其他指令与ngx_http_gzip_module的相同
         * gzip_proxied
     3.ngx_http_gunzip_module
+
+五、Rewrite
+    1.服务器组配置
+        * upstream <name> {}, 后端服务器集群列表指令， 在http块中。
+        * server <address> <parameter>, 集群内的机器配置,<address>包括ip和端口.<paramter>：
+            * weight=number, 负载均衡RR权重，默认为1
+            * fail_timout=time, 当在该时间内，nginx连接服务器错误了一定次数(max_fails)，则任务机器无效，并在这段时间内不再检查机器状态。默认为10s
+            * max_fails=number, 一定时间范围内(fail_timout)，若请求失败次数达到该值，则认为服务器无效，默认为1
+            * backup, 设置服务器作为备份用。只有在所有非backup计算机处于无效和繁忙状态时，才能用来处理客户端请求
+            * down, 将服务器标记为下线
+        * ip hash， 在upstream块中，标识通过nginx进行负载均衡
+    2.辅助配置
+        rewrite支持正则表达式，需要有pcre库的支持。
+        * if (<condition>) { ... }, 条件为真时采用该配置。位于server或者location块中。
+        * break, 中断当前配置块的后面的配置项
+        * return, 完成对请求的处理，直接返回客户端响应, 有三种形式:
+            * return <status-code>
+            * return <status-code> <url>   ,返回状态码，并进行重定向(客户端会感觉状态码才决定石否进行重定向的)
+            * return <url>, 进行重定向
+        * set <var> <val>, 设置新变量
+        * uninitialized_variable_warn on | off, 使用未初始化变量时，是否记录警告日志，默认为开启(on)的
+        * rewrite_log on | off, 是否开启URL重写日志功能
+    3.rewrite
+        rewrite <regex> <replacement> [flag];
+            * regex, 用于匹配uri的正则表达式，这个正则表达式不包含请求的host和请求的get参数。
+            * replacement, 匹配成功后，用于替换uri中被截取的字符串
+            * flag是对uri更新后的行为选择
+                * last, 停止在当前location中处理接收到的uri，将新的uri重新寻找location
+                * break, uri仍在当前location中进行处理
+                * redirect, 将重写后的uri返回给客户端进行302重定向
+                * permanent, 将重写后的uri返回给客户端进行301重定向
+六、反向代理配置
+
+
+# nginx常用内置变量
+* $remote_addr 客户端ip地址
+* $remote_port 客户端端口
