@@ -182,8 +182,94 @@
                 * redirect, 将重写后的uri返回给客户端进行302重定向
                 * permanent, 将重写后的uri返回给客户端进行301重定向
 六、反向代理配置
+    服务器提供Internet上的资源，则服务器是正向代理。
+    服务器提供局域网上的资源，则服务器是反向代理。
+    1.正向代理相关配置
+        * resolver <address>, 指定DNS服务器IP地址
+        * resolver_timeout <time>, 指定DNS服务器域名解析超时时间
+        * proxy_pass http://$http_host$request_uri, 这里是写死的，用来将请求转发到请求的host，并用请求自带的uri。
+        nginx的正向代理功能很弱，比如不支持https。
+    2.反向代理相关配置
+        用了反向代理后，最大连接客户端数 = worker_processes * worker_connections / 2。
+            * proxy_pass <url>, 反向代理的地址，可以是主机名+端口、集群名+端口、ip+端口。还需要写上是http还是https。(通常内部提供的都是http，对外提供的数https，也就是虚拟服务器用的https)
+                <url>中，若包含了uri，nginx会使用的新的uri代替原来请求中的uri(location中若用了正则，则无法在<url>中带上uri)。若不包含uri，则使用请求中的uri。
+                若<url>中，用'/'来作结尾，则会将请求uri中的资源名(最后的名字)，用来添加到<url>后面。尽量不要添加'/'结尾。
+            * proxy_hide_header <field>, 隐藏http的头域信息
+            * proxy_pass_header <field>, Nginx默认在转发时，不会转发“Data”，“Server”，“X-Access”等header，该指令可以运行这类header发送
+            * proxy_pass_request_body on/off, 是否将客户端的请求body发往后端服务器
+            * proxy_pass_request_header on/off, 是否将客户端的请求header发送给代理服务器
+            * proxy_set_header <field> <val>, 添加或者修改发往后端服务器的请求头信息，若<val>为空，则不会发送
+                默认为
+                    proxy_set_header Host $proxy_host
+                    proxy_set_header Connection close;
+                通常为了让后端服务器知悉客户端的请求情况，需要对header进行改写:
+                    proxy_set_header Host $host
+                    proxy_set_header X-Real-IP $remote_addr;
+            * proxy_set_body <val>, 更改转发到后端服务器的http请求体的信息
+            * proxy_bind <address>,
+            * proxy_connect_timeout <time>, 服务器与后端服务器尝试建立连接的超时时间
+            * proxy_read_timeout <time>, 读后端服务器数据的超时时间
+            * proxy_http_version 1.0/1.1, 默认为1.0。1.1中支持upstream中的keepalive指令
+            * proxy_method <method>, nginx发请求到后端服务器的方法，一般为get或post
+            * proxy_redirect <options>, 用于修改代理服务器返回的Location和Refresh头域
+                * proxy_redirect <redirect> <replacement>, <redirect>用于匹配Location头域，<replacement>用于替换匹配的内容
+                * proxy_redirect default, 用proxy_pass里面的内容作为<redirect>, 用location中的uri作为<replacement>
+                * proxy_redirect off, nginx不对Location和Refresh进行修改
+            * proxy_headers_hash_max_size <size>, Nginx存放HTTP报文头的缓存空间大小，用于加速检索http头域的信息
+            * proxy_headers_hash_bucket_size <size>
+            * proxy_next_upstream
+    3.Proxy Buffer
+        Buffer是给每个请求的配置的，可以异步的将代理服务器的响应传递给客户端。Nginx将会把后端服务器的响应存放在Buffer中，Buffer不够时，启动磁盘临时文件进行存放。
+        当后端的数据返回完成，或是Buffer被装载满时，将数据发送给客户端，在这个发送期间处于BUSY状态，不允许其他操作。该功能关闭时，Nginx会同步的将响应数据直接发送给客户端。
+            * proxy_buffering on/off, 启用或关闭proxy_buffer, 默认打开的
+            * proxy_buffers <number> <size>, <number>是ProxyBuffer的个数，<size>是每个buffer的大小。也就是说一次请求，Nginx对这个请求的响应可以缓存的大小时<number>*<size>
+            * proxy_buffer_size <size>, http响应的第一部分内容的缓存大小，即http头部的缓存
+            * proxy_busy_buffer_size <size>, busy状态时的缓存区总大小
+            * proxy_temp_path <file>, proxy buffer装满，溢出的数据放在该文件中
+            * proxy_max_temp_file_size <size>, 临时文件总体积上限
+            * proxy_temp_file_write_size <size>, 写入临时文件数据量的总大小
+    4.Proxy Cache
+        Cache将会把Buffer的数据进行缓存，客户端下次访问相同数据时，直接使用这些缓存数据。显然，Cache是依赖Buffer的。缓存管理进程会进行检查过期数据。
+        Cache还会检查HTTP头中的`Cache-Control`和`Expires`，来判断请求的数据是否进行缓存，以及缓存多长时间等。
+            * proxy_cache zone|off, 默认是off关闭的。
+            * proxy_cache_bypass <options>, 不从缓存中读取的条件
+            * proxy_cache_key
+            * proxy_cache_lock
+            * proxy_cache_lock_timeout
+            * proxy_cache_min_uses
+            * proxy_no_cache
 
+七、Nginx源码结构
+    core, event, http, mail, misc, os
+    1.core目录
+        Nginx的关键数据结构和Nginx内核源码实现。
+            * nginx, nginx入口函数, 对nginx整体控制
+            * ngx_connection, 网络连接管理功能
+            * ngx_inet, socket网络套接字功能
+            * ngx_cycle, 系统整个运行过程中的参数和资源的统一调配
+            * ngx_log, 日志输出和管理的功能
+            * ngx_file, 文件读写功能
+            * ngx_regex, nginx服务器对正则表达式的支持
+            * ngx_string, 对字符串处理的功能
+            * ngx_times, 对时间的获取和处理
+    2.event目录
+        实现了Nginx的事件驱动模型.event/modules/目录中有epoll, select, ...等多个事件驱动的实现
+    3.http目录
+        为web服务提供了主要的支持, http/modules/目录中是nginx的http模块实现代码
 
+八、Nginx基本数据结构
+    1.ngx_modules_s
+    2.ngx_command_s
+    3.ngx_pool_s
+    4.ngx_event_s
+    5.ngx_connection_s
+    6.ngx_cycle
+    7.ngx_conf_s
+    8.ngx_signal_t
+    9.ngx_process_t
 # nginx常用内置变量
 * $remote_addr 客户端ip地址
 * $remote_port 客户端端口
+* $http_host   请求的host
+* $proxy_host  代理服务器的host
+* $request_uri 请求的uri部分(首位带/)
