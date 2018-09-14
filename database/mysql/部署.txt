@@ -11,10 +11,10 @@
 	5).获得密码(由mysql生成随机密码)
 		grep "password" /var/log/mysqld.log;
 	6).修改密码
-		set global validate_password_policy=0;
-		set global validate_password_length=1;
-		ALTER USER 'root'@'localhost' IDENTIFIED BY '你想设置的密码';
-		
+		设置密码安全策略，最简单为0: set global validate_password_policy=0;
+		密码长度设置，最短为1: set global validate_password_length=1;
+		修改密码: ALTER USER 'root'@'localhost' IDENTIFIED BY '你想设置的密码';
+	
 二、字符集配置
 	为了避免中文乱码等问题，通常统一采用utf-8进行字符编码。
 	1.查看字符集
@@ -33,4 +33,4 @@
 	修改为任意主机进行访问(直接改表)
 		update user set host = '%' where user = 'root';
 	重启服务
-		service mysql restart
+		service mysqld restart
