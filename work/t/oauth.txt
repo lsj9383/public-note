@@ -1,0 +1,142 @@
+一、概述
+    oauth2.0是一种授权框架，该框架可以让资源所有者和http服务之间的交互批准，使得第三方应用可以获得http服务的有限访问权限，或者通过允许第三方服务代表资源所有者，以获得访问权限。
+    现已经完全废弃了OAUTH1.0。
+    在传统客户端和服务器的授权模型中，客户端为了访问受限的服务器资源，需要获得资源所有者的凭证(credential)，因此用户需要和第三方应用共享自己的身份凭证，这存在以下缺点：
+        * 第三方服务器需要存储用户的凭证，以便将来获取资源。凭证通常是明文的用户名和密码
+        * 每次资源访问都需要进行密码验证，增加密码被窃取的风险
+        * 第三方应用通过凭证可以获得对资源的完全访问，资源所有者无法对其访问进行限制
+        * 资源所有者无法取消第三方应用的访问凭证，只能修改凭证
+        * 第三方应用程序获得凭证，降低了资源服务的安全性
+    oauth通过引入授权层并且分离客户端和资源所有者之间的角色来解决这些问题。客户端请求访问由资源所有者控制的资源服务器的资源，并向客户端发放一个和资源所有者不通的凭证，以获得受限资源。
+    授权服务器在资源所有者的批准后，将会向第三方客户端发放用于访问的access token，客户端使用access token去访问资源服务器托管的受限资源。access token中包含了授权范围，过期时间等信息。
+1.角色
+    1).资源所有者(resource owner)
+        资源的持有者，可以授权第三方访问受限资源的实体
+    2).资源服务器(resource server)
+        资源服务器托管了资源所有者的受限资源，第三方可以通过access token可以访问受限资源。
+    3).客户端(client)
+        第三方(client)通过资源所有者的授权代表资源所有者访问资源服务器上的受限资源。"客户端"这一术语，并不包含任何形式的实现特征。
+    4).授权服务器(authorization server)
+        在资源所有者成功授权后，授权服务器将会发放access token给client。
+
+2.oauth2工作流程
+    1).工作流程简图
+        client  -------A.授权请求------->  Resource Owner
+        client  <---B.授权允许(code)-----  Resource Owner
+
+        client  -----C.授权允许(code)---->  Authorization Server
+        client  <---D.访问令牌(token)-----  Authorization Server
+
+        client  ----E.访问令牌(token)---->  Resource Server
+        client  <-------F.受限资源--------  Resource Server
+
+    2).工作流程描述
+        A). 客户端发送授权请求给资源所有者。授权请求可以直接发送给resource owner(如图)， 也可以发送给Authorization Server。
+            现在一般采用的流程是，client发送给Resource Owner的是具有授权请求的【按钮】，由Resource Owner点击按钮，自行发送授权请求到Authorization Server，结果将会发送给client。
+                client     -------a.授权请求按钮------->   Resource Owner
+            Resource Owner -------b.发送授权请求------->   Authorization Server
+                client     <------c.授权允许(code)-----   rAuthorization Server
+        B). 客户端将会接收到授权允许，授权允许中包含了资源所有者的【授权凭证】，授权凭证取决于授权类型，授权类型有四种基本的授权类型+扩展授权类型。
+        C). 通过授权允许，从Authorization Server获得访问令牌。
+        D). 授权服务器授权client，并检查授权允许是否有效，如果有效则发放授权码。
+            限制一般会让client到授权服务器上进行注册，出了检查授权允许是否有效外，还要检查client是否为注册的client。
+        E/F). 通过访问令牌access token访问资源服务器上的受限资源。
+    client获得授权允许的首选方案是采用授权服务器作为中介
+    
+3.授权许可方式
+    授权允许(Authorization Grant)是一个来自resource owner授权的凭证，可以用于获取access token，进而访问resource owner的受保护资源。
+    oauth2.0支持四种类型的授权允许：
+    1).Authorization Code
+        授权码(Authorization Code)，通过授权服务器作为client和resource owner的中介来获取。client不直接将授权请求发向resource owner，而是引导resource owner指向授权服务器
+        授权服务器又将会使用授权码，将resource owner引导回client。
+        在引导resource owner回client前，授权服务器将会验证resource owner的身份，避免了resource owner与client共享身份凭证。
+    2).Implicit
+        隐式授权简化了access token的获取流程，在这个流程中，并不向client发送授权码，而是直接发放access token。
+        在发放access token时，并不需要验证client的身份，而是通过重定向URL进行鉴别。access token可以被暴露给resource owner或者其他可以访问资源所有者用户代理的程序。
+        隐式流程提升了响应能力和效率，减少了获取access token的流程，但是具备比授权码模式更大的安全隐患。
+
+    3).Resource Owner Password Credentials
+        这个模式会将resource owner的身份凭证(username password)交给client，client直接向授权服务器拉取access token。
+        只有当对client高度信任才能使用这样的模式，比如client是操作系统的一部分。
+        虽然client需要resource owner的credential，但是只有单次需要使用用户凭证，client后面可以只保存refresh token以供长期访问。
+
+    4).Client Credentials
+
+4.访问令牌(access token)
+    访问令牌是用于访问受保护资源的凭证，一个访问令牌代表了发向一个client的授权。授权服务器生成的token中表示出详细的scope和声明。
+    在资源服务器对安全性的要求下，access token可以有不同的格式，结构和使用方法。
+
+5.刷新令牌(refresh token)
+    refresh token通过授权服务器发送给客户端，并且用于在当前access token失效时获取新的access token。refresh token也可以用于获取额外的新access token。
+    通过refresh token获取的新token，应比直接通过resource owner获取的token有更端的生命周期以及更小的访问权限。
+    refresh token时可选的方案，若授权服务器支持refresh token，则在发放access token时，将会把refresh token一并发放。
+6.TLS
+7.重定向
+    在oauth2.0中广泛使用http重定向，目的时client和授权服务器之间通过重定向，引导resource owner的浏览器将请求发送给彼此。
+8.Interoperability
+二、客户端注册
+    在oauth2.0协议开始前，需要client到授权服务器进行注册。
+    1.客户端类型
+        oauth定义了两种客户端类型：
+        1).confidential
+        2).public
+    2.客户端标识(client identifier)
+        授权服务器需要给注册的客户端发放client标识，这是一个唯一的字符串用于表示由client提供的注册信息。
+        该标识并非密钥，因此不能仅仅依赖该标识进行client身份认证。
+        标识的大小是任意的，client不应该假设标识大小。
+    3.客户端认证(client authentication)
+        1).客户端密码(client password)
+            a). HTTP BASIC认证
+                拥有password的client可以使用HTTP BASIC认证方案来发送请求，授权服务器对此进行client的身份认证。
+                授权服务器也需要支持HTTP BASIC身份认证方案，用于对客户端发出的用户名和密码进行验证。
+                HTTP BASIC认证是指的将username和password拼接为字符串:`<username>:<password>`，并对这个字符串进行base64编码，并放入HTTP HEADER的Authorization中：
+                    Authorization: Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3
+                需要注意的是，在oauth中用客户端标识表示<username>，用客户端密码表示<password>
+            b). 普通认证
+                为了方便，也可以支持将标识和密码放在rquest body中。
+                    * client_id，必选， 在注册的时候授权服务器发放的客户端标识
+                    * client_secret，必选，客户端密码，在注册的时候授权服务器发放的
+                oauth不推荐这个认证方案，因为如果不支持https则id和secret是相当危险的。并且需要强制性要求不能将参数放在uri中。
+        2).认证方法
+            授权服务器应该支持符合安全要求的任何认证方案，授权服务器需要建立客户端标识和认证方法之间的映射。
+三、 Oauth协议端点
+    授权过程使用了两个服务器端点，以及一个client端点：
+        * 授权端点，和资源所有者进行交互，资源所有者在交互中将会带上client的信息，使得client获得授权。
+        * 令牌端点，和client进行交互，用于获取access token，端点通常需要验证客户端身份
+        * 重定向端点，授权服务器通过资源所有者的用户代理将包含授权的响应返回给client
+    1.授权端点
+        授权端点用于和资源所有者进行交互并获得授权允许，授权端点首先需要验证资源所有者的身份，授权端点对资源所有者的验证方式：
+            * username password
+            * session
+            (一般是资源所有者先登陆，登陆请求成功后种入cookie，然后重定向到授权端点的授权允许接口，授权端点通cookie检查身份)
+        授权端点对资源所有者身份验证需要使用https请求以确保安全。
+        1).响应内容
+            授权端点在授权码模式和隐式授权模式下使用，client通过请求中的response_type告知采用何种授权模式。
+                * response_type:
+                    - code, 授权码模式，授权端点下发code给client
+                    - token, 隐式模式，授权端点下发access token给client
+            下发响应给client其实就是一个重定向。如果缺少response_type，或是服务器无法理解的值，授权服务器必须返回错误响应。
+        2).重定向端点
+            在授权服务器和资源所有者之间完成交互后，授权服务器将会引导resource owner的user-agent返回数据给client。通常user-agent是一个浏览器，
+            因此授权服务器直接返回重定向给resource owner。client不应该在重定向端点中响应任何第三方脚本，否则这样会导致重定向中的授权数据被第三方获取。
+            a).client注册要求
+                授权服务器必须要求客户端注册重定向端点。
+                授权服务器要求client提供的完整的重定向URI。
+                授权服务器服务器可以允许client注册多个重定向端点。
+            b).无效的授权
+                如果resource owner发起的授权请求由于缺少，无效或者不匹配的重定向uri等原因造成了授权失败，则授权服务器应该通知资源所有者错误，并不得重定向到无效的URI上。
+    2.令牌端点
+        令牌端点是client通过code和refresh token获取acess token的场所，其实通常会将令牌端点和授权端点做到一个服务器上面。
+        * 客户端认证
+            在resource owner授权的时候，可以不进行客户端认证(就算认证，也是通过client_id进行最简单的判断)。client认证主要在resource owner授权后，client发送code和注册信息到
+            令牌端点，令牌端点对其进行认证。
+    3.访问令牌scope范围
+四、获取授权
+五、发放access token
+六、刷新access token
+七、访问受保护的资源
+八、Extensibility
+九、Native Applications
+十、出于安全的考虑
+十一、IANA Considerations
+十二、OAUTH1.0

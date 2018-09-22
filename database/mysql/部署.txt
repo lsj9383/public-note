@@ -7,7 +7,7 @@
 	3).通过yum进行下载和安装
 		yum -y install mysql-community-server;
 	4).启动mysql服务
-		service mysql start
+		service mysql startd
 	5).获得密码(由mysql生成随机密码)
 		grep "password" /var/log/mysqld.log;
 	6).修改密码
