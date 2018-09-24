@@ -132,9 +132,110 @@
             令牌端点，令牌端点对其进行认证。
     3.访问令牌scope范围
 四、获取授权
+    客户端为了获取访问令牌，需要获得来自resource owner的授权允许。oauth定义了四种授权允许:
+        `authorization code`, `implicit`, `resource owner password credentials`, `client credentials`
+    1.authorization code
+        1).简图
+        2).描述
+            A).client引导rouserce owner的user-agent(通常是浏览器)定向到授权端点
+                    引导的形式主要是：client将会返回rousrce owner一个授权页面按钮，owner点击该按钮会进入来自授权端点的授权页
+                    在授权页中，进行登陆并授权，授权会将请求发送到授权端点
+                将请求发送到授权端点的数据包括了client标识，请求范围，state，重定向URI(允许授权或拒绝授权都会重定向到URI)
+            B).授权服务器对resource owner的身份进行认证，判断是否建立授权允许或client的访问请求
+            C).假设resource owner允许访问，授权服务器通过重定向使user-agent发送请求和来自授权服务器的数据给client，重定向URI为client注册过的uri。
+                重定向URI中包含了授权码和client先前提供的state。
+            D).client利用上一步获得的授权码，从令牌端点请求访问令牌。授权服务器将会对client的身份进行验证，client获取code的重定向URI也需要传上去，用于验证。
+            E).授权服务器对授权码和client的身份进行验证，验证client身份需要利用client_id和client_secret的信息，以及请求中的重定向URI与获取code的重定向URI是否匹配。
+        3).授权码请求
+            构造请求授权码的URI，需要使用授权端点的URI以及Query参数:
+                response_type, 【必填】, 值为code
+                client_id, 【必填】, client标识，在client注册的时候发放
+                redirect_uri, 【可选】, 重定向URI。(在很多oauth服务器实现中，redirect_uri一般是必填的)
+                scope, 【可选】, client访问请求的范围
+                state, 【建议】, client维护的在请求和回调之间的非透明值，授权服务器在重定向回client时，应该包含该值。这个值可以用于防CSRF攻击。
+                    (client被收到黑客冒充来自授权服务器请求, 让client误以为拿到了一个授权码)
+            client引导resource owner构造这样的URI，并由resource owner的user-agent发起授权码请求。
+        4).授权码响应
+            若resource owner允许访问请求，授权服务器发放授权码给client通过重定向URI中添加query参数。
+            client应该忽略不可识别的参数，授权码的长度没有定义，client不应该假设授权码长度的大小。
+                code
+                state
+            * 错误响应
+                1). 如果授权码请求由于缺少参数，参数无效，重定向URI不匹配，或client_id缺失等原因，导致授权码请求失败，授权服务器应该通知【resource owner】
+                并且，【一定不能】自动重定向到错误的URI。
+                2). 如果resource owner拒绝访问授权，或是【除了】重定向URI缺失或不匹配的原因导致的失败，授权服务器都应该重定向到client，以告知client。
+                3). 错误响应数据
+                    - error，错误码，必填，应该包含以下的情况：
+                        invalid_request，请求的参数无效，或是缺失，或是重复包含参数，或是其他的无效格式。
+                        unauthorized_client，client没有授权去请求code
+                        access_denied，资源所有者或授权服务器拒绝访问请求
+                        unsupported_response_type, 不支持的response_type
+                        invalid_scope, 无效的scope参数
+                        server_error, 授权服务器遇到异常
+                        temporarily_unavailable, 暂时不可用
+                    - error_description，可选
+                    - error_uri，可选
+                    - state，必填
+        5).访问令牌请求
+        6).访问令牌响应
+    2.Implicit Grant
+        隐式授权用于获取token，并且【不支持】发放refresh token。
+        隐式授权类型不包含client的身份认证，其认证仅仅依赖于注册的【重定向URI】以及resource owner的身份认证。
+        由于token通过重定向给client，因此token有几率【暴露】给和user-agent同一设备的其他应用查询，具有一定的风险。而授权码模式是client直接和令牌服务器交互。
+        1).授权请求
+            response_type
+            client_id
+            redirect_uri
+            scope
+            state
+        2).授权响应
+            access_token
+            token_type
+            expires_in
+            scope
+            state
 五、发放access token
+    如果请求访问令牌有效并且已经被认证，授权服务器将会发放access token和可选的刷新令牌。
+    如果客户端认证失败或请求无效，则授权服务器返回失败的页面。
+    1.成功响应
+        授权服务器的响应中，只要涉及了token，凭证或者其他的敏感数据，都需要包含HEADER，"Cache-Control: no-store;Pragma: no-cache"
+            access_token，必要，服务器发放的访问令牌
+            token_type，令牌类型
+            expires_in，建议，访问令牌以秒为单位的生存时间。如果忽略，则授权服务器应该通过其他的手段告诉client过期时间或在文档中写死。
+            refresh_token，可选，用于获取新的access token。
+            scope，可选，如果有，则和client要求的scope相同。
+    2.错误响应
+        授权服务器的失败响应，使用状态码400(Bad Request)
+            error，错误码，表示失败的原因
+                invalid_request
+                invalid_client
+                invalid_grant
+                unauthorized_client
+                unsupported_grant_type
+                invalid_scope
+            error_description, 可选
+            error_uri，可选
 六、刷新access token
+    如果授权服务器发放了refresh token给client，则client可以发送刷新请求到token端点：
+        grant_type， 必填，为refresh_token
+        refresh_token, 必填
+        scope，可选，授权范围绝不能超出最初授予token时的范围，如果省略则采用和最初授予token时的相同范围。
+    由于refresh token是一个长期有效的凭证，因此需要将refresh token在client上进行存储。
+    授权服务器响应中可以包含
+        * 旧的refresh token
+            在这种情况下，意味着refresh token的过期时间是固定的，也就是固定了一次授权的最长的资源获取周期。
+        * 新的refresh token，
+            在这种情况下，意味着refresh token的过期时间被无限刷新，client必须丢弃老的refresh token，授权服务器也会让以前的refresh token失效。
 七、访问受保护的资源
+    client通过access token访问资源服务器上的受限资源，资源服务器需要access token，并且确保其没有过期，并且请求资源在其scope范围之内。
+    client和资源服务器进行身份验证的方法，取决与授权服务器提供的access token类型。最典型的是，在http的请求头中加入"Authorization"字段，其具有所使用的access tokend的认证方案。
+    1.access token类型
+        access token类型为client指出了如何发送access token来访问受保护的资源。如果client不理解access token的类型，则不得使用token。
+            bearer token，这样的类型是将access token放在Authorization字段中：
+                Authorization: Bearer mF_9.B5f-4.1JqM
+            mac token....
+        每种access token验证方式所需要的额外属性，都是在发放access token时一同发放。
+    2.错误响应
 八、Extensibility
 九、Native Applications
 十、出于安全的考虑
