@@ -1,0 +1,93 @@
+一、基本概念
+    1.Index
+        es会索引所有字段，经处理后写入反向索引。(正向索引是通过key查询val，反响索引是根据val查询key)
+        es的顶层数据单位叫Index，和mysql里面的db是一个概念。
+        因此，索引在es里有两层含义，数据的顶层单位 以及 检索的底层数据结构。
+        查看当前节点所有Index：
+            curl -X GET 'http://localhost:9200/_cat/indices?v'
+    2.Document
+        Index里的单条记录就是一个Document，且通常使用JSON表示。
+        同一个Index下的Document结构不要求相同，但尽量一致，这可以提升检索效率。
+    3.Type
+        Document可以进行分类，是虚拟逻辑分组。不同的Type也应该有相似的数据结构(因为都是同一个Index的)
+        数据结构完全不同的Document就应该放在不同的Index中。
+        列出每个Index下的Type：
+            curl 'localhost:9200/_mapping?pretty=true'
+
+二、新建和删除Index
+    新建Index:
+        curl -X PUT 'localhost:9200/<Index-Name>'
+    删除Index:
+        curl -X DELETE 'localhost:9200/<Index-Name>'
+
+三、中文分词
+    es不能直接对中文进行分词然后反向索引，需要安装相关的插件。es默认就会给字段配置分词器，但是默认配置的分词器不支持中文。
+        ./bin/elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v5.5.1/elasticsearch-analysis-ik-5.5.1.zip
+    重新启动 Elastic，就会自动加载这个新安装的插件。
+    然后对<index>的<type>的<propertie>设置分词的配置，类型为text，分词器为ik_max_word。
+        curl -X PUT 'localhost:9200/<index>' -d '
+        {
+            "mappings": {
+                "<type>": {
+                    "properties": {
+                        "<propertie>": {
+                            "type": "text",
+                            "analyzer": "ik_max_word",
+                            "search_analyzer": "ik_max_word"
+                            },
+                        ...
+                    }
+                }
+            }
+        }
+
+四、数据操作
+    1.添加
+        curl -X PUT 'localhost:9200/<Index>/<Type>/<ID>' -d '
+        {
+            "<key>": "<value>",
+            ...
+        }'
+        执行成功后，es会返回创建的相关信息。这里需要指定<ID>，可以是任意字符串，若没有指定，es会自动分配一个ID。
+        需要小心，若添加数据时，不存在<Index>，es将会为其自动创建<Index>
+    2.查询
+        curl 'localhost:9200/<Index>/<Type>/<Index>?pretty=true'
+        会返回对应的整个文档，这相当于是正向检索。
+    3.删除
+        curl -X DELETE 'localhost:9200/<Index>/<Type>/<Index>'
+    4.更新
+        curl -X PUT 'localhost:9200/<Index>/<Type>/<Index>' -d '
+        {
+            "<key>": "<value>",
+            ...
+        }'
+    5.列表查询
+        curl 'localhost:9200/<Index>/<Type>/_search'
+        这将会返回对应单元下的所有document
+    6.反向检索
+        即通过key下面的val检索出整个document
+            curl 'localhost:9200/<Index>/<Type>/_search'  -d '
+            {
+                "query" : { "match" : { "<key>" : "<val>" }},
+                "size" : <size>     // 默认10条
+                "from": <offset>    // 偏移量 默认为1
+            }'
+        从<Index>/<Type>下面，检索出<key>中包含了<val>的document，若有多个符合条件，会进行相关性打分排序。
+        Elastic 默认一次返回10条结果，可以通过size字段改变这个设置。
+        AND关系
+            即搜索条件都满足的才会返回:
+                {
+                    "query": {
+                        "bool": {
+                            "must": [
+                                { "match": { "<key>": "<val>" } },
+                                { "match": { "<key>": "<val>" } }
+                            ]
+                        }
+                    }
+                }'
+        OR关系
+            curl 'localhost:9200/accounts/person/_search'  -d '
+            {
+                "query" : { "match" : { "<key>" : "<val> <val>" }}
+            }'
