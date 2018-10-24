@@ -1,0 +1,280 @@
+一、概述
+二、安装
+    Docker分为CE和EE两个版本
+    * CE, 社区版，重点免费
+        * stable，稳定版
+        * test，测试版
+        * nightly，每天的迭代版本，应该是开发版的意思
+    * EE, 企业版，重点安全
+    1.CentOS安装Docker CE
+    2.MacOS安装Docker CE
+        1). 安装
+            >> brew cask install docker
+            >> docker --version
+        2). 测试docker的nginx服务
+            >> docker run -d -p 80:80 --name webserver nginx
+            >> docker stop webserver
+            >> docker rm webserver
+        3). 镜像加速
+            国内从Docker HUB拉取困难，需要配置镜像仓库，提升拉取速度。
+            Docker For Mac --> Perferences --> Daemon --> Registry Mirrors。
+            在列表中填写加速器地址。
+    3.Windows10安装Docker CE
+    4.常用镜像
+        Docker中国 https://registry.docker-cn.com
+        七牛云加速  https://reg-mirror.qiniu.com
+        docker info中可以看到镜像配置信息。
+
+三、使用Docker镜像
+    1.获取镜像
+        >> docker pull [options] [Docker Registry地址[:port]/]仓库名[:tag]
+        * Docker Registry地址，镜像仓库地址，默认是Docker Hub
+        * 仓库名, 两段式, 仓库名=<用户名>/<软件名>, 对于Docker Hub，没有给出用户名，则采用library
+        * tag, 通常指的版本号
+    2.运行
+        >> docker run [-it] [--rm] <镜像名> bash
+        启动docker镜像，就是进入容器，并且指定一个shell来和这个容器进行交互
+        * -it, 表示需要交互式终端
+        * --rm, 容器退出后, 随之将其删除。默认情况下，docker退出并不会立即删除容器，除非手动rm。
+        * <镜像名>, 
+        * bash, 和启动后的docker进行交互的shell
+        在容器中通过exit退出容器
+    3.列出镜像
+        >> docker image ls
+        会列出本地镜像(仅包含顶层镜像)，包括其ID，大小，创建时间等
+        需要注意，这里列出的大小和docker hub上面的大小不同， docker hub为为压缩后的大小
+        这里的大小也不是实际在本地占用的空间，因为镜像分层，本地镜像若是有基于相同的层构建的，则会进行复用。
+        >> docker system df
+        可以查看镜像、容器、数据卷的所占用的实际空间。
+        >> docker image ls -a
+        列出全部镜像，包含顶层镜像和中间层镜像。中间层镜像被上层镜像所依赖，中间镜像不能被删除，否则会导致上层镜像依赖错误。
+        当依赖某中间件镜像的所有上层镜像都被删除后，中间镜像被自动删除。
+    4.删除镜像
+        >> docker image rm [options] <镜像1> [<镜像2> ...]
+        这里的<镜像x>可以通过id，镜像名等方式进行指定。
+        删除镜像的时候，会先进行untagged和deleted:
+        * untagged, 删除指定的标签
+        * deleted, 当某个镜像的所有标签都被删除后，才会真正的出发对某个镜像的删除。
+        可以看成该删除其实并非真正删除镜像，而是删除标签，当镜像没有标签所对应时，才会出发镜像的删除。
+    5.镜像构成
+        运行一个容器时，做的任何修改都会被记录于容器存储层，commit可以将容器的更改保存下来，并成为一个镜像。也就是在原有镜像的基础上，叠加容器存储层，构成新的镜像。
+        >> docker commit [options] <容器id或容器名> [<仓库名>[:标签]]
+        >> docker commit --author "lsj" --message "test" webserver nginx:v2
+        docker commit应该慎重使用
+        >> docker diff <container-name>, 检查容器相对于原本镜像的更改。
+    6.dockerfile
+        可以使用dockerfile进行镜像定制。docker是一个文本文件，包含了多条指令，每条指令构建一层。每一条指令的内容，就是描述该层如何构建。
+        1).指令
+            a).FROM
+                定制镜像，是在一个镜像的基础上进行定制的，需要“基础镜像”。Docker Store上有很多镜像，这些镜像已经部署了一些服务，可以直接在其基础上进行修改。
+                FROM命令可以指定基础镜像。
+            b).RUN
+                用来执行命令行命令。有两种格式:
+                每一个RUN都会从镜像启动容器，运行命令，记录修改，提交，并生成新的镜像。
+                当一个Dockerfile有多个run，则会在上一层镜像的基础上启动新的容器，运行命令，提交存储层变更，生产新的镜像。
+            c).COPY
+                复制文件，特指讲本地的文件复制到docker镜像中。
+                COPY origin1, origin2, ..., target
+                origin可以有多个，甚至是通配符，将这些文件放到docer镜像的目标目录下。目标目录可以不存在，会自动创建。
+            d).ADD
+                和COPY基本一样，但功能更强，origin可以是url，docker引擎将会试图去url下载文件放到target
+                下载的文件，前行默认是600，若需要调整权限，需要额外的一层RUN，但是这样不如直接使用RUN，通过wget进行下载，修改权限，无需额外添加ADD层。
+                因此通常不推荐使用ADD来进行文件的下载。
+                ADD还支持自动对gzip, bzip2, xz的解压，ADD的含义复杂，不推荐使用。
+            e).CMD
+                容器启动命令，在容器启动的时候，【必须】有一个运行的进程，如在docker run时，经常会指定运行bash。
+                若docker run没有指定运行的进程，则会用镜像的CMD来运行。若docker run的时候若指定了运行的进程，则不会用CMD。
+                CMD命令有两种格式:
+                    * exec 格式
+                        CMD ["可执行文件", "参数1", "参数2", ...]
+                    * shell 格式
+                        CMD <命令>
+                        若使用该模式，命令会被包装为sh -c的模式
+                        即等价于
+                        CMD ["sh", "-c", "<命令>"]
+                docker运行的进程完成以后，就会自动退出，因此若在CMD中运行后台进程，则会导致CMD的进程运行完毕时docker关闭，而后台进程此时并未结束。
+            f).ENTRYPOINT
+                ENTRYPOINT的格式和RUN、CMD一样。
+                当指定了ENTRYPOINT后，CMD的含义就变化了，不再是直接运行命令，而是<ENTRYPOINT> "<CMD>"
+                场景:
+                    * 最简单的容器运行参数传递方案
+                        docker run可以传递给容器启动的最简单的方案就是修改<CMD>，因此可以将<CMD>作为参数传递，进程启动则靠<ENTRYPOINT>指定
+                    * 准备工作
+                        启动容器就是启动主进程，但是启动主进程通常会有些准备工作。这时候通常有两层，一层是准备工作的ENTRYPOINT，一层是进程运行的CMD
+                        准备工作通常是交给脚本运行，docker run的参数就交给脚本进行脚本进行处理，处理完成后再运行外层的CMD，如:
+                        FROM <image>
+                        ...
+                        ENTRYPOINT ["preprocess.sh"]
+                        ...
+                        CMD ["worker.binary"]
+            g).ENV
+                环境变量设置
+                ENV <key1>=<val1> <key2>=<val2>
+            h).ARG
+                构建参数
+            i).VOLUME
+            j).EXPOSE
+                声明端口，用于容器运行时提供的服务端口。这只是声明，并不能完全保证容器的该端口是可用的。
+                主要是为了告诉主机，便于主机随机分配端口连接到该端口。(docker run -P会自动分配主机端口映射到EXPOSE的端口)
+            k).WORKDIR
+                工作目录，若工作目录不存在，则会自动创建该目录。
+                若在某层设置了WORKDIR，则后面层的工作目录均是该目录。
+            l).USER
+                指定当前用户，这个用户必须是事先建立好的。
+                RUN groupadd -r <group-name> && useradd -r <user-name> <group-name>
+                USER <user-name>
+                RUN ...
+            m).HEALTHCHECK
+            n).ONBUILD
+            o).
+            需要注意:
+                * 每个命令都会构建一层，RUN也不例外，切接不要写多行RUN，而是用&&和\来进行多命令运行和换行。
+                * 每层的清理工作。每一层构建的东西，其他层是无权删除的，只能设置标志是否在该层可用，因此每一层构建的时候，无关啊的东西需要进行清理。--auto-remove $buildDeps
+        3).docker build
+            docker build指定镜像构建上下文，生成镜像。
+            镜像上下文是一个 文件夹，而不是一个文件。
+            a).docker引擎
+            b).docker client
+        4).多阶段构建
+    7.镜像实现原理
+        Docker的镜像是根据添加层，来实现对镜像的增量修改和维护。因此每个镜像也由很多层构成，Docker通过Union FS将不同的层结合到一个镜像中去。
+
+四、操作容器
+    容器是独立运行的一个或一组应用，以及它们的运行环境。
+    1.启动容器
+        容器有两种启动方式：
+            * 基于镜像新建并启动
+            * 终止状态的容器重新启动
+        1).新建并启动
+            >> docker run <container>/<tag> <CMD>
+            >> docker run -t -i <container>/<tag> bash
+                * -t 表示分配伪终端
+                * -i 表示标准输入打开
+                * bash 表示启动bash
+            docker run的实际流程:
+                * 检查本地是否存在镜像，不存在则到仓库下载
+                * 利用镜像创建并启动一个容器
+                * 分配一个文件系统，并在只读的镜像层外面挂在一层读写层
+                * 从宿主主机配置的网桥接口，桥接一个虚拟接口到容器中
+                * 从地址池配置一个ip地址给容器
+                * 执行用户指定的应用程序
+                * 执行完毕 容器被终止
+        2).启动已终止的容器
+            docker container start, 直接将一个已终止的容器启动运行。
+    2.后台运行
+        >> docker run ... <cmd>     将结果打印到标准输出
+        >> docker run -d ... <cmd>  后台运行，结果打印到log
+        -d会返回容器id，用来寻找后台运行的容器。
+        >> docker container ls
+        打印所有运行的容器。
+        >> docker container logs <container-id>
+        打印对应的容器日志
+    3.终止容器
+        >> docker container stop <container-id>
+        可以通过该命令让docker终止
+        docker指定的应用终结时，也会自动终止。
+        >> docker container ls [-a]
+        加上-a可以看到正在运行的容器以及终止了的容器的状态，不加-a只会看到正在运行的容器
+        >>docker container start <container-id>
+        处于终止状态的容器，可以通过重新运行
+        >>docker container restart <container-id>
+        处于运行状态的容器，可以通过重新运行
+    4.进入容器
+        通过使用run的-d参数，容器运行后会进入后台，可以通过命令进入容器。
+        1).attach
+            >> docker attach <container-id>
+            进入指定id的，正在运行的容器
+            进入容器，并退出的时候，会让容器终止。
+        2).exec
+            >> docker exec -it <container-id>
+            若没有-t，则不会分配伪终端，没有linux命令提示符。
+            若没有-i，无法获得来自宿主机的标准输入。
+            退出的时候，容器不会终止。
+    5.容器的导入和导出
+        其实就是容器的快照。
+        >> docker export <container-id> > <tar-path>
+        >> cat <tar-path> | docker import - <image>
+        将快照导为镜像
+    6.删除容器
+        >> docker container rm <container-id>
+        删除终止状态的容器
+        >> docker container prune
+        删除所有终止状态的容器
+五、Docker仓库
+    Docker是集中存放容器的地方，被称为Reporsitory.
+    还有一个注册服务器，被称为Registry.
+    Registry下有很多Repository，一个Reporsitory通常是一个镜像的多个版本，比如centos，python等等。
+    Repository的概念在github中也有，并且类似，是一个项目。github下载的时候也是下载一个repository的一个分支，或版本。
+    1.Docker Hub
+        Docker Hub时一个Registry，里面包含了很多Reporsitory。
+        1).登入登出
+            >> docker login
+            >> docker logout
+        2).查询和拉取
+            >> docker search <image-name>
+            >> docker pull <image-name>
+        3).上传本地镜像
+            >> docker tag <image-name> <username>/<image-name>
+            先创建镜像的标签
+            >> docker push <username>/<image-name>
+            讲镜像push到仓库
+        4).自动创建
+    2.私有仓库：docker-registry
+        docker-registry，官方提供的用于创建私有仓库的工具
+        docker hub中有docker-registry的镜像服务，可以下载后直接加载该镜像运行容器服务。
+    3.私有仓库：Nexus3.x
+
+六、数据管理
+    1.数据卷
+        是一个可供一个或多个容器使用的特殊目录，有以下特性：
+            * 数据卷可以在容器之间共享使用
+            * 数据卷的修改会立即生效
+            * 数据卷独立于镜像，对数据卷的更新不会影响镜像
+            * 数据卷默认一直存在，即使容器被删除(因为数据卷是独立的单元)
+        1).相关指令
+            >> docker volume create <volume-name> 创建数据卷
+            >> docker volume ls 列出存在的数据卷
+            >> docker volume inspect <volume-name> 查看数据卷信息
+            >> docker volume rm <volume-name>   删除数据卷
+            >> docker volume prune  清空没有容器引用的数据卷
+        2).容器挂载
+            >> docker run --mount source=<volume-name>,target=<container-dir>...
+            指定将卷挂载到指定的容器的目录上
+        数据卷用来进行持久化工作，生命周期独立于容器，容器在删除的时候不会自动删除数据卷，docker也不会主动删除没有容器引用的数据卷。
+    2.挂载主机目录
+        容器运行的时候，不但可以挂载数据卷，还可以挂载主机目录，需要指定type为bind(数据卷的挂载，type为volume)
+        >> docker run --mount type=bind,source=<主机目录>,target=<容器目录>[,readonly] ...
+        默认挂载后，容器对目录有读写权限
+七、网络
+    1.外部访问容器
+        在容器运行的时候，通过-p或-P参数可以指定端口映射
+        >>docker run -d -P <image> <cmd>
+        主机会从49000-49900中随机选择一个端口映射到容器的开放端口。
+        >>docker run -d -p <host-port>:<container-port>[|<host-port>:<container-port>|...] <image> <cmd>
+        将指定的端口映射到容器指定的端口，这会绑定到
+    2.容器互联
+        1).新建docker网络
+            >> docker network create -d bridge <net-name>
+        2).连接容器
+            >> docker run -it -rm --name c1 --network <network> <image> bash
+            >> docker run -it -rm --name c2 --network <network> <image> bash
+            这样将两个容器，置于相同的网络下，他们在内网进行了连接, 并且配置了容器名作为域名，在容器中直接ping容器名即可。
+        3).Docker Compose
+            多个容器之间的连接，推荐采用Docker Compose
+    3.DNS配置
+八、底层实现
+    1.基本架构
+        Docker采用c/s架构，docker的server可以在服务器端也可以在一台机器上，也可以在通过socket或restful api来进行通信。
+        docker的server处理来自client的请求。
+    2.命名空间
+        
+    3.控制组
+    4.联合文件系统
+    5.容器格式
+    6.网络
+九、docker Compose
+十、K8S
+
+FAQ：
+* UFS
+* CMD是否应该在最顶层？
