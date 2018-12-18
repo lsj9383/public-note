@@ -146,7 +146,7 @@ namespace WebDav.ClientConsole
             {
                 PropertiesToSet = new Dictionary<XName, string> { { "{DAV:}getcontenttype", "text/plain" }, { XName.Get("myprop", xns), "myval" } },
                 PropertiesToRemove = new List<XName> { "{DAV:}ETag" },
-                Namespaces = new List<NamespaceAttr> { new NamespaceAttr("x", xns) }
+                // Namespaces = new List<NamespaceAttr> { new NamespaceAttr("x", xns) }
             };
             var response = await webDavClient.Proppatch("http://localhost:88/1.txt", @params);
             Console.WriteLine(response.ToString());
