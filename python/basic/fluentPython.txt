@@ -73,6 +73,38 @@
     1.类属性和实例属性
 十、接口
 十一继承
+早起Python并没有提供判断子类是否实现了父类的抽象方法/接口的判断，在python 2.6引入了抽象基类的库，即abc.ABC，可以在子类实例化时判断有没有实现基类的抽象方法:
+```py
+import abc
+
+# 自定义的抽象基类要继承abc.ABC
+class A(abc.ABC)
+    @abc.abstractmethod
+    def test():
+        '''要求子类实现'''
+
+class B(A):
+    pass
+
+class C(A):
+    def test():
+        print("hello")
+
+class D(A):
+    def test(args):
+        print("hello")
+
+class E():
+    pass
+
+b = B()     # 抛出异常，因为没有实现基类的抽象方法
+c = C()     # 成功
+d = D()     # 成功，判断是否实现基类方法只看方法名，不会管方法的签名(参数列表)
+
+# 注册, 只是让issubclass和isinstance可以认为是子类，不会去检查是否实现了基类抽象方法
+E = A.register(E)
+print(issubclass(B, A))
+```
 十二、重载运算符
 十三、迭代器
     1.迭代器
