@@ -61,7 +61,7 @@
 * 标签(tags)
 
 ### 2).日志组(LogGroup)
-是一组日志的集合，写入与读取的基本单位。一个LogGroup中的数据包含相同Meta（IP、Source等信息）。多条日志会打包成一个LogGroup，以LogGroup为单位发往日志服务。相对于以日志为单位读写数据，LogGroup的读写方式可以最大限度地减少读取与写入次数，提高业务效率。看起来就是一种缓存日志的方案。
+是一组日志的集合，是`API/SDK`写入与读取数据的基本单位。一个LogGroup中的数据包含相同Meta（IP、Source等信息）。多条日志会打包成一个LogGroup，以LogGroup为单位发往日志服务。相对于以日志为单位读写数据，LogGroup的读写方式可以最大限度地减少读取与写入次数，提高业务效率。看起来就是一种缓存日志的方案。
 
 ### 3).日志主题(Topic)
 一个日志库内的日志可以通过日志主题（Topic）来划分。用户可以在写入时指定日志主题，并在查询时指定查询的日志主题。
@@ -89,6 +89,23 @@
 
 ### 1).LogTail安装
 ```sh
+# 下载包
 wget http://logtail-release-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/linux64/logtail.sh -O logtail.sh;chmod 755 logtail.sh
+
+# 安装(安装后会自动运行)
 ./logtail.sh install auto
+
+# 查询logtail版本信息
+cat /usr/local/ilogtail/app_info.json
+
+# 启动logtail
+/etc/init.d/ilogtaild start
+
+# 关闭logtail
+/etc/init.d/ilogtaild stop
+
+# 卸载logtail
+wget http://logtail-release-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/linux64/logtail.sh -O logtail.sh
+chmod 755 logtail.sh;
+./logtail.sh uninstall
 ```
