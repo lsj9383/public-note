@@ -87,7 +87,19 @@
 * 在LogService上配置采集的节点，这些节点上需要安装LogTail，LogService和LogTail之间会进行心跳检测
 * 创建采集的配置，将输入的各个字段进行配置
 
-### 1).LogTail安装
+### 1).LogTail
+* 特点
+    * 基于日志文件、无侵入式的收集日志。用户无需修改应用程序代码，且日志收集不会影响用户应用程序的运行逻辑。
+    * 除支持文本日志采集外，还支持binlog、http、容器stdout等采集方式。
+    * 对于容器支持友好，支持标准容器、swarm集群、Kubernetes集群等容器集群的数据采集。
+    * 能够稳定地处理日志收集过程中各种异常。当遇到网络异常、服务端异常等问题时会采用主动重试、本地缓存数据等措施保障数据安全。
+    * 基于服务端的集中管理能力。用户在安装Logtail后（参见 安装Logtail（Windows系统） 和 安装Logtail（Linux系统）），只需要在服务端集中配置需要收集的机器、收集方式等信息即可，无需逐个登录服务器进行配置。
+    * 完善的自我保护机制。为保证运行在客户机器上的收集Agent不会明显影响用户自身服务的性能，Logtail客户端在CPU、内存及网络使用方面都做了严格的限制和保护机制。
+* 核心概念
+    * 机器组, 一个机器组包含一或多台需要收集一类日志的机器。通过绑定Logtail配置到机器组，可以让日志服务根据同样的Logtail配置采集一个机器组内所有服务器上的日志。
+    * LogTail客户端, Logtail是运行在需要收集日志的服务器上上执行日志收集工作的Agent。
+
+#### a.安装
 ```sh
 # 下载包
 wget http://logtail-release-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/linux64/logtail.sh -O logtail.sh;chmod 755 logtail.sh
@@ -109,3 +121,42 @@ wget http://logtail-release-cn-hangzhou.oss-cn-hangzhou.aliyuncs.com/linux64/log
 chmod 755 logtail.sh;
 ./logtail.sh uninstall
 ```
+
+#### b.logtail采集原理
+* 监听文件
+    * 根据数据源添加Logtail采集配置之后，Logtail采集配置从服务端实时下发到Logtail
+    * Logtail根据采集配置开始监听文件。
+    * 如果有日志文件产生了修改事件，会触发采集流程，Logtail开始读取文件。
+* 读取文件
+    * 若该文件首次读取，会检查文件大小。
+        * 如果文件小于1 MB，则从文件内容起始位置开启读取。
+        * 如果文件大于1 MB，则从文件末尾1 MB处开始读取。
+    * 如果该文件曾被Logtail读取过，则从上次读取的Checkpoint处继续读取。
+    * 读取文件时，每次最多可以读取512KB，因此每条日志请控制在512KB以内，否则无法正常读取。
+* 处理日志
+    * 分行
+    * 解析
+    * 解析失败处理
+    * 设置日志时间字段
+* 过滤日志
+    * 根据Logtail采集配置中的过滤器配置过滤日志。
+* 聚合日志
+    * 为降低网络请求次数，当日志处理、过滤完毕后，会在Logtail内部缓存一段时间，进行聚合打包，再发送到日志服务。
+    * 缓存过程中，如果满足以下条件之一，日志将即时打包发送到日志服务：
+        * 日志聚合时间超过3秒。
+        * 日志聚合条数超过4096条。
+        * 日志聚合总大小超过512 KB。
+* 发送数据
+    * Logtail将采集到的日志数据聚合发送到日志服务。
+    * 启动参数配置中的参数：
+        * max_bytes_per_sec可以调整日志数据的发送速度
+        * send_request_concurrency可以调整最大并发数
+        * Logtail会保证发送速率以及并发不超过配置值。
+    * 若数据发送失败，Logtail自动根据错误信息决定重试或放弃发送。
+
+
+## 3.FAQ
+### 1).如果ECS主机和LogService不在同一账号下, 需要配置ECS主机的AliUid
+* 获得LogService服务的AliUid
+* 在ECS上配置上一步的AliUid
+* 详情看：https://help.aliyun.com/document_detail/49007.html?spm=a2c4g.11186623.2.17.1a1e6cc3klIVyW
