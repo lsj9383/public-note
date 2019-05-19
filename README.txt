@@ -1,2 +1,2 @@
 # Just Note
-test,bbq
+[软考](other/soft/note.md)
