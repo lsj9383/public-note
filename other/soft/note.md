@@ -286,39 +286,78 @@ VLAN是一种将物理上的局域网从逻辑上划分为多个子网的技术�
 
 ## 9.3 【重要】访问控制表(ACL)
 ACL是属于路由器中的配置，提供了基于源地址、目的地址、各种协议和端口号的过滤准则。
-* 标准访问控制列表
-    * 只针对数据包中的【源地址】进行检查，表号为1~99 和 1300~1999。
-* 扩展访问控制列表
-    * 检查源地址、目的地址、协议。表号为100~199 和 2000~2699。
+* 基本ACL，只针对数据包中的【源地址】进行检查。范围2000-2999
+* 高级ACL，检查源地址、目的地址、协议。范围3000-3999
 * 匹配顺序从上至下，特殊的放在前，通用的放在后。所谓的从上至下指的是以rule-id为顺序。
 * 接近数据源地址的路由器应该使用`扩展访问控制`，接近目的地址的路由器应该使用`标准访问控制`
 
 ## 9.4 交换机和路由器配置
+* 登录
+    * Console端口登录。
+    * telnet登录，要求先配置好IP。
+    * 通过console进行登录需要键入认证信息，而认证信息需要通过Console进行配置。
+        * `[R1] authentication-mode [aaa/password/none]`
+            * aaa, 需要输入账号和密码进行登录
+            * password, 仅需要输入账号便能登录
+            * none, 直接登录即可    
 * 华为配置视图状态
-    * `<switch>`, 交换机路由器正常启动。用户用Telnet登录后自动进入用户视图模式。用户可以查看链接状态，访问其他网络和主机，但是不能更改路由器设置。
-    * `[switch]`, 系统视图命令状态。在用户视图下输入`system-view`进入。
-    * `[switch-bussines]`, 业务视图状态。在switch输入需要配置的业务命令后进入，通过`quit`退出到系统视图。
-* Cisco交换机/路由器提示符模式(思科的直接放弃吧)
-    * `>`, 用户模式。在Cisco设备启动工作完成后，进入用户模式。只允许基本检测命令。
-    * `#`, 特权模式。在用户模式下输入enable, 可以查看状态，但是不能配置。
-    * `(config)#`, 全局模式。在特权模式下输入config terminal进入全局模式。通过全局模式还可以进入单个接口进行单独的配置
-    * `(config-if)#`, 在单个接口中进行配置。在全剧模式下输入命令可以进入，如interface fastethernet0/1。通过`exit`可以退出到全局模式。
-* 用户密码相关配置
-    * pass
+    * `<switch>`, 用户视图, 交换机路由器正常启动。用户用Telnet登录后自动进入。用户可以查看链接状态，访问其他网络和主机，但是不能更改路由器设置。
+    * `[switch]`, 系统视图。在用户视图下输入`system-view`进入。
+    * `[switch-bussines]`, 业务视图。在switch输入需要配置的业务命令后进入，通过`quit`退出到系统视图。
 * 常见的配置
     * `<huawei>system-view`, 进入系统命令视图
     * `[huawei]sysname R1`, 配置设备名从huawei--->R1
     * `[R1]user-interface console 0`, 进入console业务界面视图，console编号只能为0
     * `[R1-ui-console0] quit`, 退出到系统命令视图.
-    * `[R1]acl 2000` , 定义ACL。
-    * `[R1-acl-2000] rule 5 permit source <ip> <nmask>`，添加ACL匹配规则。
     * `[R1]interface GigabiEthernet 0/0/1`, 进入接口的配置视图。
     * `[R1-GigabitEthernet 0/0/1] ip address <address> <mask>`, 配置路由器接口的ip地址。
-    * `[R1] nat address-group 1 <start-ip> <end-ip>`, 配置nat的出口ip范围(nat ip池)。
-    * `[R1-GigabitEthernet 0/0/1] nat bound 2000 address-group1`, 把GigabitEthernet 0/0/1的ACL2000配置与ip地址1关联。
     * `[Router-GigabitEthernet 1/0/0]ip route-static 0.0.0.0 <next-ip>`, 配置默认路由。
-    * `[switch-ge 0/0/2] port link-type `
     * `[switch-ge 0/0/2] ip address <ip> <mask>`, 配置端口的ip地址和掩码。
-    * `[switch]dhcp enable`, 开启dhcp
-    * `[switch]ip pool pooll`
-    * `[switch-ip-pool-pooll]lesae day <day>`, dhcp的ip租期。
+    * VLAN相关配置
+        * `[switch-ge 0/0/2] port link-type [access/trunk/hybird]`
+            * access, 端口只能属于一个vlan，一般用于连接计算机。
+            * trunk, 端口可以属于端个vlan，可以接收和发送多个vlan报文，多用于交换机之间。
+            * hybrid, 端口可以属于多个vlan，可以接收和发送多个vlan的报文，可以用于交换机之间，也可以用于连接用户主机。并且允许多个vlan不带标签通过。
+        * `[switch-ge 0/0/2] port trunk allow-pass vlan allow` 允许所有vlan通过trunk端口
+        * `[switch]vlan batch 2 3`, 批量创建VLAN(vlan2和vlan3)
+        * `[switch]vlan 2`, 进入VLAN2
+        * `[switch-vlan2]mac-vlan mac-address <macaddress>`, vlan2中添加mac地址
+        * `[switch-ge 0/0/2] mac-vlan enable`, 交换机接口的vlan启用mac地址
+        * `[switch-ge 0/0/1] port default vlan 2`, 将交换机的该接口加入vlan2
+        * `[switch]vlanif 2`, 创建并进入VLAN2
+    * DHCP相关配置
+        * `[switch]dhcp enable`, 开启dhcp
+        * `[switch-if] dhcp select global`, 接口工作在全局池模式下。
+        * `[switch]ip pool pool1`
+        * `[switch-ip-pool-pooll]lease day <day>`, dhcp的ip租期。若没配置，默认为1天。
+    * NAT相关配置
+        * NAT分类
+            * 静态NAT
+            * 动态NAT
+            * 基于端口的NAT
+        * `[R1] nat address-group 1 <start-ip> <end-ip>`, 配置nat的出口ip范围(nat ip池)。
+        * `[R1-GigabitEthernet 0/0/1] nat bound 2000 address-group1`, 把GigabitEthernet 0/0/1的ACL2000配置与ip地址1关联。
+    * ACL相关配置
+        * `[R1]acl 2000` , 定义ACL。
+        * `[R1-acl-2000] rule 5 permit source <ip> <nmask>`，添加ACL匹配规则。
+    * OSPF相关配置(OSPF, 开放最短路径有限协议, 是一种【链路状态】路由选择协议，在单一自治系统内决策路由
+        * `[R1] area <area-id>`, 创建并进入OSPF区域视图
+        * `[R1-ospf-area-0] network <ip> <nmask>`, 配置区域所包含的网段。
+    * DNS相关配置
+        * `[R1-pool]dns-list <dns-ip>`, 配置dns服务器
+        * `[R1-pool]domain-name <domain>`, 配置公司域名
+    * VPN相关
+        * 工作在网络层的有Ipsec VPN和GRE VPN
+        * Ipsec有两种模式:隧道和传输。隧道模式常用语局域网的公网通信。
+        * 有两个安全协议:AH和ESP。ESP可以提供加密还能提供认证。
+        * `[R1]ipset propsal `
+        * `[R1]Esp encryption-algorithm 3des`, ESP加密采用3des，通常成对配置
+        * `[R1]Esp authentication-algorithm sha1`, ESP认证采用sha1，通常成对配置
+        * `[R1-ike peer peer]pre-shared simple huawei`, 配置对等体预共享密钥，通常成对配置
+        * `[R1-ike peer peer]remote address <远程建立VPN的ip>`, 通常成对配置
+        * `[R1-ipsec-policy...]security acl 3000`
+    * RIP相关(距离适量路由协议)
+        * v1以广播传播，v2以组播传播
+        * 最大跳数为15
+        * `[R1]rip`, 进入rip配置
+        * `[R1-rip-1] version 2`, 配置为v2版本的rip
