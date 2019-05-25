@@ -517,7 +517,10 @@ ACL是属于路由器中的配置，提供了基于源地址、目的地址、�
         * `[R1] authentication-mode [aaa/password/none]`
             * aaa, 需要输入账号和密码进行登录
             * password, 仅需要输入账号便能登录
-            * none, 直接登录即可    
+            * none, 直接登录即可 
+        * `[R1] aaa` 进入配置
+        * `[R1-aaa] local-user <user> password <pwd>`, 配置aaa的用户名和密码
+        * `[R1-aaa] local-user privilege <>`, 配置aaa指定用户的权限
 * 华为配置视图状态
     * `<switch>`, 用户视图, 交换机路由器正常启动。用户用Telnet登录后自动进入。用户可以查看链接状态，访问其他网络和主机，但是不能更改路由器设置。
     * `[switch]`, 系统视图。在用户视图下输入`system-view`进入。
@@ -568,7 +571,7 @@ ACL是属于路由器中的配置，提供了基于源地址、目的地址、�
         * 工作在网络层的有Ipsec VPN和GRE VPN
         * Ipsec有两种模式:隧道和传输。隧道模式常用语局域网的公网通信。
         * 有两个安全协议:AH和ESP。ESP可以提供加密还能提供认证。
-        * `[R1]ipset propsal `
+        * `[R1]ipset propsal tran1`
         * `[R1]Esp encryption-algorithm 3des`, ESP加密采用3des，通常成对配置
         * `[R1]Esp authentication-algorithm sha1`, ESP认证采用sha1，通常成对配置
         * `[R1-ike peer peer]pre-shared simple huawei`, 配置对等体预共享密钥，通常成对配置
@@ -579,6 +582,11 @@ ACL是属于路由器中的配置，提供了基于源地址、目的地址、�
         * 最大跳数为15
         * `[R1]rip`, 进入rip配置
         * `[R1-rip-1] version 2`, 配置为v2版本的rip
+    * bfd
+        * `bfd` bfd全局使能
+        * `bfd-inerface enable`
+        * ``
+        * `protocol inbind telnet`
 
 # 十、计算机基础
 ## 10.1 数据表示
