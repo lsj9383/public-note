@@ -35,8 +35,14 @@
         - [5).*match*](#5match)
         - [6).*match_phrase*](#6match_phrase)
         - [7).*multi_match*](#7multi_match)
-        - [8).*bool复合子句*](#8bool复合子句)
+        - [8).*match_all*](#8match_all)
+        - [9).*bool复合子句*](#9bool复合子句)
     - [3.验证查询](#3验证查询)
+- [八、排序](#八排序)
+    - [1.排序](#1排序)
+    - [2.相关性](#2相关性)
+- [九、索引管理](#九索引管理)
+- [十、深入结构化搜索](#十深入结构化搜索)
 - [附录、常用命令](#附录常用命令)
 
 <!-- /TOC -->
@@ -572,7 +578,19 @@ curl -XGET -H "Content-Type:application/json" "http://localhost:9200/_search" -d
     }
 }'
 ```
-### 8).*bool复合子句*
+
+### 8).*match_all*
+这个是个特殊的match，里面不会有任何数据，本质上是一个空查询.
+```sh
+curl -XGET -H "Content-Type:application/json" "http://localhost:9200/_search" -d'
+{
+    "query": {
+        "match_all": {}
+    }
+}'
+```
+
+### 9).*bool复合子句*
 上述的叶子节点都类似于SQL命令中的WHERE语句中的单一条件，bool可以将那些单一的条件通过OR和AND进行组合。bool可以支持的子查询语句有:
 * must, 对叶子查询语句提供了AND的功能
 * must_not, 对叶子查询语句提供了 AND NOT 功能
@@ -611,6 +629,59 @@ curl -XGET -H "Content-Type:application/json" "http://localhost:9200/_validate/q
 ```
 如果是合法语句的话，使用 explain 参数可以返回一个带有查询语句的可阅读描述， 可以帮助了解查询语句在ES中是如何执行的。
 
+# 八、排序
+## 1.排序
+默认情况下，结果集会按照相关性进行排序, 排名越靠前(即默认以降序排列)。我们也可以人为的选择按某一个字段进行排序
+```sh
+# 单一字段排序
+curl -XGET -H "Content-Type:application/json" "http://localhost:9200/_search" -d '
+{
+    "query" : {
+        "match_all" : {}
+    },
+    "sort": { "age": { "order": "desc" }}
+}'
+```
+order的参数可以是:
+* desc, 降序.对于_score的相关性排序默认以降序排列
+* asc, 升序.对于指定的字段 默认以升序排列
+
+当选定了某个字段进行排序后, max_score, _score等信息将会无效。es还支持多级排序, 即首先按第一个字段排序，对于该字段相等的按第二个字段排序。
+```sh
+# 多级排序
+curl -XGET -H "Content-Type:application/json" "http://localhost:9200/_search" -d '
+{
+    "query" : {
+        "match_all" : {}
+    },
+    "sort": [
+        { "age": { "order": "desc" }},
+        { "_score": { "order": "desc" }},
+    ]
+}'
+```
+
+## 2.相关性
+每个文档都有相关性评分，用一个相对的浮点数字段 _score 来表示 -- _score 的评分越高，相关性越高。查询语句会为每个文档添加一个 _score 字段。评分的计算方式取决于不同的查询语句。ElasticSearch的相似度算法被定义为 TF/IDF，即检索词频率/反向文档频率:
+* 检索词频率: 检索词在该字段出现频率越高，则文档的相关性也越高。
+* 反向文档频率: 检索词在文档(除了指定的字段)出现的频率越高，则文档的相关性越低。es中用IDF表示在文档中出现的次数, 1/IDF用于计算相关性。
+* 字段长度准则: 字段的长度越长，相关性越低。
+
+通过在查询语句中使用explain，可以返回时带上_score的计算依据。(好像在现在最新的版本里面不是这么传的)
+```sh
+curl -XGET -H "Content-Type:application/json" "http://localhost:9200/_search?explain" -d '
+{
+   "query": {
+      "match" : {
+         "last_name" : "微小"
+      }
+   }
+}'
+```
+
+# 九、索引管理
+
+# 十、深入结构化搜索
 
 # 附录、常用命令
 ```sh
